@@ -1,0 +1,23 @@
+@use 'faPaintedDivider.mixin.scss' as paintedDivider;
+
+/* Opt-in utility — also @include paintedDivider.fa-painted-divider in feature SCSS. */
+.fa-painted-divider {
+  @include paintedDivider.fa-painted-divider(vertical);
+}
+
+.fa-painted-divider--horizontal {
+  @include paintedDivider.fa-painted-divider(horizontal);
+}
+
+/*
+ * Default Quasar vertical gutters (Project Settings / App Settings columns).
+ * Horizontal menu / context-menu separators keep their own mixins — add
+ * .fa-painted-divider--horizontal only where the brush stroke is wanted.
+ */
+.q-separator--vertical {
+  @include paintedDivider.fa-painted-divider(vertical);
+}
+
+.faVerticalDraggableTabs__divider {
+  @include paintedDivider.fa-painted-divider(horizontal);
+}

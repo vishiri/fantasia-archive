@@ -1,0 +1,109 @@
+@use 'faMicroCornerField.mixin.scss' as microCorner;
+@use 'faMicroCornerField.variables.scss' as *;
+
+/* Animate accent chrome colors (used inside background-image gradients). */
+@property --fa-micro-corner-chrome {
+  inherits: true;
+  initial-value: transparent;
+  syntax: '<color>';
+}
+
+@property --fa-micro-corner-bottom-line {
+  inherits: true;
+  initial-value: transparent;
+  syntax: '<color>';
+}
+
+/*
+ * App-wide dark flat fields (standard / filled / outlined):
+ * Thin secondary grey border on the control + bottom-only L-brackets and a
+ * short hairline between them (small gaps). No top corner brackets.
+ * Quasar underline / outline / focus bar are killed on ::before / ::after.
+ * Exclude borderless + standout (different chrome language).
+ */
+.q-field--dark:not(.q-field--borderless, .q-field--standout) {
+  --fa-micro-corner-bottom-line:
+    color-mix(
+      in srgb,
+      var(--fa-micro-corner-chrome) #{$faMicroCornerField-bottomLine-darkenMix},
+      black
+    );
+  --fa-micro-corner-chrome: #{$faMicroCornerField-chrome-passive};
+
+  .q-field__control {
+    background-color: $faMicroCornerField-control-backgroundColor;
+    /* Inset so bottom L / hairline can sit on the same edge (no double bottom). */
+    border: 0 none transparent !important;
+    border-radius: $faMicroCornerField-control-borderRadius;
+    box-shadow:
+      inset 0 0 0 $faMicroCornerField-secondaryBorderWidth
+      $faMicroCornerField-secondaryBorderColor;
+    transition:
+      --fa-micro-corner-chrome $faMicroCornerField-transitionDuration
+      $faMicroCornerField-transitionTiming,
+      --fa-micro-corner-bottom-line $faMicroCornerField-transitionDuration
+      $faMicroCornerField-transitionTiming;
+
+    &::before {
+      @include microCorner.fa-micro-corner-field-kill-quasar-chrome;
+      @include microCorner.fa-micro-corner-field-chrome-background;
+    }
+
+    &::after {
+      @include microCorner.fa-micro-corner-field-kill-focus-after;
+    }
+  }
+
+  /* Filled / outlined variants also paint wash + border on ::before — kill again. */
+  &.q-field--filled .q-field__control,
+  &.q-field--outlined .q-field__control {
+    background-color: $faMicroCornerField-control-backgroundColor;
+    border: 0 none transparent !important;
+    box-shadow:
+      inset 0 0 0 $faMicroCornerField-secondaryBorderWidth
+      $faMicroCornerField-secondaryBorderColor;
+
+    &::before {
+      @include microCorner.fa-micro-corner-field-kill-quasar-chrome;
+      @include microCorner.fa-micro-corner-field-chrome-background;
+    }
+
+    &::after {
+      @include microCorner.fa-micro-corner-field-kill-focus-after;
+    }
+  }
+
+  &.q-field--filled.q-field--highlighted .q-field__control::before,
+  &.q-field--outlined.q-field--highlighted .q-field__control::before {
+    @include microCorner.fa-micro-corner-field-kill-quasar-chrome;
+    @include microCorner.fa-micro-corner-field-chrome-background;
+  }
+
+  &.q-field--standard .q-field__control {
+    padding-inline: $faMicroCornerField-standard-control-paddingInline;
+  }
+
+  &.q-field--highlighted {
+    --fa-micro-corner-chrome: #{$faMicroCornerField-chrome-active};
+  }
+
+  &.q-field--error {
+    --fa-micro-corner-chrome: #{$faMicroCornerField-chrome-error};
+  }
+
+  &.q-field--disabled {
+    --fa-micro-corner-chrome: color-mix(in srgb, var(--fa-color-white) 22%, transparent);
+  }
+
+  /* Readonly: same frame + corners; hatch fill signals non-editable (no lock icon). */
+  &.q-field--readonly {
+    .q-field__control {
+      @include microCorner.fa-micro-corner-field-readonly-hatch;
+    }
+
+    &.q-field--filled .q-field__control,
+    &.q-field--outlined .q-field__control {
+      @include microCorner.fa-micro-corner-field-readonly-hatch;
+    }
+  }
+}

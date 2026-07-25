@@ -1,0 +1,17 @@
+@use 'faTabEdgeGlow.variables.scss' as *;
+
+/* GLOBALS - OUTLINE BUTTON GLOW
+ * Idle: bottom-edge bloom on ::after.
+ * Hover: external box-shadow on the button, strength via --fa-outline-btn-ext-glow (0→1).
+ * Quasar outline border stays on ::before — never replace that pseudo.
+ */
+$faOutlineButtonGlow-default-bloomSize: $faTabEdgeGlow-active-bloomSize;
+$faOutlineButtonGlow-edgeOffset: $faTabEdgeGlow-edgeOffset;
+$faOutlineButtonGlow-lineSpan: $faTabEdgeGlow-lineSpan;
+$faOutlineButtonGlow-lineThickness: $faTabEdgeGlow-lineThickness;
+$faOutlineButtonGlow-longAxisMask: $faTabEdgeGlow-longAxisMask;
+$faOutlineButtonGlow-transitionDuration: $faTabEdgeGlow-transitionDuration;
+$faOutlineButtonGlow-transitionTiming: $faTabEdgeGlow-transitionTiming;
+$faOutlineButtonGlow-zIndex: $faTabEdgeGlow-zIndex;
+$faOutlineButtonGlow-hover-fadeDuration: 0.2s;
+$faOutlineButtonGlow-hover-fadeTiming: ease-out;

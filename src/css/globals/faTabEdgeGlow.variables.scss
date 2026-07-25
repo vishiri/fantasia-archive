@@ -1,0 +1,41 @@
+@use '../app.palette.scss' as *;
+
+/* GLOBALS - TAB EDGE GLOW (horizontal bottom + vertical right active/hover chrome) */
+$faTabEdgeGlow-active-bloomSize: 32px;
+$faTabEdgeGlow-colorDeep: color-mix(
+  in srgb,
+  fa-v('primary', $primary) 48%,
+  fa-v('black', $black)
+);
+$faTabEdgeGlow-edgeOffset: -1px;
+$faTabEdgeGlow-hover-bloomSize: 52px;
+/* Vertical right bloom — wider than bottom so it reads across the tab row.
+ * Per-list override: --fa-tab-edge-glow-right-active-bloom-size / -hover-bloom-size. */
+$faTabEdgeGlow-right-active-bloomSize: 220px;
+/* Align core line with painted separator: gutter puts tab edge on separator,
+ * so only a small overhang is needed (between prior -1 inside / -2 outside). */
+$faTabEdgeGlow-right-edgeOffset: -1px;
+$faTabEdgeGlow-right-hover-bloomSize: 240px;
+$faTabEdgeGlow-right-lineSpan: 100%;
+$faTabEdgeGlow-right-lineThickness: 2.5px;
+$faTabEdgeGlow-lineSpan: 72%;
+$faTabEdgeGlow-lineThickness: 1.5px;
+/* Soft tip fade along the long axis of the tab box. */
+$faTabEdgeGlow-longAxisMask: linear-gradient(
+  to right,
+  transparent 0%,
+  #000 30%,
+  #000 70%,
+  transparent 100%
+);
+/* Same tip fade for vertical right glow (top / bottom), matching horizontal left / right. */
+$faTabEdgeGlow-longAxisMask-vertical: linear-gradient(
+  to bottom,
+  transparent 0%,
+  #000 30%,
+  #000 70%,
+  transparent 100%
+);
+$faTabEdgeGlow-transitionDuration: 0.28s;
+$faTabEdgeGlow-transitionTiming: ease-out;
+$faTabEdgeGlow-zIndex: 2;

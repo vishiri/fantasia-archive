@@ -1,0 +1,12 @@
+@use '../app.palette.scss' as *;
+
+/* GLOBALS - PAINTED DIVIDER (brush-stroke separators) */
+$faPaintedDivider-color-end: fa-v('primary', $primary);
+$faPaintedDivider-color-start: fa-v('primary-bright', $primary-bright);
+$faPaintedDivider-crossFade-end: 82%;
+$faPaintedDivider-crossFade-mid: 50%;
+$faPaintedDivider-crossFade-start: 18%;
+$faPaintedDivider-gradient-midStop: 38%;
+$faPaintedDivider-gradient-startStop: 0%;
+$faPaintedDivider-stroke-width: 1px;
+$faPaintedDivider-tip-fade: 16px;

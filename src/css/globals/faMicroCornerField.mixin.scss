@@ -1,0 +1,83 @@
+@use 'faMicroCornerField.variables.scss' as *;
+
+/*
+ * Five linear-gradients: bottom-left L, bottom-right L, short center hairline.
+ * Vertical L-arms sit $cornerJoinGap above the bottom horizontal arms so the
+ * join does not double-paint the corner pixel.
+ * No top corners — secondary box border lives on .q-field__control.
+ * Corner stroke: --fa-micro-corner-chrome. Hairline: --fa-micro-corner-bottom-line.
+ */
+
+@mixin fa-micro-corner-field-chrome-background {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(var(--fa-micro-corner-chrome), var(--fa-micro-corner-chrome)),
+    linear-gradient(var(--fa-micro-corner-chrome), var(--fa-micro-corner-chrome)),
+    linear-gradient(var(--fa-micro-corner-chrome), var(--fa-micro-corner-chrome)),
+    linear-gradient(var(--fa-micro-corner-chrome), var(--fa-micro-corner-chrome)),
+    linear-gradient(var(--fa-micro-corner-bottom-line), var(--fa-micro-corner-bottom-line)) !important;
+  background-position:
+    left bottom,
+    left bottom $faMicroCornerField-cornerJoinGap,
+    right bottom,
+    right bottom $faMicroCornerField-cornerJoinGap,
+    center bottom !important;
+  background-repeat: no-repeat !important;
+  background-size:
+    $faMicroCornerField-armLength $faMicroCornerField-strokeWidth-horizontal,
+    $faMicroCornerField-strokeWidth-vertical
+    ($faMicroCornerField-armLength - $faMicroCornerField-cornerJoinGap),
+    $faMicroCornerField-armLength $faMicroCornerField-strokeWidth-horizontal,
+    $faMicroCornerField-strokeWidth-vertical
+    ($faMicroCornerField-armLength - $faMicroCornerField-cornerJoinGap),
+    calc(
+      100% - #{2 * $faMicroCornerField-armLength} - #{2 * $faMicroCornerField-bottomLineGap}
+    )
+    $faMicroCornerField-bottomLineStrokeWidth !important;
+}
+
+@mixin fa-micro-corner-field-kill-quasar-chrome {
+  background: none !important;
+  border: 0 none transparent !important;
+  border-bottom: 0 none transparent !important;
+  border-radius: $faMicroCornerField-control-borderRadius !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+@mixin fa-micro-corner-field-kill-focus-after {
+  background: none !important;
+  border: 0 none transparent !important;
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  transform: none !important;
+}
+
+/* Low-contrast diagonal hatch over control wash; keeps inset border + L-chrome.
+ * Hatch sits inside the secondary border with $readonly-hatch-inset clearance.
+ * !important: Quasar filled/outlined background shorthand resets size → auto, which
+ * leaves only top/left gaps (positioned image fills to bottom-right).
+ */
+@mixin fa-micro-corner-field-readonly-hatch {
+  $faMicroCornerField-readonly-hatch-edgeOffset: $faMicroCornerField-secondaryBorderWidth + $faMicroCornerField-readonly-hatch-inset;
+  $faMicroCornerField-readonly-hatch-period: $faMicroCornerField-readonly-hatch-bandWidth + $faMicroCornerField-readonly-hatch-gapWidth;
+
+  background-clip: border-box !important;
+  background-image:
+    repeating-linear-gradient(
+      $faMicroCornerField-readonly-hatch-angle,
+      $faMicroCornerField-readonly-hatch-bandColor 0,
+      $faMicroCornerField-readonly-hatch-bandColor $faMicroCornerField-readonly-hatch-bandWidth,
+      transparent $faMicroCornerField-readonly-hatch-bandWidth,
+      transparent $faMicroCornerField-readonly-hatch-period
+    ) !important;
+  background-origin: border-box !important;
+  background-position: $faMicroCornerField-readonly-hatch-edgeOffset $faMicroCornerField-readonly-hatch-edgeOffset !important;
+  background-repeat: no-repeat !important;
+  /* Height uses +1px vs width so bottom clears L-brackets / hairline (3px / 6×7). */
+  background-size:
+    calc(100% - #{2 * $faMicroCornerField-readonly-hatch-edgeOffset})
+    calc(100% - #{2 * $faMicroCornerField-readonly-hatch-edgeOffset + $faMicroCornerField-readonly-hatch-insetBottomExtra}) !important;
+}

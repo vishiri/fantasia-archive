@@ -8,6 +8,7 @@
 /* QUASAR COLORS - GENERAL */
 $accent: #f5f5f5;
 $dark: #1b333e;
+$dark-darker: #152229; /* Dialog card shells; ~darker than $dark */
 $dark-middle: #183e4d; /* Between $dark and $dark-lighter; app header + window controls chrome */
 $dark-lighter: #194456;
 $dark-page: #303742;
@@ -33,6 +34,9 @@ $brand-discord: #7289da;
 $brand-patreon: #ff424d;
 $brand-reddit: #ff4500;
 $codeToken-background: #366c82;
+$dialog-rim-cyan: #59a5b3;
+$dialog-rim-cyan-bright: #79c8d5;
+$dialog-rim-cyan-deep: color.scale($dialog-rim-cyan, $lightness: -52%); /* Extended top bloom (darker teal) */
 $neutral-border: #c8c8c8;
 $select-background-dark: #bb3b32;
 $select-background-light: #aa2a21;
@@ -59,6 +63,7 @@ $text-muted: #9e9e9e;
 $text-placement-nickname-highlight: #7bbdd5;
 $text-status-queued: #2196f3;
 $text-workspace-row: #dcdcdc;
+$tooltip-text: #453426; /* Parchment tooltip ink (sepia) */
 
 /// Pairs with --fa-color-#{$token} on :root (see fa-theme.scss). $value must stay a real color for Sass color.* APIs elsewhere.
 @function fa-v($token, $value) {

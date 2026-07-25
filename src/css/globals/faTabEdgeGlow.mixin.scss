@@ -1,0 +1,133 @@
+@use '../app.palette.scss' as *;
+@use 'faTabEdgeGlow.variables.scss' as *;
+
+// Bright core line + soft bloom. $orientation: bottom | right
+@mixin fa-tab-edge-glow-idle($orientation: bottom) {
+  background-repeat: no-repeat;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+
+  @if $orientation == right {
+    background-image:
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        color-mix(in srgb, fa-v('primary', $primary) 45%, transparent) 28%,
+        color-mix(in srgb, fa-v('primary-bright', $primary-bright) 88%, transparent) 50%,
+        color-mix(in srgb, fa-v('primary', $primary) 45%, transparent) 72%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to left,
+        color-mix(in srgb, fa-v('primary-bright', $primary-bright) 12.5%, transparent) 0%,
+        color-mix(in srgb, fa-v('primary', $primary) 8%, transparent) 18%,
+        color-mix(in srgb, fa-v('primary', $primary) 4%, transparent) 42%,
+        color-mix(in srgb, fa-v('primary', $primary) 1.3%, transparent) 70%,
+        transparent 100%
+      );
+    background-position: right center, right center;
+    background-size:
+      $faTabEdgeGlow-right-lineThickness $faTabEdgeGlow-right-lineSpan,
+      100% 100%;
+    inset: 0 $faTabEdgeGlow-right-edgeOffset 0 auto;
+    -webkit-mask-image: $faTabEdgeGlow-longAxisMask-vertical;
+    mask-image: $faTabEdgeGlow-longAxisMask-vertical;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    transition:
+      opacity $faTabEdgeGlow-transitionDuration $faTabEdgeGlow-transitionTiming,
+      width $faTabEdgeGlow-transitionDuration $faTabEdgeGlow-transitionTiming;
+    width: 0;
+    z-index: $faTabEdgeGlow-zIndex;
+  }
+
+  @if $orientation != right {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 0%,
+        color-mix(in srgb, fa-v('primary', $primary) 45%, transparent) 28%,
+        color-mix(in srgb, fa-v('primary-bright', $primary-bright) 88%, transparent) 50%,
+        color-mix(in srgb, fa-v('primary', $primary) 45%, transparent) 72%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in srgb, $faTabEdgeGlow-colorDeep 34%, transparent) 0%,
+        color-mix(in srgb, $faTabEdgeGlow-colorDeep 18%, transparent) 18%,
+        color-mix(in srgb, $faTabEdgeGlow-colorDeep 8%, transparent) 40%,
+        color-mix(in srgb, $faTabEdgeGlow-colorDeep 2.5%, transparent) 65%,
+        transparent 100%
+      );
+    background-position: center bottom, center bottom;
+    background-size:
+      $faTabEdgeGlow-lineSpan $faTabEdgeGlow-lineThickness,
+      100% 100%;
+    height: 0;
+    inset: auto 0 $faTabEdgeGlow-edgeOffset 0;
+    -webkit-mask-image: $faTabEdgeGlow-longAxisMask;
+    mask-image: $faTabEdgeGlow-longAxisMask;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    transition:
+      height $faTabEdgeGlow-transitionDuration $faTabEdgeGlow-transitionTiming,
+      opacity $faTabEdgeGlow-transitionDuration $faTabEdgeGlow-transitionTiming;
+    width: auto;
+    z-index: $faTabEdgeGlow-zIndex;
+  }
+}
+
+@mixin fa-tab-edge-glow-active($orientation: bottom) {
+  opacity: 1;
+
+  @if $orientation == right {
+    width:
+      var(
+        --fa-tab-edge-glow-right-active-bloom-size,
+        #{$faTabEdgeGlow-right-active-bloomSize}
+      );
+  }
+
+  @if $orientation != right {
+    height: $faTabEdgeGlow-active-bloomSize;
+  }
+}
+
+@mixin fa-tab-edge-glow-hover($orientation: bottom) {
+  opacity: 1;
+
+  @if $orientation == right {
+    width:
+      var(
+        --fa-tab-edge-glow-right-hover-bloom-size,
+        #{$faTabEdgeGlow-right-hover-bloomSize}
+      );
+  }
+
+  @if $orientation != right {
+    height: $faTabEdgeGlow-hover-bloomSize;
+  }
+}
+
+// Hide Quasar square hover/focus fill when gold edge glow is the chrome.
+// @at-root block + body.desktop beats globals/quasarComponentsAdjustments.scss hover helper !important.
+@mixin fa-tab-edge-glow-kill-focus-helper {
+  @at-root {
+    body.desktop #{&}.q-focusable:focus > .q-focus-helper,
+    body.desktop #{&}.q-hoverable:hover > .q-focus-helper,
+    body.desktop #{&}.q-manual-focusable--focused > .q-focus-helper {
+      opacity: 0 !important;
+
+      &::after,
+      &::before {
+        opacity: 0 !important;
+      }
+    }
+  }
+}

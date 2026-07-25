@@ -1,0 +1,8 @@
+/* GLOBALS - COLOR BEAD (soft shaded circular swatches / world badges) */
+$faColorBead-borderColor: color-mix(in srgb, var(--fa-color-black) 55%, transparent);
+$faColorBead-borderWidth: 1px;
+$faColorBead-boxShadow:
+  inset 0 1.5px 2px color-mix(in srgb, var(--fa-color-white) 42%, transparent),
+  inset 0 -2px 3px color-mix(in srgb, var(--fa-color-black) 38%, transparent),
+  0 1px 2px color-mix(in srgb, var(--fa-color-black) 45%, transparent);
+$faColorBead-radius: 50%;

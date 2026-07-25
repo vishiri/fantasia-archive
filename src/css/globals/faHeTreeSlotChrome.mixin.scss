@@ -1,0 +1,43 @@
+@use '../app.palette.scss' as *;
+@use 'faHeTreeSlotChrome.variables.scss' as *;
+
+/*
+ * Idle footprint matching fa-he-tree-slot-chrome box size (no layout jump on hover).
+ */
+@mixin fa-he-tree-slot-chrome-idle {
+  border: $faHeTreeSlotChrome-borderWidth solid transparent;
+  border-radius: $faHeTreeSlotChrome-borderRadius;
+  box-shadow: inset $faHeTreeSlotChrome-accentWidth 0 0 transparent;
+  box-sizing: border-box;
+}
+
+/*
+ * Inset left accent + tinted fill + soft gold border (he-tree drag slot).
+ * Pass $strength 1 for placeholder; $faHeTreeSlotChrome-hoverStrength for hover.
+ */
+@mixin fa-he-tree-slot-chrome($strength: 1) {
+  background-color:
+    color-mix(
+      in srgb,
+      fa-v('primary-bright', $primary-bright) #{$faHeTreeSlotChrome-bgMixPercent * $strength},
+      transparent
+    );
+  border:
+    $faHeTreeSlotChrome-borderWidth
+    solid
+    color-mix(
+      in srgb,
+      fa-v('primary-bright', $primary-bright) #{$faHeTreeSlotChrome-borderMixPercent * $strength},
+      transparent
+    );
+  border-radius: $faHeTreeSlotChrome-borderRadius;
+  border-style: solid;
+  box-shadow:
+    inset $faHeTreeSlotChrome-accentWidth 0 0
+    color-mix(
+      in srgb,
+      fa-v('primary-bright', $primary-bright) #{$strength * 100%},
+      transparent
+    );
+  box-sizing: border-box;
+}

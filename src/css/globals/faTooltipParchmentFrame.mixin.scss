@@ -1,0 +1,43 @@
+@use '../theme/quasar-components/qTooltip.variables' as *;
+
+/* Shared parchment tooltip chrome: grain fill + fixed-px concave mask + gold double frame. */
+@mixin fa-tooltip-parchment-surface {
+  background-blend-mode: soft-light, normal;
+  background-color: $qTooltip-backgroundColor;
+  background-image: $qTooltip-backgroundImage;
+  background-repeat: repeat, no-repeat;
+  background-size: $qTooltip-backgroundSize;
+  border: none;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+  color: $qTooltip-color;
+  filter: $qTooltip-filter;
+  -webkit-mask-image: $qTooltip-frame-maskImage;
+  mask-image: $qTooltip-frame-maskImage;
+  -webkit-mask-position: $qTooltip-frame-maskPosition;
+  mask-position: $qTooltip-frame-maskPosition;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: $qTooltip-frame-maskSize;
+  mask-size: $qTooltip-frame-maskSize;
+  padding: $qTooltip-padding;
+  position: relative;
+
+  /* Outer + inner gold lines (parent mask clips corners to the concave silhouette). */
+  &::before,
+  &::after {
+    border: $qTooltip-frame-borderWidth solid $qTooltip-frame-borderColor;
+    box-sizing: border-box;
+    content: '';
+    pointer-events: none;
+    position: absolute;
+  }
+
+  &::before {
+    inset: $qTooltip-frame-outerInset;
+  }
+
+  &::after {
+    inset: $qTooltip-frame-innerInset;
+  }
+}

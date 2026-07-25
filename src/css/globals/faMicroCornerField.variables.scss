@@ -1,0 +1,40 @@
+@use '../app.palette.scss' as *;
+
+/* GLOBALS - MICRO CORNER FIELD
+ * Dark q-field chrome: thin secondary grey box border + bottom-only L-brackets
+ * + short bottom hairline between those brackets (small gaps).
+ * Corner stroke via --fa-micro-corner-chrome; hairline via --fa-micro-corner-bottom-line
+ * (darker mix of the corner chrome).
+ */
+$faMicroCornerField-armLength: 8px;
+$faMicroCornerField-bottomLineGap: 3px;
+$faMicroCornerField-bottomLineStrokeWidth: 1px;
+$faMicroCornerField-bottomLine-darkenMix: 68%;
+$faMicroCornerField-chrome-active: fa-v('primary-bright', $primary-bright);
+$faMicroCornerField-chrome-error: fa-v('negative', $negative);
+$faMicroCornerField-chrome-passive: color-mix(in srgb, var(--fa-color-white) 55%, transparent);
+/* 1px gap between vertical L-arm and horizontal L-arm / bottom edge. */
+$faMicroCornerField-cornerJoinGap: 1px;
+$faMicroCornerField-control-backgroundColor: color-mix(in srgb, var(--fa-color-white) 5%, transparent);
+$faMicroCornerField-control-borderRadius: 0;
+/* Fine diagonal hatch for readonly controls (texture only — no lock glyph).
+ * Wide low-opacity bands + thin transparent gaps (matches sketch — not thin strokes).
+ */
+$faMicroCornerField-readonly-hatch-angle: -45deg;
+$faMicroCornerField-readonly-hatch-bandColor: color-mix(in srgb, var(--fa-color-white) 3%, transparent);
+$faMicroCornerField-readonly-hatch-bandWidth: 4px;
+$faMicroCornerField-readonly-hatch-gapWidth: 1.5px;
+/* Clear wash between inset secondary border and hatch fill.
+ * Edge offset = border + inset → 3px (matches filled/outlined control chrome).
+ */
+$faMicroCornerField-readonly-hatch-inset: 2px;
+/* Extra subtract on hatch height so bottom gap clears L-brackets / hairline. */
+$faMicroCornerField-readonly-hatch-insetBottomExtra: 1px;
+/* Quieter secondary frame (12% white mix). */
+$faMicroCornerField-secondaryBorderColor: color-mix(in srgb, var(--fa-color-white) 12%, transparent);
+$faMicroCornerField-secondaryBorderWidth: 1px;
+$faMicroCornerField-standard-control-paddingInline: 10px;
+$faMicroCornerField-strokeWidth-horizontal: 1px;
+$faMicroCornerField-strokeWidth-vertical: 1.5px;
+$faMicroCornerField-transitionDuration: 0.2s;
+$faMicroCornerField-transitionTiming: ease-out;

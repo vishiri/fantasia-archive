@@ -1,0 +1,41 @@
+@use '../theme/quasar-components/qNotification.variables' as *;
+
+/* Parchment scoop + double frame + paper grain over Quasar .bg-* fills. */
+@mixin fa-notification-parchment-chrome {
+  background-blend-mode: soft-light, soft-light !important;
+  background-image: $qNotification-parchmentTextureImage !important;
+  background-repeat: repeat, no-repeat !important;
+  background-size: $qNotification-parchmentTextureSize !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+  -webkit-mask-image: $qNotification-frame-maskImage;
+  mask-image: $qNotification-frame-maskImage;
+  -webkit-mask-position: $qNotification-frame-maskPosition;
+  mask-position: $qNotification-frame-maskPosition;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: $qNotification-frame-maskSize;
+  mask-size: $qNotification-frame-maskSize;
+  padding: $qNotification-padding !important;
+  position: relative;
+
+  &::before,
+  &::after {
+    border: $qNotification-frame-borderWidth solid var(--fa-toast-frame-color, #{$qNotification-frame-color-info});
+    box-sizing: border-box;
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    /* Below toast content so close/icons are not painted over by gold/dark frame lines. */
+    z-index: 0;
+  }
+
+  &::before {
+    inset: $qNotification-frame-outerInset;
+  }
+
+  &::after {
+    inset: $qNotification-frame-innerInset;
+  }
+}

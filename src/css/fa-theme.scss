@@ -11,9 +11,13 @@
   --fa-color-brand-reddit: #{$brand-reddit};
   --fa-color-code-token-background: #{$codeToken-background};
   --fa-color-dark: #{$dark};
+  --fa-color-dark-darker: #{$dark-darker};
   --fa-color-dark-lighter: #{$dark-lighter};
   --fa-color-dark-middle: #{$dark-middle};
   --fa-color-dark-page: #{$dark-page};
+  --fa-color-dialog-rim-cyan: #{$dialog-rim-cyan};
+  --fa-color-dialog-rim-cyan-bright: #{$dialog-rim-cyan-bright};
+  --fa-color-dialog-rim-cyan-deep: #{$dialog-rim-cyan-deep};
   --fa-color-gold-muted-border: #{$gold-muted-border-raw};
   --fa-color-grey: #{$grey};
   --fa-color-grey-lighter: #{$grey-lighter};
@@ -49,7 +53,8 @@
   --fa-color-text-placement-nickname-highlight: #{$text-placement-nickname-highlight};
   --fa-color-text-status-queued: #{$text-status-queued};
   --fa-color-text-workspace-row: #{$text-workspace-row};
-  --fa-color-tooltip-background: #{$accent};
+  --fa-color-tooltip-background: #{$info};
+  --fa-color-tooltip-text: #{$tooltip-text};
   --fa-color-warning: #{$warning};
   --fa-color-white: #{$white};
 }

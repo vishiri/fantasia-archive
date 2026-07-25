@@ -1,0 +1,60 @@
+@use 'faPaintedDivider.variables.scss' as *;
+
+// Brush-stroke divider: primary-bright to primary along long axis, soft sides, tapered tips.
+// $orientation: vertical | horizontal
+@mixin fa-painted-divider($orientation: vertical) {
+  @if $orientation == horizontal {
+    @include fa-painted-divider-oriented(to right, to bottom, horizontal);
+  }
+
+  @if $orientation != horizontal {
+    @include fa-painted-divider-oriented(to bottom, to right, vertical);
+  }
+}
+
+@mixin fa-painted-divider-oriented($long-axis, $cross-axis, $orientation) {
+  $edge-mask: linear-gradient(
+    $cross-axis,
+    transparent 0%,
+    #000 $faPaintedDivider-crossFade-start,
+    #000 $faPaintedDivider-crossFade-mid,
+    #000 $faPaintedDivider-crossFade-end,
+    transparent 100%
+  );
+  $tip-mask: linear-gradient(
+    $long-axis,
+    transparent 0,
+    #000 $faPaintedDivider-tip-fade,
+    #000 calc(100% - #{$faPaintedDivider-tip-fade}),
+    transparent 100%
+  );
+
+  background:
+    linear-gradient(
+      $long-axis,
+      $faPaintedDivider-color-start $faPaintedDivider-gradient-startStop,
+      $faPaintedDivider-color-end $faPaintedDivider-gradient-midStop,
+      $faPaintedDivider-color-end 100%
+    ) !important;
+  border: 0;
+  flex-shrink: 0;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-image: $tip-mask, $edge-mask;
+  mask-image: $tip-mask, $edge-mask;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  opacity: 1;
+
+  @if $orientation == horizontal {
+    height: $faPaintedDivider-stroke-width !important;
+  }
+
+  @if $orientation != horizontal {
+    align-self: stretch;
+    height: auto;
+    width: $faPaintedDivider-stroke-width !important;
+  }
+}

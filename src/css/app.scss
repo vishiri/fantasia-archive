@@ -6,4 +6,10 @@
 @use './globals/htmlAdjustments.scss';
 @use './globals/quasarComponentsAdjustments.scss';
 @use './globals/customComponentsAdjustments.scss';
+@use './globals/faPaintedDivider.scss';
+@use './globals/faOutlineButtonGlow.scss';
+@use './globals/faFlatButtonGlow.scss';
+@use './globals/faMicroCornerField.scss';
+@use './globals/faColorBead.scss';
+@use './globals/faColorGlyph.scss';
 @use 'fa-quasar-public-vars-bridge.scss';

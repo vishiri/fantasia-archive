@@ -1,11 +1,16 @@
 @use 'faQIconDisplay.variables.scss' as *;
 
 // Sizes Font Awesome ::before glyphs and MDI ligatures inside fixed q-icon boxes.
+// min-width/min-height 0: flex min-content from wide FA glyphs must not grow the box.
 @mixin fa-q-icon-display-constrain-glyph-in-box {
   align-items: center;
+  box-sizing: border-box;
   display: inline-flex;
   justify-content: center;
   line-height: 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
   text-align: center;
 
   &:not(.fa-brands, .fa-regular, .fa-solid) {
@@ -31,8 +36,10 @@
     --fa-q-icon-display-glyph-fit-scale: #{$faQIconDisplay-faBrandsGlyph-fitScale};
   }
 
-  // Wide solid glyphs (e.g. fa-dragon) draw larger than letter icons at the same em size.
-  &.fa-solid.fa-dragon {
+  // Extra-wide solid glyphs still overshoot the em box after the default solid fit-scale.
+  &.fa-solid.fa-book-open,
+  &.fa-solid.fa-dragon,
+  &.fa-solid.fa-sword {
     --fa-q-icon-display-glyph-fit-scale: #{$faQIconDisplay-faWideSolidGlyph-fitScale};
   }
 }

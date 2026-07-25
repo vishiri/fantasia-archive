@@ -1,4 +1,6 @@
 @use '../../quasar.variables.scss' as *;
+@use '../../globals/faHeTreeSlotChrome.mixin.scss' as heTreeSlot;
+@use '../../globals/faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
 
 /* faVerticalDraggableTabs — vertical draggable tab column (vue-draggable-plus).
  * BEM block: faVerticalDraggableTabs; tab rows use __tab, labels __tabLabel.
@@ -11,7 +13,10 @@
   flex-direction: column;
   min-height: 0;
   overflow-y: scroll;
+  /* Above painted vertical column separators so right-edge glow can overlap them. */
+  position: relative;
   width: $faVerticalDraggableTabs-column-default-width;
+  z-index: $faTabEdgeGlow-zIndex;
 
   &::-webkit-scrollbar {
     display: none;
@@ -25,15 +30,6 @@
   .faVerticalDraggableTabs__tab:active {
     cursor: $faVerticalDraggableTabs-tab-cursor-default !important;
   }
-
-  .faVerticalDraggableTabs__tab.q-hoverable:hover > .q-focus-helper {
-    opacity: 0 !important;
-
-    &::after,
-    &::before {
-      opacity: 0 !important;
-    }
-  }
 }
 
 .faVerticalDraggableTabs__addButton {
@@ -45,6 +41,7 @@
   display: flex;
   flex: 0 0 auto;
   justify-content: center;
+  margin-bottom: $faVerticalDraggableTabs-addButtonRow-marginBottom;
 }
 
 .faVerticalDraggableTabs__divider {
@@ -71,7 +68,7 @@
   justify-content: var(--fa-vertical-draggable-tabs-tab-justify-content, flex-start);
   min-height: var(--fa-vertical-draggable-tabs-tab-min-height, #{$faVerticalDraggableTabs-tab-minHeight});
   min-width: $faVerticalDraggableTabs-tab-content-minWidth;
-  overflow: hidden;
+  overflow: visible;
   padding: var(--fa-vertical-draggable-tabs-tab-padding, #{$faVerticalDraggableTabs-tab-padding-default});
   position: relative;
   text-align: var(--fa-vertical-draggable-tabs-tab-text-align, left);
@@ -84,41 +81,47 @@
     cursor: $faVerticalDraggableTabs-tab-cursor-active;
   }
 
-  > .q-focus-helper {
-    transition:
-      background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
-      opacity $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing !important;
-
-    &::after,
-    &::before {
-      transition:
-        background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
-        opacity $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing !important;
-    }
+  &::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-idle(right);
   }
+}
+
+/* Focus sink after click — not Quasar .q-focus-helper (that class triggers square hover fill). */
+.faVerticalDraggableTabs__tabBlurTarget {
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
 }
 
 .faVerticalDraggableTabs__tab--active {
   color: var(--fa-color-primary-bright);
 
   &::after {
-    background: var(--fa-color-primary-bright);
-    bottom: 0;
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: $faVerticalDraggableTabs-tab-activeIndicator-width;
-    z-index: $faVerticalDraggableTabs-tab-activeIndicator-zIndex;
+    @include tabEdgeGlow.fa-tab-edge-glow-active(right);
   }
 }
 
-.faVerticalDraggableTabs__tab--dragging > .q-focus-helper {
-  opacity: $qFocusable-hoverHelper-opacity !important;
+.faVerticalDraggableTabs:not(.faVerticalDraggableTabs--listDragging) .faVerticalDraggableTabs__tab:hover::after {
+  @include tabEdgeGlow.fa-tab-edge-glow-hover(right);
+}
 
-  &::after,
-  &::before {
+/* Drag slot — shared he-tree / placeholder chrome. */
+.faVerticalDraggableTabs__tab--dragging,
+.faVerticalDraggableTabs__sortableGhost {
+  @include heTreeSlot.fa-he-tree-slot-chrome(1);
+
+  color: transparent;
+
+  &::after {
     opacity: 0 !important;
+    width: 0 !important;
+  }
+
+  > * {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 

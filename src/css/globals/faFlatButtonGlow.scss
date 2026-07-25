@@ -1,0 +1,22 @@
+@use 'faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
+
+/*
+ * App-wide flat (borderless) buttons:
+ * Same bottom-edge gold highlight + bloom as horizontal tab hover
+ * (fa-tab-edge-glow bottom). Idle hidden; hover reveals.
+ * ::after free on flat (outline uses ::before for Quasar border).
+ */
+.q-btn--flat {
+  overflow: visible;
+  position: relative;
+
+  @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
+
+  &::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-idle(bottom);
+  }
+
+  &:hover:not(.disabled, [disabled], [aria-disabled='true'])::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-hover(bottom);
+  }
+}

@@ -1,10 +1,61 @@
+@use 'sass:color';
 @use '../../app.palette.scss' as *;
 
-/* QUASAR COMPONENT - Q-TOOLTIP — Fantasia: $accent surface, $dark copy (not stock Quasar tooltip tokens). */
-$qTooltip-backgroundColor: fa-v('tooltip-background', $accent);
-$qTooltip-color: fa-v('dark', $dark);
+/* QUASAR COMPONENT - Q-TOOLTIP — Fantasia: parchment surface + sepia ink (not stock Quasar tooltip tokens). */
+$qTooltip-backgroundColor: fa-v('tooltip-background', $info);
+$qTooltip-backgroundImage:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E"),
+  linear-gradient(
+    145deg,
+    color.change($white, $alpha: 0.28) 0%,
+    color.change($primary, $alpha: 0.06) 55%,
+    color.change($primary, $alpha: 0.1) 100%
+  );
+$qTooltip-backgroundSize: 160px 160px, 100% 100%;
+$qTooltip-color: fa-v('tooltip-text', $tooltip-text);
+$qTooltip-filter: drop-shadow(0 2px 6px color.change($black, $alpha: 0.42));
 $qTooltip-fontSize: 13px;
 $qTooltip-fontWeight: 600;
-$qTooltip-maxWidth: 400px;
+/*
+ * Concave corners use fixed-px radial masks (stay circular on any tip size).
+ * Do not stretch a square SVG mask — that pinches wide tooltips.
+ */
+$qTooltip-frame-notchFeather: 1.5px;
+$qTooltip-frame-notchRadius: 9px;
+$qTooltip-frame-borderColor: fa-v('primary', $primary);
+$qTooltip-frame-borderWidth: 1.5px;
+/* Insets >= notch radius so rect gold lines sit inside the mask (not clipped at scoops). */
+$qTooltip-frame-innerInset: 14px;
+$qTooltip-frame-outerInset: 10px;
+$qTooltip-frame-maskImage:
+  radial-gradient(
+    circle at 0 0,
+    #0000 0,
+    #0000 calc(#{$qTooltip-frame-notchRadius} - #{$qTooltip-frame-notchFeather}),
+    #000 #{$qTooltip-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 100% 0,
+    #0000 0,
+    #0000 calc(#{$qTooltip-frame-notchRadius} - #{$qTooltip-frame-notchFeather}),
+    #000 #{$qTooltip-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 0 100%,
+    #0000 0,
+    #0000 calc(#{$qTooltip-frame-notchRadius} - #{$qTooltip-frame-notchFeather}),
+    #000 #{$qTooltip-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 100% 100%,
+    #0000 0,
+    #0000 calc(#{$qTooltip-frame-notchRadius} - #{$qTooltip-frame-notchFeather}),
+    #000 #{$qTooltip-frame-notchRadius}
+  );
+$qTooltip-frame-maskPosition: 0 0, 100% 0, 0 100%, 100% 100%;
+$qTooltip-frame-maskSize: 51% 51%;
+$qTooltip-maxWidth: 500px;
+/* 12px clear between inner gold line and copy on all sides. */
+$qTooltip-padding: $qTooltip-frame-innerInset + $qTooltip-frame-borderWidth + 12px;
 $qTooltip-zIndex: 999999999;
 /* Open delay: FA_Q_TOOLTIP_DELAY_MS (500) in src/scripts/appGlobalManagementUI/functions/faQTooltipDelay.ts — boot tooltip-defaults patches QTooltip. */

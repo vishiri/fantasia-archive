@@ -1,4 +1,7 @@
 @use '../quasar.variables.scss' as *;
+@use './faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
+@use './faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
+@use './faNotificationParchmentFrame.mixin.scss' as notificationParchment;
 
 /* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
 
@@ -81,6 +84,18 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 }
 
+.q-btn {
+  font-weight: $qBtn-fontWeight;
+
+  > span {
+    letter-spacing: $qBtn-content-letterSpacing;
+  }
+}
+
+.q-btn--rectangle {
+  border-radius: $qBtn-rectangle-borderRadius;
+}
+
 .q-card {
   box-shadow: $qCard-boxShadow;
 }
@@ -128,23 +143,47 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-dialog > .q-dialog__inner > .q-card {
+  /* Beat Quasar .bg-dark / .q-dark on dialog shells so Custom app CSS --fa-color-dark-darker applies. */
+  background: $qDialog-card-backgroundColor !important;
+  border: 0;
+  border-radius: $qDialog-card-borderRadius;
+  box-shadow: $qDialog-card-rim-boxShadow;
   max-width: $qDialog-card-maxWidth;
+  position: relative;
+
+  /* Soft inward glow above opaque card children (inset shadow on the card itself stays hidden under panels). */
+  &::after {
+    background: $qDialog-card-rim-after-background;
+    border-radius: inherit;
+    content: '';
+    inset: $qDialog-card-rim-after-inset;
+    pointer-events: none;
+    position: absolute;
+    z-index: $qDialog-card-rim-after-zIndex;
+  }
+
+  &::before {
+    background-image: $qDialog-card-rim-before-backgroundImage;
+    background-position: $qDialog-card-rim-before-backgroundPosition;
+    background-repeat: $qDialog-card-rim-before-backgroundRepeat;
+    background-size: $qDialog-card-rim-before-backgroundSize;
+    content: '';
+    filter: $qDialog-card-rim-before-filter;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: $qDialog-card-rim-before-zIndex;
+  }
+}
+
+.q-dialog__backdrop {
+  background: $qDialog-backdrop-background;
 }
 
 .q-card.dialogComponent__wrapper {
 
   /* Hard ceiling for every Fantasia dialog card shell — must beat per-dialog height/max-height. */
   max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract}) !important;
-}
-
-.q-field--dark .q-field__control::before {
-
-  /* Quasar uses rgba white at ~60%; tint follows Custom app CSS --fa-color-white. */
-  border-color: color-mix(in srgb, var(--fa-color-white) 60%, transparent);
-}
-
-.q-field--dark .q-field__control:hover::before {
-  border-color: var(--fa-color-white);
 }
 
 .q-field--dark .q-field__input,
@@ -154,10 +193,53 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   color: var(--fa-color-white);
 }
 
+.q-field--dark.q-field--readonly .q-field__input,
+.q-field--dark.q-field--readonly .q-field__native,
+.q-field--dark.q-field--readonly .q-field__prefix,
+.q-field--dark.q-field--readonly .q-field__suffix {
+  color: var(--fa-color-text-muted);
+}
+
 .q-field--dark .q-field__bottom,
 .q-field--dark .q-field__marginal,
 .q-field--dark:not(.q-field--highlighted) .q-field__label {
   color: color-mix(in srgb, var(--fa-color-white) 70%, transparent);
+}
+
+/*
+ * Decorative prepend/append (search icon, etc.): let clicks reach the control so the
+ * native input focuses. Interactive children keep pointer-events.
+ */
+.q-field__prepend,
+.q-field__append {
+  pointer-events: none;
+}
+
+.q-field__prepend .q-btn,
+.q-field__append .q-btn,
+.q-field__prepend .q-field__focusable-action,
+.q-field__append .q-field__focusable-action,
+.q-field__prepend .cursor-pointer,
+.q-field__append .cursor-pointer,
+.q-field__prepend button,
+.q-field__append button,
+.q-field__prepend a,
+.q-field__append a,
+.q-field__prepend [role='button'],
+.q-field__append [role='button'] {
+  pointer-events: auto;
+}
+
+/*
+ * Standard / filled / outlined dark fields: micro corner chrome in faMicroCornerField.scss.
+ * Standout keeps Quasar border/fill language — retain hover border tint here only.
+ */
+.q-field--standout.q-field--dark .q-field__control::before {
+  border-color: color-mix(in srgb, var(--fa-color-white) 60%, transparent);
+}
+
+.q-field--standout.q-field--dark .q-field__control:hover::before {
+  border-color: var(--fa-color-white);
 }
 
 .q-field--standout.q-field--dark.q-field--highlighted .q-field__control {
@@ -392,28 +474,106 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-notification {
+  @include notificationParchment.fa-notification-parchment-chrome;
+
+  /* Keep message/icons/actions above double-frame pseudos. */
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Quasar adds .text-white on the same node as .bg-info; faSemanticText.scss uses
    * .text-white { color: var(--fa-color-white) !important; }. This block must be !important
    * and match or beat that selector's specificity so dark text stays on the light info tint. */
+  /* Re-assert grain longhands after Quasar .bg-* `background` shorthand. */
+  &.bg-info,
+  &.bg-positive,
+  &.bg-negative,
+  &.bg-warning,
+  &.bg-primary,
+  &.bg-primary-bright,
+  &.bg-dark,
+  &.bg-grey-8 {
+    background-blend-mode: soft-light, soft-light !important;
+    background-image: $qNotification-parchmentTextureImage !important;
+    background-repeat: repeat, no-repeat !important;
+    background-size: $qNotification-parchmentTextureSize !important;
+  }
+
   &.bg-info {
-    border: $qNotification-bgInfo-borderWidth solid $qNotify-bgColor;
-    color: $qNotify-color !important;
+    --fa-toast-frame-color: #{$qNotification-frame-color-info};
+    --fa-toast-text-color: #{$qNotification-text-color-onLight};
+
+    background-color: var(--fa-color-info, #{$info}) !important;
+    color: var(--fa-toast-text-color) !important;
     max-width: $qNotification-bgInfo-maxWidth;
 
     i {
-      color: $qNotify-icon-color !important;
+      color: var(--fa-toast-text-color) !important;
     }
   }
 
+  &.bg-positive {
+    --fa-toast-frame-color: #{$qNotification-frame-color-positive};
+    --fa-toast-text-color: #{$qNotification-text-color-onDark};
+
+    background-color: var(--fa-color-positive, #{$positive}) !important;
+    color: var(--fa-toast-text-color) !important;
+  }
+
+  &.bg-negative {
+    --fa-toast-frame-color: #{$qNotification-frame-color-negative};
+    --fa-toast-text-color: #{$qNotification-text-color-onDark};
+
+    background-color: var(--fa-color-negative, #{$negative}) !important;
+    color: var(--fa-toast-text-color) !important;
+  }
+
   &.bg-warning {
+    --fa-toast-frame-color: #{$qNotification-frame-color-warning};
+    --fa-toast-text-color: #{$qNotification-text-color-onLight};
 
-    /* Match body copy (text-dark); close actions often pass Quasar color 'white' for contrast on red bars. */
-    .q-notification__actions .q-btn {
-      color: $qNotify-warningActions-color !important;
-    }
+    background-color: var(--fa-color-warning, #{$warning}) !important;
+    color: var(--fa-toast-text-color) !important;
+  }
 
-    .q-notification__actions .q-btn .q-icon {
-      color: inherit !important;
+  &.bg-primary {
+    --fa-toast-frame-color: #{$qNotification-frame-color-primary};
+    --fa-toast-text-color: #{$qNotification-text-color-onLight};
+
+    background-color: var(--fa-color-primary, #{$primary}) !important;
+    color: var(--fa-toast-text-color) !important;
+  }
+
+  &.bg-primary-bright {
+    --fa-toast-frame-color: #{$qNotification-frame-color-primary};
+    --fa-toast-text-color: #{$qNotification-text-color-onLight};
+
+    background-color: var(--fa-color-primary-bright, #{$primary-bright}) !important;
+    color: var(--fa-toast-text-color) !important;
+  }
+
+  /* Quasar type 'ongoing' → color grey-8 (not dark). */
+  &.bg-dark,
+  &.bg-grey-8 {
+    --fa-toast-frame-color: #{$qNotification-frame-color-ongoing};
+    --fa-toast-text-color: #{$qNotification-text-color-onDark};
+
+    color: var(--fa-toast-text-color) !important;
+  }
+
+  &.bg-dark {
+    background-color: var(--fa-color-dark, #{$dark}) !important;
+  }
+
+  /* Close actions: same token as body text; kill Quasar hover/focus square fill. */
+  &__actions .q-btn {
+    @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
+
+    color: var(--fa-toast-text-color) !important;
+
+    .q-icon {
+      color: var(--fa-toast-text-color) !important;
     }
   }
 
@@ -424,6 +584,13 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
   &__caption {
     opacity: 1;
+  }
+
+  &__progress {
+    background: var(--fa-toast-frame-color, #{$qNotification-frame-color-info}) !important;
+    left: 0 !important;
+    opacity: 1 !important;
+    right: 0 !important;
   }
 
   &__avatar {
@@ -462,14 +629,47 @@ div + .q-notification__caption {
   min-height: $qTab-minHeight;
 }
 
+/* Vertical Quasar tabs: gold right-edge glow instead of side indicator / square hover. */
+.q-tabs--vertical {
+  overflow: visible;
+  position: relative;
+  z-index: $faTabEdgeGlow-zIndex;
+
+  .q-tabs__content {
+    overflow: visible;
+  }
+
+  .q-tab {
+    overflow: visible;
+
+    @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
+
+    &::after {
+      @include tabEdgeGlow.fa-tab-edge-glow-idle(right);
+    }
+
+    &.q-tab--active::after {
+      @include tabEdgeGlow.fa-tab-edge-glow-active(right);
+    }
+
+    &:hover::after {
+      @include tabEdgeGlow.fa-tab-edge-glow-hover(right);
+    }
+  }
+}
+
+.q-tabs--vertical .q-tab__indicator {
+  display: none;
+}
+
 .q-tabs__arrow {
   font-size: $qTabs-arrow-fontSize;
   text-shadow: none;
 }
 
 .q-tooltip {
-  background-color: $qTooltip-backgroundColor;
-  color: $qTooltip-color;
+  @include tooltipParchment.fa-tooltip-parchment-surface;
+
   font-size: $qTooltip-fontSize;
   font-weight: $qTooltip-fontWeight;
   letter-spacing: 0.01em;

@@ -1,0 +1,6 @@
+@use 'faColorGlyph.mixin.scss' as colorGlyph;
+
+/* Opt-in utility — prefer @include colorGlyph.fa-color-glyph-shading in feature SCSS. */
+.fa-color-glyph {
+  @include colorGlyph.fa-color-glyph-shading;
+}

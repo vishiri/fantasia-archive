@@ -8,8 +8,9 @@ $faQIconDisplay-iconLeadingWidth: calc(
 $faQIconDisplay-faFontGlyph-fontSize: 22px;
 $faQIconDisplay-faSolidBefore-marginTop: 2px;
 $faQIconDisplay-faBrandsGlyph-fitScale: 0.83;
-$faQIconDisplay-faSolidGlyph-fitScale: 0.86;
-$faQIconDisplay-faWideSolidGlyph-fitScale: 0.64;
+/* FA solids paint denser/wider than MDI at the same em — keep below MDI fit-scale. */
+$faQIconDisplay-faSolidGlyph-fitScale: 0.827;
+$faQIconDisplay-faWideSolidGlyph-fitScale: 0.667;
 $faQIconDisplay-mdiGlyph-fontSize: $faQIconDisplay-faFontGlyph-fontSize;
-$faQIconDisplay-mdiGlyph-fitScale: $faQIconDisplay-faSolidGlyph-fitScale;
+$faQIconDisplay-mdiGlyph-fitScale: 0.86;
 $faQIconDisplay-mdiGlyph-marginTop: $faQIconDisplay-faSolidBefore-marginTop;

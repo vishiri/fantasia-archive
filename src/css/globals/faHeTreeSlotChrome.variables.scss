@@ -1,0 +1,12 @@
+@use '../app.palette.scss' as *;
+
+/* GLOBALS - HE-TREE SLOT CHROME
+ * Drag placeholder + hover twin (same inset accent frame).
+ * $strength 1 = placeholder; 0.5 = row hover.
+ */
+$faHeTreeSlotChrome-accentWidth: 3px;
+$faHeTreeSlotChrome-bgMixPercent: 10%;
+$faHeTreeSlotChrome-borderMixPercent: 28%;
+$faHeTreeSlotChrome-borderRadius: 4px;
+$faHeTreeSlotChrome-borderWidth: 1px;
+$faHeTreeSlotChrome-hoverStrength: 0.5;

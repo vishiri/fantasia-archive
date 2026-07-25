@@ -1,0 +1,7 @@
+/* GLOBALS - COLOR GLYPH (gradient shading painted into icon glyphs) */
+$faColorGlyph-baseVar: --fa-color-glyph-base;
+$faColorGlyph-dropShadow: 0 1px 1px color-mix(in srgb, var(--fa-color-black) 40%, transparent);
+/* Base-color share in color-mix stops (rest is white / black). */
+$faColorGlyph-gradient-highlightBase: 58%;
+$faColorGlyph-gradient-midStop: 45%;
+$faColorGlyph-gradient-shadeBase: 62%;

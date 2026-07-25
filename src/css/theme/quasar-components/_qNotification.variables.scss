@@ -1,11 +1,72 @@
+@use 'sass:color';
+@use '../../app.palette.scss' as *;
+
 /* QUASAR COMPONENT - Q-NOTIFICATION */
 $qNotification-avatar-height: 135px;
 $qNotification-avatar-marginBottom: 15px;
 $qNotification-avatar-marginRight: 30px;
 $qNotification-avatar-marginTop: 15px;
 $qNotification-avatar-width: 135px;
-$qNotification-bgInfo-borderWidth: 2px;
 $qNotification-bgInfo-maxWidth: 550px;
 $qNotification-captionSibling-marginTop: 4px;
 $qNotification-message-fontSize: 16px;
 $qNotification-message-fontWeight: 500;
+/*
+ * Scoop geometry matches tooltip parchment (same literals; no @use of qTooltip.variables —
+ * that module is forwarded later in quasar.variables.scss and circular loads break Sass).
+ */
+$qNotification-frame-notchFeather: 1.5px;
+$qNotification-frame-notchRadius: 9px;
+$qNotification-frame-borderWidth: 1.5px;
+$qNotification-frame-innerInset: 14px;
+$qNotification-frame-outerInset: 10px;
+$qNotification-frame-maskImage:
+  radial-gradient(
+    circle at 0 0,
+    #0000 0,
+    #0000 calc(#{$qNotification-frame-notchRadius} - #{$qNotification-frame-notchFeather}),
+    #000 #{$qNotification-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 100% 0,
+    #0000 0,
+    #0000 calc(#{$qNotification-frame-notchRadius} - #{$qNotification-frame-notchFeather}),
+    #000 #{$qNotification-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 0 100%,
+    #0000 0,
+    #0000 calc(#{$qNotification-frame-notchRadius} - #{$qNotification-frame-notchFeather}),
+    #000 #{$qNotification-frame-notchRadius}
+  ),
+  radial-gradient(
+    circle at 100% 100%,
+    #0000 0,
+    #0000 calc(#{$qNotification-frame-notchRadius} - #{$qNotification-frame-notchFeather}),
+    #000 #{$qNotification-frame-notchRadius}
+  );
+$qNotification-frame-maskPosition: 0 0, 100% 0, 0 100%, 100% 100%;
+$qNotification-frame-maskSize: 51% 51%;
+$qNotification-padding: $qNotification-frame-innerInset + $qNotification-frame-borderWidth + 12px;
+/*
+ * Neutral paper grain (no cream tint) so Quasar type hues stay dominant.
+ * Soft-light over .bg-* fills.
+ */
+$qNotification-parchmentTextureImage:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E"),
+  linear-gradient(
+    145deg,
+    color.change($white, $alpha: 0.18) 0%,
+    color.change($black, $alpha: 0.06) 100%
+  );
+$qNotification-parchmentTextureSize: 160px 160px, 100% 100%;
+/* Frame + progress: info/ongoing → primary; success → primary-bright; error/warning → dark. */
+$qNotification-frame-color-info: fa-v('primary', $primary);
+$qNotification-frame-color-negative: fa-v('dark', $dark);
+$qNotification-frame-color-ongoing: fa-v('primary', $primary);
+$qNotification-frame-color-positive: fa-v('primary-bright', $primary-bright);
+$qNotification-frame-color-primary: fa-v('primary-bright', $primary-bright);
+$qNotification-frame-color-warning: fa-v('dark', $dark);
+/* Body + close-button text (cream/amber → dark; saturated fills → white). */
+$qNotification-text-color-onDark: fa-v('white', $white);
+$qNotification-text-color-onLight: fa-v('dark', $dark);

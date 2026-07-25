@@ -1,3 +1,67 @@
+@use '../../app.palette.scss' as *;
+@use './qCard.variables' as qCard;
+
 /* QUASAR COMPONENT - Q-DIALOG */
+$qDialog-backdrop-background: rgba($black, 0.5);
+$qDialog-card-backgroundColor: fa-v('dark-darker', $dark-darker);
+$qDialog-card-borderRadius: 12px;
 $qDialog-card-maxHeightSubtract: 100px;
 $qDialog-card-maxWidth: 1400px;
+/* Continuous L/R/bottom edge feathers — stacked directional inset shadows made horizontal
+ * “shelves” down the side glow. No top edge here (::before owns top bloom). */
+$qDialog-card-rim-after-background:
+  linear-gradient(
+    to right,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 20%, transparent),
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 8%, transparent) 7px,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 2%, transparent) 14px,
+    transparent 24px
+  ),
+  linear-gradient(
+    to left,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 20%, transparent),
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 8%, transparent) 7px,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 2%, transparent) 14px,
+    transparent 24px
+  ),
+  linear-gradient(
+    to top,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 18%, transparent),
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 7%, transparent) 7px,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 1.5%, transparent) 14px,
+    transparent 24px
+  );
+$qDialog-card-rim-after-inset: 0;
+$qDialog-card-rim-after-zIndex: 1;
+/* Top bloom ends before typical title+tabs band so it cannot fake an under-tabs divider. */
+$qDialog-card-rim-before-backgroundImage:
+  linear-gradient(
+    to right,
+    transparent 0%,
+    color-mix(in srgb, fa-v('dialog-rim-cyan', $dialog-rim-cyan) 70%, transparent) 18%,
+    fa-v('dialog-rim-cyan-bright', $dialog-rim-cyan-bright) 50%,
+    color-mix(in srgb, fa-v('dialog-rim-cyan', $dialog-rim-cyan) 70%, transparent) 82%,
+    transparent 100%
+  ),
+  linear-gradient(
+    to bottom,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 32%, transparent) 0%,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 16%, transparent) 2.5%,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 6%, transparent) 5%,
+    color-mix(in srgb, fa-v('dialog-rim-cyan-deep', $dialog-rim-cyan-deep) 1.5%, transparent) 7.5%,
+    transparent 10%
+  );
+$qDialog-card-rim-before-backgroundPosition: center top, center top;
+$qDialog-card-rim-before-backgroundRepeat: no-repeat;
+$qDialog-card-rim-before-filter: none;
+$qDialog-card-rim-before-line-height: 1.5px;
+$qDialog-card-rim-before-line-width: 42%;
+$qDialog-card-rim-before-backgroundSize:
+  $qDialog-card-rim-before-line-width $qDialog-card-rim-before-line-height,
+  100% 100%;
+$qDialog-card-rim-before-zIndex: 2;
+$qDialog-card-rim-borderColor: color-mix(in srgb, fa-v('dialog-rim-cyan', $dialog-rim-cyan) 55%, transparent);
+/* Outline via shadow ring — avoids border + overflow:hidden dark/bright AA seam. */
+$qDialog-card-rim-boxShadow:
+  0 0 0 1px $qDialog-card-rim-borderColor,
+  #{qCard.$qCard-boxShadow};

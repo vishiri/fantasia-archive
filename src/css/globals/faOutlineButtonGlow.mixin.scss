@@ -1,0 +1,63 @@
+@use 'faOutlineButtonGlow.variables.scss' as *;
+@use 'faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
+
+/*
+ * Idle: bottom-edge bloom on ::after.
+ * Hover glow: box-shadow on the button; opacity via --fa-outline-btn-ext-glow (interpolated).
+ * Do not style ::before — Quasar uses it for the outline border.
+ */
+
+@mixin fa-outline-button-glow-idle {
+  background-image:
+    linear-gradient(
+      to right,
+      transparent 0%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-core) 45%, transparent) 28%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-core) 88%, transparent) 50%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-core) 45%, transparent) 72%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--fa-outline-btn-glow-deep) 34%, transparent) 0%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-deep) 18%, transparent) 18%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-deep) 8%, transparent) 40%,
+      color-mix(in srgb, var(--fa-outline-btn-glow-deep) 2.5%, transparent) 65%,
+      transparent 100%
+    );
+  background-position: center bottom, center bottom;
+  background-repeat: no-repeat;
+  background-size:
+    $faOutlineButtonGlow-lineSpan $faOutlineButtonGlow-lineThickness,
+    100% 100%;
+  content: '';
+  height: $faOutlineButtonGlow-default-bloomSize;
+  inset: auto 0 $faOutlineButtonGlow-edgeOffset 0;
+  -webkit-mask-image: $faOutlineButtonGlow-longAxisMask;
+  mask-image: $faOutlineButtonGlow-longAxisMask;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transition:
+    height $faOutlineButtonGlow-transitionDuration $faOutlineButtonGlow-transitionTiming,
+    opacity $faOutlineButtonGlow-transitionDuration $faOutlineButtonGlow-transitionTiming;
+  width: auto;
+  z-index: $faOutlineButtonGlow-zIndex;
+}
+
+@mixin fa-outline-button-glow-external-shadow {
+  box-shadow:
+    0 0 6px color-mix(in srgb, currentcolor calc(28% * var(--fa-outline-btn-ext-glow, 0)), transparent),
+    0 0 14px color-mix(in srgb, currentcolor calc(16% * var(--fa-outline-btn-ext-glow, 0)), transparent),
+    0 4px 16px color-mix(in srgb, currentcolor calc(18% * var(--fa-outline-btn-ext-glow, 0)), transparent),
+    0 8px 22px color-mix(in srgb, currentcolor calc(10% * var(--fa-outline-btn-ext-glow, 0)), transparent);
+  transition: --fa-outline-btn-ext-glow $faOutlineButtonGlow-hover-fadeDuration $faOutlineButtonGlow-hover-fadeTiming;
+}
+
+@mixin fa-outline-button-glow-kill-focus-helper {
+  @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
+}

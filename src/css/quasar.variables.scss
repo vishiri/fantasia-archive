@@ -7,7 +7,15 @@
 @forward 'globals/htmlAdjustments.variables';
 @forward 'globals/scrollbar.variables';
 @forward 'globals/faQIconDisplay.variables';
+@forward 'globals/faPaintedDivider.variables';
+@forward 'globals/faTabEdgeGlow.variables';
+@forward 'globals/faOutlineButtonGlow.variables';
+@forward 'globals/faMicroCornerField.variables';
+@forward 'globals/faHeTreeSlotChrome.variables';
+@forward 'globals/faColorBead.variables';
+@forward 'globals/faColorGlyph.variables';
 @forward 'theme/custom-components/faVerticalDraggableTabs.variables';
+@forward 'theme/quasar-components/qBtn.variables';
 @forward 'theme/quasar-components/qCard.variables';
 @forward 'theme/quasar-components/qCheckbox.variables';
 @forward 'theme/quasar-components/qDialog.variables';
@@ -35,6 +43,7 @@
 @forward '../components/dialogs/DialogProjectSettings/styles/variables';
 @forward '../components/elements/ErrorCard/styles/variables';
 @forward '../components/elements/FaColorPickerInput/styles/variables';
+@forward '../components/elements/FaHelpTooltipIcon/styles/variables';
 @forward '../components/elements/FaIconPickerInput/styles/variables';
 @forward '../components/elements/SocialContactSingleButton/styles/variables';
 @forward '../components/floatingWindows/WindowAppStyling/styles/variables';

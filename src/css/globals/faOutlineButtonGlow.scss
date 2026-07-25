@@ -1,0 +1,41 @@
+@use 'faOutlineButtonGlow.mixin.scss' as outlineBtnGlow;
+
+/* Animate external glow strength (0→1). Registered so transition interpolates. */
+@property --fa-outline-btn-ext-glow {
+  inherits: false;
+  initial-value: 0;
+  syntax: '<number>';
+}
+
+/*
+ * App-wide outline (border + empty fill) buttons:
+ * ::before = Quasar outline border (untouched).
+ * ::after = idle bottom bloom.
+ * box-shadow on button = hover external glow via --fa-outline-btn-ext-glow.
+ */
+.q-btn--outline {
+  --fa-outline-btn-ext-glow: 0;
+  --fa-outline-btn-glow-core: currentcolor;
+  --fa-outline-btn-glow-deep: color-mix(in srgb, currentcolor 48%, black);
+
+  overflow: visible;
+  position: relative;
+
+  @include outlineBtnGlow.fa-outline-button-glow-external-shadow;
+  @include outlineBtnGlow.fa-outline-button-glow-kill-focus-helper;
+
+  &::after {
+    @include outlineBtnGlow.fa-outline-button-glow-idle;
+  }
+
+  &:hover:not(.disabled, [disabled], [aria-disabled='true']) {
+    --fa-outline-btn-ext-glow: 1;
+  }
+
+  /* Quasar may still match :hover on disabled; keep external glow at 0. */
+  &.disabled,
+  &[disabled],
+  &[aria-disabled='true'] {
+    --fa-outline-btn-ext-glow: 0;
+  }
+}

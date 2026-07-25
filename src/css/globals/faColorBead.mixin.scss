@@ -1,0 +1,10 @@
+@use 'faColorBead.variables.scss' as *;
+
+// Soft bead depth on a circular filled element (background already set by consumer).
+// Box-shadow only — no ::before/::after (q-icon / MDI glyphs own those pseudos).
+@mixin fa-color-bead-shading {
+  border: $faColorBead-borderWidth solid $faColorBead-borderColor;
+  border-radius: $faColorBead-radius;
+  box-shadow: $faColorBead-boxShadow;
+  overflow: hidden;
+}
