@@ -126,10 +126,16 @@ export default {
       description: 'Détermine si les balises sont affichées sous forme de catégories individuelles ou sous forme d\'une seule catégorie avec chaque balise comme sous-catégorie.',
       tags: 'regroupement de balises, dossier de balises unique, balises imbriquées, hiérarchie de balises',
     },
-    darkMode: {
-      title: 'Mode sombre',
-      description: 'Basculez entre les modes clair et sombre pour l\'application.',
-      tags: 'sombre, lumière, thème, thématisation, couleur, couleurs',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Arrêter la fermeture après la sélection',

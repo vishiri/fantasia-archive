@@ -25,9 +25,25 @@
         </div>
       </div>
       <q-toggle
+        v-if="setting.control === 'toggle'"
         color="primary-bright"
         :model-value="setting.value"
         @update:model-value="onToggle"
+      />
+      <q-select
+        v-else
+        dense
+        emit-value
+        filled
+        map-options
+        options-dense
+        class="dialogAppSettings__settingSelect"
+        color="primary-bright"
+        popup-content-class="dialogAppSettings__settingSelectMenu"
+        :model-value="setting.value"
+        :options="setting.options"
+        :data-test-locator="selectLocator"
+        @update:model-value="onSelect"
       />
       <p
         v-if="setting.note !== undefined && setting.note !== ''"
@@ -41,7 +57,10 @@
 </template>
 
 <script setup lang="ts">
-import type { I_appSettingsSettingRenderItem } from 'app/types/I_dialogAppSettings'
+import type {
+  I_appSettingsSettingRenderItem,
+  T_appSettingsSettingUpdateValue
+} from 'app/types/I_dialogAppSettings'
 import { computed } from 'vue'
 
 import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
@@ -53,7 +72,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update-setting': [key: string, value: boolean]
+  'update-setting': [key: string, value: T_appSettingsSettingUpdateValue]
 }>()
 
 const settingLocator = computed(() => {
@@ -65,7 +84,18 @@ const labelLocator = computed(() =>
   props.displayMode === 'tab' ? 'dialogAppSettings-settingLabel' : 'dialogAppSettings-search-settingLabel'
 )
 
+const selectLocator = computed(() =>
+  props.displayMode === 'tab' ? 'dialogAppSettings-settingSelect' : 'dialogAppSettings-search-settingSelect'
+)
+
 function onToggle (value: boolean): void {
+  emit('update-setting', props.settingKey, value)
+}
+
+function onSelect (value: string | null | undefined): void {
+  if (typeof value !== 'string') {
+    return
+  }
   emit('update-setting', props.settingKey, value)
 }
 </script>
@@ -91,8 +121,16 @@ function onToggle (value: boolean): void {
   margin-top: $dialogAppSettings-settingHelpIcon-marginTop;
 }
 
+.dialogAppSettings__settingSelect {
+  max-width: $dialogAppSettings-settingSelect-maxWidth;
+  padding: $dialogAppSettings-settingSelect-paddingBlock $dialogAppSettings-settingSelect-paddingInline;
+  width: 100%;
+}
+
 .dialogAppSettings__settingNote {
   margin-left: $dialogAppSettings-settingTitle-marginLeft;
   text-shadow: $dialogAppSettings-settingNote-textShadow;
 }
 </style>
+
+<style lang="scss" src="./styles/DialogAppSettings.settingSelectMenu.unscoped.scss"></style>

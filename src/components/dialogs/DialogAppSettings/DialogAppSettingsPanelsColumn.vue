@@ -16,14 +16,25 @@
         :name="categoryKey"
         class="dialogAppSettings__tabPanel q-pa-none"
       >
-        <div class="dialogAppSettings__panelScroll hasScrollbar">
-          <div class="dialogAppSettings__panelScrollInner q-py-sm">
-            <DialogAppSettingsCategoryPanel
-              display-mode="tab"
-              :category="category"
-              :category-key="String(categoryKey)"
-              @update-setting="(k, v) => emit('update-setting', k, v)"
-            />
+        <div class="dialogAppSettings__panelBody">
+          <div class="dialogAppSettings__panelHeader">
+            <h5
+              class="dialogAppSettings__categoryTitle text-bold q-my-none text-h6"
+              data-test-locator="dialogAppSettings-categoryTitle"
+            >
+              {{ category.title }}
+            </h5>
+          </div>
+          <div class="dialogAppSettings__panelScroll hasScrollbar">
+            <div class="dialogAppSettings__panelScrollInner q-py-sm">
+              <DialogAppSettingsCategoryPanel
+                display-mode="tab"
+                :shows-category-title="false"
+                :category="category"
+                :category-key="String(categoryKey)"
+                @update-setting="(k, v) => emit('update-setting', k, v)"
+              />
+            </div>
           </div>
         </div>
       </q-tab-panel>
@@ -38,41 +49,51 @@
         class="dialogAppSettings__searchAllSettingsPanel q-tab-panel q-pa-none"
         data-test-locator="dialogAppSettings-searchAllSettingsPanel"
       >
-        <div class="dialogAppSettings__panelScroll hasScrollbar">
+        <div class="dialogAppSettings__panelBody">
           <div
-            v-show="hasSearchNoMatchingSettings"
-            class="dialogAppSettings__searchEmpty flex flex-center"
-            data-test-locator="dialogAppSettings-searchNoResults"
+            class="dialogAppSettings__panelHeader"
+            aria-hidden="true"
           >
-            <ErrorCard
-              :title="$t('dialogs.appSettings.searchNoResultsTitle')"
-              :details="$t('dialogs.appSettings.searchNoResultsDescription')"
-              image-name="reading"
-              :width="650"
-            />
+            <h5 class="dialogAppSettings__categoryTitle text-bold q-my-none text-h6">
+              &nbsp;
+            </h5>
           </div>
-          <div
-            v-show="!hasSearchNoMatchingSettings"
-            class="dialogAppSettings__panelScrollInner q-py-sm"
-          >
-            <template
-              v-for="(category, categoryKey, categoryIndex) in searchFilteredAppSettingsTree"
-              :key="categoryKey"
+          <div class="dialogAppSettings__panelScroll hasScrollbar">
+            <div
+              v-show="hasSearchNoMatchingSettings"
+              class="dialogAppSettings__searchEmpty flex flex-center"
+              data-test-locator="dialogAppSettings-searchNoResults"
             >
-              <DialogAppSettingsCategoryPanel
-                display-mode="search"
-                :category="category"
-                :category-key="String(categoryKey)"
-                @update-setting="(k, v) => emit('update-setting', k, v)"
+              <ErrorCard
+                :title="$t('dialogs.appSettings.searchNoResultsTitle')"
+                :details="$t('dialogs.appSettings.searchNoResultsDescription')"
+                image-name="reading"
+                :width="650"
               />
+            </div>
+            <div
+              v-show="!hasSearchNoMatchingSettings"
+              class="dialogAppSettings__panelScrollInner q-py-sm"
+            >
+              <template
+                v-for="(category, categoryKey, categoryIndex) in searchFilteredAppSettingsTree"
+                :key="categoryKey"
+              >
+                <DialogAppSettingsCategoryPanel
+                  display-mode="search"
+                  :category="category"
+                  :category-key="String(categoryKey)"
+                  @update-setting="(k, v) => emit('update-setting', k, v)"
+                />
 
-              <q-separator
-                v-if="showNonLastTopCategorySeparator(searchFilteredAppSettingsTree, categoryIndex)"
-                horizontal
-                class="q-my-lg"
-                color="primary"
-              />
-            </template>
+                <q-separator
+                  v-if="showNonLastTopCategorySeparator(searchFilteredAppSettingsTree, categoryIndex)"
+                  horizontal
+                  class="q-my-lg"
+                  color="primary"
+                />
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -81,7 +102,10 @@
 </template>
 
 <script setup lang="ts">
-import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
+import type {
+  T_appSettingsRenderTree,
+  T_appSettingsSettingUpdateValue
+} from 'app/types/I_dialogAppSettings'
 import DialogAppSettingsCategoryPanel from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsCategoryPanel.vue'
 import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
 import { showNonLastTopCategorySeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
@@ -95,7 +119,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update-setting': [key: string, value: boolean]
+  'update-setting': [key: string, value: T_appSettingsSettingUpdateValue]
 }>()
 </script>
 
@@ -163,9 +187,33 @@ const emit = defineEmits<{
   padding: 0;
 }
 
+.dialogAppSettings__panelBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.dialogAppSettings__panelHeader {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  padding:
+    $dialogAppSettings-categoryTitle-paddingTop
+    $dialogAppSettings-category-paddingX
+    $dialogAppSettings-categoryTitle-paddingBottom;
+  position: relative;
+  z-index: $dialogAppSettings-categoryTitle-zIndex;
+}
+
+.dialogAppSettings__categoryTitle {
+  margin: 0;
+  padding-right: $dialogAppSettings-categoryTitle-paddingInlineEndForSearch;
+}
+
 .dialogAppSettings__panelScroll {
   flex: 1 1 auto;
-  height: 100%;
   min-height: 0;
   overflow: hidden auto;
 }

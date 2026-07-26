@@ -5,6 +5,7 @@ import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettin
 import { i18n } from 'app/i18n/externalFileLoader'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
@@ -17,6 +18,7 @@ const dialogAppSettingsApi = createDialogAppSettings({
   APP_SETTINGS_OPTIONS,
   S_DialogComponent,
   S_FaUserSettings,
+  appThemeValues: FA_USER_SETTINGS_APP_THEME_VALUES,
   buildAppSettingsRenderTree,
   computed,
   filterAppSettingsTreeForSearch,

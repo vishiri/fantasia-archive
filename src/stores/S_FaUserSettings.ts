@@ -7,7 +7,12 @@ import { ResultAsync } from 'neverthrow'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { applyFaAppThemeToDocument } from 'app/src/scripts/appInternals/faAppThemeApplyWiring'
 import { applyFaI18nLocaleFromLanguageCode } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
+import {
+  FA_USER_SETTINGS_APP_THEME_DEFAULT,
+  isFaUserSettingsAppTheme
+} from 'app/types/faUserSettingsAppThemeRegistry'
 import { isFaUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import { didObjectPatchPersist } from './functions/faPersistPatchVerify'
@@ -20,12 +25,35 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   const settings: Ref<I_faUserSettings | null> = ref(null)
   const appSettingsDialogPreview: Ref<Partial<I_faUserSettings> | null> = ref(null)
 
+  function resolveEffectiveAppTheme (): string {
+    const previewTheme = appSettingsDialogPreview.value?.appTheme
+    if (typeof previewTheme === 'string' && isFaUserSettingsAppTheme(previewTheme)) {
+      return previewTheme
+    }
+
+    const persistedTheme = settings.value?.appTheme
+    if (typeof persistedTheme === 'string' && isFaUserSettingsAppTheme(persistedTheme)) {
+      return persistedTheme
+    }
+
+    return FA_USER_SETTINGS_APP_THEME_DEFAULT
+  }
+
+  function applyEffectiveAppTheme (): void {
+    applyFaAppThemeToDocument(resolveEffectiveAppTheme())
+  }
+
   function setAppSettingsDialogPreview (preview: Partial<I_faUserSettings>): void {
-    appSettingsDialogPreview.value = preview
+    appSettingsDialogPreview.value = {
+      ...(appSettingsDialogPreview.value ?? {}),
+      ...preview
+    }
+    applyEffectiveAppTheme()
   }
 
   function clearAppSettingsDialogPreview (): void {
     appSettingsDialogPreview.value = null
+    applyEffectiveAppTheme()
   }
 
   async function refreshSettings (): Promise<void> {
@@ -34,6 +62,7 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     if (s !== null && s.languageCode !== undefined && isFaUserSettingsLanguageCode(s.languageCode)) {
       applyFaI18nLocaleFromLanguageCode(s.languageCode)
     }
+    applyEffectiveAppTheme()
   }
 
   async function persistSettingsPatch (
@@ -64,6 +93,8 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     if (updateObject.languageCode !== undefined) {
       applyFaI18nLocaleFromLanguageCode(updateObject.languageCode)
     }
+
+    applyEffectiveAppTheme()
 
     return retrievedSettings
   }

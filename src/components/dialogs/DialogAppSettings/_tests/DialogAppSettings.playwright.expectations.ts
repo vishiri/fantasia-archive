@@ -1,5 +1,6 @@
 import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
 import type {
+  I_appSettingsSettingRenderItem,
   I_appSettingsSubCategoryRenderItem,
   T_appSettingsRenderTree
 } from 'app/types/I_dialogAppSettings'
@@ -10,11 +11,14 @@ import {
 } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsTreeBuild'
 import appSettingsMessages from 'app/i18n/en-US/dialogs/L_appSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
+
 type T_appSettingsOptionMessageBlock = {
   title: string
   description: string
   tags: string
   note?: string
+  values?: Record<string, string>
 }
 
 /**
@@ -22,6 +26,48 @@ type T_appSettingsOptionMessageBlock = {
  */
 const normalizeExpectedSettingDescription = (description: string): string => {
   return description.replace(/\\\|/g, '|')
+}
+
+function buildExpectedSettingLeaf (
+  settingKey: keyof typeof APP_SETTINGS_OPTIONS,
+  optBlock: T_appSettingsOptionMessageBlock
+): I_appSettingsSettingRenderItem {
+  const note = optBlock.note
+  const title = optBlock.title
+  const description = normalizeExpectedSettingDescription(optBlock.description)
+  const tags = optBlock.tags
+
+  if (settingKey === 'appTheme') {
+    const leaf: I_appSettingsSettingRenderItem = {
+      title,
+      description,
+      tags,
+      control: 'select',
+      value: String(FA_USER_SETTINGS_DEFAULTS.appTheme),
+      options: FA_USER_SETTINGS_APP_THEME_VALUES.map((themeValue) => {
+        return {
+          label: optBlock.values?.[themeValue] ?? themeValue,
+          value: themeValue
+        }
+      })
+    }
+    if (note !== undefined && note !== '') {
+      leaf.note = note
+    }
+    return leaf
+  }
+
+  const leaf: I_appSettingsSettingRenderItem = {
+    title,
+    description,
+    tags,
+    control: 'toggle',
+    value: FA_USER_SETTINGS_DEFAULTS[settingKey] as boolean
+  }
+  if (note !== undefined && note !== '') {
+    leaf.note = note
+  }
+  return leaf
 }
 
 /**
@@ -64,15 +110,8 @@ export function buildExpectedAppSettingsTreeFromEnUsMessages (): T_appSettingsRe
     }
 
     const optBlock = appOpts[settingKey]!
-    const note = optBlock.note
-
-    unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = {
-      title: optBlock.title,
-      description: normalizeExpectedSettingDescription(optBlock.description),
-      tags: optBlock.tags,
-      value: FA_USER_SETTINGS_DEFAULTS[settingKey],
-      ...(note !== undefined && note !== '' ? { note } : {})
-    }
+    unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] =
+      buildExpectedSettingLeaf(settingKey, optBlock)
   }
 
   const sortedCategoryEntries = Object.entries(unsortedTree).sort(

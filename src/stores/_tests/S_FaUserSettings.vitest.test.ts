@@ -6,6 +6,7 @@ import type * as S_FaUserSettingsStore from '../S_FaUserSettings'
 
 const {
   applyLocaleMock,
+  applyAppThemeMock,
   notifyCreateMock,
   tMock,
   getSettingsMock,
@@ -13,6 +14,7 @@ const {
 } = vi.hoisted(() => {
   return {
     applyLocaleMock: vi.fn(),
+    applyAppThemeMock: vi.fn(),
     notifyCreateMock: vi.fn(),
     tMock: vi.fn((key: string) => key),
     getSettingsMock: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),
@@ -23,6 +25,12 @@ const {
 vi.mock('quasar', () => {
   return {
     Notify: { create: notifyCreateMock }
+  }
+})
+
+vi.mock('app/src/scripts/appInternals/faAppThemeApplyWiring', () => {
+  return {
+    applyFaAppThemeToDocument: applyAppThemeMock
   }
 })
 
@@ -45,6 +53,7 @@ beforeEach(async () => {
   setActivePinia(createPinia())
   vi.resetModules()
   applyLocaleMock.mockReset()
+  applyAppThemeMock.mockReset()
   notifyCreateMock.mockReset()
   tMock.mockReset()
   tMock.mockImplementation((key: string) => key)
@@ -76,7 +85,7 @@ beforeEach(async () => {
 test('Test that refreshSettings populates settings from the IPC bridge', async () => {
   const snapshot = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true
+    appTheme: 'darkThemeFantasy' as const
   }
   getSettingsMock.mockResolvedValueOnce(snapshot)
 
@@ -86,6 +95,7 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
   expect(getSettingsMock).toHaveBeenCalledOnce()
   expect(store.settings).toEqual(snapshot)
   expect(applyLocaleMock).toHaveBeenCalledWith('en-US')
+  expect(applyAppThemeMock).toHaveBeenCalledWith('darkThemeFantasy')
 })
 
 /**
@@ -95,11 +105,11 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
 test('Test that refreshSettings replaces settings on each call', async () => {
   const firstSnapshot = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true
+    appTheme: 'darkThemeFantasy' as const
   }
   const secondSnapshot = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: false
+    appTheme: 'lightThemeFlat' as const
   }
   getSettingsMock.mockResolvedValueOnce(firstSnapshot).mockResolvedValueOnce(secondSnapshot)
 
@@ -139,16 +149,16 @@ test('Test that refreshSettings does not apply i18n when persisted languageCode 
  * On a successful save the retrieved settings match the update object, positive notify fires.
  */
 test('Test that updateSettings shows positive notify when saved values match the update object', async () => {
-  const updateObject = { darkMode: true }
+  const updateObject = { appTheme: 'darkThemeFantasy' as const }
   getSettingsMock.mockResolvedValueOnce({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true
+    appTheme: 'darkThemeFantasy' as const
   })
 
   await store.updateSettings(updateObject)
 
   expect(setSettingsMock).toHaveBeenCalledWith(updateObject)
-  expect(store.settings?.darkMode).toBe(true)
+  expect(store.settings?.appTheme).toBe('darkThemeFantasy')
   expect(notifyCreateMock).toHaveBeenCalledOnce()
   expect(notifyCreateMock).toHaveBeenCalledWith({
     group: false,
@@ -205,10 +215,10 @@ test('Test that updateSettings does not apply i18n locale when languageCode patc
  * When retrieved settings do not match the update object, throw without emitting a notify (action manager owns the toast).
  */
 test('Test that updateSettings throws without emitting notify when saved values do not match the update object', async () => {
-  const updateObject = { darkMode: true }
+  const updateObject = { appTheme: 'darkThemeFantasy' as const }
   getSettingsMock.mockResolvedValueOnce({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: false
+    appTheme: 'lightThemeFlat' as const
   })
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -227,12 +237,12 @@ test('Test that updateSettings throws without emitting notify when saved values 
 test('Test that updateSettings always replaces settings with the retrieved value from the bridge', async () => {
   const retrievedSettings = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: false
+    appTheme: 'lightThemeFlat' as const
   }
   getSettingsMock.mockResolvedValueOnce(retrievedSettings)
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow()
+  await expect(store.updateSettings({ appTheme: 'darkThemeFantasy' as const })).rejects.toThrow()
   consoleErrorSpy.mockRestore()
 
   expect(store.settings).toEqual(retrievedSettings)
@@ -281,12 +291,12 @@ test('Test that patchSettingsSilently persists without emitting notify', async (
  */
 test('Test that updateSettings throws without emitting notify when one of several keys mismatches', async () => {
   const updateObject = {
-    darkMode: true,
+    appTheme: 'darkThemeFantasy' as const,
     compactTags: true
   }
   getSettingsMock.mockResolvedValueOnce({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true,
+    appTheme: 'darkThemeFantasy' as const,
     compactTags: false
   })
 
@@ -306,7 +316,7 @@ test('Test that updateSettings throws without emitting notify when setSettings r
   setSettingsMock.mockRejectedValueOnce(new Error('ipc failed'))
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow()
+  await expect(store.updateSettings({ appTheme: 'darkThemeFantasy' as const })).rejects.toThrow()
 
   expect(setSettingsMock).toHaveBeenCalledOnce()
   expect(getSettingsMock).not.toHaveBeenCalled()
@@ -325,7 +335,7 @@ test('Test that updateSettings wraps non-Error rejections in an Error before thr
   setSettingsMock.mockRejectedValueOnce('plain string boom')
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow('plain string boom')
+  await expect(store.updateSettings({ appTheme: 'darkThemeFantasy' as const })).rejects.toThrow('plain string boom')
   consoleErrorSpy.mockRestore()
 })
 
@@ -335,8 +345,24 @@ test('Test that updateSettings wraps non-Error rejections in an Error before thr
  */
 test('Test that setAppSettingsDialogPreview and clearAppSettingsDialogPreview update preview state', () => {
   expect(store.appSettingsDialogPreview).toBeNull()
-  store.setAppSettingsDialogPreview({ darkMode: true })
-  expect(store.appSettingsDialogPreview).toEqual({ darkMode: true })
+  store.setAppSettingsDialogPreview({ appTheme: 'darkThemeFantasy' as const })
+  expect(store.appSettingsDialogPreview).toEqual({ appTheme: 'darkThemeFantasy' as const })
+  expect(applyAppThemeMock).toHaveBeenCalledWith('darkThemeFantasy')
   store.clearAppSettingsDialogPreview()
   expect(store.appSettingsDialogPreview).toBeNull()
+  expect(applyAppThemeMock).toHaveBeenLastCalledWith('darkThemeFantasy')
+})
+
+/**
+ * S_FaUserSettings / app settings dialog preview
+ * Preview patches merge so live theme preview survives other preview keys.
+ */
+test('Test that setAppSettingsDialogPreview merges patches and applies light theme preview', () => {
+  store.setAppSettingsDialogPreview({ hideTooltipsProject: true })
+  store.setAppSettingsDialogPreview({ appTheme: 'lightThemeFlat' as const })
+  expect(store.appSettingsDialogPreview).toEqual({
+    hideTooltipsProject: true,
+    appTheme: 'lightThemeFlat'
+  })
+  expect(applyAppThemeMock).toHaveBeenLastCalledWith('lightThemeFlat')
 })

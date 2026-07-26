@@ -1,15 +1,17 @@
 <template>
   <div
     class="dialogAppSettings__category"
+    :class="{ 'dialogAppSettings__category--bodyOnly': !showsCategoryTitle }"
     :data-test-locator="displayMode === 'tab' ? `dialogAppSettings-category-${categoryKey}` : `dialogAppSettings-search-category-${categoryKey}`"
   >
     <h5
+      v-if="showsCategoryTitle"
       :class="[
         'dialogAppSettings__categoryTitle',
         'text-bold',
         'q-my-none',
         'text-h6',
-        displayMode === 'search' ? 'dialogAppSettings__categoryTitle--searchOverlay' : ''
+        displayMode === 'search' ? 'dialogAppSettings__categoryTitle--search' : ''
       ]"
       :data-test-locator="categoryTitleLocator(displayMode)"
     >
@@ -51,18 +53,27 @@
 </template>
 
 <script setup lang="ts">
-import type { I_appSettingsCategoryRenderItem } from 'app/types/I_dialogAppSettings'
+import type {
+  I_appSettingsCategoryRenderItem,
+  T_appSettingsSettingUpdateValue
+} from 'app/types/I_dialogAppSettings'
 import DialogAppSettingsSettingBlock from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsSettingBlock.vue'
 import { showNonLastSeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
 
-defineProps<{
-  category: I_appSettingsCategoryRenderItem
-  categoryKey: string
-  displayMode: 'tab' | 'search'
-}>()
+withDefaults(
+  defineProps<{
+    category: I_appSettingsCategoryRenderItem
+    categoryKey: string
+    displayMode: 'tab' | 'search'
+    showsCategoryTitle?: boolean
+  }>(),
+  {
+    showsCategoryTitle: true
+  }
+)
 
 const emit = defineEmits<{
-  'update-setting': [key: string, value: boolean]
+  'update-setting': [key: string, value: T_appSettingsSettingUpdateValue]
 }>()
 
 function categoryTitleLocator (mode: 'tab' | 'search'): string {
@@ -79,22 +90,17 @@ function subCategoryTitleLocator (mode: 'tab' | 'search'): string {
   padding: $dialogAppSettings-category-paddingTop $dialogAppSettings-category-paddingX 0;
 }
 
-.dialogAppSettings__categoryTitle {
-  background: $dialogAppSettings-surface-backgroundColor;
-  left: $dialogAppSettings-categoryTitle-left;
-  padding-bottom: $dialogAppSettings-categoryTitle-paddingBottom;
-  padding-top: $dialogAppSettings-categoryTitle-paddingTop;
-  position: absolute;
-  right: $dialogAppSettings-categoryTitle-right;
-  top: 0;
-  z-index: $dialogAppSettings-categoryTitle-zIndex;
+.dialogAppSettings__category--bodyOnly {
+  padding-top: 0;
 }
 
-.dialogAppSettings__categoryTitle--searchOverlay {
-  left: auto;
-  margin-bottom: $dialogAppSettings-searchPanel-categoryTitle-marginBottom;
-  margin-top: $dialogAppSettings-searchPanel-categoryTitle-marginTop;
-  position: static;
-  right: auto;
+.dialogAppSettings__categoryTitle {
+  margin-bottom: $dialogAppSettings-categoryTitle-paddingBottom;
+  padding-bottom: $dialogAppSettings-categoryTitle-paddingBottom;
+  padding-top: $dialogAppSettings-categoryTitle-paddingTop;
+}
+
+.dialogAppSettings__categoryTitle--search {
+  margin-bottom: $dialogAppSettings-categoryTitle-paddingBottom;
 }
 </style>

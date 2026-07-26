@@ -126,10 +126,16 @@ export default {
       description: 'Bestämmer om taggar visas som enskilda kategorier eller som en kategori med varje tagg som en underkategori.',
       tags: 'tagggruppering, enstaka taggmapp, kapslade taggar, tagghierarki',
     },
-    darkMode: {
-      title: 'Mörkt läge',
-      description: 'Växla mellan ljust och mörkt läge för appen.',
-      tags: 'mörkt, ljust, tema, tema, färg, färger',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Sluta stänga efter val',

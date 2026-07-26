@@ -1,0 +1,5 @@
+/* Teleported q-select menu; stack above modal QDialog chrome. */
+
+.dialogAppSettings__settingSelectMenu.q-menu {
+  z-index: $dialogAppSettings-settingSelectMenu-zIndex !important;
+}

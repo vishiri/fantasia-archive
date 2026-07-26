@@ -9,18 +9,24 @@ import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 
 const faUserSettingsLanguageCodeSchema = z.enum(FA_USER_SETTINGS_LANGUAGE_CODES)
+const faUserSettingsAppThemeSchema = z.enum(FA_USER_SETTINGS_APP_THEME_VALUES)
 
 /**
  * Full persisted 'faUserSettings.json' document (not a patch). Unknown keys rejected via .strict().
+ * 'languageCode' and 'appTheme' are enums; remaining fields are booleans.
  */
 const faUserSettingsFileShape = Object.fromEntries(
   (Object.keys(FA_USER_SETTINGS_DEFAULTS) as Array<keyof I_faUserSettings>).map((key) => {
-    const fieldSchema = key === 'languageCode'
-      ? faUserSettingsLanguageCodeSchema
-      : z.boolean()
+    let fieldSchema: z.ZodTypeAny = z.boolean()
+    if (key === 'languageCode') {
+      fieldSchema = faUserSettingsLanguageCodeSchema
+    } else if (key === 'appTheme') {
+      fieldSchema = faUserSettingsAppThemeSchema
+    }
 
     return [
       key,

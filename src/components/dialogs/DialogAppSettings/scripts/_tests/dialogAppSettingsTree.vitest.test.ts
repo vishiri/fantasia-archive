@@ -5,18 +5,19 @@ vi.mock('app/i18n/externalFileLoader', () => {
     i18n: {
       global: {
         t: (key: string) => {
-          if (key === 'dialogs.appSettings.appOptions.darkMode.note') {
+          if (key === 'dialogs.appSettings.appOptions.appTheme.note') {
             return 'Fixture note'
           }
           return key
         },
-        te: (key: string) => key === 'dialogs.appSettings.appOptions.darkMode.note'
+        te: (key: string) => key === 'dialogs.appSettings.appOptions.appTheme.note'
       }
     }
   }
 })
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_appSettingsSettingRenderItem } from 'app/types/I_dialogAppSettings'
 import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
@@ -40,7 +41,7 @@ const appSettingsCategoryTitleByKey: Record<string, string> = {
 
 const dialogAppSettingsTreeTranslate = {
   t: (key: string): string => {
-    if (key === 'dialogs.appSettings.appOptions.darkMode.note') {
+    if (key === 'dialogs.appSettings.appOptions.appTheme.note') {
       return 'Fixture note'
     }
     const categoryTitleMatch = /^dialogs\.appSettings\.appOptionsCategories\.([^.]+)\.title$/.exec(key)
@@ -50,14 +51,15 @@ const dialogAppSettingsTreeTranslate = {
     }
     return key
   },
-  te: (key: string): boolean => key === 'dialogs.appSettings.appOptions.darkMode.note'
+  te: (key: string): boolean => key === 'dialogs.appSettings.appOptions.appTheme.note'
 }
 
 function buildAppSettingsRenderTreeForTest (settingsSnapshot: I_faUserSettings) {
   return buildAppSettingsRenderTree(
     dialogAppSettingsTreeTranslate,
     APP_SETTINGS_OPTIONS,
-    settingsSnapshot
+    settingsSnapshot,
+    FA_USER_SETTINGS_APP_THEME_VALUES
   )
 }
 
@@ -65,6 +67,7 @@ const stubSetting = (title: string): I_appSettingsSettingRenderItem => ({
   description: '',
   tags: '',
   title,
+  control: 'toggle',
   value: false
 })
 
@@ -229,11 +232,11 @@ test('Test that buildAppSettingsRenderTree maps showDocumentID into developer do
 test('Test that buildAppSettingsRenderTree attaches note text when i18n te reports the note key exists', () => {
   const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: false
+    appTheme: 'lightThemeFlat'
   })
 
   expect(
-    tree.visualAccessibility?.subCategories.visualsAppwideFunctionality?.settingsList.darkMode?.note
+    tree.visualAccessibility?.subCategories.visualsAppwideFunctionality?.settingsList.appTheme?.note
   ).toBe('Fixture note')
 })
 
@@ -242,8 +245,8 @@ test('Test that buildAppSettingsRenderTree attaches note text when i18n te repor
  * Second and later settings that share the same category and subcategory reuse existing tree nodes instead of recreating them.
  */
 test('Test that buildAppSettingsRenderTree hits reuse branches when two settings share category and subcategory', () => {
-  const partial: Pick<I_faUserSettings, 'darkMode' | 'disableSpellCheck'> = {
-    darkMode: false,
+  const partial: Pick<I_faUserSettings, 'appTheme' | 'disableSpellCheck'> = {
+    appTheme: 'lightThemeFlat',
     disableSpellCheck: true
   }
 
@@ -251,7 +254,8 @@ test('Test that buildAppSettingsRenderTree hits reuse branches when two settings
   const list =
     tree.visualAccessibility?.subCategories.visualsAppwideFunctionality?.settingsList
 
-  expect(list?.darkMode?.value).toBe(false)
+  expect(list?.appTheme?.value).toBe('lightThemeFlat')
+  expect(list?.appTheme?.control).toBe('select')
   expect(list?.disableSpellCheck?.value).toBe(true)
 })
 

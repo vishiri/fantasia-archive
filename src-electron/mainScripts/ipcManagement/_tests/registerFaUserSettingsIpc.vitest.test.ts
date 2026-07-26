@@ -85,7 +85,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
 test('Test that user settings get handler returns all keys from the backing store', async () => {
   const store = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true,
+    appTheme: 'darkThemeFantasy',
     futureKey: true
   } as I_faUserSettings & Record<string, unknown>
   getFaUserSettingsMock.mockReturnValue({
@@ -111,7 +111,7 @@ test('Test that user settings set handler writes merged store state', async () =
   getFaUserSettingsMock.mockReturnValue({
     store: {
       ...FA_USER_SETTINGS_DEFAULTS,
-      darkMode: true
+      appTheme: 'darkThemeFantasy'
     },
     set: storeSetMock
   })
@@ -120,12 +120,12 @@ test('Test that user settings set handler writes merged store state', async () =
   registerFaUserSettingsIpc()
 
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
-  setHandler({}, { darkMode: false })
+  setHandler({}, { appTheme: 'lightThemeFlat' })
 
   expect(storeSetMock).toHaveBeenCalledOnce()
   expect(storeSetMock).toHaveBeenCalledWith({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: false
+    appTheme: 'lightThemeFlat'
   })
 })
 
@@ -144,7 +144,7 @@ test('Test that user settings set handler throws ZodError and skips store set fo
 
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
   expect(() => {
-    setHandler({}, { darkMode: 'false' })
+    setHandler({}, { appTheme: 123 })
   }).toThrow(ZodError)
   expect(storeSetMock).not.toHaveBeenCalled()
 })
@@ -260,7 +260,7 @@ test('Test that user settings set handler does not sync spellchecker when langua
   registerFaUserSettingsIpc()
 
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
-  setHandler({}, { darkMode: false })
+  setHandler({}, { appTheme: 'lightThemeFlat' })
 
   expect(applyFaSpellCheckerLanguagesToSessionMock).not.toHaveBeenCalled()
 })

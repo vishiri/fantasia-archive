@@ -14,6 +14,7 @@ export const dialogAppSettingsStorybookMinimalTree: T_appSettingsRenderTree = {
             description: 'd',
             tags: '',
             title: 'Setting',
+            control: 'toggle',
             value: false
           }
         }
@@ -28,11 +29,37 @@ export const dialogAppSettingsStorybookCategoryFixture: I_appSettingsCategoryRen
     subOne: {
       title: 'Sub title',
       settingsList: {
-        darkMode: {
+        showDocumentID: {
           description: '',
           tags: '',
-          title: 'Dark mode',
+          title: 'Show document ID',
+          control: 'toggle',
           value: false
+        },
+        appTheme: {
+          description: 'Choose a visual theme for the app to use.',
+          tags: 'theme',
+          title: 'App theme',
+          control: 'select',
+          value: 'darkThemeFantasy',
+          options: [
+            {
+              label: 'Flat theme, Light',
+              value: 'lightThemeFlat'
+            },
+            {
+              label: 'Dark, flat theme',
+              value: 'darkThemeFlat'
+            },
+            {
+              label: 'Light, fantasy theme',
+              value: 'lightThemeFantasy'
+            },
+            {
+              label: 'Fantasy theme, Dark',
+              value: 'darkThemeFantasy'
+            }
+          ]
         }
       }
     }

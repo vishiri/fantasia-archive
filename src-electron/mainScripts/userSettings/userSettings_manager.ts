@@ -4,6 +4,7 @@ import { buildSanitizedFaUserSettings } from './functions/faUserSettingsStoreCle
 import { createFaUserSettingsStoreApi } from './functions/faUserSettingsStoreApi'
 import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { migrateLegacyFaUserSettingsKeys } from 'app/src-electron/shared/faUserSettingsLegacyKeyMigrate'
+import { isFaUserSettingsAppTheme } from 'app/types/faUserSettingsAppThemeRegistry'
 import { FA_USER_SETTINGS_DEFAULTS } from './faUserSettingsDefaults'
 
 const faUserSettingsStoreApi = createFaUserSettingsStoreApi({
@@ -11,6 +12,7 @@ const faUserSettingsStoreApi = createFaUserSettingsStoreApi({
   buildSanitizedFaUserSettings,
   createLazySingleton,
   defaults: FA_USER_SETTINGS_DEFAULTS,
+  isFaUserSettingsAppTheme,
   migrateLegacyFaUserSettingsKeys,
   storeName: 'faUserSettings'
 })

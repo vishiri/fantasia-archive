@@ -16,6 +16,7 @@ const minimalTree: T_appSettingsRenderTree = {
             description: 'd',
             tags: '',
             title: 'Setting',
+            control: 'toggle',
             value: false
           }
         }

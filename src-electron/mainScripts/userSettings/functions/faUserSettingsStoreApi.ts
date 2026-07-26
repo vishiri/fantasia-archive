@@ -18,7 +18,8 @@ export function createFaUserSettingsStoreApi (deps: I_faUserSettingsStoreApiDeps
       sanitized
     } = deps.buildSanitizedFaUserSettings(
       migrated as Partial<I_faUserSettings>,
-      deps.defaults
+      deps.defaults,
+      deps.isFaUserSettingsAppTheme
     )
     if (hadUnexpectedKeysBeforeMigrate) {
       store.store = sanitized

@@ -4,6 +4,8 @@
 ## 2.4.15
 
 ### New features
+- **App Settings**: **App theme** under **Visuals & app-wide functionality** lets you pick **Flat theme, Light**, **Flat theme, Dark**, **Fantasy theme, Light**, or **Fantasy theme, Dark** (replaces the old dark-mode toggle). Changing the choice previews live while the dialog is open; **Save** keeps it.
+- **Themes**: **Flat** skin uses simpler Quasar-like chrome (light tooltips, flat dialog shells, thin field underlines, solid active vertical-tab indicator). **Fantasy** skin keeps parchment tooltips and notifications, dialog rim glow, gold tab edge glow, and diamond help icons.
 - **App Settings**: The former **Document control bar** is now the **App control bar** (setting **Disable app control bar**, subcategory title, and related UI copy). Existing saved preferences under the old setting keys keep working after upgrade.
 - **Document workspace**: **Document text color** and **Document background color** fields on each open document tab use the assigned world's color palette footer (including **+** to append a swatch to that world). Preview mode shows read-only pickers; edit mode lets you change and save them with the document. Saved colors apply to that document's tab label and icon, to its row in the hierarchy tree, and to the matching row in the tab context menu **Browse opened tabs** submenu. Multi-world projects also show the world-colored globe on document tabs and on those browse rows.
 - **Document workspace**: Programmatic **create temporary opened document** support lets integrations open unsaved document tabs before the first save. Temporary tabs stay in the **opened_documents** snapshot with world, template, and optional parent metadata; first save creates the SQLite row. **Delete current document** and tab **Delete this document** stay hidden for temporary tabs until they are saved.
@@ -40,8 +42,12 @@
 - **App Settings**: **Prevent filled app noteboard from showing** and **Prevent filled project noteboard from showing** (defaults off). When off, a filled **App Noteboard** opens at app load and a filled **Project Noteboard** opens when a project loads; when on, that auto-open is skipped. Empty noteboards never open on their own. Manual toggle and keybinds still work. Older **Prevent filled noteboard** saves migrate to the app setting.
 
 ### Bugfixes & Optimizations
+- **App Settings**: Category titles stay pinned above the scrollable settings list in tab mode so they no longer scroll away with the rows.
+- **Project Settings**: Vertical world and document-template tab hover follows the pointer after drag-reorder instead of sticking on the wrong row.
+- **Workspace sidebar**: Hierarchy tree row hover chrome hugs icon and label padding, stays visible while pressed or when the row matches the active document tab, and world glyph shading applies only in the fantasy theme.
+- **Social contact buttons**: Native browser title tooltips are removed; labels and icon alt text remain.
 - **Forms**: Readonly dark text fields keep the framed L-corner chrome but fill with a subtle diagonal hatch and muted text so they read as non-editable (no lock icon).
-- **Theme**: Dark Quasar fields use a thin grey box frame with bottom L-corner marks; tooltips and notifications use parchment framing; outline/flat buttons and vertical tabs pick up soft edge-glow accents; Quasar material ripple feedback is off app-wide.
+- **Theme**: Dark Quasar fields use a thin grey box frame with bottom L-corner marks; fantasy-theme tooltips and notifications use parchment framing; outline/flat buttons and vertical tabs pick up soft edge-glow accents in fantasy; Quasar material ripple feedback is off app-wide.
 - **Project overview**: The tip card **Did you know** heading renders in capital letters.
 - **Project Settings**: World template layout placements report separate **document** and **category** counts (aligned with hierarchy tree placement badges).
 - **Help affordances**: Shared diamond **help** tooltip icon wraps help copy on settings rows and related controls.

@@ -13,6 +13,7 @@ import GlobalLanguageSelector from '../GlobalLanguageSelector.vue'
 import { faAppHeaderChromeSpellcheckRefreshVisible } from '../scripts/faAppHeaderChromeSpellcheckReserveWiring'
 
 vi.mock('quasar', () => ({
+  Dark: { set: vi.fn() },
   Notify: { create: vi.fn() },
   copyToClipboard: vi.fn(async () => undefined)
 }))

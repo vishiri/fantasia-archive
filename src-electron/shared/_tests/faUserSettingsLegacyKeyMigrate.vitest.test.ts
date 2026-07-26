@@ -8,7 +8,7 @@ import { migrateLegacyFaUserSettingsKeys } from '../faUserSettingsLegacyKeyMigra
  */
 test('Test that migrateLegacyFaUserSettingsKeys maps legacy control bar keys onto new keys', () => {
   const migrated = migrateLegacyFaUserSettingsKeys({
-    darkMode: true,
+    appTheme: 'darkThemeFantasy',
     disableDocumentControlBar: true,
     disableDocumentControlBarGuides: true
   })
@@ -17,7 +17,7 @@ test('Test that migrateLegacyFaUserSettingsKeys maps legacy control bar keys ont
   expect(migrated.disableAppControlBarGuides).toBe(true)
   expect(migrated.disableDocumentControlBar).toBeUndefined()
   expect(migrated.disableDocumentControlBarGuides).toBeUndefined()
-  expect(migrated.darkMode).toBe(true)
+  expect(migrated.appTheme).toBe('darkThemeFantasy')
 })
 
 /**
@@ -40,13 +40,13 @@ test('Test that migrateLegacyFaUserSettingsKeys overwrites new keys when legacy 
  */
 test('Test that migrateLegacyFaUserSettingsKeys maps doNotCollapseTreeOptions onto force off', () => {
   const migrated = migrateLegacyFaUserSettingsKeys({
-    darkMode: true,
+    appTheme: 'darkThemeFantasy',
     doNotCollapseTreeOptions: true
   })
 
   expect(migrated.forceSublevelCollapseInTree).toBe(false)
   expect(migrated.doNotCollapseTreeOptions).toBeUndefined()
-  expect(migrated.darkMode).toBe(true)
+  expect(migrated.appTheme).toBe('darkThemeFantasy')
 })
 
 /**
@@ -69,13 +69,13 @@ test('Test that migrateLegacyFaUserSettingsKeys keeps existing forceSublevelColl
  */
 test('Test that migrateLegacyFaUserSettingsKeys maps preventFilledNoteBoardPopup onto app key', () => {
   const migrated = migrateLegacyFaUserSettingsKeys({
-    darkMode: true,
+    appTheme: 'darkThemeFantasy',
     preventFilledNoteBoardPopup: true
   })
 
   expect(migrated.preventFilledAppNoteBoardPopup).toBe(true)
   expect(migrated.preventFilledNoteBoardPopup).toBeUndefined()
-  expect(migrated.darkMode).toBe(true)
+  expect(migrated.appTheme).toBe('darkThemeFantasy')
 })
 
 /**
@@ -90,6 +90,15 @@ test('Test that migrateLegacyFaUserSettingsKeys overwrites app noteboard prevent
 
   expect(migrated.preventFilledAppNoteBoardPopup).toBe(true)
   expect(migrated.preventFilledNoteBoardPopup).toBeUndefined()
+})
+
+/**
+ * migrateLegacyFaUserSettingsKeys
+ * Maps legacy boolean appTheme (dark-mode toggle) onto fantasy light/dark theme ids.
+ */
+test('Test that migrateLegacyFaUserSettingsKeys maps boolean appTheme onto fantasy theme ids', () => {
+  expect(migrateLegacyFaUserSettingsKeys({ appTheme: true }).appTheme).toBe('darkThemeFantasy')
+  expect(migrateLegacyFaUserSettingsKeys({ appTheme: false }).appTheme).toBe('lightThemeFantasy')
 })
 
 /**

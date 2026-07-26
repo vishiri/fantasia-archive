@@ -3,6 +3,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_dialogAppSettingsProps } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsFaUserSettingsStoreForSync } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
+import type { T_appSettingsSettingUpdateValue } from 'app/types/I_dialogAppSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { ComputedRef, Ref } from 'app/types/I_vueCompositionRefs'
 
@@ -18,8 +19,10 @@ export function createDialogAppSettings (deps: {
   buildAppSettingsRenderTree: (
     translate: { t: (key: string) => string; te: (key: string) => boolean },
     options: Record<string, { category: string; subcategory: string }>,
-    settings: I_faUserSettings
+    settings: I_faUserSettings,
+    appThemeValues: readonly string[]
   ) => T_appSettingsRenderTree
+  appThemeValues: readonly string[]
   computed: <T>(getter: () => T) => ComputedRef<T>
   filterAppSettingsTreeForSearch: (
     tree: T_appSettingsRenderTree,
@@ -44,7 +47,7 @@ export function createDialogAppSettings (deps: {
     tree: T_appSettingsRenderTree,
     options: Record<string, { category: string; subcategory: string }>,
     settingKey: string,
-    updatedValue: boolean
+    updatedValue: T_appSettingsSettingUpdateValue
   ) => void
   watch: (
     source: unknown,
@@ -81,7 +84,7 @@ export function createDialogAppSettings (deps: {
     }) => {
       openDialog: (input: T_dialogName) => void
       saveAndCloseDialog: () => Promise<void>
-      updateLocalSetting: (settingKey: string, updatedValue: boolean) => void
+      updateLocalSetting: (settingKey: string, updatedValue: T_appSettingsSettingUpdateValue) => void
     }
     useDialogAppSettings: (props: I_dialogAppSettingsProps) => {
       dialogModel: Ref<boolean>
@@ -94,7 +97,7 @@ export function createDialogAppSettings (deps: {
       searchFilteredAppSettingsTree: ComputedRef<T_appSettingsRenderTree>
       searchSettingsQuery: Ref<string | null>
       selectedCategoryTab: Ref<string>
-      updateLocalSetting: (settingKey: string, updatedValue: boolean) => void
+      updateLocalSetting: (settingKey: string, updatedValue: T_appSettingsSettingUpdateValue) => void
     }
   } {
   const dialogAppSettingsTranslate = {
@@ -136,7 +139,8 @@ export function createDialogAppSettings (deps: {
       appSettingsTree.value = deps.buildAppSettingsRenderTree(
         dialogAppSettingsTranslate,
         deps.APP_SETTINGS_OPTIONS,
-        localSettings.value
+        localSettings.value,
+        deps.appThemeValues
       )
     }
   }
@@ -273,7 +277,7 @@ export function createDialogAppSettings (deps: {
   }): {
       openDialog: (input: T_dialogName) => void
       saveAndCloseDialog: () => Promise<void>
-      updateLocalSetting: (settingKey: string, updatedValue: boolean) => void
+      updateLocalSetting: (settingKey: string, updatedValue: T_appSettingsSettingUpdateValue) => void
     } {
     const {
       dialogModel,
@@ -295,7 +299,8 @@ export function createDialogAppSettings (deps: {
         appSettingsTree.value = deps.buildAppSettingsRenderTree(
           dialogAppSettingsTranslate,
           deps.APP_SETTINGS_OPTIONS,
-          nextSettings
+          nextSettings,
+          deps.appThemeValues
         )
         return
       }
@@ -312,7 +317,7 @@ export function createDialogAppSettings (deps: {
       dialogModel.value = false
     }
 
-    function updateLocalSetting (settingKey: string, updatedValue: boolean): void {
+    function updateLocalSetting (settingKey: string, updatedValue: T_appSettingsSettingUpdateValue): void {
       if (localSettings.value === null) {
         return
       }
@@ -325,9 +330,15 @@ export function createDialogAppSettings (deps: {
         updatedValue
       )
 
-      if (settingKey === 'hideTooltipsProject') {
+      if (settingKey === 'hideTooltipsProject' && typeof updatedValue === 'boolean') {
         deps.S_FaUserSettings().setAppSettingsDialogPreview({
           hideTooltipsProject: updatedValue
+        })
+      }
+
+      if (settingKey === 'appTheme' && typeof updatedValue === 'string') {
+        deps.S_FaUserSettings().setAppSettingsDialogPreview({
+          appTheme: updatedValue as I_faUserSettings['appTheme']
         })
       }
     }

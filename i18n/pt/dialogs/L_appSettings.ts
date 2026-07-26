@@ -126,10 +126,16 @@ export default {
       description: 'Determina se as tags são mostradas como categorias individuais ou como uma categoria com cada tag como uma subcategoria.',
       tags: 'agrupamento de tags, pasta de tags única, tags aninhadas, hierarquia de tags',
     },
-    darkMode: {
-      title: 'Modo escuro',
-      description: 'Alterne entre o modo claro e escuro do aplicativo.',
-      tags: 'escuro, claro, tema, temática, cor, cores',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Pare de fechar após a seleção',

@@ -126,10 +126,16 @@ export default {
       description: 'Määrittää, näytetäänkö tunnisteet yksittäisinä luokkina vai yhtenä kategoriana, jolloin kukin tunniste on alaluokka.',
       tags: 'tunnisteiden ryhmittely, yhden tagin kansio, sisäkkäiset tunnisteet, tunnistehierarkia',
     },
-    darkMode: {
-      title: 'Tumma tila',
-      description: 'Vaihda sovelluksen vaalean ja tumman tilan välillä.',
-      tags: 'tumma, vaalea, teema, teema, väri, värit',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Lopeta sulkeminen valinnan jälkeen',

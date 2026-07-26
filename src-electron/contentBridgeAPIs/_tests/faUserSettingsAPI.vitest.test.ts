@@ -30,7 +30,7 @@ beforeEach(() => {
 test('faUserSettingsAPI getSettings invokes IPC get channel', async () => {
   const snapshot = {
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true
+    appTheme: 'darkThemeFantasy'
   }
   invokeMock.mockResolvedValueOnce(snapshot)
   await expect(faUserSettingsAPI.getSettings()).resolves.toEqual(snapshot)
@@ -43,8 +43,8 @@ test('faUserSettingsAPI getSettings invokes IPC get channel', async () => {
  */
 test('faUserSettingsAPI setSettings invokes IPC set channel with patch', async () => {
   invokeMock.mockResolvedValueOnce(undefined)
-  await faUserSettingsAPI.setSettings({ darkMode: false })
-  expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.setAsync, { darkMode: false })
+  await faUserSettingsAPI.setSettings({ appTheme: 'lightThemeFlat' })
+  expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.setAsync, { appTheme: 'lightThemeFlat' })
 })
 
 /**

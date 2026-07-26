@@ -6,6 +6,7 @@ import { defineComponent } from 'vue'
 import { expect, test, vi } from 'vitest'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
 
 import DialogAppSettings from '../DialogAppSettings.vue'
 import { APP_SETTINGS_OPTIONS } from '../_data/appSettingsOptions'
@@ -236,7 +237,7 @@ test('Test that DialogAppSettings hydrates from directSettingsSnapshot without f
       directInput: 'AppSettings',
       directSettingsSnapshot: {
         ...FA_USER_SETTINGS_DEFAULTS,
-        darkMode: true
+        appTheme: 'darkThemeFantasy'
       }
     },
     ...appSettingsDialogMountOptions
@@ -245,7 +246,7 @@ test('Test that DialogAppSettings hydrates from directSettingsSnapshot without f
   await flushPromises()
 
   expect(getSettings).not.toHaveBeenCalled()
-  expect(w.find('[data-test-setting-id="darkMode"]').exists()).toBe(true)
+  expect(w.find('[data-test-setting-id="appTheme"]').exists()).toBe(true)
   w.unmount()
 })
 
@@ -337,7 +338,7 @@ test('Test that DialogAppSettings hides empty state visually when search returns
 
   await flushPromises()
 
-  await w.get('input.dialogAppSettings__settingsSearchInput').setValue('dark')
+  await w.get('input.dialogAppSettings__settingsSearchInput').setValue('theme')
   await flushPromises()
   await new Promise((resolve) => {
     setTimeout(resolve, SEARCH_DEBOUNCE_MS)
@@ -393,7 +394,8 @@ test('Test that DialogAppSettings updates selected category tab from QTabs emit'
       te: (key: string) => i18n.global.te(key)
     },
     APP_SETTINGS_OPTIONS,
-    { ...FA_USER_SETTINGS_DEFAULTS }
+    { ...FA_USER_SETTINGS_DEFAULTS },
+    FA_USER_SETTINGS_APP_THEME_VALUES
   ))
   const nextTab = keys.length > 1 ? keys[1]! : keys[0]
   const tabs = w.findComponent({ name: 'QTabs' })

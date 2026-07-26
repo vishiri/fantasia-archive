@@ -1,10 +1,21 @@
+import type { T_faUserSettingsAppTheme } from 'app/types/faUserSettingsAppThemeRegistry'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+
+export type {
+  T_faUserSettingsAppTheme
+} from 'app/types/faUserSettingsAppThemeRegistry'
 
 export type {
   T_faUserSettingsLanguageCode,
   T_faUserSettingsLanguageNamesKey,
   T_faUserSettingsLanguageSelectorRow
 } from 'app/types/faUserSettingsLanguageRegistry'
+
+export {
+  FA_USER_SETTINGS_APP_THEME_DEFAULT,
+  FA_USER_SETTINGS_APP_THEME_VALUES,
+  isFaUserSettingsAppTheme
+} from 'app/types/faUserSettingsAppThemeRegistry'
 
 export {
   FA_SPELL_CHECKER_CANDIDATES_BY_LANGUAGE_CODE,
@@ -22,9 +33,9 @@ export interface I_faUserSettings {
   aggressiveRelationshipFilter: boolean
   allowQuickPopupSameKeyClose: boolean
   allowWiderScrollbars: boolean
+  appTheme: T_faUserSettingsAppTheme
   disableCategoryCount: boolean
   compactTags: boolean
-  darkMode: boolean
   disableCloseAfterSelectQuickSearch: boolean
   disableAppControlBar: boolean
   disableAppControlBarContentButtons: boolean

@@ -74,7 +74,7 @@ test('Test that getFaUserSettings creates the store once with expected name and 
  * Unknown persisted settings keys are removed and the sanitized settings are auto-saved once.
  */
 test('Test that getFaUserSettings removes unknown persisted keys during startup cleanup', async () => {
-  persistedStoreExtras.darkMode = true
+  persistedStoreExtras.appTheme = 'lightThemeFlat'
   persistedStoreExtras.futureKey = true
 
   const { getFaUserSettings } = await import('../userSettings_manager')
@@ -83,7 +83,7 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
   expect(storeReplacementCalls).toEqual([
     {
       ...FA_USER_SETTINGS_DEFAULTS,
-      darkMode: true
+      appTheme: 'lightThemeFlat'
     }
   ])
   expect((store.store as I_faUserSettings & Record<string, unknown>).futureKey).toBeUndefined()
@@ -94,13 +94,13 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
  * Startup cleanup does not rewrite the store when all persisted keys still exist in defaults.
  */
 test('Test that getFaUserSettings does not rewrite a clean persisted settings store', async () => {
-  persistedStoreExtras.darkMode = true
+  persistedStoreExtras.appTheme = 'lightThemeFlat'
 
   const { getFaUserSettings } = await import('../userSettings_manager')
   const store = getFaUserSettings()
 
   expect(storeReplacementCalls).toEqual([])
-  expect(store.store.darkMode).toBe(true)
+  expect(store.store.appTheme).toBe('lightThemeFlat')
 })
 
 /**
@@ -154,7 +154,7 @@ test('Test that cleanupFaUserSettings fills missing keys when persisted store sn
 test('Test that cleanupFaUserSettings backfills omitted default keys from a partial persisted object', async () => {
   const { cleanupFaUserSettings } = await import('../userSettings_manager')
   const partial = {
-    darkMode: true
+    appTheme: 'darkThemeFantasy'
   } as Partial<I_faUserSettings> & Record<string, unknown>
   const fakeStore = {
     get store () {
@@ -167,5 +167,5 @@ test('Test that cleanupFaUserSettings backfills omitted default keys from a part
 
   cleanupFaUserSettings(fakeStore)
 
-  expect(partial.darkMode).toBe(true)
+  expect(partial.appTheme).toBe('darkThemeFantasy')
 })

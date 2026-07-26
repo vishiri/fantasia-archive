@@ -10,10 +10,11 @@ const categoryFixture = {
     subOne: {
       title: 'Sub title',
       settingsList: {
-        darkMode: {
+        showDocumentID: {
           description: '',
           tags: '',
-          title: 'Dark mode',
+          title: 'Show document ID',
+          control: 'toggle' as const,
           value: false
         }
       }
@@ -24,7 +25,7 @@ const categoryFixture = {
 const settingBlockEmitter = defineComponent({
   name: 'DialogAppSettingsSettingBlock',
   emits: ['update-setting'],
-  template: '<button type="button" @click="$emit(\'update-setting\', \'darkMode\', true)">emit-setting</button>'
+  template: '<button type="button" @click="$emit(\'update-setting\', \'showDocumentID\', true)">emit-setting</button>'
 })
 
 const appSettingsCategoryPanelMount = {
@@ -54,7 +55,7 @@ test('Test that DialogAppSettingsCategoryPanel forwards update-setting from chil
   await flushPromises()
   await w.get('button').trigger('click')
 
-  expect(w.emitted('update-setting')?.[0]!).toEqual(['darkMode', true])
+  expect(w.emitted('update-setting')?.[0]!).toEqual(['showDocumentID', true])
   w.unmount()
 })
 

@@ -85,7 +85,6 @@ function emitSearchQueryFromInput (value: string | number | null): void {
 }
 
 .dialogAppSettings__settingsSearchWrapper {
-  background-color: $dialogAppSettings-surface-backgroundColor;
   pointer-events: auto;
   position: absolute;
   right: $dialogAppSettings-settingsSearchWrapper-right;

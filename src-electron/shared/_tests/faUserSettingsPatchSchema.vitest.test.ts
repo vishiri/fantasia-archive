@@ -15,10 +15,10 @@ test('Test that parseFaUserSettingsPatch accepts empty plain object', () => {
 
 /**
  * parseFaUserSettingsPatch
- * Accepts a single known boolean field.
+ * Accepts a single known appTheme field.
  */
-test('Test that parseFaUserSettingsPatch accepts a single-key boolean patch', () => {
-  expect(parseFaUserSettingsPatch({ darkMode: true })).toEqual({ darkMode: true })
+test('Test that parseFaUserSettingsPatch accepts a single-key appTheme patch', () => {
+  expect(parseFaUserSettingsPatch({ appTheme: 'darkThemeFantasy' })).toEqual({ appTheme: 'darkThemeFantasy' })
 })
 
 /**
@@ -68,7 +68,7 @@ test('Test that parseFaUserSettingsPatch accepts full settings object', () => {
 test('Test that parseFaUserSettingsPatch throws ZodError for unknown key', () => {
   expect(() => {
     parseFaUserSettingsPatch({
-      darkMode: true,
+      appTheme: 'darkThemeFantasy',
       futureKey: true
     })
   }).toThrow(ZodError)
@@ -80,7 +80,7 @@ test('Test that parseFaUserSettingsPatch throws ZodError for unknown key', () =>
  */
 test('Test that parseFaUserSettingsPatch throws ZodError when boolean field is string', () => {
   expect(() => {
-    parseFaUserSettingsPatch({ darkMode: 'true' })
+    parseFaUserSettingsPatch({ textShadow: 'true' })
   }).toThrow(ZodError)
 })
 
@@ -90,8 +90,28 @@ test('Test that parseFaUserSettingsPatch throws ZodError when boolean field is s
  */
 test('Test that parseFaUserSettingsPatch throws ZodError when boolean field is null', () => {
   expect(() => {
-    parseFaUserSettingsPatch({ darkMode: null })
+    parseFaUserSettingsPatch({ textShadow: null })
   }).toThrow(ZodError)
+})
+
+/**
+ * parseFaUserSettingsPatch
+ * Rejects invalid appTheme enum strings.
+ */
+test('Test that parseFaUserSettingsPatch throws ZodError for invalid appTheme', () => {
+  expect(() => {
+    parseFaUserSettingsPatch({ appTheme: 'notATheme' })
+  }).toThrow(ZodError)
+})
+
+/**
+ * parseFaUserSettingsPatch
+ * Accepts a valid appTheme enum value.
+ */
+test('Test that parseFaUserSettingsPatch accepts appTheme enum values', () => {
+  expect(parseFaUserSettingsPatch({ appTheme: 'darkThemeFantasy' })).toEqual({
+    appTheme: 'darkThemeFantasy'
+  })
 })
 
 /**
@@ -130,6 +150,6 @@ test('Test that parseFaUserSettingsPatch throws TypeError for Date root', () => 
  */
 test('Test that faUserSettingsPatchSchema rejects nested object for boolean field', () => {
   expect(() => {
-    faUserSettingsPatchSchema.parse({ darkMode: { value: true } })
+    faUserSettingsPatchSchema.parse({ textShadow: { value: true } })
   }).toThrow(ZodError)
 })

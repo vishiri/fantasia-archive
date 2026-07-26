@@ -126,10 +126,16 @@ export default {
       description: 'यह निर्धारित करता है कि टैग को अलग-अलग श्रेणियों के रूप में दिखाया गया है या प्रत्येक टैग को उपश्रेणी के रूप में एक श्रेणी के रूप में दिखाया गया है।',
       tags: 'टैग समूहन, एकल टैग फ़ोल्डर, नेस्टेड टैग, टैग पदानुक्रम',
     },
-    darkMode: {
-      title: 'डार्क मोड',
-      description: 'ऐप के लिए लाइट और डार्क मोड के बीच स्विच करें।',
-      tags: 'गहरा, प्रकाश, थीम, थीम, रंग, रंग',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'चयन के बाद बंद करना बंद करें',

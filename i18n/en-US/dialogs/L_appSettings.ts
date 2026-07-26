@@ -126,10 +126,16 @@ export default {
       description: 'Determines whether tags are shown as individual categories or as one category with each tag as a subcategory.',
       tags: 'tag grouping, single tag folder, nested tags, tag hierarchy'
     },
-    darkMode: {
-      title: 'TODO - Dark mode',
-      description: 'Switch between light and dark mode for the app.',
-      tags: 'dark, light, theme, theming, color, colors'
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'TODO - Prevent close after selection on quick-search popup',

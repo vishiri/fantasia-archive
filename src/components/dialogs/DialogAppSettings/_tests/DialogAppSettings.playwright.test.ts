@@ -311,18 +311,18 @@ test.describe.serial('App settings dialog', () => {
     await expect(searchPanel).toHaveCount(0)
   })
 
-  test('App settings search finds dark mode by tag substring theme', async () => {
+  test('App settings search finds app theme by tag substring theme', async () => {
     await fillAppSettingsSearch(appWindow, 'theme')
 
     const matchRoots = appWindow.locator('[data-test-locator^="dialogAppSettings-search-setting-"]')
     await expect(matchRoots).toHaveCount(1)
 
-    const darkModeRow = appWindow.locator(
-      `[data-test-locator="${appSettingsSearchSelector.setting('darkMode')}"]`
+    const appThemeRow = appWindow.locator(
+      `[data-test-locator="${appSettingsSearchSelector.setting('appTheme')}"]`
     )
-    await expect(darkModeRow).toBeVisible()
-    await expect(darkModeRow).toHaveAttribute('data-test-setting-id', 'darkMode')
-    await expect(darkModeRow).toHaveAttribute('data-test-tags', /theme/)
+    await expect(appThemeRow).toBeVisible()
+    await expect(appThemeRow).toHaveAttribute('data-test-setting-id', 'appTheme')
+    await expect(appThemeRow).toHaveAttribute('data-test-tags', /theme/)
 
     await clearAppSettingsSearch(appWindow)
   })

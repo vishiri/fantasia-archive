@@ -126,10 +126,16 @@ export default {
       description: '确定标签是显示为单个类别还是显示为一个类别（其中每个标签作为一个子类别）。',
       tags: '标签分组、单个标签文件夹、嵌套标签、标签层次结构',
     },
-    darkMode: {
-      title: '深色模式',
-      description: '在应用程序的浅色和深色模式之间切换。',
-      tags: '深色、浅色、主题、主题、颜色、颜色',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: '选择后停止关闭',

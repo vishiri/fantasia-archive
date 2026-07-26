@@ -126,10 +126,16 @@ export default {
       description: 'Καθορίζει εάν οι ετικέτες εμφανίζονται ως μεμονωμένες κατηγορίες ή ως μία κατηγορία με κάθε ετικέτα ως υποκατηγορία.',
       tags: 'ομαδοποίηση ετικετών, φάκελος μεμονωμένης ετικέτας, ένθετες ετικέτες, ιεραρχία ετικετών',
     },
-    darkMode: {
-      title: 'Σκοτεινή λειτουργία',
-      description: 'Εναλλαγή μεταξύ φωτεινής και σκοτεινής λειτουργίας για την εφαρμογή.',
-      tags: 'σκούρο, ανοιχτό, θέμα, θέμα, χρώμα, χρώματα',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Σταματήστε το κλείσιμο μετά την επιλογή',

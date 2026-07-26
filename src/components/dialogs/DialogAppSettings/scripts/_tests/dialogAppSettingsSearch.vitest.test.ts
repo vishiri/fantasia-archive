@@ -16,13 +16,19 @@ import {
 } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
 import { useDialogAppSettingsSearchComputed } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
 
-const stubSetting = (overrides: Partial<I_appSettingsSettingRenderItem> = {}): I_appSettingsSettingRenderItem => ({
-  description: '',
-  tags: '',
-  title: '',
-  value: false,
-  ...overrides
-})
+const stubSetting = (overrides: Partial<I_appSettingsSettingRenderItem> = {}): I_appSettingsSettingRenderItem => {
+  const base: I_appSettingsSettingRenderItem = {
+    description: '',
+    tags: '',
+    title: '',
+    control: 'toggle',
+    value: false
+  }
+  return {
+    ...base,
+    ...overrides
+  } as I_appSettingsSettingRenderItem
+}
 
 const stubSubCategory = (): I_appSettingsSubCategoryRenderItem => ({
   settingsList: {},
@@ -143,12 +149,14 @@ test('Test that filterAppSettingsTreeForSearch keeps only matching settings', ()
               description: '',
               tags: '',
               title: 'findme',
+              control: 'toggle',
               value: true
             }),
             drop: stubSetting({
               description: 'other',
               tags: 'x',
               title: 'y',
+              control: 'toggle',
               value: false
             })
           },
@@ -174,6 +182,7 @@ test('Test that filterAppSettingsTreeForSearch omits empty sub-categories and ca
               description: 'nope',
               tags: 'nope',
               title: 'nope',
+              control: 'toggle',
               value: false
             })
           },
@@ -190,6 +199,7 @@ test('Test that filterAppSettingsTreeForSearch omits empty sub-categories and ca
               description: '',
               tags: '',
               title: 'needle-here',
+              control: 'toggle',
               value: true
             })
           },
@@ -217,6 +227,7 @@ test('Test that filterAppSettingsTreeForSearch preserves category and sub-catego
               description: '',
               tags: 'hit',
               title: '',
+              control: 'toggle',
               value: false
             })
           },
@@ -228,6 +239,7 @@ test('Test that filterAppSettingsTreeForSearch preserves category and sub-catego
               description: '',
               tags: 'hit',
               title: '',
+              control: 'toggle',
               value: false
             })
           },
@@ -244,6 +256,7 @@ test('Test that filterAppSettingsTreeForSearch preserves category and sub-catego
               description: '',
               tags: '',
               title: 'hit',
+              control: 'toggle',
               value: false
             })
           },
@@ -297,6 +310,7 @@ test('hasSearchNoMatchingSettings is true when filter yields empty tree', () => 
               description: 'd',
               tags: 't',
               title: 'UniqueTitle',
+              control: 'toggle',
               value: false
             }
           },
@@ -349,6 +363,7 @@ test('hasSearchNoMatchingSettings is false when filtered tree is non-empty', () 
               description: 'd',
               tags: 't',
               title: 'UniqueTitle',
+              control: 'toggle',
               value: false
             }
           },

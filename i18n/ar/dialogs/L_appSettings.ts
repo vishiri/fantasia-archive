@@ -126,10 +126,16 @@ export default {
       description: 'يحدد ما إذا كانت العلامات سيتم عرضها كفئات فردية أو كفئة واحدة مع كل علامة كفئة فرعية.',
       tags: 'تجميع العلامات، مجلد علامات واحد، علامات متداخلة، التسلسل الهرمي للعلامات',
     },
-    darkMode: {
-      title: 'الوضع المظلم',
-      description: 'التبديل بين الوضع الفاتح والداكن للتطبيق.',
-      tags: 'الظلام والضوء والموضوع والموضوعات واللون والألوان',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'توقف عن الإغلاق بعد التحديد',

@@ -17,6 +17,10 @@ I_appSettingsStaticOption
     category: 'accessibility',
     subcategory: 'accessibility'
   },
+  appTheme: {
+    category: 'visualAccessibility',
+    subcategory: 'visualsAppwideFunctionality'
+  },
   disableCategoryCount: {
     category: 'hierarchicalTree',
     subcategory: 'informationDisplaySettings'
@@ -24,10 +28,6 @@ I_appSettingsStaticOption
   compactTags: {
     category: 'hierarchicalTree',
     subcategory: 'tagSettings'
-  },
-  darkMode: {
-    category: 'visualAccessibility',
-    subcategory: 'visualsAppwideFunctionality'
   },
   disableCloseAfterSelectQuickSearch: {
     category: 'popupsFloatingWindows',

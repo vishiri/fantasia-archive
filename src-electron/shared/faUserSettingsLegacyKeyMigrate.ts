@@ -8,6 +8,7 @@
  * 'forceSublevelCollapseInTree: false' — force-off is the new default (children
  * remember pre-close state). Prefer an already-present force key when set.
  * 'preventFilledNoteBoardPopup' maps onto 'preventFilledAppNoteBoardPopup'.
+ * Boolean 'appTheme' (old dark-mode toggle) maps to fantasy light/dark theme ids.
  */
 export function migrateLegacyFaUserSettingsKeys (
   raw: unknown
@@ -37,6 +38,9 @@ export function migrateLegacyFaUserSettingsKeys (
   }
   if (typeof source.preventFilledNoteBoardPopup === 'boolean') {
     next.preventFilledAppNoteBoardPopup = source.preventFilledNoteBoardPopup
+  }
+  if (typeof source.appTheme === 'boolean') {
+    next.appTheme = source.appTheme ? 'darkThemeFantasy' : 'lightThemeFantasy'
   }
 
   delete next.disableDocumentControlBar

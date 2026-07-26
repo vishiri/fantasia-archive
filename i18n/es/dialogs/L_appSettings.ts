@@ -126,10 +126,16 @@ export default {
       description: 'Determina si las etiquetas se muestran como categorías individuales o como una categoría con cada etiqueta como una subcategoría.',
       tags: 'agrupación de etiquetas, carpeta de etiquetas únicas, etiquetas anidadas, jerarquía de etiquetas',
     },
-    darkMode: {
-      title: 'modo oscuro',
-      description: 'Cambie entre el modo claro y oscuro para la aplicación.',
-      tags: 'oscuro, claro, tema, tematización, color, colores',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Dejar de cerrar después de la selección',

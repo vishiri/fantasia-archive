@@ -126,10 +126,16 @@ export default {
       description: 'タグを個別のカテゴリとして表示するか、各タグをサブカテゴリとして含む 1 つのカテゴリとして表示するかを決定します。',
       tags: 'タグのグループ化、単一タグ フォルダー、ネストされたタグ、タグ階層',
     },
-    darkMode: {
-      title: 'ダークモード',
-      description: 'アプリのライトモードとダークモードを切り替えます。',
-      tags: 'ダーク、ライト、テーマ、主題、色、色',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: '選択後に閉じるのをやめる',

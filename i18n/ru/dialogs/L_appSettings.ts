@@ -126,10 +126,16 @@ export default {
       description: 'Определяет, отображаются ли теги как отдельные категории или как одна категория, где каждый тег является подкатегорией.',
       tags: 'группировка тегов, папка с одним тегом, вложенные теги, иерархия тегов',
     },
-    darkMode: {
-      title: 'Темный режим',
-      description: 'Переключение между светлым и темным режимом приложения.',
-      tags: 'темный, светлый, тема, тематика, цвет, цвета',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Перестать закрывать после выбора',

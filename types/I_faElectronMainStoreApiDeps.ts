@@ -87,13 +87,15 @@ export interface I_faUserSettingsStoreApiDeps {
   }) => I_faElectronStoreHandle<I_faUserSettings>
   buildSanitizedFaUserSettings: (
     currentSettings: Partial<I_faUserSettings>,
-    defaults: I_faUserSettings
+    defaults: I_faUserSettings,
+    isAppTheme: (value: string) => boolean
   ) => {
     hasUnexpectedKeys: boolean
     sanitized: I_faUserSettings
   }
   createLazySingleton: <T>(factory: () => T) => () => T
   defaults: I_faUserSettings
+  isFaUserSettingsAppTheme: (value: string) => boolean
   migrateLegacyFaUserSettingsKeys: (raw: unknown) => Record<string, unknown>
   storeName: string
 }

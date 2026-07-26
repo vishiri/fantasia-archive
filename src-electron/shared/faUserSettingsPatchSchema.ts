@@ -3,21 +3,26 @@ import { z } from 'zod'
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 const faUserSettingsLanguageCodeSchema = z.enum(FA_USER_SETTINGS_LANGUAGE_CODES)
+const faUserSettingsAppThemeSchema = z.enum(FA_USER_SETTINGS_APP_THEME_VALUES)
 
 /**
  * Strict partial: only keys from 'FA_USER_SETTINGS_DEFAULTS'.
- * Boolean fields accept optional booleans; 'languageCode' accepts optional supported locale codes.
+ * Boolean fields accept optional booleans; 'languageCode' and 'appTheme' accept optional enums.
  * Unknown keys are rejected. Built from defaults so IPC allowed keys stay aligned with 'cleanupFaUserSettings'.
  */
 const faUserSettingsPatchShape = Object.fromEntries(
   (Object.keys(FA_USER_SETTINGS_DEFAULTS) as Array<keyof I_faUserSettings>).map((key) => {
-    const fieldSchema = key === 'languageCode'
-      ? faUserSettingsLanguageCodeSchema.optional()
-      : z.boolean().optional()
+    let fieldSchema: z.ZodTypeAny = z.boolean().optional()
+    if (key === 'languageCode') {
+      fieldSchema = faUserSettingsLanguageCodeSchema.optional()
+    } else if (key === 'appTheme') {
+      fieldSchema = faUserSettingsAppThemeSchema.optional()
+    }
 
     return [
       key,

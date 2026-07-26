@@ -126,10 +126,16 @@ export default {
       description: 'Bestemmer om tagger skal vises som individuelle kategorier eller som én kategori med hver kode som en underkategori.',
       tags: 'tag-gruppering, enkelt tag-mappe, nestede tagger, tag-hierarki',
     },
-    darkMode: {
-      title: 'Mørk modus',
-      description: 'Bytt mellom lys og mørk modus for appen.',
-      tags: 'mørk, lys, tema, tema, farge, farger',
+    appTheme: {
+      title: 'App theme',
+      description: 'Choose a visual theme for the app to use.',
+      tags: 'dark, light, theme, theming, color, colors',
+      values: {
+        lightThemeFlat: 'Flat theme, Light',
+        darkThemeFlat: 'Flat theme, Dark',
+        lightThemeFantasy: 'Fantasy theme, Light',
+        darkThemeFantasy: 'Fantasy theme, Dark'
+      }
     },
     disableCloseAfterSelectQuickSearch: {
       title: 'Stopp lukking etter valg',

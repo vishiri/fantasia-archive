@@ -126,7 +126,7 @@ test('saveAndCloseDialog dispatches saveAppSettings action when local snapshot e
   const documentName = ref('')
   const localSettings = ref<I_faUserSettings | null>({
     ...FA_USER_SETTINGS_DEFAULTS,
-    darkMode: true
+    appTheme: 'darkThemeFantasy'
   })
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const searchSettingsQuery = ref<string | null>(null)
@@ -148,7 +148,7 @@ test('saveAndCloseDialog dispatches saveAppSettings action when local snapshot e
   expect(runFaActionAwaitMock).toHaveBeenCalledWith(
     'saveAppSettings',
     expect.objectContaining({
-      settings: expect.objectContaining({ darkMode: true })
+      settings: expect.objectContaining({ appTheme: 'darkThemeFantasy' })
     })
   )
   expect(dialogModel.value).toBe(false)
@@ -177,6 +177,7 @@ test('updateLocalSetting updates a toggle leaf when the tree contains the key', 
               description: '',
               tags: '',
               title: 'Show document ID',
+              control: 'toggle',
               value: false
             }
           },
@@ -273,6 +274,45 @@ test('updateLocalSetting does not patch hideTooltipsProject on the user settings
 
 /**
  * createDialogAppSettingsDialogActions
+ * Selecting appTheme previews the theme on the live document via the user-settings store.
+ */
+test('updateLocalSetting previews appTheme through the user-settings store', () => {
+  const store = createAppSettingsStoreMock({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      appTheme: 'darkThemeFantasy'
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('appTheme', 'lightThemeFlat')
+
+  expect(localSettings.value?.appTheme).toBe('lightThemeFlat')
+  expect(store.setAppSettingsDialogPreview).toHaveBeenCalledWith({
+    appTheme: 'lightThemeFlat'
+  })
+})
+
+/**
+ * createDialogAppSettingsDialogActions
  * updateLocalSetting still updates the local draft when directSettingsSnapshot props are used.
  */
 test('updateLocalSetting updates local draft for directSettingsSnapshot props without touching the store', () => {
@@ -351,6 +391,7 @@ test('updateLocalAppSettingsField writes localSettings and appSettingsTree for s
               description: '',
               tags: '',
               title: 'Show document ID',
+              control: 'toggle',
               value: false
             }
           },
@@ -374,6 +415,59 @@ test('updateLocalAppSettingsField writes localSettings and appSettingsTree for s
     appSettingsTree.value.developerSettings?.subCategories.documentBody?.settingsList
       .showDocumentID?.value
   ).toBe(true)
+})
+
+/**
+ * updateLocalAppSettingsField
+ * Updates both the flat settings snapshot and the matching render-tree select for a known key.
+ */
+test('updateLocalAppSettingsField writes localSettings and appSettingsTree for appTheme select', () => {
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({
+    visualAccessibility: {
+      subCategories: {
+        visualsAppwideFunctionality: {
+          settingsList: {
+            appTheme: {
+              control: 'select',
+              description: '',
+              options: [
+                {
+                  label: 'Fantasy theme, Dark',
+                  value: 'darkThemeFantasy'
+                },
+                {
+                  label: 'Flat theme, Light',
+                  value: 'lightThemeFlat'
+                }
+              ],
+              tags: '',
+              title: 'App theme',
+              value: 'darkThemeFantasy'
+            }
+          },
+          title: 'Visuals'
+        }
+      },
+      title: 'Visual'
+    }
+  })
+
+  updateLocalAppSettingsField(
+    localSettings.value as I_faUserSettings,
+    appSettingsTree.value,
+    APP_SETTINGS_OPTIONS,
+    'appTheme',
+    'lightThemeFlat'
+  )
+
+  expect(localSettings.value?.appTheme).toBe('lightThemeFlat')
+  expect(
+    appSettingsTree.value.visualAccessibility?.subCategories.visualsAppwideFunctionality
+      ?.settingsList.appTheme?.value
+  ).toBe('lightThemeFlat')
 })
 
 /**
