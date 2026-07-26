@@ -1,6 +1,5 @@
 .faHelpTooltipIcon {
   align-items: center;
-  color: $faHelpTooltipIcon-color;
   display: inline-flex;
   flex-shrink: 0;
   height: $faHelpTooltipIcon-size;
@@ -8,11 +7,20 @@
   position: relative;
   width: $faHelpTooltipIcon-size;
 
+  /* Flat: solid white help-circle (fantasy shows diamond instead). */
+  &__circle {
+    color: $faHelpTooltipIcon-circle-color;
+    font-size: $faHelpTooltipIcon-circle-size !important;
+    height: $faHelpTooltipIcon-circle-size !important;
+    width: $faHelpTooltipIcon-circle-size !important;
+  }
+
   &__diamond {
     align-items: center;
     border: $faHelpTooltipIcon-border-width solid currentcolor;
     box-sizing: border-box;
-    display: inline-flex;
+    color: $faHelpTooltipIcon-color;
+    display: none;
     flex-shrink: 0;
     height: $faHelpTooltipIcon-diamond-size;
     justify-content: center;

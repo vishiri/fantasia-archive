@@ -80,7 +80,52 @@
   &:active {
     cursor: $faVerticalDraggableTabs-tab-cursor-active;
   }
+}
 
+/* Flat: Quasar-like hover wash (::before; fantasy uses ::after gold edge glow).
+ * Drive via --pointerHover (JS), not :hover — Sortable reorder leaves sticky CSS :hover. */
+body.fa-appTheme--flat .faVerticalDraggableTabs__tab::before {
+  background: currentcolor;
+  content: '';
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;
+  z-index: 0;
+}
+
+body.fa-appTheme--flat .faVerticalDraggableTabs:not(.faVerticalDraggableTabs--listDragging) {
+  .faVerticalDraggableTabs__tab--pointerHover:not(.faVerticalDraggableTabs__tab--dragging)::before {
+    opacity: $qFocusable-hoverHelper-opacity;
+  }
+}
+
+/* Flat: Quasar-like solid right-edge active indicator (no fantasy bloom). */
+body.fa-appTheme--flat .faVerticalDraggableTabs__tab--active:not(.faVerticalDraggableTabs__tab--dragging)::after {
+  background: var(--fa-color-primary-bright);
+  content: '';
+  inset: 0 $faTabEdgeGlow-right-edgeOffset 0 auto;
+  pointer-events: none;
+  position: absolute;
+  width: 2px;
+  z-index: $faTabEdgeGlow-zIndex;
+}
+
+/* Kill Quasar square focus-helper wash on vertical tabs (both themes; JS pointerHover owns chrome). */
+body.desktop .faVerticalDraggableTabs__tab.q-focusable:focus > .q-focus-helper,
+body.desktop .faVerticalDraggableTabs__tab.q-hoverable:hover > .q-focus-helper,
+body.desktop .faVerticalDraggableTabs__tab.q-manual-focusable--focused > .q-focus-helper {
+  opacity: 0 !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+/* Fantasy: gold right-edge glow on vertical draggable tabs. */
+body.fa-appTheme--fantasy .faVerticalDraggableTabs__tab {
   &::after {
     @include tabEdgeGlow.fa-tab-edge-glow-idle(right);
   }
@@ -97,13 +142,15 @@
 
 .faVerticalDraggableTabs__tab--active {
   color: var(--fa-color-primary-bright);
+}
 
+body.fa-appTheme--fantasy .faVerticalDraggableTabs__tab--active {
   &::after {
     @include tabEdgeGlow.fa-tab-edge-glow-active(right);
   }
 }
 
-.faVerticalDraggableTabs:not(.faVerticalDraggableTabs--listDragging) .faVerticalDraggableTabs__tab:hover::after {
+body.fa-appTheme--fantasy .faVerticalDraggableTabs:not(.faVerticalDraggableTabs--listDragging) .faVerticalDraggableTabs__tab--pointerHover::after {
   @include tabEdgeGlow.fa-tab-edge-glow-hover(right);
 }
 
@@ -117,6 +164,10 @@
   &::after {
     opacity: 0 !important;
     width: 0 !important;
+  }
+
+  &::before {
+    opacity: 0 !important;
   }
 
   > * {

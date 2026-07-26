@@ -160,6 +160,7 @@ setup((app) => {
 
   if (typeof document !== 'undefined') {
     document.body.classList.add('body--dark')
+    document.body.classList.add('fa-appTheme--fantasy')
     Dark.set(true)
   }
 })
@@ -235,6 +236,7 @@ const preview: Preview = {
 
       if (typeof document !== 'undefined') {
         document.body.classList.add('body--dark')
+        document.body.classList.add('fa-appTheme--fantasy')
         Dark.set(true)
       }
 

@@ -3,6 +3,11 @@
     class="faHelpTooltipIcon"
     role="img"
   >
+    <q-icon
+      class="faHelpTooltipIcon__circle"
+      name="mdi-help-circle"
+      aria-hidden="true"
+    />
     <span
       class="faHelpTooltipIcon__diamond"
       aria-hidden="true"
@@ -23,3 +28,4 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped src="./styles/FaHelpTooltipIcon.scoped.scss"></style>
+<style lang="scss" src="./styles/FaHelpTooltipIcon.unscoped.scss"></style>

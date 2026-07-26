@@ -46,8 +46,6 @@
 
   &__helpTooltip {
     /* QMenu (replaces QTooltip): match global parchment tooltip surface + z-index. */
-    @include tooltipParchment.fa-tooltip-parchment-surface;
-
     max-width: $windowAppStyling-helpTooltip-width;
     width: $windowAppStyling-helpTooltip-width;
     z-index: $qTooltip-zIndex;
@@ -178,4 +176,8 @@
   &__cardActions {
     flex: 0 0 auto;
   }
+}
+
+body.fa-appTheme--fantasy .windowProjectStyling__helpTooltip {
+  @include tooltipParchment.fa-tooltip-parchment-surface;
 }

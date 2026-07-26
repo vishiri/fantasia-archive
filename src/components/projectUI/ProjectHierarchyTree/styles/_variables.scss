@@ -19,6 +19,9 @@ $projectHierarchyTree-nodeContextMenu-sortBySubmenu-bgColor: fa-v('dark', $dark)
 $projectHierarchyTree-nodeContextMenu-zIndex: mainLayout.$mainLayout-appHeader-zIndex + 2;
 $projectHierarchyTree-nodeIcon-boxSize: $iconSize;
 $projectHierarchyTree-nodeIcon-marginRight: 8px;
+$projectHierarchyTree-nodeChrome-expandBlock: 4px;
+$projectHierarchyTree-nodeChrome-expandInlineEnd: 5px;
+$projectHierarchyTree-nodeChrome-expandInlineStart: 10px;
 $projectHierarchyTree-nodeRowContent-paddingBlock: 4px;
 $projectHierarchyTree-nodeRowContent-paddingInlineEnd: 5px;
 $projectHierarchyTree-nodeRowContent-paddingInlineStart: 26px;

@@ -1,9 +1,21 @@
 @use '../../../../css/globals/faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
 @use './variables' as *;
 
-/* Unscoped: same parchment surface pipeline as global .q-tooltip (scoped SFC can mangle data-URI layers). */
+/* Unscoped: theme chrome for tip card (scoped SFC mangles parchment data-URI layers). */
 .projectOverview__hint {
-  @include tooltipParchment.fa-tooltip-parchment-surface;
-
   margin-bottom: $projectOverview-hint-marginBottom;
+}
+
+/* Flat: pre-parchment info card (cream fill + dark border). */
+body.fa-appTheme--flat .projectOverview__hint {
+  background-color: $projectOverview-hint-background;
+  border: $projectOverview-hint-border-width solid $projectOverview-hint-border-color;
+  border-radius: $projectOverview-hint-border-radius;
+  color: $projectOverview-hint-border-color;
+  padding: $projectOverview-hint-paddingBlock $projectOverview-hint-paddingInline;
+}
+
+/* Fantasy: parchment surface (same pipeline as global .q-tooltip). */
+body.fa-appTheme--fantasy .projectOverview__hint {
+  @include tooltipParchment.fa-tooltip-parchment-surface;
 }

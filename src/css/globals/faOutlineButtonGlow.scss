@@ -8,12 +8,25 @@
 }
 
 /*
- * App-wide outline (border + empty fill) buttons:
+ * Fantasy theme: outline (border + empty fill) buttons —
  * ::before = Quasar outline border (untouched).
  * ::after = idle bottom bloom.
  * box-shadow on button = hover external glow via --fa-outline-btn-ext-glow.
  */
-.q-btn--outline {
+
+/* Kill Quasar white hover/focus wash (must compound body.desktop + fantasy). */
+body.desktop.fa-appTheme--fantasy .q-btn--outline.q-focusable:focus > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-btn--outline.q-hoverable:hover > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-btn--outline.q-manual-focusable--focused > .q-focus-helper {
+  opacity: 0 !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+body.fa-appTheme--fantasy .q-btn--outline {
   --fa-outline-btn-ext-glow: 0;
   --fa-outline-btn-glow-core: currentcolor;
   --fa-outline-btn-glow-deep: color-mix(in srgb, currentcolor 48%, black);
@@ -22,7 +35,6 @@
   position: relative;
 
   @include outlineBtnGlow.fa-outline-button-glow-external-shadow;
-  @include outlineBtnGlow.fa-outline-button-glow-kill-focus-helper;
 
   &::after {
     @include outlineBtnGlow.fa-outline-button-glow-idle;

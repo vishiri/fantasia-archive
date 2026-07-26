@@ -33,7 +33,7 @@
 
       <div class="projectOverview__hintBody col">
         <div
-          class="projectOverview__hintHeading text-subtitle1 text-bold text-left text-uppercase"
+          class="projectOverview__hintHeading text-subtitle1 text-bold text-left"
           data-test-locator="projectOverview-tipHeading"
         >
           {{ $t('globalFunctionality.unsortedAppTexts.didYouKnow') }}

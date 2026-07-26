@@ -1,3 +1,3 @@
 export default {
-  didYouKnow: 'Did you know?'
+  didYouKnow: 'Did You Know?'
 }

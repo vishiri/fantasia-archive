@@ -3,7 +3,7 @@
 @use './faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
 @use './faNotificationParchmentFrame.mixin.scss' as notificationParchment;
 
-/* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
+/* Quasar component overrides. Native element selectors first (alphabetical), then class-based rules. */
 
 body.body--dark {
 
@@ -13,8 +13,8 @@ body.body--dark {
 
 body.desktop .q-focusable:focus > .q-focus-helper {
 
-  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  background: $qFocusable-hoverHelper-backgroundColor;
+  /* Wash follows the control's color (primary gold, secondary red, menu hover, etc.). */
+  background: currentcolor;
   opacity: $qFocusable-focusHelper-opacity !important;
 
   &::before,
@@ -28,8 +28,8 @@ body.desktop .q-focusable:focus > .q-focus-helper {
 body.desktop .q-hoverable:hover > .q-focus-helper,
 body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
-  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  background: $qFocusable-hoverHelper-backgroundColor;
+  /* Wash follows the control's color (primary gold, secondary red, menu hover, etc.). */
+  background: currentcolor;
   opacity: $qFocusable-hoverHelper-opacity !important;
 
   &::before,
@@ -143,13 +143,18 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-dialog > .q-dialog__inner > .q-card {
-  /* Beat Quasar .bg-dark / .q-dark on dialog shells so Custom app CSS --fa-color-dark-darker applies. */
-  background: $qDialog-card-backgroundColor !important;
+  /* Flat: $dark shell. Fantasy override below uses --fa-color-dark-darker. */
+  background: $qDialog-card-backgroundColor-flat !important;
   border: 0;
   border-radius: $qDialog-card-borderRadius;
-  box-shadow: $qDialog-card-rim-boxShadow;
   max-width: $qDialog-card-maxWidth;
   position: relative;
+}
+
+/* Fantasy: cyan rim ring + top bloom + side feathers (flat keeps global .q-card elevation only). */
+body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card {
+  background: $qDialog-card-backgroundColor !important;
+  box-shadow: $qDialog-card-rim-boxShadow;
 
   /* Soft inward glow above opaque card children (inset shadow on the card itself stays hidden under panels). */
   &::after {
@@ -198,6 +203,16 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 .q-field--dark.q-field--readonly .q-field__prefix,
 .q-field--dark.q-field--readonly .q-field__suffix {
   color: var(--fa-color-text-muted);
+}
+
+/* Flat Quasar focus chrome: thin hairline (fantasy uses micro-corner fields instead). */
+.q-field--standard .q-field__control::after,
+.q-field--filled .q-field__control::after {
+  height: $qField-activeUnderline-height;
+}
+
+.q-field--outlined.q-field--highlighted .q-field__control::after {
+  border-width: $qField-outlined-focusBorderWidth;
 }
 
 .q-field--dark .q-field__bottom,
@@ -474,17 +489,16 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-notification {
-  @include notificationParchment.fa-notification-parchment-chrome;
-
-  /* Keep message/icons/actions above double-frame pseudos. */
+  /* Keep wrapper above fantasy double-frame pseudos. */
   > * {
     position: relative;
     z-index: 1;
   }
+}
 
-  /* Quasar adds .text-white on the same node as .bg-info; faSemanticText.scss uses
-   * .text-white { color: var(--fa-color-white) !important; }. This block must be !important
-   * and match or beat that selector's specificity so dark text stays on the light info tint. */
+body.fa-appTheme--fantasy .q-notification {
+  @include notificationParchment.fa-notification-parchment-chrome;
+
   /* Re-assert grain longhands after Quasar .bg-* `background` shorthand. */
   &.bg-info,
   &.bg-positive,
@@ -500,6 +514,32 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
     background-size: $qNotification-parchmentTextureSize !important;
   }
 
+  /*
+   * Progress lives inside __wrapper (Quasar: row items-center). Pin to the toast
+   * chrome instead so the bar sits on the inner frame — not vertically centered
+   * through the icon/message.
+   */
+  .q-notification__wrapper.relative-position {
+    position: static !important;
+  }
+
+  .q-notification__progress {
+    background: var(--fa-toast-frame-color, #{$qNotification-frame-color-info}) !important;
+    inset: auto $qNotification-frame-innerInset $qNotification-frame-innerInset !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    z-index: 1;
+  }
+
+  &--multi-line .q-notification__progress {
+    inset: auto $qNotification-frame-innerInset $qNotification-frame-innerInset !important;
+  }
+}
+
+.q-notification {
+  /* Quasar adds .text-white on the same node as .bg-info; faSemanticText.scss uses
+   * .text-white { color: var(--fa-color-white) !important; }. This block must be !important
+   * and match or beat that selector's specificity so dark text stays on the light info tint. */
   &.bg-info {
     --fa-toast-frame-color: #{$qNotification-frame-color-info};
     --fa-toast-text-color: #{$qNotification-text-color-onLight};
@@ -587,10 +627,20 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 
   &__progress {
-    background: var(--fa-toast-frame-color, #{$qNotification-frame-color-info}) !important;
-    left: 0 !important;
-    opacity: 1 !important;
-    right: 0 !important;
+    /* Flat: Quasar currentcolor @ 30%. Position relative to __wrapper (inside side padding) —
+     * negative left/right cancel Quasar --standard/--multi-line horizontal padding (16px). */
+    background: currentcolor !important;
+    border-radius: 0 !important;
+    bottom: 0 !important;
+    left: -16px !important;
+    opacity: 0.3 !important;
+    position: absolute !important;
+    right: -16px !important;
+    z-index: 1;
+  }
+
+  &--multi-line &__progress {
+    bottom: -8px !important;
   }
 
   &__avatar {
@@ -641,25 +691,41 @@ div + .q-notification__caption {
 
   .q-tab {
     overflow: visible;
-
-    @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
-
-    &::after {
-      @include tabEdgeGlow.fa-tab-edge-glow-idle(right);
-    }
-
-    &.q-tab--active::after {
-      @include tabEdgeGlow.fa-tab-edge-glow-active(right);
-    }
-
-    &:hover::after {
-      @include tabEdgeGlow.fa-tab-edge-glow-hover(right);
-    }
   }
 }
 
-.q-tabs--vertical .q-tab__indicator {
+body.fa-appTheme--fantasy .q-tabs--vertical .q-tab {
+  &::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-idle(right);
+  }
+
+  &.q-tab--active::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-active(right);
+  }
+
+  &:hover::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-hover(right);
+  }
+}
+
+body.desktop.fa-appTheme--fantasy .q-tabs--vertical .q-tab.q-focusable:focus > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-tabs--vertical .q-tab.q-hoverable:hover > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-tabs--vertical .q-tab.q-manual-focusable--focused > .q-focus-helper {
+  opacity: 0 !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+/* Fantasy glow replaces side indicator; flat keeps Quasar .q-tab__indicator. */
+body.fa-appTheme--fantasy .q-tabs--vertical .q-tab__indicator {
   display: none;
+}
+
+.q-tab__indicator {
+  height: $qTab-indicator-height;
 }
 
 .q-tabs__arrow {
@@ -668,14 +734,25 @@ div + .q-notification__caption {
 }
 
 .q-tooltip {
-  @include tooltipParchment.fa-tooltip-parchment-surface;
-
   font-size: $qTooltip-fontSize;
   font-weight: $qTooltip-fontWeight;
   letter-spacing: 0.01em;
   line-height: 1.4;
   max-width: $qTooltip-maxWidth;
   z-index: $qTooltip-zIndex !important;
+}
+
+/* Flat: light tip + dark ink (beats Quasar .q-tooltip--style grey-7 / #fafafa). */
+body.fa-appTheme--flat .q-tooltip,
+body.fa-appTheme--flat .q-tooltip--style {
+  background: $qTooltip-flat-backgroundColor;
+  box-shadow: $qTooltip-flat-boxShadow;
+  color: $qTooltip-flat-color;
+  padding: $qTooltip-flat-padding;
+}
+
+body.fa-appTheme--fantasy .q-tooltip {
+  @include tooltipParchment.fa-tooltip-parchment-surface;
 }
 
 .q-toggle {

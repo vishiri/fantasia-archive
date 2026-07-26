@@ -3,6 +3,8 @@
 
 /* QUASAR COMPONENT - Q-DIALOG */
 $qDialog-backdrop-background: rgba($black, 0.5);
+/* Flat: pre-fantasy shell ($dark). Fantasy: darker card under cyan rim. */
+$qDialog-card-backgroundColor-flat: fa-v('dark', $dark);
 $qDialog-card-backgroundColor: fa-v('dark-darker', $dark-darker);
 $qDialog-card-borderRadius: 12px;
 $qDialog-card-maxHeightSubtract: 100px;

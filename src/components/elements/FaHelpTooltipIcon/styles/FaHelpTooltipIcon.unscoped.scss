@@ -1,0 +1,8 @@
+/* Fantasy: gold diamond help glyph; hide flat circle. */
+body.fa-appTheme--fantasy .faHelpTooltipIcon__circle {
+  display: none;
+}
+
+body.fa-appTheme--fantasy .faHelpTooltipIcon__diamond {
+  display: inline-flex;
+}

@@ -1,4 +1,5 @@
-/* QUASAR COMPONENT - Q-FOCUSABLE */
+/* QUASAR COMPONENT - Q-FOCUSABLE
+ * Hover/focus wash uses currentcolor on the control (button/tab/menu color).
+ */
 $qFocusable-focusHelper-opacity: 0.15;
-$qFocusable-hoverHelper-backgroundColor: #85b7cc;
 $qFocusable-hoverHelper-opacity: 0.11;

@@ -9,6 +9,10 @@
   border-radius: $faHeTreeSlotChrome-borderRadius;
   box-shadow: inset $faHeTreeSlotChrome-accentWidth 0 0 transparent;
   box-sizing: border-box;
+  transition:
+    background-color $faHeTreeSlotChrome-transition-duration $faHeTreeSlotChrome-transition-timing,
+    border-color $faHeTreeSlotChrome-transition-duration $faHeTreeSlotChrome-transition-timing,
+    box-shadow $faHeTreeSlotChrome-transition-duration $faHeTreeSlotChrome-transition-timing;
 }
 
 /*

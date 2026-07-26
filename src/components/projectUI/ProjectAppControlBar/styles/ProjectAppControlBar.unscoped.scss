@@ -160,8 +160,6 @@
 }
 
 .projectAppControlBarTabs__tabWorldIndicator {
-  @include colorGlyph.fa-color-glyph-shading;
-
   align-items: center;
   display: inline-flex;
   font-size: $projectAppControlBar-tabWorldIndicator-fontSize;
@@ -176,13 +174,17 @@
   z-index: 1;
 }
 
+body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
+  @include colorGlyph.fa-color-glyph-shading;
+}
+
 .tabsWrapper {
   &.q-tabs--dense .q-tab {
     min-height: mainLayout.$mainLayout-appHeader-heightPx;
   }
 
   .q-tab {
-    --projectAppControlBarTab-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+    --projectAppControlBarTab-focusHelperColor: currentcolor;
 
     color: $projectAppControlBar-tabContent-color;
     padding: 0 $projectAppControlBar-tabPadding-inlinePx;

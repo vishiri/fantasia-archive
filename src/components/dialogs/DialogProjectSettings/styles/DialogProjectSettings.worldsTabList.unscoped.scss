@@ -51,6 +51,14 @@
   }
 }
 
+/* Flat: match left inset on filter row (fantasy keeps tighter right for edge glow). */
+body.fa-appTheme--flat {
+  .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList .faVerticalDraggableTabs__filterRow,
+  .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList .faVerticalDraggableTabs__filterRow {
+    padding-right: $dialogProjectSettings-verticalTabListFilterRow-paddingRight-flat;
+  }
+}
+
 .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList {
   --fa-tab-edge-glow-right-active-bloom-size: 160px;
   --fa-tab-edge-glow-right-hover-bloom-size: 180px;
@@ -71,8 +79,12 @@
 }
 
 .dialogProjectSettingsWorldsTabItem__colorSwatch {
-  @include colorBead.fa-color-bead-shading;
-
+  /* Flat: plain circle + outline; fantasy adds bead shading below. */
+  border:
+    $dialogProjectSettings-worldsTabColorSwatch-borderWidth
+    solid
+    $dialogProjectSettings-worldsTabColorSwatch-borderColor;
+  border-radius: $dialogProjectSettings-worldsTabColorSwatch-borderRadius;
   box-sizing: border-box;
   height: $dialogProjectSettings-worldsTabColorSwatch-size;
   pointer-events: none;
@@ -82,4 +94,8 @@
   transform: translateY(-50%);
   width: $dialogProjectSettings-worldsTabColorSwatch-size;
   z-index: $dialogProjectSettings-worldsTabColorSwatch-zIndex;
+}
+
+body.fa-appTheme--fantasy .dialogProjectSettingsWorldsTabItem__colorSwatch {
+  @include colorBead.fa-color-bead-shading;
 }

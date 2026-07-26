@@ -117,6 +117,7 @@
 
 // Hide Quasar square hover/focus fill when gold edge glow is the chrome.
 // @at-root block + body.desktop beats globals/quasarComponentsAdjustments.scss hover helper !important.
+// Caller & must NOT already start with body (fantasy-wrapped chrome uses explicit body.desktop.fa-appTheme--fantasy rules).
 @mixin fa-tab-edge-glow-kill-focus-helper {
   @at-root {
     body.desktop #{&}.q-focusable:focus > .q-focus-helper,

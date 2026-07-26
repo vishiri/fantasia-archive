@@ -17,8 +17,6 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group),
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template) {
-  @include heTreeSlot.fa-he-tree-slot-chrome-idle;
-
   cursor: $faVerticalDraggableTabs-tab-cursor-default;
 
   &:active {
@@ -26,10 +24,26 @@
   }
 }
 
-.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
-.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover {
-  @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
+/*
+ * Chrome on the node (inside he-tree indent padding), not .tree-node —
+ * otherwise hover box spans the indent gutter.
+ */
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  @include heTreeSlot.fa-he-tree-slot-chrome-idle;
+}
 
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover .dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover .dialogProjectSettingsWorldTemplateLayoutTreeNode--template,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):active .dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):active .dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):active,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):active {
   .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
     opacity: 0 !important;
   }
@@ -43,13 +57,6 @@
 
   .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
     opacity: 0 !important;
-  }
-
-  .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
-  .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover {
-    background-color: transparent;
-    border-color: transparent;
-    box-shadow: none;
   }
 }
 

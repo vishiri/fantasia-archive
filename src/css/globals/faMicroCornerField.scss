@@ -15,13 +15,13 @@
 }
 
 /*
- * App-wide dark flat fields (standard / filled / outlined):
+ * Fantasy theme: dark flat fields (standard / filled / outlined) —
  * Thin secondary grey border on the control + bottom-only L-brackets and a
  * short hairline between them (small gaps). No top corner brackets.
  * Quasar underline / outline / focus bar are killed on ::before / ::after.
  * Exclude borderless + standout (different chrome language).
  */
-.q-field--dark:not(.q-field--borderless, .q-field--standout) {
+body.fa-appTheme--fantasy .q-field--dark:not(.q-field--borderless, .q-field--standout) {
   --fa-micro-corner-bottom-line:
     color-mix(
       in srgb,

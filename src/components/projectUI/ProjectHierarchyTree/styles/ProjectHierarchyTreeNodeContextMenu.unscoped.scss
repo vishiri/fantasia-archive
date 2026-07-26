@@ -70,7 +70,7 @@
 /* Sort by submenu: keep title/detail colors on hover; browse-tab-style focus helper only. */
 .projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
   .projectHierarchyTreeNodeContextMenu__item.q-item {
-    --projectHierarchyTreeSortByItem-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+    --projectHierarchyTreeSortByItem-focusHelperColor: currentcolor;
   }
 
   .projectHierarchyTreeNodeContextMenu__item.q-focusable:focus > .q-focus-helper,

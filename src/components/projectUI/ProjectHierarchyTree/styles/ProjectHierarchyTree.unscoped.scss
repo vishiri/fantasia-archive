@@ -2,7 +2,6 @@
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../../css/globals/faHeTreeSlotChrome.mixin.scss' as heTreeSlot;
 @use '../../../../css/globals/faHeTreeSlotChrome.variables.scss' as *;
-@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
 .projectHierarchyTreeRoot {
   display: flex;
@@ -113,31 +112,37 @@
 }
 
 .projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable {
-  @include heTreeSlot.fa-he-tree-slot-chrome-idle;
+  /* Chrome on ::before inset by row padding so hover hugs icons/label, not padding box. */
+  &::before {
+    @include heTreeSlot.fa-he-tree-slot-chrome-idle;
+
+    content: '';
+    inset:
+      calc(var(--projectHierarchyTreeNode-chrome-inset-block, 0) - #{$projectHierarchyTree-nodeChrome-expandBlock})
+      calc(var(--projectHierarchyTreeNode-chrome-inset-inline-end, 0) - #{$projectHierarchyTree-nodeChrome-expandInlineEnd})
+      calc(var(--projectHierarchyTreeNode-chrome-inset-block, 0) - #{$projectHierarchyTree-nodeChrome-expandBlock})
+      calc(var(--projectHierarchyTreeNode-chrome-inset-inline-start, 0) - #{$projectHierarchyTree-nodeChrome-expandInlineStart});
+    pointer-events: none;
+    position: absolute;
+    z-index: 0;
+  }
 }
 
-.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover {
+/* Keep chrome while hovered, pressed, press-hold armed for DnD, or active opened tab. */
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover::before,
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:active::before,
+.projectHierarchyTreeHost .projectHierarchyTree__leftPointerDown .projectHierarchyTreeNode.q-hoverable::before,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--activeTabDocument.q-hoverable::before {
   @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
+}
 
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover,
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:active,
+.projectHierarchyTreeHost .projectHierarchyTree__leftPointerDown .projectHierarchyTreeNode.q-hoverable,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--activeTabDocument.q-hoverable {
   > .q-focus-helper {
     opacity: 0 !important;
   }
-}
-
-.projectHierarchyTreeHost .projectHierarchyTreeNode--activeTabDocument > .q-focus-helper {
-  background: var(--projectHierarchyTreeNode-focusHelperColor);
-  opacity: $qFocusable-hoverHelper-opacity !important;
-
-  &::before,
-  &::after {
-    opacity: 0 !important;
-  }
-}
-
-.projectHierarchyTree--listDragging .projectHierarchyTreeNode.q-hoverable:hover {
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
 }
 
 .projectHierarchyTree--listDragging .projectHierarchyTreeNode > .q-focus-helper {
@@ -185,6 +190,10 @@
   }
 
   .projectHierarchyTreeNode--world {
+    --projectHierarchyTreeNode-chrome-inset-block: 0;
+    --projectHierarchyTreeNode-chrome-inset-inline-end: #{$projectHierarchyTree-worldNode-paddingInlineEnd};
+    --projectHierarchyTreeNode-chrome-inset-inline-start: #{$projectHierarchyTree-worldNode-paddingInlineStart};
+
     border-radius: $projectHierarchyTree-node-borderRadius;
     padding: 0 $projectHierarchyTree-worldNode-paddingInlineEnd 0 $projectHierarchyTree-worldNode-paddingInlineStart !important;
   }
@@ -215,6 +224,10 @@
   }
 
   .projectHierarchyTreeNode {
+    --projectHierarchyTreeNode-chrome-inset-block: #{$projectHierarchyTree-nodeRowContent-paddingBlock};
+    --projectHierarchyTreeNode-chrome-inset-inline-end: #{$projectHierarchyTree-nodeRowContent-paddingInlineEnd};
+    --projectHierarchyTreeNode-chrome-inset-inline-start: #{$projectHierarchyTree-nodeRowContent-paddingInlineStart};
+
     border-radius: $projectHierarchyTree-node-borderRadius;
     margin-left: $projectHierarchyTree-nodeRowIndent-offsetPx;
     padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
