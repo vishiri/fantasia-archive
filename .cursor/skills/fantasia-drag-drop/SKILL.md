@@ -81,7 +81,9 @@ Sortable root not component root → **`useDraggable(el, list, options)`** or **
 
 ### Vertical tab strips (**`DialogProjectSettings`** worlds list)
 
-Vertical category tabs reuse **`faDragDrop_manager`** (**`faVerticalDraggableTabsSortableDragOptions`**, document drag cursor from **`faDragDropDocumentDragCursorWiring.ts`**, **`hideNativeSortableDragGhost`**) + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Reusable element **`FaVerticalDraggableTabList`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
+Vertical category tabs reuse **`faDragDrop_manager`** (**`faVerticalDraggableTabsSortableDragOptions`**, document drag cursor from **`faDragDropDocumentDragCursorWiring.ts`**, **`hideNativeSortableDragGhost`**, **`resolveFaVerticalDraggableTabIdUnderPoint`**) + **`faVerticalDraggableTabListPointerHoverWiring.ts`** + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Reusable element **`FaVerticalDraggableTabList`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
+
+**Pointer hover (not CSS `:hover`):** Sortable sticky `:hover` wrong after reorder → **`FaVerticalDraggableTabList`** tracks **`pointerHoverItemId`** via **`pointermove`** / **`pointerleave`**; tab slot gets **`isPointerHovered`** → **`faVerticalDraggableTabs__tab--pointerHover`**. After drag **`end`**, clear hover then resync from last client point after **`FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS`**. Flat skin: Quasar-like wash; fantasy: gold edge glow on pointer class.
 
 #### Vertical draggable tab strips (reusable column)
 
