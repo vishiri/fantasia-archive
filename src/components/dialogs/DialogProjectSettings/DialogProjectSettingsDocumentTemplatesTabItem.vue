@@ -88,13 +88,15 @@ const props = withDefaults(
     currentLanguageCode: T_faUserSettingsLanguageCode
     isBeingDragged?: boolean
     isListDragging?: boolean
+    isPointerHovered?: boolean
     isSelected: boolean
     tabHasError: boolean
     template: I_dialogProjectSettingsDocumentTemplateDraft
   }>(),
   {
     isBeingDragged: false,
-    isListDragging: false
+    isListDragging: false,
+    isPointerHovered: false
   }
 )
 
@@ -166,6 +168,7 @@ const tabClassList = computed(() => {
     'faVerticalDraggableTabs__tab--active': props.isSelected,
     'faVerticalDraggableTabs__tab--dragging': props.isBeingDragged,
     'faVerticalDraggableTabs__tab--error': props.tabHasError,
+    'faVerticalDraggableTabs__tab--pointerHover': props.isPointerHovered,
     'fa-text-muted': !props.tabHasError && !props.isSelected,
     'q-focusable': !props.isListDragging,
     'q-hoverable': !props.isListDragging,

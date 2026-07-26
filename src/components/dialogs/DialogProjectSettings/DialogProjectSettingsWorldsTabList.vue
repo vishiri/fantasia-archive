@@ -26,11 +26,12 @@
     @add="emit('addWorld')"
     @update:items="emit('update:worlds', $event)"
   >
-    <template #tab="{ item, isBeingDragged, isListDragging }">
+    <template #tab="{ item, isBeingDragged, isListDragging, isPointerHovered }">
       <DialogProjectSettingsWorldsTabItem
         :current-language-code="props.currentLanguageCode"
         :is-being-dragged="isBeingDragged"
         :is-list-dragging="isListDragging"
+        :is-pointer-hovered="isPointerHovered"
         :is-selected="item.id === props.selectedWorldId"
         :tab-has-error="isWorldTabValidationError(item)"
         :world="item"

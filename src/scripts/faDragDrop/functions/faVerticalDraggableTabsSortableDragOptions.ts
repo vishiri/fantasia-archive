@@ -17,6 +17,11 @@ export const FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_GHOST_CLASS =
 export const FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_FALLBACK_TOLERANCE_PX = 8
 
 /**
+ * Sortable list animation duration (ms). Sticky :hover flush must wait for this to finish.
+ */
+export const FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS = 150
+
+/**
  * Shared vue-draggable-plus / Sortable options for vertical tab lists.
  * forceFallback avoids HTML5 DnD so CSS cursor rules work in Chromium / Electron.
  */

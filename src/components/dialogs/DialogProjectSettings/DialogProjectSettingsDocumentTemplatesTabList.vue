@@ -26,11 +26,12 @@
     @add="emit('addTemplate')"
     @update:items="emit('update:templates', $event)"
   >
-    <template #tab="{ item, isBeingDragged, isListDragging }">
+    <template #tab="{ item, isBeingDragged, isListDragging, isPointerHovered }">
       <DialogProjectSettingsDocumentTemplatesTabItem
         :current-language-code="props.currentLanguageCode"
         :is-being-dragged="isBeingDragged"
         :is-list-dragging="isListDragging"
+        :is-pointer-hovered="isPointerHovered"
         :is-selected="item.id === props.selectedTemplateId"
         :tab-has-error="isTemplateTabValidationError(item)"
         :template="item"

@@ -7,8 +7,12 @@ export {
   clearFaVerticalDraggableTabsDocumentDragCursor
 } from './faDragDropDocumentDragCursorWiring'
 export { hideNativeSortableDragGhost } from './functions/hideNativeSortableDragGhost'
-export { faVerticalDraggableTabsSortableDragOptions } from './functions/faVerticalDraggableTabsSortableDragOptions'
+export {
+  FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS,
+  faVerticalDraggableTabsSortableDragOptions
+} from './functions/faVerticalDraggableTabsSortableDragOptions'
 export { readFaSortableDragItemDataAttribute } from './functions/readFaSortableDragItemDataAttribute'
+export { resolveFaVerticalDraggableTabIdUnderPoint } from './functions/resolveFaVerticalDraggableTabIdUnderPoint'
 export { buildFaVerticalDraggableTabsRootStyle } from './functions/buildFaVerticalDraggableTabsRootStyle'
 export {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT,

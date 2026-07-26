@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="tabListRootRef"
     :class="[faVerticalDraggableTabsRootClassList, props.blockClassSuffix]"
     :style="tabListRootStyle"
     class="faVerticalDraggableTabs"
@@ -21,11 +22,13 @@
       ref="tabListScrollRef"
       class="faVerticalDraggableTabs__scroll"
       :data-test-locator="props.testLocatorList"
+      @pointerleave="onTabListPointerLeave"
+      @pointermove="onTabListPointerMove"
     >
       <VueDraggable
         v-bind="faVerticalDraggableTabsSortableDragOptions"
         v-model="sortableList"
-        :animation="150"
+        :animation="sortableAnimationMs"
         :set-data="hideNativeSortableDragGhost"
         :touch-start-threshold="5"
         class="faVerticalDraggableTabs__draggable column"
@@ -40,6 +43,7 @@
             :drag-id="item.id"
             :is-being-dragged="item.id === draggingItemId"
             :is-list-dragging="draggingItemId !== null"
+            :is-pointer-hovered="item.id === pointerHoverItemId"
             :item="item"
             name="tab"
           />
@@ -71,9 +75,9 @@
 </template>
 
 <script setup lang="ts" generic="T extends I_faVerticalDraggableTabListIdentifiedItem">
-// faVerticalDraggableTabs column host — layout props and drag wiring documented in
-// .cursor/skills/fantasia-drag-drop/SKILL.md (Vertical draggable tab strips).
-import { computed, nextTick, ref, shallowRef, watch } from 'vue'
+// faVerticalDraggableTabs column host — layout props, pointer-hover, and drag wiring
+// documented in .cursor/skills/fantasia-drag-drop/SKILL.md (Vertical draggable tab strips).
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { ShallowRef } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import type { SortableEvent } from 'sortablejs'
@@ -87,6 +91,7 @@ import type {
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 import {
+  FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_TEXT_TRANSFORM_DEFAULT,
@@ -97,8 +102,10 @@ import {
   clearFaVerticalDraggableTabsDocumentDragCursor,
   faVerticalDraggableTabsSortableDragOptions,
   hideNativeSortableDragGhost,
-  readFaSortableDragItemDataAttribute
+  readFaSortableDragItemDataAttribute,
+  resolveFaVerticalDraggableTabIdUnderPoint
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
+import { createFaVerticalDraggableTabListPointerHoverWiring } from 'app/src/scripts/faDragDrop/faVerticalDraggableTabListPointerHoverWiring'
 import DialogProjectSettingsVerticalTabListFilterInput from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsVerticalTabListFilterInput.vue'
 import { createDialogProjectSettingsFilteredVerticalTabListSortableWiring } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsFilteredVerticalTabListSortableWiring'
 import { createDialogProjectSettingsScrollOnAppendWatch } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsScrollOnAppendWiring'
@@ -148,9 +155,13 @@ const emit = defineEmits<{
 
 const draggableItems: ShallowRef<T[]> = shallowRef(props.cloneList(props.items))
 
+const tabListRootRef = ref<HTMLElement | null>(null)
+
 const tabListScrollRef = ref<HTMLElement | null>(null)
 
 const draggingItemId = ref<string | null>(null)
+
+const sortableAnimationMs = FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS
 
 const filterQuery = ref('')
 
@@ -164,6 +175,24 @@ const {
   filterItems: (list, query) => props.filterItems(list, query),
   filterQuery,
   fullList: draggableItems
+})
+
+const {
+  cancelPointerHoverResync,
+  clearPointerHover,
+  onTabListPointerLeave,
+  onTabListPointerMove,
+  pointerHoverItemId,
+  schedulePointerHoverResyncAfterAnimation
+} = createFaVerticalDraggableTabListPointerHoverWiring({
+  dragIdDataAttribute: () => props.dragIdDataAttribute,
+  draggingItemId,
+  elementFromPoint: (x, y) => document.elementFromPoint(x, y),
+  getRoot: () => tabListRootRef.value,
+  getScroll: () => tabListScrollRef.value,
+  readDragItemId: readFaSortableDragItemDataAttribute,
+  resolveTabIdUnderPoint: resolveFaVerticalDraggableTabIdUnderPoint,
+  sortableAnimationMs
 })
 
 const faVerticalDraggableTabsRootClassList = computed(() => ({
@@ -199,6 +228,8 @@ createDialogProjectSettingsScrollOnAppendWatch({
 })
 
 function onDragStart (event: SortableEvent): void {
+  cancelPointerHoverResync()
+  clearPointerHover()
   draggingItemId.value = readFaSortableDragItemDataAttribute(
     event.item,
     props.dragIdDataAttribute
@@ -211,7 +242,15 @@ function onDragEnd (): void {
   clearFaVerticalDraggableTabsDocumentDragCursor()
   applySortableListToFull()
   emit('update:items', props.cloneList(draggableItems.value))
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur()
+  }
+  schedulePointerHoverResyncAfterAnimation()
 }
+
+onBeforeUnmount(() => {
+  cancelPointerHoverResync()
+})
 </script>
 
 <style lang="scss" src="app/src/components/dialogs/DialogProjectSettings/styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

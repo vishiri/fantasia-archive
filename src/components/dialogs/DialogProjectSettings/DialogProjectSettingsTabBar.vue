@@ -110,15 +110,15 @@ const documentTemplatesTabClassList = computed(() => {
 
   :deep(.q-tab) {
     overflow: visible;
-
-    @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
   }
+}
 
+/* Fantasy: golden bottom bloom replaces Quasar indicator. */
+body.fa-appTheme--fantasy .dialogProjectSettings__tabs {
   :deep(.q-tab__indicator) {
     display: none;
   }
 
-  /* Golden bottom bloom — shared fa-tab-edge-glow; overlaps painted divider. */
   :deep(.q-tab)::after {
     @include tabEdgeGlow.fa-tab-edge-glow-idle(bottom);
   }
@@ -132,7 +132,22 @@ const documentTemplatesTabClassList = computed(() => {
   }
 }
 
+body.desktop.fa-appTheme--fantasy .dialogProjectSettings__tabs :deep(.q-tab.q-focusable:focus > .q-focus-helper),
+body.desktop.fa-appTheme--fantasy .dialogProjectSettings__tabs :deep(.q-tab.q-hoverable:hover > .q-focus-helper),
+body.desktop.fa-appTheme--fantasy .dialogProjectSettings__tabs :deep(.q-tab.q-manual-focusable--focused > .q-focus-helper) {
+  opacity: 0 !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+/* Flat: Quasar dark separator color (fantasy paints via .fa-painted-divider--horizontal). */
 .dialogProjectSettings__tabBarDivider {
+  background-color: color-mix(in srgb, var(--fa-color-white) 28%, transparent);
+  flex-shrink: 0;
+  height: 1px;
   margin:
     $dialogProjectSettings-tabBarDivider-marginTop
     auto
