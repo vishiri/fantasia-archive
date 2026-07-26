@@ -6,11 +6,6 @@ export interface I_socialContactButton {
   label: string
 
   /**
-   * Title of the button (hover, tooltip)
-   */
-  title: string
-
-  /**
    * URL to be opened when the button is clicked
    */
   url: string
@@ -53,7 +48,7 @@ export interface I_socialContactButtonSet {
 }
 
 /** Static fields for a single social button (URLs, icons, layout). */
-export type I_socialContactButtonStaticFields = Omit<I_socialContactButton, 'label' | 'title'>
+export type I_socialContactButtonStaticFields = Omit<I_socialContactButton, 'label'>
 
 /** Full static config map for SocialContactButtons. */
 export type T_socialContactButtonStaticConfig = {

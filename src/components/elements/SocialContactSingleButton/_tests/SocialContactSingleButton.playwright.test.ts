@@ -10,7 +10,6 @@ import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
  * Button payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.
  */
 const testData: I_socialContactButton = {
-  title: 'Patreon - Title',
   label: 'Patreon - Label',
   url: 'https://www.patreon.com/c/vishiri',
   icon: 'patreon_logo.png',
@@ -85,16 +84,15 @@ test.describe.serial('Social contact single button', () => {
   })
 
   /**
-   * Check if the component has proper title, url and classes
+   * Check if the component has proper url and classes
    */
-  test('Check if the component has proper title, url and classes', async () => {
+  test('Check if the component has proper url and classes', async () => {
     const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
 
     await expect(buttonElement).toHaveCount(1)
 
-    const buttonTitle = await buttonElement.evaluate((el: HTMLElement) => el.title)
-    const dataTitle = testData.title
-    expect(buttonTitle).toBe(dataTitle)
+    await expect(buttonElement).toHaveAttribute('href', testData.url)
+    await expect(buttonElement).toHaveClass(new RegExp(`\\b${testData.cssClass}\\b`))
   })
 
   /**

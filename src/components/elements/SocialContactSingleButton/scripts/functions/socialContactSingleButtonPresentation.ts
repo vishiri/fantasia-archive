@@ -9,17 +9,18 @@ export function socialContactSingleButtonShowLabel (label: string): boolean {
 
 /**
  * Accessible alt text for the social icon image.
+ * Icon-only buttons (empty label) fall back to the layout cssClass token.
  */
 export function socialContactSingleButtonImageAlt (
   label: string,
-  title: string
+  cssClass: string
 ): string {
   const trimmedLabel = label.trim()
   if (trimmedLabel.length > 0) {
     return `${trimmedLabel} icon`
   }
 
-  return title
+  return cssClass
 }
 
 /**

@@ -7,7 +7,7 @@ export function createUseSocialContactSingleButton (deps: {
   resolveVitePublicAssetPath: (pathFromPublicRoot: string) => string
   socialContactSingleButtonData: (input: I_socialContactButton) => I_socialContactButton
   socialContactSingleButtonIconRelativePath: (iconFileName: string) => string
-  socialContactSingleButtonImageAlt: (label: string, title: string) => string
+  socialContactSingleButtonImageAlt: (label: string, cssClass: string) => string
   socialContactSingleButtonShowLabel: (label: string) => boolean
   toRef: <T extends object, K extends keyof T>(
     object: T,
@@ -42,7 +42,7 @@ export function createUseSocialContactSingleButton (deps: {
     const imageAltText = deps.computed(() => {
       return deps.socialContactSingleButtonImageAlt(
         dataInput.value.label,
-        dataInput.value.title
+        dataInput.value.cssClass
       )
     })
 

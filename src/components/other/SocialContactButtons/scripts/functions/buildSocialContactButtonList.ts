@@ -3,7 +3,7 @@ import type {
   I_socialContactButtonSet
 } from 'app/types/I_socialContactButtons'
 
-type T_socialContactButtonStaticFields = Omit<I_socialContactButton, 'label' | 'title'>
+type T_socialContactButtonStaticFields = Omit<I_socialContactButton, 'label'>
 
 /**
  * Builds the full social-button feed for the active locale using the supplied translate function.
@@ -16,38 +16,31 @@ export function buildSocialContactButtonList (
 ): I_socialContactButtonSet {
   const buttonPatreon = {
     ...staticConfig.buttonPatreon,
-    label: translate('socialContactButtons.buttonPatreon.label'),
-    title: translate('socialContactButtons.buttonPatreon.title')
+    label: translate('socialContactButtons.buttonPatreon.label')
   }
   const buttonKofi = {
     ...staticConfig.buttonKofi,
-    label: translate('socialContactButtons.buttonKofi.label'),
-    title: translate('socialContactButtons.buttonKofi.title')
+    label: translate('socialContactButtons.buttonKofi.label')
   }
   const buttonWebsite = {
     ...staticConfig.buttonWebsite,
-    label: translate('socialContactButtons.buttonWebsite.label'),
-    title: translate('socialContactButtons.buttonWebsite.title')
+    label: translate('socialContactButtons.buttonWebsite.label')
   }
   const buttonGitHub = {
     ...staticConfig.buttonGitHub,
-    label: translate('socialContactButtons.buttonGitHub.label'),
-    title: translate('socialContactButtons.buttonGitHub.title')
+    label: translate('socialContactButtons.buttonGitHub.label')
   }
   const buttonDiscord = {
     ...staticConfig.buttonDiscord,
-    label: translate('socialContactButtons.buttonDiscord.label'),
-    title: translate('socialContactButtons.buttonDiscord.title')
+    label: translate('socialContactButtons.buttonDiscord.label')
   }
   const buttonReddit = {
     ...staticConfig.buttonReddit,
-    label: translate('socialContactButtons.buttonReddit.label'),
-    title: translate('socialContactButtons.buttonReddit.title')
+    label: translate('socialContactButtons.buttonReddit.label')
   }
   const buttonTwitter = {
     ...staticConfig.buttonTwitter,
-    label: translate('socialContactButtons.buttonTwitter.label'),
-    title: translate('socialContactButtons.buttonTwitter.title')
+    label: translate('socialContactButtons.buttonTwitter.label')
   }
 
   return {

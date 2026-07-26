@@ -1,7 +1,6 @@
 <template>
   <q-btn
     :class="['socialContactSingleButton', buttonData.cssClass]"
-    :title="buttonData.title"
     :href="buttonData.url"
     data-test-locator="socialContactSingleButton"
     no-caps

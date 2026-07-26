@@ -6,7 +6,6 @@ import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 import SocialContactSingleButton from '../SocialContactSingleButton.vue'
 
 const sampleInput: I_socialContactButton = {
-  title: 'Unit title',
   label: 'Unit label',
   url: 'https://example.com',
   icon: 'unit.png',
@@ -25,7 +24,7 @@ test('Test that SocialContactSingleButton renders dataInput for default env wiri
     global: { mocks: { $t: (k: string) => k } }
   })
 
-  expect(w.attributes('title')).toBe(sampleInput.title)
+  expect(w.attributes('title')).toBeUndefined()
   expect(w.get('[data-test-locator="socialContactSingleButton-text"]').text()).toBe(sampleInput.label)
   w.unmount()
 })
@@ -82,11 +81,10 @@ test('Test that SocialContactSingleButton prefixes icon path when BASE_URL is a 
 
 /**
  * SocialContactSingleButton
- * Icon-only buttons omit the label strip and use the title for image alt text.
+ * Icon-only buttons omit the label strip and use cssClass for image alt text.
  */
-test('Test that SocialContactSingleButton hides text and uses title for alt when label is empty', () => {
+test('Test that SocialContactSingleButton hides text and uses cssClass for alt when label is empty', () => {
   const iconOnly: I_socialContactButton = {
-    title: 'Subreddit hover title',
     label: '',
     url: 'https://www.reddit.com/r/FantasiaArchive',
     icon: 'reddit_logo.png',
@@ -101,7 +99,7 @@ test('Test that SocialContactSingleButton hides text and uses title for alt when
 
   expect(w.find('[data-test-locator="socialContactSingleButton-text"]').exists()).toBe(false)
   expect(w.get('[data-test-locator="socialContactSingleButton-image"]').attributes('alt')).toBe(
-    iconOnly.title
+    iconOnly.cssClass
   )
   w.unmount()
 })

@@ -9,15 +9,12 @@ import { buildSocialContactButtonList } from '../buildSocialContactButtonList'
 
 /**
  * buildSocialContactButtonList
- * Merges static button config with translated label and title strings.
+ * Merges static button config with translated label strings.
  */
 test('Test that buildSocialContactButtonList maps static config and translate output', () => {
   const list = buildSocialContactButtonList((messageKey) => {
     if (messageKey === 'socialContactButtons.buttonPatreon.label') {
       return L_socialContactButtonsEnUs.buttonPatreon.label
-    }
-    if (messageKey === 'socialContactButtons.buttonPatreon.title') {
-      return L_socialContactButtonsEnUs.buttonPatreon.title
     }
     return messageKey
   }, socialContactButtonStaticConfig)
@@ -33,7 +30,7 @@ test('Test that buildSocialContactButtonList uses the translate callback for eve
   }, socialContactButtonStaticConfig)
 
   expect(list.buttonTwitter.label).toBe('translated:socialContactButtons.buttonTwitter.label')
-  expect(list.buttonReddit.title).toBe('translated:socialContactButtons.buttonReddit.title')
+  expect(list.buttonReddit.label).toBe('translated:socialContactButtons.buttonReddit.label')
 })
 
 test('Test that buildSocialContactButtonList can produce German Patreon copy', () => {
