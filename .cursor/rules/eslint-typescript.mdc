@@ -26,7 +26,7 @@ Line/block comments + JSDoc above APIs/tests: no Markdown `**bold**` or `*italic
 
 ## File and function size (ESLint)
 
-- **`eslint.config.mjs`**: **`max-lines`**, **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`**; exemptions tests, Storybook, configs, **`i18n/`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, **`.utility-scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤250**, **function ≤100** ([code-size-decomposition.mdc](code-size-decomposition.mdc) intent, split strategy, **Return object literals**).
+- **`eslint.config.mjs`**: **`max-lines`**, **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`**; exemptions per [code-size-decomposition.mdc](code-size-decomposition.mdc) / **`codeSizeRuleIgnores`** (tests, Storybook, configs, **`i18n/`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, **`.utility-scripts/**/*.mjs`**, **`**/*_manager.ts`**, **`src/stores/S_*.ts`**, **`**/_data/**/*.ts`**, **`eslint-rules/**`**). Targets: **Vue ≤250**, **TS/JS module ≤250**, **function ≤100** (intent, split strategy, **Return object literals**).
 
 ## Pre-commit / pre-changelog quality gate
 
@@ -36,7 +36,7 @@ Line/block comments + JSDoc above APIs/tests: no Markdown `**bold**` or `*italic
 
 Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn test:coverage:verify` individually only while debugging specific failure. **During edits:** dev scoped gate ([dev-scoped-verify.mdc](dev-scoped-verify.mdc)).
 
-**Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev` same **`--max-warnings 0`** as `yarn lint:eslint`; keep `@typescript-eslint` major in sync with TypeScript — avoid unsupported-TS-version warnings from `typescript-estree`.
+**Dev server**: `vite-plugin-checker` ESLint during `quasar dev` uses same **`--max-warnings 0`**, narrower path set than **`yarn lint:eslint`** (`eslint .`) — see **`quasar.config.ts`** **`lintCommand`** (`src` / `i18n` / `src-electron` / `quasar.config.ts`). Keep `@typescript-eslint` major in sync with TypeScript — avoid unsupported-TS-version warnings from `typescript-estree`.
 
 ## `tsconfig` and `.vue` / Quasar
 

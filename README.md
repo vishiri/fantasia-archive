@@ -187,6 +187,7 @@ yarn test:e2e:list
 | `yarn audit:scss-literals` | Consumer SCSS literal audit (not CI). |
 | `yarn audit:domain-policy` | Domain policy grep (not CI). |
 | `yarn audit:quasar-component-tokens` | **`$q*`** token audit. |
+| `yarn audit:quasar-variables` | Feature **`styles/_variables.scss`** unused-$ audit. |
 | `yarn audit:full` | Chained local audits (not CI). |
 | `yarn audit:yagni` | YAGNI inventory + heuristic scan (not CI). |
 | `yarn audit:yagni:full` | YAGNI scan + optional jscpd/depcheck. |
@@ -200,6 +201,7 @@ yarn test:e2e:list
 | `quasarBuildElectronSummarized.mjs` | Summarized Electron build |
 | `playwrightWithArtifactTrim.mjs` | Playwright wrapper + artifact trim |
 | `auditQuasarComponentTokens.mjs` | Quasar component token audit |
+| `auditQuasarVariablesUsage.mjs` | Feature `_variables.scss` unused-$ audit |
 | `auditScssConsumerLiterals.mjs` | Consumer SCSS literal audit |
 | `domainPolicyGrep.mjs` | Domain policy grep |
 | `runFullProjectAudit.mjs` | Chained local audits |

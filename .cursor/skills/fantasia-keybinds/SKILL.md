@@ -13,9 +13,9 @@ description: >-
 
 - **Renderer** **`keydown`** listener (capture) — calls dialog/app helpers without widening preload beyond **`getKeybinds`** / **`setKeybinds`**
 - **Definitions**: **`faKeybindCommandDefinitions.ts`** (**`FA_KEYBIND_COMMAND_DEFINITIONS`**)
-- **Chord logic**: **`faKeybindsChordFromEvent.ts`**, **`faKeybindsChordEqualityAndResolve.ts`**, **`faKeybindsChordDisplayAndConflict.ts`**
-- **UI formatting**: **`faKeybindsChordUiFormatting.ts`** — settings, menus, shortcut copy
-- **Dispatch**: **`faKeybindsGlobalDispatch.ts`** → **`faKeybindRunCommand.ts`** → **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** ([fantasia-action-manager](../fantasia-action-manager/SKILL.md))
+- **Chord logic**: **`functions/faKeybindsChordEqualityAndResolve.ts`**, **`functions/createFaKeybindsChordFromEvent.ts`**, managers **`faKeybindsChordFromEvent_manager.ts`**, **`faKeybindsChordDisplayAndConflict_manager.ts`**
+- **UI formatting**: **`faKeybindsChordUiFormatting_manager.ts`** / **`functions/createFaKeybindsChordUiFormatting.ts`** — settings, menus, shortcut copy
+- **Dispatch**: **`faKeybindsGlobalDispatch_manager.ts`** → **`faKeybindRunCommand`** → **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** ([fantasia-action-manager](../fantasia-action-manager/SKILL.md))
 - **Layout**: **`MainLayout.vue`** registers after **`refreshKeybinds()`**; skipped in Storybook canvas + non-Electron
 - **Chromium Ctrl+Shift suppress**: main **`registerFaChromiumCtrlShiftShortcutSuppress`** (takes **`BrowserWindow`**) → **`createFaChromiumCtrlShiftGlobalShortcutForwardController`** (`activate`/`deactivate`); **`globalShortcut`** accelerators register **only while main window focused** (activate on **`focus`**, release on **`blur`** + teardown on close) so backgrounded app never intercepts chords in other apps. **`before-input-event`** already focus-scoped. Boot **`faChromiumForwardedKeyChord`**
 - **Pinia**: **`S_FaKeybinds.ts`**

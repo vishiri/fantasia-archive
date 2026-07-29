@@ -79,4 +79,4 @@ Store: **`enterDocumentEditMode`**, **`saveDocumentDisplayName(documentId, { kee
 ## Related
 
 - Rule: [fa-document-workspace-edit-state.mdc](../../rules/fa-document-workspace-edit-state.mdc)
-- [fantasia-quasar-vue](fantasia-quasar-vue/SKILL.md), [fantasia-sqlite-main](fantasia-sqlite-main/SKILL.md)
+- [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md), [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md)

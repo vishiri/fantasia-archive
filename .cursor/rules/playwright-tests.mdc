@@ -115,7 +115,7 @@ Each **`test(...)`**:
 
 ## Keyboard strings (cross-OS keybinds and Playwright `keyboard.press`)
 
-- **Why**: App defaults with **`primary`** → **Meta** darwin, **Control** win32/linux (`faKeybindExpandDefaultChord` in [faKeybindsChordEqualityAndResolve.ts](src/scripts/keybinds/faKeybindsChordEqualityAndResolve.ts)). User capture storing **ctrl** in keybind model → **physical Control** in Playwright **all** hosts (not **Meta** macOS). Hard-coded single **Control+…** or **Meta+…** breaks one side unless matches rule.
+- **Why**: App defaults with **`primary`** → **Meta** darwin, **Control** win32/linux (`faKeybindExpandDefaultChord` in [faKeybindsChordEqualityAndResolve.ts](../../src/scripts/keybinds/functions/faKeybindsChordEqualityAndResolve.ts)). User capture storing **ctrl** in keybind model → **physical Control** in Playwright **all** hosts (not **Meta** macOS). Hard-coded single **Control+…** or **Meta+…** breaks one side unless matches rule.
 - **Shared module** — [faPlaywrightKeyboardChords.ts](helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts): **prefer** in **`*.playwright.test.ts`** / **`*.playwright.spec.ts`** over ad hoc `keyboard.press` for cases below.
 - **Default global shortcuts (primary in definitions)** — **`getFaPlaywrightDefaultToggleDevtoolsPressString()`** (F12), **`getFaPlaywrightDefaultActionMonitorOpenPressString()`** (F11), or same Meta-vs-Control pattern for new getters beside them.
 - **Literal Control in capture/overrides** — chords persisting **ctrl** (e.g. user **Control+Shift+F12**): **`FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F12`**, **`FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11`**, **`FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12`** for E2E **Control+Alt+Shift+F12** documented chord.

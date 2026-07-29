@@ -25,7 +25,7 @@ description: >-
 
 ## Flatten procedure (checklist)
 
-1. Read [docs/database/projectDB.md](../../docs/database/projectDB.md); list tables/columns/indexes to keep
+1. Read [docs/database/projectDB.md](../../../docs/database/projectDB.md); list tables/columns/indexes to keep
 2. Merge DDL into **`faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**)
 3. Simplify **`faProjectDbMigrateWiring.ts`** — max version **1**, remove legacy steps
 4. Delete obsolete migration-only helpers

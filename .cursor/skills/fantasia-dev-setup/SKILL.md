@@ -32,7 +32,7 @@ quasar dev -m electron
 
 (`yarn quasar:dev:electron`). Electron + Storybook together: **`yarn app:dev`**.
 
-Post-implementation agent gates ([dev-electron-compile-check.mdc](../rules/dev-electron-compile-check.mdc)): (1) **dev scoped gate** ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)), (2) **`yarn quasar:dev:electron`** **20s** compile smoke — separate terminals; kill agent-spawned dev after pass. Full **`yarn testbatch:verify`** only at final cleanup, commit, or explicit user request.
+Post-implementation agent gates ([dev-electron-compile-check.mdc](../../rules/dev-electron-compile-check.mdc)): (1) **dev scoped gate** ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)), (2) **`yarn quasar:dev:electron`** **20s** compile smoke — separate terminals; kill agent-spawned dev after pass. Full **`yarn testbatch:verify`** only at final cleanup, commit, or explicit user request.
 
 ## Troubleshooting
 

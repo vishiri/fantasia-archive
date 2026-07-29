@@ -82,7 +82,7 @@ Related props: **`virtualization`**, **`virtualizationPrerenderCount`**.
 
 ### DnD + scroll preservation (layout tree playbook)
 
-Full postmortem: [`.cursor/plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md`](../../plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md). Reference: **`DialogProjectSettingsWorldTemplateLayoutTree.vue`**.
+Full postmortem: this skill section below (**DnD + scroll preservation**). Reference: **`DialogProjectSettingsWorldTemplateLayoutTree.vue`**.
 
 **Symptom:** drop moves data OK; **`scrollTop`** jumps (often top). Or add row does not scroll into view.
 
@@ -129,7 +129,7 @@ Use **`walkTreeData`** for search, bulk expand, validation — not ad hoc recurs
 
 ## Project Settings — world template layout
 
-**`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — **`Draggable`**, max depth 2, DnD rules in **`dialogProjectSettingsWorldTemplateLayoutDnD.ts`**, commit policy + wiring in feature **`scripts/`**. DnD scroll playbook: [he-tree-dnd-scroll-playbook plan](../plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md). Full map: [fa-he-tree.mdc](../../rules/fa-he-tree.mdc) and [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc).
+**`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — **`Draggable`**, max depth 2, DnD rules in **`dialogProjectSettingsWorldTemplateLayoutDnD.ts`**, commit policy + wiring in feature **`scripts/`**. DnD scroll playbook: this skill **DnD + scroll preservation**. Full map: [fa-he-tree.mdc](../../rules/fa-he-tree.mdc) and [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc).
 
 ## Tests
 

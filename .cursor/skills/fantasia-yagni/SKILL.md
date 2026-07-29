@@ -40,4 +40,4 @@ Both can stay on. YAGNI does not replace caveman or **cavemem** hooks.
 - [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) — fewer modules until line caps force split
 - [fa-two-level-architecture.mdc](../../rules/fa-two-level-architecture.mdc)
 - [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md) — default post-edit gate
-- [fantasia-testing](fantasia-testing/SKILL.md) — connected tests + full gate at ship
+- [fantasia-testing](../fantasia-testing/SKILL.md) — connected tests + full gate at ship

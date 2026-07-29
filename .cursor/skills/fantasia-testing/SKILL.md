@@ -34,7 +34,7 @@ See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI
 
 ## Unit tests (Vitest)
 
-- **Commands**: **`yarn test:unit`** — multi-project root ([vitest.config.mts](../../vitest.config.mts): **`unit-electron`**, **`unit-src-renderer`**, **`unit-helpers`**, **`unit-i18n`**, **`unit-components`**) without coverage. **`yarn testbatch:verify`** ends with **`yarn test:coverage:verify`**. Debug slices: **`yarn test:coverage:electron`**, **`yarn test:coverage:helpers`**, **`yarn test:coverage:i18n`**, **`yarn test:coverage:src`**. Full tier detail: [vitest-tests.mdc](../../rules/vitest-tests.mdc).
+- **Commands**: **`yarn test:unit`** — multi-project root ([vitest.config.mts](../../../vitest.config.mts): **`unit-electron`**, **`unit-src-renderer`**, **`unit-helpers`**, **`unit-i18n`**, **`unit-components`**) without coverage. **`yarn testbatch:verify`** ends with **`yarn test:coverage:verify`**. Debug slices: **`yarn test:coverage:electron`**, **`yarn test:coverage:helpers`**, **`yarn test:coverage:i18n`**, **`yarn test:coverage:src`**. Full tier detail: [vitest-tests.mdc](../../rules/vitest-tests.mdc).
 - **Execution**: **Dev edits** — [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md). **Commit / final cleanup** — **`yarn testbatch:verify`**. Do not chain unit/coverage with `yarn quasar:build:electron` or Playwright in one shell line.
 - **Reports**: `test-results/vitest-report/test-results-vitest-*.json` per project.
 - **Scope**: `src/` + `src-electron/` with `*.vitest.test.ts` under `_tests/`; component mounts use `@vue/test-utils` + [vitest.setup.ts](../../../vitest/vitest.setup.ts).

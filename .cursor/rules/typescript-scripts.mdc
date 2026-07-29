@@ -10,7 +10,7 @@ Vue SFCs import **pure helpers** from here; [vue-quasar.mdc](vue-quasar.mdc), [c
 
 ## Layout
 
-- **`_utilities/`** — small pure helpers (format, parsing); **JSDoc** each export (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
+- **`_utilities/`** — small pure helpers (format, parsing); **JSDoc** each export (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](../../src/scripts/_utilities/functions/colorFormatConvertors.ts).
 - **`appInternals/`** — cross-cutting renderer helpers in **`rendererAppInternals_manager.ts`**, **`appInternals_manager.ts`** (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing) — not feature-dialog/keybind-specific.
 - **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; one area per file group.
 - **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, user-visible chord labels in **`faKeybindsChordUiFormatting.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired **`MainLayout.vue`** + **`S_FaKeybinds`**. New app-wide shortcuts: [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).

@@ -7,7 +7,7 @@ alwaysApply: true
 
 Every agent reply in this repo use **caveman** style unless user say **stop caveman** or **normal mode**.
 
-Full playbook: [.agents/skills/caveman/SKILL.md](../skills/caveman/SKILL.md). Follow that skill on every turn — persistence, intensity, auto-clarity, boundaries.
+Full playbook: [.agents/skills/caveman/SKILL.md](../../.agents/skills/caveman/SKILL.md). Follow that skill on every turn — persistence, intensity, auto-clarity, boundaries.
 
 ## Defaults
 

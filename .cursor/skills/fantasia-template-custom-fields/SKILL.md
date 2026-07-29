@@ -10,9 +10,9 @@ description: >-
 
 ## Canonical documentation
 
-- **Design (not yet in v4 schema):** [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)
-- **Shipped schema:** [docs/database/projectDB.md](../../docs/database/projectDB.md) — same commit when migrations/IPC land
-- **Index:** [docs/database/README.md](../../docs/database/README.md)
+- **Design (not yet in v4 schema):** [docs/database/templateCustomFields.md](../../../docs/database/templateCustomFields.md)
+- **Shipped schema:** [docs/database/projectDB.md](../../../docs/database/projectDB.md) — same commit when migrations/IPC land
+- **Index:** [docs/database/README.md](../../../docs/database/README.md)
 
 ## Related skills
 

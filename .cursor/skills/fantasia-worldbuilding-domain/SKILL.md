@@ -18,7 +18,7 @@ description: >-
 
 - **Project**: worldbuilding dataset container (new/save/load/export)
 - **Document**: content unit in **`.faproject`** **`documents`** table — not i18n help/license markdown
-- **Template**: form schema via **`template_id`**; v4 = display name on **`document_templates`**; custom fields in [templateCustomFields.md](../../docs/database/templateCustomFields.md)
+- **Template**: form schema via **`template_id`**; v4 = display name on **`document_templates`**; custom fields in [templateCustomFields.md](../../../docs/database/templateCustomFields.md)
 - **Custom field**: typed template slot with stable **`field_id`**; document values keyed by id, merged at read
 - **Tools / settings**: app behavior — distinct from in-universe lore unless intentionally meta
 
