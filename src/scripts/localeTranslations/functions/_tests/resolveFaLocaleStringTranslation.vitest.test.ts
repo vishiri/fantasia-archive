@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 
 import {
@@ -13,6 +14,24 @@ import { createNormalizeFaLocaleStringTranslations } from '../normalizeFaLocaleS
 import { resolveFaLocaleTranslationsMenuAnchorElement } from '../resolveFaLocaleTranslationsMenuAnchorElement'
 import { buildFaLocaleTranslationsMenuContentStyle, resolveFaLocaleTranslationsMenuPresentation } from '../resolveFaLocaleTranslationsMenuPresentation'
 import { scheduleFaLocaleTranslationsMenuInputFocus } from '../scheduleFaLocaleTranslationsMenuInputFocus'
+
+/**
+ * Level-1 functions/_tests cannot import neverthrow; stub ResultAsync.fromPromise for DI.
+ */
+const ResultAsync = {
+  fromPromise: <T>(promise: Promise<T>, mapError: (error: unknown) => unknown) => {
+    return {
+      match: (
+        onOk: (value: T) => void,
+        onErr: (error: unknown) => void
+      ): Promise<void> => {
+        return promise.then(onOk, (error: unknown) => {
+          onErr(mapError(error))
+        })
+      }
+    }
+  }
+} as unknown as T_injectedResultAsync
 
 const normalizeFaLocaleStringTranslations = createNormalizeFaLocaleStringTranslations({
   languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
@@ -195,6 +214,7 @@ test('Test that scheduleFaLocaleTranslationsMenuInputFocus focuses menu input af
   const focusMenuInput = vi.fn()
   const rafCallbacks: Array<() => void> = []
   scheduleFaLocaleTranslationsMenuInputFocus({
+    ResultAsync,
     focusMenuInput,
     nextTick: async () => {},
     requestAnimationFrame: (callback) => {
@@ -202,17 +222,20 @@ test('Test that scheduleFaLocaleTranslationsMenuInputFocus focuses menu input af
       return 1
     }
   })
-  await Promise.resolve()
-  expect(focusMenuInput).toHaveBeenCalledTimes(1)
+  await vi.waitFor(() => {
+    expect(focusMenuInput).toHaveBeenCalledTimes(1)
+  })
   rafCallbacks[0]!?.()
-  await Promise.resolve()
-  expect(focusMenuInput).toHaveBeenCalledTimes(2)
+  await vi.waitFor(() => {
+    expect(focusMenuInput).toHaveBeenCalledTimes(2)
+  })
 })
 
 test('Test that scheduleFaLocaleTranslationsMenuInputFocus logs when nextTick rejects', async () => {
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const focusMenuInput = vi.fn()
   scheduleFaLocaleTranslationsMenuInputFocus({
+    ResultAsync,
     focusMenuInput,
     nextTick: () => Promise.reject(new Error('nextTick failed')),
     requestAnimationFrame: vi.fn()
@@ -224,6 +247,44 @@ test('Test that scheduleFaLocaleTranslationsMenuInputFocus logs when nextTick re
     )
   })
   expect(focusMenuInput).not.toHaveBeenCalled()
+  consoleErrorSpy.mockRestore()
+})
+
+/**
+ * scheduleFaLocaleTranslationsMenuInputFocus
+ * First nextTick + rAF succeed; second nextTick rejects so the inner error mapper and logger run.
+ */
+test('Test that scheduleFaLocaleTranslationsMenuInputFocus logs when second nextTick rejects', async () => {
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const focusMenuInput = vi.fn()
+  const rafCallbacks: Array<() => void> = []
+  let nextTickCallCount = 0
+  scheduleFaLocaleTranslationsMenuInputFocus({
+    ResultAsync,
+    focusMenuInput,
+    nextTick: () => {
+      nextTickCallCount += 1
+      if (nextTickCallCount === 1) {
+        return Promise.resolve()
+      }
+      return Promise.reject(new Error('second nextTick failed'))
+    },
+    requestAnimationFrame: (callback) => {
+      rafCallbacks.push(callback)
+      return 1
+    }
+  })
+  await vi.waitFor(() => {
+    expect(focusMenuInput).toHaveBeenCalledTimes(1)
+  })
+  rafCallbacks[0]!?.()
+  await vi.waitFor(() => {
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[faLocaleTranslations] nextTick chain failed',
+      expect.any(Error)
+    )
+  })
+  expect(focusMenuInput).toHaveBeenCalledTimes(1)
   consoleErrorSpy.mockRestore()
 })
 

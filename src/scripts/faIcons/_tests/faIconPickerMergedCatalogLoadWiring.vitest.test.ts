@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { loadFaIconPickerMergedCatalogAsync } from '../faIconPickerMergedCatalogLoadWiring'
 
@@ -16,12 +16,14 @@ vi.mock('../faIconPickerCatalogLazyLoadWiring', () => ({
   })
 }))
 
-describe('loadFaIconPickerMergedCatalogAsync', () => {
-  test('loads and merges every configured icon pack', async () => {
-    await expect(loadFaIconPickerMergedCatalogAsync()).resolves.toEqual([
-      'fa-solid fa-user',
-      'mdi-home',
-      'person'
-    ])
-  })
+/**
+ * loadFaIconPickerMergedCatalogAsync
+ * Loads and merges every configured icon pack through the wiring layer.
+ */
+test('Test that loadFaIconPickerMergedCatalogAsync loads and merges every configured icon pack', async () => {
+  await expect(loadFaIconPickerMergedCatalogAsync()).resolves.toEqual([
+    'fa-solid fa-user',
+    'mdi-home',
+    'person'
+  ])
 })

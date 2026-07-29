@@ -2781,3 +2781,33 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects temporary ta
 
   await expect(store.saveDocumentDisplayName('temp-1', { keepEditMode: false })).rejects.toThrow()
 })
+
+/**
+ * createTemporaryDocumentUnderParentDocument
+ * Returns null when source document lookup rejects so ResultAsync error mapper runs.
+ */
+test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentDocument returns null when source lookup fails', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('source missing'))
+
+  const documentId = await store.createTemporaryDocumentUnderParentDocument('missing-source')
+
+  expect(documentId).toBeNull()
+})
+
+/**
+ * createTemporaryDocumentCopyFromSource
+ * Returns null when source document lookup rejects so ResultAsync error mapper runs.
+ */
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource returns null when source lookup fails', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('source missing'))
+
+  const documentId = await store.createTemporaryDocumentCopyFromSource('missing-source')
+
+  expect(documentId).toBeNull()
+})

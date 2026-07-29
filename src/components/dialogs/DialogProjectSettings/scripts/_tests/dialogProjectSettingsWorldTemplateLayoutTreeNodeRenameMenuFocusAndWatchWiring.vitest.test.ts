@@ -82,9 +82,13 @@ test('Test that rename menu input focus scheduler retries after animation frame'
   })
 
   await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
   expect(focus).toHaveBeenCalledTimes(1)
   rafCallback?.(0)
   await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
   expect(focus).toHaveBeenCalledTimes(2)
 })
 

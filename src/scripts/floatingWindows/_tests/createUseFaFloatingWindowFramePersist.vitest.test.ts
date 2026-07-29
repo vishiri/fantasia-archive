@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
+import { ResultAsync } from 'neverthrow'
 import { expect, test, vi } from 'vitest'
 
 import { createUseFaFloatingWindowFramePersist } from '../functions/createUseFaFloatingWindowFramePersist'
@@ -20,6 +21,7 @@ test('Test that createUseFaFloatingWindowFramePersist flushes debounce when the 
   const watch = vi.fn()
 
   const useFaFloatingWindowFramePersist = createUseFaFloatingWindowFramePersist({
+    ResultAsync,
     debounce,
     runFaAction: vi.fn(),
     watch
@@ -63,6 +65,7 @@ test('Test that createUseFaFloatingWindowFramePersist persists on close when the
   const watch = vi.fn()
 
   const useFaFloatingWindowFramePersist = createUseFaFloatingWindowFramePersist({
+    ResultAsync,
     debounce,
     runFaAction: vi.fn(),
     watch

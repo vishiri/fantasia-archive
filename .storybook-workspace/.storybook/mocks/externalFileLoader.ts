@@ -9,6 +9,8 @@ import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_help
 import L_project from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
 import L_tools from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
+import L_deleteOpenedDocument from 'app/i18n/en-US/components/dialogs/L_deleteOpenedDocument'
+import L_discardOpenedDocumentTab from 'app/i18n/en-US/components/dialogs/L_discardOpenedDocumentTab'
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
@@ -73,6 +75,8 @@ const defaultMessages: Record<string, unknown> = {
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
+    deleteOpenedDocument: L_deleteOpenedDocument,
+    discardOpenedDocumentTab: L_discardOpenedDocumentTab,
     keybindSettings: L_dialogKeybindSettings,
     importExportAppConfig: L_importExportAppConfig,
     markdownDocument: L_markdownDocument,

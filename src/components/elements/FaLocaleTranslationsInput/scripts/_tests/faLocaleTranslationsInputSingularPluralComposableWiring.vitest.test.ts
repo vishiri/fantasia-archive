@@ -119,7 +119,8 @@ test('Test that createUseFaLocaleTranslationsInputSingularPlural wires display a
  * createUseFaLocaleTranslationsInputSingularPlural
  * Exposes singular-plural composable through the wired manager entry.
  */
-test('Test that useFaLocaleTranslationsInputSingularPlural manager wires singular plural composable', () => {
+test('Test that useFaLocaleTranslationsInputSingularPlural manager wires singular plural composable', async () => {
+  const focus = vi.fn()
   const api = useFaLocaleTranslationsInputSingularPlural({
     currentLanguageCode: ref('en-US'),
     emitModelValue: vi.fn(),
@@ -128,7 +129,7 @@ test('Test that useFaLocaleTranslationsInputSingularPlural manager wires singula
       plural: { 'en-US': 'Cats' },
       singular: { 'en-US': 'Cat' }
     }),
-    readPreferredLanguageInputFocus: () => null,
+    readPreferredLanguageInputFocus: () => focus,
     readTriggerElement: () => null,
     requestAnimationFrame: (callback) => {
       callback()
@@ -138,4 +139,11 @@ test('Test that useFaLocaleTranslationsInputSingularPlural manager wires singula
 
   expect(api.isSingularPluralMode.value).toBe(true)
   expect(api.resolvedValue.value.length).toBeGreaterThan(0)
+
+  // Hit manager ResultAsync scheduleFaLocaleTranslationsMenuInputFocus wrapper
+  api.onTranslationsMenuShow()
+  await Promise.resolve()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(focus).toHaveBeenCalled()
 })

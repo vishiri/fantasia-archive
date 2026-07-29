@@ -151,6 +151,11 @@ test('Test that FaIconPickerInput opens the menu and emits the selected icon', a
   await w.find('[data-test-locator="faIconPickerInput-test-trigger"]').trigger('click')
   expect(w.find('.q-menu-stub').exists()).toBe(true)
 
+  // Catalog load uses ResultAsync.fromPromise — drain before grid cells exist
+  await Promise.resolve()
+  await Promise.resolve()
+  await w.vm.$nextTick()
+
   await w.find('[data-test-icon-name="mdi-home"]').trigger('click')
   expect(w.emitted('update:modelValue')?.slice(-1)[0]).toEqual(['mdi-home'])
 })

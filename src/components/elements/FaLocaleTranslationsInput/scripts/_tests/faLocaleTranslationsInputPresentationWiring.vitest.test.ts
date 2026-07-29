@@ -39,6 +39,9 @@ test('Test that createFaLocaleTranslationsInputPresentationWiring focusPreferred
   })
 
   wiring.focusPreferredLanguageInput()
+  // ResultAsync.fromPromise(nextTick) + match + nested nextTick need microtask drains
+  await Promise.resolve()
+  await Promise.resolve()
   await Promise.resolve()
 
   expect(nextTick).toHaveBeenCalled()
@@ -57,5 +60,7 @@ test('Test that createFaLocaleTranslationsInputPresentationWiring focusPreferred
   })
 
   wiring.focusPreferredLanguageInput()
+  await Promise.resolve()
+  await Promise.resolve()
   await Promise.resolve()
 })
