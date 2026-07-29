@@ -21,7 +21,7 @@
     "http-server": "^14.1.1",
     "pinia": "^3.0.4",
     "playwright": "^1.49.1",
-    "quasar": "^2.16.0",
+    "quasar": "^2.22.0",
     "sass": "^1.78.0",
     "storybook": "10.3.4",
     "vite": "^8.0.16",
