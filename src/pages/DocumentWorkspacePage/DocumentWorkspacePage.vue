@@ -220,8 +220,8 @@ const {
 .documentWorkspacePage__colorFields {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
+  margin-top: $dialogProjectSettings-fieldTitle-marginTop;
   max-width: 100%;
 }
 
@@ -233,7 +233,7 @@ const {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: $dialogProjectSettings-fieldTitle-marginBottom;
 }
 
 .documentWorkspacePage__fieldHelpIcon {

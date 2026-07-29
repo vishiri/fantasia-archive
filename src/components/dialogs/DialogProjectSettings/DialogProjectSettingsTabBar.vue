@@ -147,7 +147,7 @@ body.desktop.fa-appTheme--fantasy .dialogProjectSettings__tabs :deep(.q-tab.q-ma
 .dialogProjectSettings__tabBarDivider {
   background-color: color-mix(in srgb, var(--fa-color-white) 28%, transparent);
   flex-shrink: 0;
-  height: 1px;
+  height: $dialogProjectSettings-tabBarDivider-height;
   margin:
     $dialogProjectSettings-tabBarDivider-marginTop
     auto

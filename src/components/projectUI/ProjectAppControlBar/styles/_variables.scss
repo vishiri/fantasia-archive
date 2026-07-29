@@ -23,6 +23,9 @@ $projectAppControlBar-tabAlertIcon-positionTop: 2px;
 $projectAppControlBar-tabClose-color: fa-v('grey', $grey);
 $projectAppControlBar-tabContent-color: fa-v('text-workspace-row', $text-workspace-row);
 $projectAppControlBar-tabContent-widthPx: 170px;
+$projectAppControlBar-tabDeadMarker-marginRight: 4px;
+$projectAppControlBar-tabFinishedMarker-marginLeft: 4px;
+$projectAppControlBar-tabFinishedMarker-marginRight: 4px;
 $projectAppControlBar-tabFocusTransitionDurationMs: 300ms;
 $projectAppControlBar-tabFocusTransitionEase: cubic-bezier(0.4, 0, 0.2, 1);
 /* Match hierarchy tree document/template icons ($iconSize + MDI fit-scale 1). */

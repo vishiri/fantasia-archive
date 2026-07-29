@@ -705,15 +705,15 @@ body.fa-appTheme--fantasy .q-notification {
     background: currentcolor !important;
     border-radius: 0 !important;
     bottom: 0 !important;
-    left: -16px !important;
+    left: -$qNotification-progress-horizontalInset !important;
     opacity: 0.3 !important;
     position: absolute !important;
-    right: -16px !important;
+    right: -$qNotification-progress-horizontalInset !important;
     z-index: 1;
   }
 
   &--multi-line &__progress {
-    bottom: -8px !important;
+    bottom: -$qNotification-progress-bottomInset-multiLine !important;
   }
 
   &__avatar {

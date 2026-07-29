@@ -7,7 +7,7 @@
   flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
   /* Gutter + negative margin so right-edge core line can sit on the painted separator.
    * Y-scroll alone would force X clip and leave the highlight beside the border. */
-  margin-right: -2px;
+  margin-right: -$dialogProjectSettings-worldsTabList-edgeGlowGutter;
   max-height: 100%;
   max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
   min-height: 0;
@@ -20,7 +20,7 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden auto;
-    padding-right: 2px;
+    padding-right: $dialogProjectSettings-worldsTabList-edgeGlowGutter;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
@@ -60,13 +60,13 @@ body.fa-appTheme--flat {
 }
 
 .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList {
-  --fa-tab-edge-glow-right-active-bloom-size: 160px;
-  --fa-tab-edge-glow-right-hover-bloom-size: 180px;
+  --fa-tab-edge-glow-right-active-bloom-size: #{$dialogProjectSettings-worldsTabList-edgeGlow-right-active-bloomSize};
+  --fa-tab-edge-glow-right-hover-bloom-size: #{$dialogProjectSettings-worldsTabList-edgeGlow-right-hover-bloomSize};
 }
 
 .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
-  --fa-tab-edge-glow-right-active-bloom-size: 260px;
-  --fa-tab-edge-glow-right-hover-bloom-size: 280px;
+  --fa-tab-edge-glow-right-active-bloom-size: #{$dialogProjectSettings-documentTemplatesTabList-edgeGlow-right-active-bloomSize};
+  --fa-tab-edge-glow-right-hover-bloom-size: #{$dialogProjectSettings-documentTemplatesTabList-edgeGlow-right-hover-bloomSize};
 
   flex-basis: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
   max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});

@@ -108,7 +108,7 @@ body.fa-appTheme--flat .faVerticalDraggableTabs__tab--active:not(.faVerticalDrag
   inset: 0 $faTabEdgeGlow-right-edgeOffset 0 auto;
   pointer-events: none;
   position: absolute;
-  width: 2px;
+  width: $faVerticalDraggableTabs-flat-activeIndicator-width;
   z-index: $faTabEdgeGlow-zIndex;
 }
 

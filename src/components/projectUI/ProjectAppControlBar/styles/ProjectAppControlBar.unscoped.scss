@@ -371,13 +371,13 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
 
   .projectAppControlBarTabs__deadMarker {
     flex-shrink: 0;
-    margin-right: 4px;
+    margin-right: $projectAppControlBar-tabDeadMarker-marginRight;
   }
 
   .projectAppControlBarTabs__finishedMarker {
     flex-shrink: 0;
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: $projectAppControlBar-tabFinishedMarker-marginLeft;
+    margin-right: $projectAppControlBar-tabFinishedMarker-marginRight;
   }
 
   .q-tab__alert-icon {

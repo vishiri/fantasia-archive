@@ -6,7 +6,7 @@
   color: $projectHierarchyTree-orderNumberBadge-color;
   justify-content: center;
   left: inherit;
-  min-width: 24px;
+  min-width: $projectHierarchyTree-orderNumberBadge-minWidth;
   opacity: 1;
   padding: $projectHierarchyTree-orderNumberBadge-padding;
   right: calc(100% + #{$projectHierarchyTree-orderNumberBadge-rightOffset});

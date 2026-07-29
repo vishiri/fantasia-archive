@@ -50,6 +50,9 @@ $qNotification-frame-maskSize: 51% 51%;
 $qNotification-padding: $qNotification-frame-innerInset + $qNotification-frame-borderWidth + 12px;
 /* Fantasy parchment chrome only: tighter vertical inset than horizontal. */
 $qNotification-padding-vertical: $qNotification-padding - 6px;
+/* Flat progress bar: cancel Quasar --standard/--multi-line horizontal padding; multi-line bottom inset. */
+$qNotification-progress-bottomInset-multiLine: 8px;
+$qNotification-progress-horizontalInset: 16px;
 /*
  * Neutral paper grain (no cream tint) so Quasar type hues stay dominant.
  * Soft-light over .bg-* fills.

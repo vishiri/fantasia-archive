@@ -76,12 +76,12 @@ body.fa-appTheme--fantasy .projectHierarchyTreeNode__icon--worldGlyph {
 
 .projectHierarchyTreeNode__deadMarker {
   flex-shrink: 0;
-  margin-right: 4px;
+  margin-right: $projectHierarchyTree-statusMarker-marginRight;
 }
 
 .projectHierarchyTreeNode__finishedMarker {
   flex-shrink: 0;
-  margin-right: 4px;
+  margin-right: $projectHierarchyTree-statusMarker-marginRight;
 }
 
 .projectHierarchyTreeNode__icon--layoutKind {
