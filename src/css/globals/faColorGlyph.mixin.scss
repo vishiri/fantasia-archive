@@ -29,3 +29,25 @@
     -webkit-text-fill-color: transparent;
   }
 }
+
+// Same highlight / mid / shade stops + drop-shadow as fa-color-glyph-shading, for solid fills
+// (circles, badges). Set #{$faColorGlyph-baseVar} on the element.
+@mixin fa-color-fill-shading {
+  background-color: transparent;
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-highlightBase,
+        var(--fa-color-white)
+      ),
+      var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-midStop,
+      color-mix(
+        in srgb,
+        var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-shadeBase,
+        var(--fa-color-black)
+      )
+    );
+  filter: drop-shadow(#{$faColorGlyph-dropShadow});
+}

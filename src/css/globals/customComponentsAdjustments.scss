@@ -1,5 +1,7 @@
 @use '../quasar.variables.scss' as *;
+@use './faDialogCyanRim.mixin.scss' as dialogCyanRim;
 @use '../theme/custom-components/faColorPickerQColor.scss';
+@use '../theme/custom-components/faConfirmationDialog.scss';
 @use '../theme/custom-components/faVerticalDraggableTabs.scss';
 
 .floatingWindowComponent {
@@ -15,6 +17,14 @@
   position: relative;
   vertical-align: top;
   will-change: scroll-position;
+}
+
+/* Fantasy: cyan rim ring + top bloom + side feathers — same stack as dialog cards. */
+body.fa-appTheme--fantasy .floatingWindowComponent {
+  @include dialogCyanRim.fa-dialog-cyan-rim-chrome;
+
+  background: $floatingWindowComponent-surface-backgroundColor-fantasy;
+  border: 0;
 }
 
 .floatingWindowComponent__title--shortFrame {

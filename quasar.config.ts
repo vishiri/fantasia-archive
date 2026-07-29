@@ -144,7 +144,10 @@ export default defineConfig((ctx) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
       config: {
-        ripple: false,
+        // Ripples on globally; fantasy skin hides via body.fa-appTheme--fantasy CSS
+        // (Quasar Ripple directive caches config.ripple at mount — live false/true toggle
+        // cannot enable ripples on already-mounted chrome after a fantasy boot).
+        ripple: true,
         dark: true
       },
 

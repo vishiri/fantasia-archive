@@ -116,6 +116,8 @@ test('Test that DialogDiscardOpenedDocumentTab renders discard title and action 
   await flushPromises()
 
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab"]').exists()).toBe(true)
+  expect(wrapper.find('.faConfirmationDialog').exists()).toBe(true)
+  expect(wrapper.find('.faConfirmationDialog__content').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-title"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-title"] .text-primary-bright').text()).toBe('Hero')
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-discard"]').exists()).toBe(true)

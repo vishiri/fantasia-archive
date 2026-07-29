@@ -41,6 +41,10 @@
   overflow: visible;
   width: $faIconPickerInput-iconCell-size;
 
+  > .q-focus-helper {
+    transition: $qMenu-item-hover-focusHelperTransition;
+  }
+
   .q-icon {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
@@ -49,6 +53,7 @@
     height: $faQIconDisplay-iconFontSize;
     max-height: $faQIconDisplay-iconFontSize;
     max-width: $faQIconDisplay-iconFontSize;
+    transition: $qMenu-item-hover-colorTransition;
     width: $faQIconDisplay-iconFontSize;
   }
 }

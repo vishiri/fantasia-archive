@@ -1,9 +1,19 @@
 @use '../../app.palette.scss' as *;
+@use 'sass:color';
 
 /* QUASAR COMPONENT - Q-MENU */
 $qMenu-borderRadius: 4px;
+$qMenu-item-hover-backgroundTransition: background-color 0.3s ease;
+$qMenu-item-hover-colorTransition: color 0.3s ease;
+/* Opacity wash + background (browse/sortBy/splash override currentcolor → tint). */
+$qMenu-item-hover-focusHelperTransition: opacity 0.3s ease, background-color 0.3s ease, background 0.3s ease;
 $qMenu-item-minHeight: 46px;
 $qMenu-item-padding: 9.5px 16px;
+/* Fantasy: same weight enabled/disabled; disabled uses color (not global .disabled opacity). */
+$qMenu-item-fontWeight-fantasy: 400;
+/* Approx. accent @ 0.35 opacity over dark-lighter menu panel (global disabled opacity). */
+$qMenu-item-disabled-color-fantasy: color.mix($accent, $dark-lighter, 35%);
+$qMenu-item-disabled-keybind-color-fantasy: color.mix($text-keybind-hint, $dark-lighter, 35%);
 $qMenu-negativeMenuItemLabel-fontWeight: 500;
 $qMenu-negativeMenuItemLabel-textShadow: 0 0 3px fa-v('black', $black);
 $qMenu-subMenu-zIndex: 5999;

@@ -1,0 +1,6 @@
+/* QUASAR COMPONENT - Q-TABLE
+ * Sit flush on parent surfaces (dialog cards). Quasar default is #fff / .q-dark $dark,
+ * which paints a second panel inside fantasy $fantasy-dark shells.
+ */
+$qTable-backgroundColor: transparent;
+$qTable-boxShadow: none;

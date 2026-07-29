@@ -6,7 +6,22 @@
   width: min(#{$dialogDiscardOpenedDocumentTab-maxWidth}, calc(100vw - #{$dialogDiscardOpenedDocumentTab-viewportInlineSubtractPx}));
 }
 
-.q-dialog > .q-dialog__inner > .q-card.dialogDiscardOpenedDocumentTab > .q-card__section {
+/* Confirm inset: beat Quasar .q-card__section--vert (16px) so only shared tokens apply. */
+.q-dialog > .q-dialog__inner > .q-card.faConfirmationDialog.dialogDiscardOpenedDocumentTab > .faConfirmationDialog__content {
+  padding: $faConfirmationDialog-content-padding;
+
+  > .q-card__section:not(.faConfirmationDialog__body),
+  > .q-card__section--vert:not(.faConfirmationDialog__body) {
+    padding: 0;
+  }
+
+  > .faConfirmationDialog__body {
+    padding: $faConfirmationDialog-body-padding;
+    text-align: left;
+  }
+}
+
+.q-dialog > .q-dialog__inner > .q-card.dialogDiscardOpenedDocumentTab .faConfirmationDialog__content > .q-card__section {
   max-width: 100%;
   width: 100%;
 }

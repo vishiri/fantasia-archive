@@ -8,10 +8,13 @@
 /* QUASAR COLORS - GENERAL */
 $accent: #f5f5f5;
 $dark: #1b333e;
-$dark-darker: #152229; /* Fantasy dialog card shells; ~darker than $dark */
-$dark-middle: #183e4d; /* Between $dark and $dark-lighter; app header + window controls chrome */
 $dark-lighter: #194456;
+$dark-middle: #183e4d; /* Between $dark and $dark-lighter; app header + window controls chrome */
 $dark-page: #303742;
+/* Fantasy dialog card shells (darker than $dark). */
+$fantasy-dark: #152229;
+/* $dark-lighter darkened by same HSL lightness drop as $dark → $fantasy-dark (≈ -5.294%). */
+$fantasy-medium: #133341;
 
 $primary: #d7ac47;
 $primary-bright: #ffd673;

@@ -17,7 +17,7 @@
   mask-repeat: no-repeat;
   -webkit-mask-size: $qNotification-frame-maskSize;
   mask-size: $qNotification-frame-maskSize;
-  padding: $qNotification-padding !important;
+  padding: $qNotification-padding-vertical $qNotification-padding !important;
   position: relative;
 
   &::before,

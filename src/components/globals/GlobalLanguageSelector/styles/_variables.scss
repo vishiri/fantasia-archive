@@ -1,4 +1,5 @@
 @use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as qMenu;
 
 /* COMPONENT - GLOBAL LANGUAGE SELECTOR */
 $globalLanguageSelector-borderColor: fa-v('neutral-border', $neutral-border);
@@ -12,6 +13,7 @@ $globalLanguageSelector-spellcheckRefresh-popTransition-duration: 280ms;
 $globalLanguageSelector-menu-backgroundColor: fa-v('light-background', $light-background);
 $globalLanguageSelector-menu-flag-boxShadow: 0px 0px 4px rgba($black, 0.5);
 $globalLanguageSelector-menu-itemHover-backgroundColor: fa-v('primary-bright', $primary-bright);
+$globalLanguageSelector-menu-itemHover-backgroundTransition: qMenu.$qMenu-item-hover-backgroundTransition;
 $globalLanguageSelector-menu-item-padding: 8px 24px;
 $globalLanguageSelector-menu-itemTextColor: fa-v('black', $black);
 $globalLanguageSelector-menu-maxHeight: 420px;

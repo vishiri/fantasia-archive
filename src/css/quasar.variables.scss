@@ -8,12 +8,14 @@
 @forward 'globals/scrollbar.variables';
 @forward 'globals/faQIconDisplay.variables';
 @forward 'globals/faPaintedDivider.variables';
+@forward 'globals/faTableFantasy.variables';
 @forward 'globals/faTabEdgeGlow.variables';
 @forward 'globals/faOutlineButtonGlow.variables';
 @forward 'globals/faMicroCornerField.variables';
 @forward 'globals/faHeTreeSlotChrome.variables';
 @forward 'globals/faColorBead.variables';
 @forward 'globals/faColorGlyph.variables';
+@forward 'theme/custom-components/faConfirmationDialog.variables';
 @forward 'theme/custom-components/faVerticalDraggableTabs.variables';
 @forward 'theme/quasar-components/qBtn.variables';
 @forward 'theme/quasar-components/qCard.variables';
@@ -29,7 +31,9 @@
 @forward 'theme/quasar-components/qNotification.variables';
 @forward 'theme/quasar-components/qNotify.variables';
 @forward 'theme/quasar-components/qPage.variables';
+@forward 'theme/quasar-components/qStepper.variables';
 @forward 'theme/quasar-components/qTab.variables';
+@forward 'theme/quasar-components/qTable.variables';
 @forward 'theme/quasar-components/qToggle.variables';
 @forward 'theme/quasar-components/qTooltip.variables';
 @forward '../components/dialogs/DialogAboutFantasiaArchive/styles/variables';
@@ -44,6 +48,7 @@
 @forward '../components/dialogs/DialogProjectSettings/styles/variables';
 @forward '../components/elements/ErrorCard/styles/variables';
 @forward '../components/elements/FaColorPickerInput/styles/variables';
+@forward '../components/elements/FaCornerContentDot/styles/variables';
 @forward '../components/elements/FaHelpTooltipIcon/styles/variables';
 @forward '../components/elements/FaIconPickerInput/styles/variables';
 @forward '../components/elements/SocialContactSingleButton/styles/variables';

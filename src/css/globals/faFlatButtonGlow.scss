@@ -1,3 +1,4 @@
+@use '../app.palette.scss' as *;
 @use 'faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
 
 /*
@@ -7,10 +8,11 @@
  * ::after free on flat (outline uses ::before for Quasar border).
  */
 
-/* Kill Quasar white hover/focus wash (must compound body.desktop + fantasy). */
-body.desktop.fa-appTheme--fantasy .q-btn--flat.q-focusable:focus > .q-focus-helper,
-body.desktop.fa-appTheme--fantasy .q-btn--flat.q-hoverable:hover > .q-focus-helper,
-body.desktop.fa-appTheme--fantasy .q-btn--flat.q-manual-focusable--focused > .q-focus-helper {
+/* Kill Quasar white hover/focus wash (must compound body.desktop + fantasy).
+ * Capture close keeps flat wash — see DialogKeybindSettingsCaptureDialog. */
+body.desktop.fa-appTheme--fantasy .q-btn--flat:not(.dialogKeybindSettingsCapture__close).q-focusable:focus > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-btn--flat:not(.dialogKeybindSettingsCapture__close).q-hoverable:hover > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-btn--flat:not(.dialogKeybindSettingsCapture__close).q-manual-focusable--focused > .q-focus-helper {
   opacity: 0 !important;
 
   &::after,
@@ -19,9 +21,10 @@ body.desktop.fa-appTheme--fantasy .q-btn--flat.q-manual-focusable--focused > .q-
   }
 }
 
-body.fa-appTheme--fantasy .q-btn--flat {
+body.fa-appTheme--fantasy .q-btn--flat:not(.dialogKeybindSettingsCapture__close) {
+  /* Quasar .q-btn is already position:relative (containing block for ::after).
+   * Do not re-set relative here — it beats component position:absolute (e.g. capture close X). */
   overflow: visible;
-  position: relative;
 
   &::after {
     @include tabEdgeGlow.fa-tab-edge-glow-idle(bottom);
@@ -30,4 +33,17 @@ body.fa-appTheme--fantasy .q-btn--flat {
   &:hover:not(.disabled, [disabled], [aria-disabled='true'])::after {
     @include tabEdgeGlow.fa-tab-edge-glow-hover(bottom);
   }
+}
+
+/* Destructive flat (clear X, remove): red bloom matching button ink. */
+body.fa-appTheme--fantasy .q-btn--flat.text-secondary:not(.dialogKeybindSettingsCapture__close) {
+  --fa-tab-edge-glow-bright: #{fa-v('secondary', $secondary)};
+  --fa-tab-edge-glow-core: #{fa-v('secondary', $secondary)};
+  --fa-tab-edge-glow-deep: color-mix(in srgb, #{fa-v('secondary', $secondary)} 48%, #{fa-v('black', $black)});
+}
+
+body.fa-appTheme--fantasy .q-btn--flat.text-negative:not(.dialogKeybindSettingsCapture__close) {
+  --fa-tab-edge-glow-bright: #{fa-v('negative', $negative)};
+  --fa-tab-edge-glow-core: #{fa-v('negative', $negative)};
+  --fa-tab-edge-glow-deep: color-mix(in srgb, #{fa-v('negative', $negative)} 48%, #{fa-v('black', $black)});
 }

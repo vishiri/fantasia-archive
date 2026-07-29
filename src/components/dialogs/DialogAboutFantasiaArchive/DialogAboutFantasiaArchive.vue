@@ -25,7 +25,7 @@
           color="primary"
           horizontal
           dark
-          class="dialogAboutFantasiaArchive__titleSeparator q-my-lg q-mx-auto"
+          class="dialogAboutFantasiaArchive__titleSeparator fa-painted-divider--horizontal q-my-lg q-mx-auto"
         />
 
         <SocialContactButtons />

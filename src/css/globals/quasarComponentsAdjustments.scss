@@ -1,4 +1,6 @@
 @use '../quasar.variables.scss' as *;
+@use './faDialogCyanRim.mixin.scss' as dialogCyanRim;
+@use './faPaintedDivider.mixin.scss' as paintedDivider;
 @use './faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
 @use './faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
 @use './faNotificationParchmentFrame.mixin.scss' as notificationParchment;
@@ -60,6 +62,11 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   opacity: 1 !important;
 }
 
+.body--dark .q-markdown h2,
+.body--dark .q-markdown .q-markdown--heading-h2 {
+  color: $qMarkdown-h2-color !important;
+}
+
 .disabled,
 [disabled] {
   opacity: 0.35 !important;
@@ -92,8 +99,22 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 }
 
+body.fa-appTheme--flat .q-btn {
+  font-weight: $qBtn-fontWeight-flat;
+}
+
+// Quasar ripples stay framework-enabled so live flat↔fantasy switches keep working on
+// already-mounted controls; fantasy only hides the effect (see applyFaAppThemeToDocument).
+body.fa-appTheme--fantasy .q-ripple {
+  display: none !important;
+}
+
 .q-btn--rectangle {
   border-radius: $qBtn-rectangle-borderRadius;
+}
+
+body.fa-appTheme--flat .q-btn--rectangle {
+  border-radius: $qBtn-rectangle-borderRadius-flat;
 }
 
 .q-card {
@@ -143,7 +164,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-dialog > .q-dialog__inner > .q-card {
-  /* Flat: $dark shell. Fantasy override below uses --fa-color-dark-darker. */
+  /* Flat: $dark shell. Fantasy override below uses --fa-color-fantasy-dark. */
   background: $qDialog-card-backgroundColor-flat !important;
   border: 0;
   border-radius: $qDialog-card-borderRadius;
@@ -153,31 +174,27 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
 /* Fantasy: cyan rim ring + top bloom + side feathers (flat keeps global .q-card elevation only). */
 body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card {
+  @include dialogCyanRim.fa-dialog-cyan-rim-chrome;
+
   background: $qDialog-card-backgroundColor !important;
-  box-shadow: $qDialog-card-rim-boxShadow;
+}
 
-  /* Soft inward glow above opaque card children (inset shadow on the card itself stays hidden under panels). */
-  &::after {
-    background: $qDialog-card-rim-after-background;
-    border-radius: inherit;
-    content: '';
-    inset: $qDialog-card-rim-after-inset;
-    pointer-events: none;
-    position: absolute;
-    z-index: $qDialog-card-rim-after-zIndex;
-  }
+/*
+ * Keybind capture popup: keep flat light grey-lighter surface + dark ink.
+ * Global dialog shell ($dark / $fantasy-dark !important) would otherwise paint over it
+ * (invisible title, invisible color=dark SET button, wrong help contrast).
+ */
+.q-dialog > .q-dialog__inner > .q-card.dialogKeybindSettingsCapture {
+  background: $dialogKeybindSettingsCapture-cardBackground !important;
+}
 
+body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card.dialogKeybindSettingsCapture {
+  background: $dialogKeybindSettingsCapture-cardBackground !important;
+  box-shadow: none !important;
+
+  &::after,
   &::before {
-    background-image: $qDialog-card-rim-before-backgroundImage;
-    background-position: $qDialog-card-rim-before-backgroundPosition;
-    background-repeat: $qDialog-card-rim-before-backgroundRepeat;
-    background-size: $qDialog-card-rim-before-backgroundSize;
-    content: '';
-    filter: $qDialog-card-rim-before-filter;
-    inset: 0;
-    pointer-events: none;
-    position: absolute;
-    z-index: $qDialog-card-rim-before-zIndex;
+    content: none;
   }
 }
 
@@ -344,6 +361,18 @@ body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card {
     opacity: 1 !important;
   }
 
+  h2,
+  .q-markdown--heading-h2 {
+    color: $qMarkdown-h2-color !important;
+  }
+
+  hr {
+    background-color: $qMarkdown-hr-color;
+    border: 0;
+    height: $qMarkdown-hr-height;
+    opacity: 1;
+  }
+
   a {
     border-bottom: $qMarkdown-link-borderBottomWidth $qMarkdown-link-borderBottomStyle $aLinkColor;
   }
@@ -458,13 +487,37 @@ body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card {
   }
 }
 
+body.fa-appTheme--fantasy .q-markdown hr {
+  @include paintedDivider.fa-painted-divider(horizontal);
+}
+
 .q-menu {
   border-radius: $qMenu-borderRadius;
   overflow: hidden;
 
+  /* Any hoverable in a menu (q-item rows + icon-picker cells, etc.). */
+  .q-hoverable > .q-focus-helper,
+  .q-focusable > .q-focus-helper {
+    transition: $qMenu-item-hover-focusHelperTransition;
+  }
+
   .q-item {
     min-height: $qMenu-item-minHeight;
     padding: $qMenu-item-padding;
+    transition: $qMenu-item-hover-colorTransition, $qMenu-item-hover-backgroundTransition;
+
+    /* Nested labels/icons that set color on row hover (inherit or explicit). */
+    .q-icon,
+    .q-item__label,
+    .q-item__section,
+    [class*='__primaryLabel'],
+    [class*='__secondaryHint'],
+    [class*='__contextMenuLabel'],
+    [class*='__contextMenuIcon'],
+    [class*='__browseTabIcon'],
+    [class*='__icon'] {
+      transition: $qMenu-item-hover-colorTransition;
+    }
 
     /* Legibility: destructive menu rows use text-secondary; labels only (main section), not icons. */
     &.text-secondary {
@@ -485,6 +538,26 @@ body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card {
 
     /* Submenu having 1 lower z-index than normal menu for fancier looking animation of sliding underneath the parent */
     z-index: $qMenu-subMenu-zIndex;
+  }
+}
+
+/* Fantasy: same cyan rim as dialog cards / floating windows (beats .q-menu--dark !important). */
+body.fa-appTheme--fantasy .q-menu {
+  @include dialogCyanRim.fa-dialog-cyan-rim-chrome;
+
+  /* Lock label weight; global .disabled { opacity: 0.35 } makes strokes look wrong-weight. */
+  .q-item {
+    font-weight: $qMenu-item-fontWeight-fantasy;
+
+    &.disabled,
+    &[disabled] {
+      color: $qMenu-item-disabled-color-fantasy;
+      opacity: 1 !important;
+
+      .fa-text-keybind-hint {
+        color: $qMenu-item-disabled-keybind-color-fantasy !important;
+      }
+    }
   }
 }
 
@@ -675,8 +748,25 @@ div + .q-notification__caption {
   overflow: auto;
 }
 
+/* Flush with parent (dialog card / page). Beat Quasar #fff and .q-dark $dark fill. */
+.q-stepper,
+.q-stepper.q-dark {
+  background: $qStepper-backgroundColor;
+  box-shadow: $qStepper-boxShadow;
+}
+
 .q-tab {
   min-height: $qTab-minHeight;
+}
+
+/* Flush with parent (dialog card / page). Beat Quasar #fff and .q-dark $dark fill. */
+.q-markup-table,
+.q-markup-table.q-dark,
+.q-table__card,
+.q-table__card.q-dark,
+.q-table__card--dark {
+  background: $qTable-backgroundColor;
+  box-shadow: $qTable-boxShadow;
 }
 
 /* Vertical Quasar tabs: gold right-edge glow instead of side indicator / square hover. */

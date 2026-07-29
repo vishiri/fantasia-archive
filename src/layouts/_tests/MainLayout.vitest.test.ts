@@ -38,6 +38,7 @@ test('Test that MainLayout on welcome route hides the workspace drawer', async (
 
   expect(w.find('[data-test-locator="mainLayout"]').exists()).toBe(true)
   expect(w.find('.appShellLayout--welcome').exists()).toBe(true)
+  expect(w.find('.appHeader').exists()).toBe(true)
   expect(w.find('[data-test-locator="mainLayout-sidebarSplitter"]').exists()).toBe(false)
   expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(false)
   expect(w.find('[data-test-locator="mainLayout-vitest-leaf"]').exists()).toBe(true)

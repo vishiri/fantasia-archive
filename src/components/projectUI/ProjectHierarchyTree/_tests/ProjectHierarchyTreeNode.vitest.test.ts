@@ -535,7 +535,7 @@ test('Test that ProjectHierarchyTreeNode applies document appearance chrome colo
   expect(wrapper.classes()).toContain('projectHierarchyTreeNode--customDocumentAppearance')
   expect(wrapper.classes()).toContain('projectHierarchyTreeNode--customDocumentBackground')
   expect((wrapper.element as HTMLElement).style.color).toBe('')
-  expectCssColorValue((wrapper.element as HTMLElement).style.backgroundColor, '#221100')
+  expect((wrapper.element as HTMLElement).style.backgroundColor).toBe('')
   expect((wrapper.element as HTMLElement).style.getPropertyValue('--projectHierarchyTreeNode-backgroundColor').trim()).toBe('#221100')
   expect((wrapper.element as HTMLElement).style.getPropertyValue('--projectHierarchyTreeNode-focusHelperColor').trim()).toBe('#221100')
   expectCssColorValue(

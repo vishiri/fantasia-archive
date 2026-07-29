@@ -72,6 +72,7 @@ test('Test that resolveFaAppThemeSkin maps Fantasy and Flat ids', () => {
 /**
  * applyFaAppThemeToDocument
  * Writes skin class, full-id data attribute, body dark/light, and Quasar Dark.
+ * Fantasy vs flat ripple visibility is CSS under body.fa-appTheme--* (not Dark).
  */
 test('Test that applyFaAppThemeToDocument sets skin class data and Dark mode', () => {
   const body = createMockBody([`${FA_APP_THEME_BODY_CLASS_PREFIX}flat`])

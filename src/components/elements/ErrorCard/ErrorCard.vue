@@ -80,3 +80,5 @@ const { errorCardMaxWidthPx } = useErrorCard(toRef(props, 'width'))
   white-space: pre-line;
 }
 </style>
+
+<style lang="scss" src="./styles/ErrorCard.unscoped.scss"></style>

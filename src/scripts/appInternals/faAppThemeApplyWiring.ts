@@ -19,6 +19,8 @@ export const FA_APP_THEME_BODY_LIGHT_CLASS = 'body--light'
 /**
  * Writes skin + light/dark body classes and syncs Quasar Dark for the active app theme.
  * data-fa-app-theme keeps the full settings theme id.
+ * Quasar material ripples stay enabled in framework config; fantasy skin suppresses them
+ * via body.fa-appTheme--fantasy rules in quasarComponentsAdjustments.scss (flat shows them).
  */
 export function applyFaAppThemeToDocument (theme: string): void {
   if (typeof document === 'undefined') {

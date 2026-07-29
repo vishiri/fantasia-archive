@@ -1,6 +1,9 @@
 /* QUASAR COMPONENT - Q-BTN
- * Quasar default $button-font-weight is 500; Fantasia uses regular weight app-wide.
+ * Quasar default $button-font-weight is 500. Fantasy skins use regular (400);
+ * flat skins use medium (500). Rectangle radius: fantasy 6px, flat 4px.
  */
 $qBtn-content-letterSpacing: 0.075em;
 $qBtn-fontWeight: 400;
+$qBtn-fontWeight-flat: 500;
 $qBtn-rectangle-borderRadius: 6px;
+$qBtn-rectangle-borderRadius-flat: 4px;

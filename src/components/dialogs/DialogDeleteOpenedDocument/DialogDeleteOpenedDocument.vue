@@ -5,30 +5,32 @@
     @hide="onDialogHide"
   >
     <q-card
-      class="dialogDeleteOpenedDocument bg-dark text-accent"
+      class="faConfirmationDialog dialogDeleteOpenedDocument bg-dark text-accent"
       dark
     >
-      <q-card-section class="row justify-center">
-        <h6
-          class="dialogDeleteOpenedDocument__title text-center q-my-sm"
-          data-test-locator="dialogDeleteOpenedDocument-title"
-        >
-          {{ $t('dialogs.deleteOpenedDocument.titlePrefix') }}
-          <span class="text-warning">{{ documentName }}</span>{{ $t('dialogs.deleteOpenedDocument.titleSuffix') }}
-        </h6>
-      </q-card-section>
-      <q-card-section class="dialogDeleteOpenedDocument__body text-center q-pt-none">
-        <p
-          class="dialogDeleteOpenedDocument__warning q-mb-sm"
-          data-test-locator="dialogDeleteOpenedDocument-warning"
-        >
-          {{ $t('dialogs.deleteOpenedDocument.warningPrefix') }}
-          <span class="text-secondary">{{ $t('dialogs.deleteOpenedDocument.foreverWord') }}</span>{{ $t('dialogs.deleteOpenedDocument.warningSuffix') }}
-        </p>
-        <p class="dialogDeleteOpenedDocument__proceed q-mb-none">
-          {{ $t('dialogs.deleteOpenedDocument.proceedPrompt') }}
-        </p>
-      </q-card-section>
+      <div class="faConfirmationDialog__content">
+        <q-card-section class="row justify-center">
+          <h6
+            class="dialogDeleteOpenedDocument__title text-center q-my-sm"
+            data-test-locator="dialogDeleteOpenedDocument-title"
+          >
+            {{ $t('dialogs.deleteOpenedDocument.titlePrefix') }}
+            <span class="text-warning">{{ documentName }}</span>{{ $t('dialogs.deleteOpenedDocument.titleSuffix') }}
+          </h6>
+        </q-card-section>
+        <q-card-section class="faConfirmationDialog__body dialogDeleteOpenedDocument__body text-left">
+          <p
+            class="dialogDeleteOpenedDocument__warning q-mb-none"
+            data-test-locator="dialogDeleteOpenedDocument-warning"
+          >
+            {{ $t('dialogs.deleteOpenedDocument.warningPrefix') }}
+            <span class="text-secondary">{{ $t('dialogs.deleteOpenedDocument.foreverWord') }}</span>{{ $t('dialogs.deleteOpenedDocument.warningSuffix') }}
+          </p>
+          <p class="dialogDeleteOpenedDocument__proceed q-mb-none">
+            {{ $t('dialogs.deleteOpenedDocument.proceedPrompt') }}
+          </p>
+        </q-card-section>
+      </div>
       <q-card-actions
         align="around"
         class="q-mx-xl q-mt-lg q-mb-md"

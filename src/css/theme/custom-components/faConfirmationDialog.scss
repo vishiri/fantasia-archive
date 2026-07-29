@@ -1,0 +1,21 @@
+@use '../../quasar.variables.scss' as *;
+
+/* faConfirmationDialog — compact confirm modal content inset.
+ * Put faConfirmationDialog on the q-card and wrap title/body sections in
+ * faConfirmationDialog__content so large dialogComponent shells stay untouched.
+ * Quasar pads .q-card__section--vert (not bare .q-card__section) — reset that.
+ * Message bodies use faConfirmationDialog__body for extra inset. */
+
+.q-dialog > .q-dialog__inner > .q-card.faConfirmationDialog > .faConfirmationDialog__content {
+  padding: $faConfirmationDialog-content-padding;
+
+  > .q-card__section:not(.faConfirmationDialog__body),
+  > .q-card__section--vert:not(.faConfirmationDialog__body) {
+    padding: 0;
+  }
+
+  > .faConfirmationDialog__body {
+    padding: $faConfirmationDialog-body-padding;
+    text-align: left;
+  }
+}

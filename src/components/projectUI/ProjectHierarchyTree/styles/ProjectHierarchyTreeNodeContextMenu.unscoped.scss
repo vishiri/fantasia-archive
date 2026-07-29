@@ -5,6 +5,7 @@
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
 @use '../../../../css/globals/paletteGlobals.variables.scss' as paletteGlobals;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as *;
 
 .projectHierarchyTreeNodeContextMenu__list {
   background-color: appControlMenus.$appControlMenus-bgColor;
@@ -45,6 +46,8 @@
 
 .projectHierarchyTreeNodeContextMenu.q-menu {
   .projectHierarchyTreeNodeContextMenu__item.q-item {
+    transition: $qMenu-item-hover-colorTransition;
+
     &:hover:not([aria-disabled='true']),
     &:focus:not([aria-disabled='true']) {
       color: appControlMenus.$appControlMenus-singleHover;
@@ -55,6 +58,7 @@
     .projectHierarchyTreeNodeContextMenu__primaryLabel,
     .projectHierarchyTreeNodeContextMenu__icon {
       color: $projectHierarchyTree-nodeContextMenu-sortByActivator-color;
+      transition: $qMenu-item-hover-colorTransition;
     }
 
     &:hover:not([aria-disabled='true']),
@@ -77,6 +81,7 @@
   .projectHierarchyTreeNodeContextMenu__item.q-hoverable:hover > .q-focus-helper {
     background: var(--projectHierarchyTreeSortByItem-focusHelperColor);
     opacity: $qFocusable-hoverHelper-opacity !important;
+    transition: $qMenu-item-hover-focusHelperTransition;
 
     &::after,
     &::before {

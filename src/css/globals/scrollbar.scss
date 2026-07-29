@@ -25,6 +25,30 @@
   }
 }
 
+/*
+ * Fantasy: same cyan family as flat (brightened-$dark), slightly darker;
+ * same 5px stick as flat + full pill ends (transparent inset helps Chromium draw caps).
+ */
+body.fa-appTheme--fantasy * {
+  ::-webkit-scrollbar {
+    height: $globals-scrollbar-fantasy-size;
+    width: $globals-scrollbar-fantasy-size;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $globals-scrollbar-thumbBackground;
+    border-radius: $globals-scrollbar-fantasy-thumb-borderRadius;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: $globals-scrollbar-thumbHoverBackground;
+  }
+}
+
 /* Global utility: add to scrollable containers when content may gain/lose a vertical scrollbar, to avoid horizontal layout shift (see README, AGENTS.md, project-scss.mdc, vue-quasar.mdc, fantasia-quasar-vue skill). */
 .hasScrollbar {
   scrollbar-gutter: stable;

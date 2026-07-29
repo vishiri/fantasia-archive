@@ -1,0 +1,32 @@
+@use '../theme/quasar-components/qDialog.variables' as *;
+
+/* Fantasy cyan rim: ring + top bloom + side feathers (dialogs, floating windows, menus).
+ * box-shadow !important beats `.q-menu--dark { box-shadow: … !important }`. */
+@mixin fa-dialog-cyan-rim-chrome {
+  box-shadow: $qDialog-card-rim-boxShadow !important;
+  position: relative;
+
+  /* Soft inward glow above opaque children (inset shadow on the host stays hidden under panels). */
+  &::after {
+    background: $qDialog-card-rim-after-background;
+    border-radius: inherit;
+    content: '';
+    inset: $qDialog-card-rim-after-inset;
+    pointer-events: none;
+    position: absolute;
+    z-index: $qDialog-card-rim-after-zIndex;
+  }
+
+  &::before {
+    background-image: $qDialog-card-rim-before-backgroundImage;
+    background-position: $qDialog-card-rim-before-backgroundPosition;
+    background-repeat: $qDialog-card-rim-before-backgroundRepeat;
+    background-size: $qDialog-card-rim-before-backgroundSize;
+    content: '';
+    filter: $qDialog-card-rim-before-filter;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: $qDialog-card-rim-before-zIndex;
+  }
+}

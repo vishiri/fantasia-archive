@@ -136,6 +136,18 @@
   @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
 }
 
+/*
+ * Document appearance fill on same inset ::before as hover chrome (not full row).
+ * Reassert after chrome mixin so hover/active gold wash does not wipe user color.
+ */
+.projectHierarchyTreeHost .projectHierarchyTreeNode--customDocumentBackground.q-hoverable::before,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--customDocumentBackground.q-hoverable:hover::before,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--customDocumentBackground.q-hoverable:active::before,
+.projectHierarchyTreeHost .projectHierarchyTree__leftPointerDown .projectHierarchyTreeNode--customDocumentBackground.q-hoverable::before,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--customDocumentBackground.projectHierarchyTreeNode--activeTabDocument.q-hoverable::before {
+  background-color: var(--projectHierarchyTreeNode-backgroundColor);
+}
+
 .projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover,
 .projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:active,
 .projectHierarchyTreeHost .projectHierarchyTree__leftPointerDown .projectHierarchyTreeNode.q-hoverable,

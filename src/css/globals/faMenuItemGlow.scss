@@ -1,0 +1,35 @@
+@use 'faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
+
+/*
+ * Fantasy theme: menu / submenu q-item rows —
+ * Same bottom-edge gold highlight + bloom as flat buttons / horizontal tabs
+ * (fa-tab-edge-glow bottom). Idle hidden; hover/focus reveals.
+ * Flat theme keeps Quasar focus-helper wash.
+ */
+
+/* Kill Quasar hover/focus wash (must compound body.desktop + fantasy). */
+body.desktop.fa-appTheme--fantasy .q-menu .q-item.q-focusable:focus > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-menu .q-item.q-hoverable:hover > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .q-menu .q-item.q-manual-focusable--focused > .q-focus-helper {
+  opacity: 0 !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+body.fa-appTheme--fantasy .q-menu .q-item {
+  overflow: visible;
+  position: relative;
+
+  &::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-idle(bottom);
+  }
+
+  &:hover:not(.disabled, [disabled], [aria-disabled='true'])::after,
+  &:focus:not(.disabled, [disabled], [aria-disabled='true'])::after,
+  &.q-manual-focusable--focused:not(.disabled, [disabled], [aria-disabled='true'])::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-hover(bottom);
+  }
+}

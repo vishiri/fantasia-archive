@@ -152,7 +152,8 @@ setup((app) => {
       Notify
     },
     config: {
-      ripple: false,
+      // Match app: ripples on; fantasy preview hides via body.fa-appTheme--fantasy CSS.
+      ripple: true,
       dark: true
     }
   })

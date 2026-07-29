@@ -5,17 +5,19 @@
     @hide="onDialogHide"
   >
     <q-card
-      class="dialogDiscardOpenedDocumentTab bg-dark text-accent"
+      class="faConfirmationDialog dialogDiscardOpenedDocumentTab bg-dark text-accent"
       dark
     >
-      <q-card-section class="row justify-center">
-        <h6
-          class="dialogDiscardOpenedDocumentTab__title text-center q-my-sm"
-          data-test-locator="dialogDiscardOpenedDocumentTab-title"
-        >
-          {{ $t('dialogs.discardOpenedDocumentTab.titlePrefix') }}<span class="text-primary-bright">{{ documentName }}</span>{{ $t('dialogs.discardOpenedDocumentTab.titleSuffix') }}
-        </h6>
-      </q-card-section>
+      <div class="faConfirmationDialog__content">
+        <q-card-section class="row justify-center">
+          <h6
+            class="dialogDiscardOpenedDocumentTab__title text-center q-my-sm"
+            data-test-locator="dialogDiscardOpenedDocumentTab-title"
+          >
+            {{ $t('dialogs.discardOpenedDocumentTab.titlePrefix') }}<span class="text-primary-bright">{{ documentName }}</span>{{ $t('dialogs.discardOpenedDocumentTab.titleSuffix') }}
+          </h6>
+        </q-card-section>
+      </div>
       <q-card-actions
         align="around"
         class="q-mx-xl q-mt-lg q-mb-md"

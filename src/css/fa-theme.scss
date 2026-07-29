@@ -11,13 +11,14 @@
   --fa-color-brand-reddit: #{$brand-reddit};
   --fa-color-code-token-background: #{$codeToken-background};
   --fa-color-dark: #{$dark};
-  --fa-color-dark-darker: #{$dark-darker};
   --fa-color-dark-lighter: #{$dark-lighter};
   --fa-color-dark-middle: #{$dark-middle};
   --fa-color-dark-page: #{$dark-page};
   --fa-color-dialog-rim-cyan: #{$dialog-rim-cyan};
   --fa-color-dialog-rim-cyan-bright: #{$dialog-rim-cyan-bright};
   --fa-color-dialog-rim-cyan-deep: #{$dialog-rim-cyan-deep};
+  --fa-color-fantasy-dark: #{$fantasy-dark};
+  --fa-color-fantasy-medium: #{$fantasy-medium};
   --fa-color-gold-muted-border: #{$gold-muted-border-raw};
   --fa-color-grey: #{$grey};
   --fa-color-grey-lighter: #{$grey-lighter};
@@ -57,4 +58,11 @@
   --fa-color-tooltip-text: #{$tooltip-text};
   --fa-color-warning: #{$warning};
   --fa-color-white: #{$white};
+}
+
+/* Fantasy scrollbars: flat cyan family, slightly darker; track stays quiet. */
+body.fa-appTheme--fantasy {
+  --fa-color-scrollbar-thumb: #{color.adjust($dark, $lightness: 28%)};
+  --fa-color-scrollbar-thumb-hover: #{color.adjust($dark, $lightness: 48%)};
+  --fa-color-scrollbar-track: transparent;
 }

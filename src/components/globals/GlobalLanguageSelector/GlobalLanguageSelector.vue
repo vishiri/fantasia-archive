@@ -212,6 +212,7 @@ onBeforeUnmount(() => {
 
   &__menuItem {
     padding: $globalLanguageSelector-menu-item-padding;
+    transition: $globalLanguageSelector-menu-itemHover-backgroundTransition;
 
     &:hover {
       background-color: $globalLanguageSelector-menu-itemHover-backgroundColor;

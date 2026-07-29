@@ -14,20 +14,24 @@ export const FOUNDATION_CUSTOM_SWATCHES: I_foundationCustomSwatch[] = [
     hex: '#1b333e'
   },
   {
-    sassVar: '$dark-darker',
-    hex: '#152229'
+    sassVar: '$dark-lighter',
+    hex: '#194456'
   },
   {
     sassVar: '$dark-middle',
     hex: '#183e4d'
   },
   {
-    sassVar: '$dark-lighter',
-    hex: '#194456'
-  },
-  {
     sassVar: '$dark-page',
     hex: '#303742'
+  },
+  {
+    sassVar: '$fantasy-dark',
+    hex: '#152229'
+  },
+  {
+    sassVar: '$fantasy-medium',
+    hex: '#133341'
   },
   {
     sassVar: '$grey',

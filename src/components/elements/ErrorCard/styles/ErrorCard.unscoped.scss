@@ -1,0 +1,10 @@
+@use '../../../../css/globals/faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
+
+/*
+ * Unscoped: parchment data-URI / mask layers break under scoped attribute selectors
+ * (same pattern as ProjectOverview hint / Window* help tips).
+ * Fantasy only: tooltip chrome (bg + gold frame). Keep ErrorCard text-negative copy.
+ */
+body.fa-appTheme--fantasy .errorCard {
+  @include tooltipParchment.fa-tooltip-parchment-chrome;
+}

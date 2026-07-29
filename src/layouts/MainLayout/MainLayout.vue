@@ -174,6 +174,21 @@ const faAppHeaderChromeSpellcheckRefreshVisible = useFaAppHeaderChromeSpellcheck
   z-index: $mainLayout-appHeader-zIndex;
 }
 
+/* Welcome / splash / non-workspace: full top chrome matches menu-button bar ($dark). */
+.appShellLayout--welcome {
+  .appHeader {
+    background-color: $mainLayout-appHeader-backgroundColor-welcome;
+  }
+
+  :deep(.globalWindowButtons) {
+    background-color: $mainLayout-appHeader-backgroundColor-welcome;
+  }
+
+  :deep(.globalLanguageSelectorSpellcheckRefreshControl__button) {
+    background-color: $mainLayout-appHeader-backgroundColor-welcome;
+  }
+}
+
 .appHeader__inner {
   padding-right: $mainLayout-appHeader-chromeRightReserveBasePx;
   width: 100%;

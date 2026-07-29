@@ -1,3 +1,4 @@
+@use 'faOutlineButtonGlow.variables.scss' as *;
 @use 'faOutlineButtonGlow.mixin.scss' as outlineBtnGlow;
 
 /* Animate external glow strength (0→1). Registered so transition interpolates. */
@@ -31,8 +32,8 @@ body.fa-appTheme--fantasy .q-btn--outline {
   --fa-outline-btn-glow-core: currentcolor;
   --fa-outline-btn-glow-deep: color-mix(in srgb, currentcolor 48%, black);
 
+  /* Quasar .q-btn is already position:relative — do not override absolute layout. */
   overflow: visible;
-  position: relative;
 
   @include outlineBtnGlow.fa-outline-button-glow-external-shadow;
 
@@ -50,4 +51,29 @@ body.fa-appTheme--fantasy .q-btn--outline {
   &[aria-disabled='true'] {
     --fa-outline-btn-ext-glow: 0;
   }
+}
+
+/*
+ * Project App Control Bar save buttons swap text-teal-14 ↔ text-primary-bright on the same
+ * node. Chromium keeps currentcolor frozen inside ::after background-image gradients after
+ * that swap — pin absolute glow colors so the bloom tracks Quasar color classes.
+ */
+body.fa-appTheme--fantasy .q-btn--outline.text-primary-bright {
+  --fa-outline-btn-glow-core: #{$faOutlineButtonGlow-color-primaryBright};
+  --fa-outline-btn-glow-deep:
+    color-mix(
+      in srgb,
+      #{$faOutlineButtonGlow-color-primaryBright} #{$faOutlineButtonGlow-deepMixPercent},
+      black
+    );
+}
+
+body.fa-appTheme--fantasy .q-btn--outline.text-teal-14 {
+  --fa-outline-btn-glow-core: #{$faOutlineButtonGlow-color-teal14};
+  --fa-outline-btn-glow-deep:
+    color-mix(
+      in srgb,
+      #{$faOutlineButtonGlow-color-teal14} #{$faOutlineButtonGlow-deepMixPercent},
+      black
+    );
 }

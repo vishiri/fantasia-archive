@@ -1,0 +1,9 @@
+@use '../app.palette.scss' as *;
+
+/* GLOBALS - FANTASY Q-TABLE (painted row dividers + tip-faded hover) */
+$faTableFantasy-rowHover-background: color-mix(
+  in srgb,
+  fa-v('primary-bright', $primary-bright) 6%,
+  transparent
+);
+$faTableFantasy-rowHover-tipFade: 36px;

@@ -1,0 +1,188 @@
+@use 'faPaintedDivider.variables.scss' as *;
+@use 'faTableFantasy.variables.scss' as *;
+
+/*
+ * Fantasy QTable: Quasar solid borders off; painted stroke via cell backgrounds.
+ * No tr::before/::after (those become extra table-cells).
+ * Joins: leftmost tip-left + solid-right; center solid both; rightmost solid-left + tip-right.
+ * Hover: Quasar td::before wash tip-fades at outer edges; primary-bright tint.
+ */
+body.fa-appTheme--fantasy table.q-table {
+  th,
+  td {
+    border-bottom: none !important;
+  }
+
+  thead th {
+    background-image:
+      linear-gradient(
+        to right,
+        $faPaintedDivider-color-end,
+        $faPaintedDivider-color-end
+      );
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: 100% $faPaintedDivider-stroke-width;
+  }
+
+  thead th:first-child {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        $faPaintedDivider-color-start $faPaintedDivider-tip-fade,
+        $faPaintedDivider-color-end $faPaintedDivider-gradient-midStop,
+        $faPaintedDivider-color-end 100%
+      );
+  }
+
+  thead th:last-child {
+    background-image:
+      linear-gradient(
+        to right,
+        $faPaintedDivider-color-end 0%,
+        $faPaintedDivider-color-end calc(100% - #{$faPaintedDivider-tip-fade}),
+        transparent 100%
+      );
+  }
+
+  thead th:first-child:last-child {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        $faPaintedDivider-color-start $faPaintedDivider-tip-fade,
+        $faPaintedDivider-color-end $faPaintedDivider-gradient-midStop,
+        $faPaintedDivider-color-end calc(100% - #{$faPaintedDivider-tip-fade}),
+        transparent 100%
+      );
+  }
+
+  tbody tr + tr > td {
+    background-image:
+      linear-gradient(
+        to right,
+        $faPaintedDivider-color-end,
+        $faPaintedDivider-color-end
+      );
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: 100% $faPaintedDivider-stroke-width;
+  }
+
+  tbody tr + tr > td:first-child {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        $faPaintedDivider-color-start $faPaintedDivider-tip-fade,
+        $faPaintedDivider-color-end $faPaintedDivider-gradient-midStop,
+        $faPaintedDivider-color-end 100%
+      );
+  }
+
+  tbody tr + tr > td:last-child {
+    background-image:
+      linear-gradient(
+        to right,
+        $faPaintedDivider-color-end 0%,
+        $faPaintedDivider-color-end calc(100% - #{$faPaintedDivider-tip-fade}),
+        transparent 100%
+      );
+  }
+
+  tbody tr + tr > td:first-child:last-child {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        $faPaintedDivider-color-start $faPaintedDivider-tip-fade,
+        $faPaintedDivider-color-end $faPaintedDivider-gradient-midStop,
+        $faPaintedDivider-color-end calc(100% - #{$faPaintedDivider-tip-fade}),
+        transparent 100%
+      );
+  }
+}
+
+body.desktop.fa-appTheme--fantasy table.q-table {
+  tbody > tr:not(.q-tr--no-hover):hover > td:not(.q-td--no-hover)::before {
+    background: $faTableFantasy-rowHover-background;
+  }
+
+  tbody > tr:not(.q-tr--no-hover):hover > td:not(.q-td--no-hover):first-child::before {
+    -webkit-mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        rgb(0 0 0 / 20%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.35),
+        rgb(0 0 0 / 55%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.7),
+        #000 $faTableFantasy-rowHover-tipFade,
+        #000 100%
+      );
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        rgb(0 0 0 / 20%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.35),
+        rgb(0 0 0 / 55%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.7),
+        #000 $faTableFantasy-rowHover-tipFade,
+        #000 100%
+      );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+
+  tbody > tr:not(.q-tr--no-hover):hover > td:not(.q-td--no-hover):last-child::before {
+    -webkit-mask-image:
+      linear-gradient(
+        to right,
+        #000 0,
+        #000 calc(100% - #{$faTableFantasy-rowHover-tipFade}),
+        rgb(0 0 0 / 55%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.7),
+        rgb(0 0 0 / 20%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.35),
+        transparent 100%
+      );
+    mask-image:
+      linear-gradient(
+        to right,
+        #000 0,
+        #000 calc(100% - #{$faTableFantasy-rowHover-tipFade}),
+        rgb(0 0 0 / 55%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.7),
+        rgb(0 0 0 / 20%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.35),
+        transparent 100%
+      );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+
+  tbody > tr:not(.q-tr--no-hover):hover > td:not(.q-td--no-hover):first-child:last-child::before {
+    -webkit-mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        rgb(0 0 0 / 20%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.35),
+        rgb(0 0 0 / 55%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.7),
+        #000 $faTableFantasy-rowHover-tipFade,
+        #000 calc(100% - #{$faTableFantasy-rowHover-tipFade}),
+        rgb(0 0 0 / 55%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.7),
+        rgb(0 0 0 / 20%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.35),
+        transparent 100%
+      );
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        rgb(0 0 0 / 20%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.35),
+        rgb(0 0 0 / 55%) calc(#{$faTableFantasy-rowHover-tipFade} * 0.7),
+        #000 $faTableFantasy-rowHover-tipFade,
+        #000 calc(100% - #{$faTableFantasy-rowHover-tipFade}),
+        rgb(0 0 0 / 55%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.7),
+        rgb(0 0 0 / 20%) calc(100% - #{$faTableFantasy-rowHover-tipFade} * 0.35),
+        transparent 100%
+      );
+  }
+}

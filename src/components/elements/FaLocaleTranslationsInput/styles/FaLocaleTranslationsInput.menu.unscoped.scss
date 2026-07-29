@@ -107,6 +107,16 @@
   overflow: hidden auto;
 }
 
+/* Fantasy: darker panel; left-only 12px body padding; gap before thumb on scroll. */
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody {
+  background-color: $faLocaleTranslationsInput-menu-backgroundColor-fantasy;
+  padding: 0 0 0 $faLocaleTranslationsInput-menu-body-padding-x;
+}
+
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__scroll {
+  padding-inline-end: $faLocaleTranslationsInput-scroll-scrollbarGap-fantasy;
+}
+
 .faLocaleTranslationsInput__menuBody--pinnedAside .faLocaleTranslationsInput__scroll {
   max-height: 100%;
 }
@@ -119,6 +129,10 @@
   display: flex;
   flex-direction: column;
   gap: $faLocaleTranslationsInput-menuRow-gap;
+}
+
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__rows {
+  padding: $faLocaleTranslationsInput-rows-padding-y-fantasy 0;
 }
 
 .faLocaleTranslationsInput__row {
@@ -137,6 +151,16 @@
   gap: $faLocaleTranslationsInput-columnHeaders-gap;
   margin-bottom: $faLocaleTranslationsInput-columnHeaders-marginBottom;
   padding: 0 $faLocaleTranslationsInput-columnHeaders-paddingX;
+}
+
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__columnHeaders {
+  margin-bottom: 0;
+  padding-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+}
+
+/* Match first scroll row: headers spacer alone omits fantasy rows padding-top. */
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__pinnedAside--singularPlural .faLocaleTranslationsInput__pinnedAsideInput {
+  margin-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
 }
 
 .faLocaleTranslationsInput__formHeader {

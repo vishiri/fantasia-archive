@@ -57,6 +57,11 @@ const {
     opacity: 1 !important;
   }
 
+  .q-markdown h2,
+  .q-markdown .q-markdown--heading-h2 {
+    color: $qMarkdown-h2-color !important;
+  }
+
   .q-markdown a {
     color: $aLinkColor !important;
   }
