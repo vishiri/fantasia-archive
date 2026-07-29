@@ -60,6 +60,8 @@ In addition to the advanced search functionality, Fantasia Archive also offers i
     - `^f` - Displays only documents with `Is finished` ticked on
     - `^m` - Displays only documents with `Is a minor document` ticked on, that are normally invisible and filtered out
 
+---
+
 ## Full-search filtering
 
 This feature is meant mostly for those who need full-scale search that can crawl any field in any document to match values almost anywhere in the data. Full-search filtering lets you narrow results by searching the whole document database and pinpointing what you need.

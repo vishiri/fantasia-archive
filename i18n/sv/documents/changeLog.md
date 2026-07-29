@@ -7,6 +7,8 @@
 - **Projektinställningar**: Skärmläsaranvändare får etiketterade kontroller i hela dialogen. Filterfälten **Världar** och **Dokumentmallar**, deras rensningskontroller, filtret **Tillgängliga dokumentmallar**, hjälpikonerna **Världens färg** och **Världens färgpalett**, varje palettfärgprov och hjälpikonen **Världens appendix** exponerar nu tillgängliga namn på varje gränssnittsspråk som stöds.
 - **Projektinställningar**: Den delade knappen för borttagningsbekräftelse som används av **Världar** och **Dokumentmallar** exponerar sin etikett, bekräftelsefråga och nedräkning för hjälpmedelsteknik.
 
+---
+
 ## 2.4.14 - Version bump
 
 ### Nya funktioner
@@ -16,6 +18,8 @@
 ### Buggfixar och optimeringar
 - **Projektinställningar**: **Ta bort värld** i **Världar**-detaljraden linjerar vertikalt med **Världens namn** och **Världens färg**.
 - **Språkväljare**: **Svenska** visar nu Sveriges flagga i stället för El Salvadors flagga.
+
+---
 
 ## 2.4.13 - Version bump
 
@@ -44,6 +48,8 @@
 - **Storybook**: **AppControlMenus** Autodocs komponentbeskrivning listar de aktuella **Project Management**-raderna så att de matchar **`_data/project`** efter menyändringar.
 - **Test** — End-to-end **`checkProjectStyling`** byter namn på **`.faproject`** fixturbaslinjer och svittitlar så att **Custom Project CSS**-flödet beskriver Monaco liveförhandsgranskning, SQLite ihärdighet, rensa stilmallen och istället för per ** en etikettsisolering **a ** en etikett **. Komponentsele **`WindowProjectStyling.playwright.test`** täcker flytande krom, kallladdade **Monaco**, hjälppanelens temalista och **Stäng utan att spara** lämnar det lagrade projektet CSS tomt.- **Tester** — **`checkProjectManagementFlow`** från början till slut hävdar nu splash **Återuppta senaste projekt** (**MRU-rullgardinsetiketter** matchar **Projekt → Ladda senaste projekt**, ladda om genom det delade primära segmentet efter återställningen av stavningskontrollsessionen, ladda från en annan senaste rad).
 - **Tester** — **`checkProjectOsOpenArgv`** återuppspelar paketerat **electron.launch argv** kallöppnar med **`FA_E2E_OS_OPEN=1`** isolerad från vanliga splash-only lanseringar.
+
+---
 
 ## 2.4.12 - Version bump
 
@@ -92,6 +98,8 @@
 - **Electron desktop**: **`BrowserWindow` `preload`**-sökvägen löser sig till Quasars paketerade **`preload/electron-preload.cjs`** artefakt så att **`contextBridge`** API:er (**`window.faContentBridgeAPIs kan inte initiera om filnamn) istället för att initiera förinläsning av mappen igen från paketlayouten **`dev`**.- **Action Monitor**: framgångsrika **Ladda projekt** historikrader håller köns nyttolast tom men bifogar en avslutande förhandsgranskning med den valda **`.faproject`** sökvägen och laddat projektnamn, i linje med hur **Nytt projekt** ytor detaljer efter slutförandet; när öppning misslyckas efter att du valt en fil, kan misslyckade rader inkludera meddelandet plus sökvägen när skrivbordsskalet tillhandahåller det.
 - **Electron desktop**: **`faRoutingEnv`** väntar en kort stund på förladdningsläget **extra miljö** ögonblicksbilden innan man styr de första selens rutter, undviker ett startrace där bron fäster efter den första renderarens färg.
 - **Playwright hjälpare**: Utnyttja koden för Electron komponent och **E2E** sviter är uppdelad under **`helpers/playwrightHelpers_universal`**, **`helpers/playwrightHelpers_e2e`** och **`helpers/playwrightHelpers_component so`ear`, with shared launchers förbli enhetlig; **`README`** och bidragsgivarens anteckningar listar de uppdaterade importsökvägarna.
+
+---
 
 ## 2.4.11 - Version bump
 
@@ -150,6 +158,8 @@
 - **Storybook** arbetsyta **Vite** lägger till **`server.fs.allow`** för förvarsroten så att **Keybind-inställningar** **`.vue`**-filer kan lösa syskon-**`typer/`**-kontraktsimporter under statiska builds och visuella infångningar.- **Storybook** statisk **visuell regression** (**`yarn test:storybook:visual`**): **Vite** löser **Pinia** och **Vue** från förvarsroten så att den kapslade arbetsytan inte laddar en andra **Pinia** kopia som förhindrade att dialogrutor monterades i **berättelserna. **Playwright**-selen tjänar den statiska byggnaden på en dedikerad port och återanvänder inte en befintlig server där, så en lokal **`yarn storybook:run`**-session på standardporten kan inte tillfredsställa infångningar av misstag. Misslyckade inspelningar bifogar fortfarande en helsidesskärmdump och en kort **JSON**-sond av **Storybook**-roten när navigering, renderingskontroller, typsnitt, överlagringar eller skärmdumpsteget misslyckas.
 - **Underhåll av bidragsgivare**: **Vitest** specifikationer för **AppControlMenus**, **AppControlSingleMenu**, **GlobalLanguageSelector** (inklusive sökvägen för stavningskontrollens uppdateringsfördröjning), **GlobalWindowButtons**, **ErrorCard**, **Felkortsinställningar** och expanderade skärminställningar, inställningar för appar, övningsskärmar, **s top-bar selegrenar, språkval, fönsterkromtimer och **Quasar** menyklickvägar i jsdom. Specifikationer för multi-stub-dialoger använder samma **ESLint**-undantag på filnivå som redan tillämpats på stack-guard-seletest.- **Bidragsgivareunderhåll**: mer **Vitest** jsdom-täckning för **DialogActionMonitor**-dialogrutan visar uppdatering, **DialogImportExportAppConfig** öppnas och importerar mellanlagring, **DialogKeybindSettings** när nyckelbindningsdefinitionslistan är tom, **_FaFloatingResoverHFrame** och resme **WindowAppStyling** editor hjälpverktygstips innehåll plus lastnings- och laddningsfelöverlagringar och rampekarledningar, **MainLayout** appstyling uppdateras när **Electron** bryggan avslöjar det eller inte, **AppControlMenus** komponenttestning av markeringsmenyutlösare, **SowControl**-undermeny-klickning, **SowControl**-hanterare **GlobalLanguageSelector** när användarinställningsbryggan saknas och **_FaUserCssInjector** hoppar över dubbletter av stiltextskrivningar.
 
+---
+
 ## 2.4.10 - Appinställningar, ErrorCard, tematokens och bidragsgivares verktyg
 
 ### Nya funktioner
@@ -202,6 +212,8 @@
 - **Electron Playwright** kör bifoga **WebM** skärminspelningar per test; öppna **`test-results/playwright-report/index.html`** efter **`yarn test:components`** eller **`yarn test:e2e`** (eller **`:single`**-skripten) för att granska videor under varje tests **Bilagor** (filer under **`test-right-**data)/w. Varje Playwright körning **ersätter** den HTML-rapporten; **`scripts/playwrightWithArtifactTrim.mjs`** tar bort **`test-results/playwright-artifacts`** efter dessa garnkommandon så att repor inte behålls mellan körningarna. Dokumenterat i **README**, **AGENTER** och Cursor **fantasi-test** / **dramatiker-test** vägledning; valfritt **`FA_PLAYWRIGHT_NO_VIDEO`** hoppar över inspelning.
 - Tog bort ett bortsprunget **HTML** **textområde** från sidmallen **Index**.
 
+---
+
 ## 2.4.9 - Contributor-verktyg, Pinia-dialoger och CI-härdning
 
 ### Bugfixar och optimeringar
@@ -209,6 +221,8 @@
 - Fixat **Pinia 3** dialogflöde: **`S_DialogMarkdown`** och **`S_DialogComponent`** är nu standardinstallationsbutiker (ring **`S_DialogMarkdown()`** / **`S_DialogComponent()`** på användningsplatser). **`openDialogMarkdownDocument`**, **`DialogMarkdownDocument`** och **`DialogAboutFantasiaArchive`** använder bevakade övervakare när en butik inte är aktiv (t.ex. **Storybook**). **`ComponentTesting`** hanterar saknade **`componentName`**-rutter på ett säkert sätt och renderar selen först efter att en matchande SFC har lösts.- Förenklade förhandsgranskningssidan för **Index** genom att ta bort det extra **Fantasia Mascot**-blocket från standardrutten **`IndexPage`** (behåller rutten som ett lätt skal för lokala länkar/testning).
 - Omdöpta och grupperade **Garn**-bidragsskript för tydlighetens skull: kvalitetsportar **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**; lint **`yarn lint:eslint`**, **`yarn lint:typescript`**, **`yarn lint:stylelint`**; Quasar Electron **`yarn quasar:build:electron`** / **`yarn quasar:dev:electron`**; Playwright **`yarn test:components`** och kolon-suffixed **`test:components:**`**, **`test:e2e:**`**; Storybook dev **`yarn storybook:run`** och statisk **`yarn storybook:build`** (tidigare **`build-storybook`**). Ta bort föråldrat **`garntest:full`** och duplicera **`yarn visual:storybook:ci`**; **GitHub Actions** ring **`yarn visual:storybook:test`** direkt. Uppdaterade **README**, **AGENTER**, markörregler/färdigheter, **`package.json`**, **`testRunner_*.mjs`** och arbetsflöden.- Samlokaliserad Storybook **statisk utdata** (**`.storybook-workspace/storybook-static/`**), **Playwright** visual-regression config, **`visual-tests/`** (inklusive engagerade ögonblicksbilder), arbetsyta **`storybook:visual:*`encies** scripts,` depends,`-** **`@playwright/test`**) under **`.storybook-workspace/`**; root **`yarn visual:storybook:*`** delegater med **`yarn --cwd .storybook-workspace`**. Uppdaterade sökvägar **`.gitignore`**, **`tsconfig.json`** och **`lint:eslint`**.
 - Ställ in explicita minst-privilegier **`behörigheter`** (`content: read`) på **`verify`** och manuella **`build`** **GitHub Actions** arbetsflöden; lagt till **Dependency Review**, **OSV Scanner** (återanvändbara arbetsflöden + veckoschema på **`master`**), och **Gitleaks** för PR/push-hygien.
+
+---
 
 ## 2.4.8 - Pinia 3 och Vue Router 5
 
@@ -221,12 +235,16 @@
 - Reducerat icke-åtgärdsbart Vue-varningsljud i komponent Vitest-utgång genom att filtrera kända Quasar-upplösningar och varningar för insprutning endast för test i delad testkonfiguration, vilket håller signalen fokuserad på åtgärdsbara fel.
 - Fast CI TypeScript-upplösning för Vue SFC-importer genom att ersätta den genererade `.quasar` shim-referensen i `src/env.d.ts` med en in-repo `declare module '*.vue'`-deklaration, så att `yarn verify` lyckas på rena löpare/__TK0-ringar utan re.__ filer.
 
+---
+
 ## 2.4.7 - Storybook 10 och Vite 8 justering
 
 ### Bugfixar och optimeringar
 - Uppgraderat **`.storybook-workspace`** till **Storybook 10** och **Vite 8** så att komponentförhandsgranskningar körs på samma stora paketeringslinje som skrivbordsappen (**`@quasar/app-vite`**), uppdaterade den kapslade **Yarn**-låsfilen för reproducerbara installationer (inklusive frysta **T** och frysta 0-filer) / **`eslint-plugin-storybook`** versioner med den utgivningsfamiljen.
 - Uppdaterade **root** och **`.storybook-workspace`** låsfiler med **`yarn upgrade`** inom befintliga semver-intervall (särskilt **Quasar**, **Vue**, **vue-i18n**, **Playwright**, **Sass** och relaterade verktyg); behöll **`@types/node`** på **22.x** typings-raden för **Node 22**-motorn. Uppdaterade **README** och **AGENTER** så att bidragsgivare se **Storybook 10** på **Vite 8** istället för den gamla split-Vite-formuleringen.
 - Lade till **`debug-storybook.log*`** till **`.gitignore`** så att lokala Storybook diagnostiska loggar inte plockas upp som ospårade filer.
+
+---
 
 ## 2.4.6 - Fönster krom, Storybook, Stylelint och DevTools
 
@@ -239,6 +257,8 @@
 - Uppdaterade **GitHub Actions** på **`verify`** och manuella **build** arbetsflöden (**`actions/checkout`**, **`actions/setup-node`**, **`actions/upload-artifact`**) till aktuella huvudversioner.
 - Noterade i **`quasar.config.ts`** att **`@electron/remote`**s **`electron`** peer förväntas visas som ouppfyllt under UnPackaged **`yarn installation --production`**; paketeringen lyckas fortfarande eftersom appen körs på den medföljande körtiden Electron.- Storybook förhandsgranskning registrerar Quasars **`Dark`** plugin, **`@quasar/quasar-ui-qmarkdown`** appplugin (efter Quasar, matchande startordning), **Roboto (latin-ext)** och **`preview-body.D`ark)`** / **`tru **`body--dark`** förblir i linje med appen; Sass **`additionalData`** hoppar över **`app.scss`** för att undvika dubbelladdning av variabler. **Dialog** och **toppmeny** komponent Dokument använder **`parameters.docs.story.inline: false`** igen så Autodocs monterar inte varje berättelse i ett dokument (varje **`q-dialog`** öppnas automatiskt vid montering, vilket staplade modaler när **`inline: true`**); varje kapslad Dokument-iframe laddar fortfarande samma förhandsgranskningsstapel CSS.
 
+---
+
 ## 2.4.5 - Bidragsgivares arbetsflöde och CI
 
 ### Bugfixar och optimeringar
@@ -249,6 +269,8 @@
 - Lade till ett **GitHub Actions**-arbetsflöde som kör **`yarn verify`** på **push** och **pull request** till **`master`** / **`main`** (inklusive installation av Storybook-arbetsytan så att ESLint kan lösa `.storybook-workspace/.storybook`).- Uppdaterade **root** och **`.storybook-workspace`** låsfiler med **`yarn upgrade`** inom befintliga semver-intervall (särskilt nyare **Playwright**, **Quasar**, **Vue**, **vue-i18n**, **Sass** och relaterade verktyg).
 - Gjorde **DevTools** brohjälpare att använda **`getCurrentWindow()`** istället för **`BrowserWindow.getFocusedWindow()`** så att **växla / status** förbli knuten till appfönstret när menyer eller DevTools ändrar OS-fokus, vilket stabiliserar DevTools kontrollen.**E2
 
+---
+
 ## 2.4.4 - Beroenden och utvecklingsverktyg
 
 ### Bugfixar och optimeringar
@@ -256,6 +278,8 @@
 - Uppgraderat `jsdom` till v29 för Vitest DOM-miljön, `eslint-plugin-n` till v17, och uppdaterade `@types/node` på Node 22 typings-raden.
 - Migrerade lint och typer verktyg till **ESLint 9** flat config (**neostandard**, **eslint-plugin-vue** v10, **typescript-eslint**), **TypeScript** 6 och **Stylelint** 17 med uppdaterade delbara konfigurationer; små källjusteringar matchar strängare standardvärden (importattribut, unionsavstånd, webbadressskydd för utvecklarfönster, QMarkdown CSS shim).
 - Justerade **AGENTER**, markörregler och färdigheter så att standardarbetsflödet för pre-commit och pre-changelog alltid körs **ESLint**, **TypeScript (`tsc`)**, **Stylelint** och **enhetstester** i den ordningen; **kvalitetsporten** kan köras som ett kedjat terminalkommando för effektivitet, med individuella kommandon reserverade för felsökningsfel. **Bygg** och **Playwright** kontroller förblir ett kommando per terminal.
+
+---
 
 ## 2.4.3 - Ytterligare beroendeuppdateringar och förbättrat testarbetsflöde
 
@@ -265,6 +289,8 @@
 - Lagt till beständig agent/testvägledning för att köra varje valideringskommando i en isolerad terminalanrop för att hålla långa testutgångar läsbara och lättare att granska.
 - Justerade ändringsloggblocket `2.4.3` med den kanoniska versionen av `package.json` och stärkte vägledning för bidragsgivare så att ändringar i ändringsloggar alltid läser om live `package.json` först, för att undvika sektions-/versionsdrift.
 
+---
+
 ## 2.4.2 - Uppdatering av kärnberoende och Quasar/Vite-arbetsflödesvalidering
 
 ### Bugfixar och optimeringar
@@ -272,12 +298,16 @@
 - Uppdaterade kärnapp- och verktygsberoenden (inklusive Quasar extras/qmarkdown, Axios, Pinia, Vue Router, Vitest och utvalda ESLint-plugin-program) för att minska underhållsrisken samtidigt som man håller sig inom den nuvarande projektarkitekturen.
 - Tillämpade en uppföljningsverktygsuppdatering för Quasar/Vite-arbetsflödet (`@quasar/app-vite`, `@intlify/unplugin-vue-i18n`, `vite-plugin-checker`, `eslint-plugin-vue` och `@types/node`) med full lint, component build, E, component build, validation.
 
+---
+
 ## 2.4.1 - Ändringsloggpolicylås och komponentteststabilitet
 
 ### Bugfixar och optimeringar
 - Fixat Playwright komponenttestupptäckt för `DialogAboutFantasiaArchive` genom att undvika fullständig import av i18n-lastare som drar nedmarkeringsdokument till nodsidans testladdning.
 - Uppdaterade dialogens sociala knapppåståenden för att jämföra renderade etiketter, matcha aktuell UI-utgång och hålla komponenttester stabila.
 - Låst projektvägledning för att **aldrig auto-bump-versioner**; ändringsloggsektioner följer nu strikt den befintliga `package.json`-versionen om inte en manuell ändring uttryckligen begärs.
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 och Node 22 verktygskedja
 
@@ -293,6 +323,8 @@
 - Avstämd **Quasar/elektronbyggare**-konfiguration för striktare skrivningar och paketering: PWA `workboxMode`-hölje (`GenerateSW`), tomt **`bex`** blockmatchande ström Quasar-typer, Linux **`desktop.entry`** för elektronbyggare __TK1, plus ____ (`env.d.ts` Vue shim referens, vue-i18n augmentation hantering) så `lint:types` förblir tillförlitlig.- Adresserade **Dart Sass 2** utfasningsbrus i delad SCSS via `sass:color` i Quasar variabler och rullningsliststilar (ersätter äldre färghjälpmedel).
 - **Installationspåminnelse:** **`electron`**-paketet behöver sin **efterinstallation** nedladdning; att hoppa över livscykelskript (till exempel `npm install --ignore-scripts`) kan lämna en trasig binär tills du installerar om eller kör `node node_modules/electron/install.js`.
 
+---
+
 ## 2.3.2 - Storybook layouter, sidor och bidragsgivares verktyg
 
 ### Nya funktioner
@@ -307,12 +339,16 @@
 - Tog bort ett tomt stilblock med omfattning från "SocialContactButtons" som kom till ytan genom stillinting.
 - Uppdaterad Vitest och Playwright täckning (extern länkhanterare, maskotbild, fönsterkontroller) för att matcha aktuellt beteende och väljare.
 
+---
+
 ## 2.3.1 - Electron förpackningsikon och favicon täckning
 
 ### Bugfixar och optimeringar
 - Tillagd explicit Electron Builder-ikonkonfiguration för Windows, macOS och Linux, inklusive Linux metadata för skrivbordsinmatning och Linux målinställning.
 - Länkade alla genererade favicon-storlekar i `index.html` så renderarikondeklarationer täcker hela `public/icons/`-uppsättningen.
 - Uppdaterad ändringslogg-markdown-formulering för att undvika analysfel vid byggtid i qmarkdown/Vite-pipelinen under Electron-produktionsbyggen.
+
+---
 
 ## 2.3.0 - Storybook arbetsyta och skrivbordspolering
 
@@ -325,6 +361,8 @@
 ### Bugfixar och optimeringar
 - Fixade ikoner för sociala kontaktknappar som inte laddas i paketerade Electron-byggen genom att lösa offentliga bildwebbadresser med en relativ bas när appbasens URL är "/" eller tom, istället för rotrelativa URL:er under file://.
 - Uppdaterad Playwright komponenttäckning för fönsterkontroller för att matcha aktuella markeringar och tillgänglighetsetiketter.
+
+---
 
 ## 2.2.1 - Typnamn och konsistenssvep
 
@@ -347,6 +385,8 @@
 - Förtydligade AGENTER/regler/färdigheter vägledning så Vitest behandlar uttryckligen både `src/` och `src-electron/` som förstklassiga enhetstestningsytor samtidigt som Playwright behålls som integrations-/körtidsskikt.
 - Förtydligade testdataregler: automatiserade testfixturer förblir inline i varje `*.vitest.test.ts` / `*.playwright.test.ts`, komponenttestande nyttolaster använder `COMPONENT_PROPS` där det är möjligt, och inbäddad komponentlägesmenydata förblir inline i `AppControl-triggermenus`.- Lösta ESLint-fynd i boot extern-länk Vitest hånar ('Event' lyssnare typning och vadderade block).
 
+---
+
 ## 2.2.0 - Testning och agentverktyg
 
 ### Nya funktioner
@@ -358,11 +398,15 @@
 - Ersatte återstående TypeScript `alla`-anteckningar i delade typdeklarationer med `okänd` för att hålla menyutlösare och Vue-komponentskrivning striktare.
 - Lagt till explicit anti-`any`-vägledning till Vue, TypeScript skript, Vitest och Playwright regler/färdigheter för att hålla framtida kod starkt skriven.
 
+---
+
 ## 2.1.0 - Verktygs- och AI-stödd utveckling
 
 ### Nya funktioner
 - Markörprojektregler och färdigheter för Vue/Quasar, BEM och scoped SCSS, Playwright och Vitest, Electron preload, global SCSS, konventionella Git-commits och en-US changelog underhåll kopplat till appversionen.
 - AGENTS.md som projektstartpunkt för AI-assisterad utveckling.
+
+---
 
 ## 2.0.0 - The Big Rewrite
 

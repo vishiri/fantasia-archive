@@ -7,6 +7,8 @@
 - **Projektiasetukset**: Ruudunlukuohjelman käyttäjät saavat nimettyjä ohjausobjekteja koko valintaikkunassa. **Maailmat**- ja **Asiakirjamallit**-suodattimen kentät, niiden tyhjennyspainikkeet, **Käytettävissä olevat asiakirjamallit** -suodatin, **Maailman väri**- ja **Maailman väripaletti**-ohjekuvakkeet, jokainen paletin värinäyte ja **Maailman liite**-ohjekuvake paljastavat nyt saavutettavat nimet jokaisella tuetulla käyttöliittymän kielellä.
 - **Projektiasetukset**: Jaettu poiston vahvistuspainike, jota **Maailmat** ja **Asiakirjamallit** käyttävät, paljastaa nimikkeensä, vahvistuskehotteensa ja vastalaskennan apuvälineille.
 
+---
+
 ## 2.4.14 - Versiovirhe
 
 ### Uusia ominaisuuksia
@@ -16,6 +18,8 @@
 ### Virhekorjaukset ja optimoinnit
 - **Projektiasetukset**: **Poista maailma** **Maailmat**-tietorivillä kohdistuu pystysuunnassa **Maailman nimi**- ja **Maailman väri** -kenttiin.
 - **Kielenvalitsin**: **Svenska** näyttää nyt Ruotsin lipun El Salvadorin lipun sijaan.
+
+---
 
 ## 2.4.13 - Versiovirhe
 
@@ -44,6 +48,8 @@
 - **Storybook**: **AppControlMenus** Autodocs-komponentin kuvauksessa luetellaan nykyiset **Project Management** -rivit siten, että se vastaa **`_data/project`** -kohtaa valikon muutosten jälkeen.
 - **Testit** — End-to-end **`checkProjectStyling`** nimeää uudelleen **`.faproject`** -kokoonpanon perusviivat ja sarjan otsikot, joten **Mukautetun projektin CSS**-kulku kuvaa Monaco live-esikatselun, SQLite pysyvyyttä, /phase-projektin **kohtaisen lomakkeen tyhjennystä ja poistoa**. **beta**-tunnisteet. Komponenttivaljaat **`WindowProjectStyling.playwright.test`** kattaa kelluvan kromin, kylmälatauksen **Monaco**, ohjepaneelin teemaluettelon ja **Sulje tallentamatta** jättäen tallennetun projektin CSS tyhjäksi.- **Testit** — **`checkProjectManagementFlow`** päästä päähän nyt vahvistaa splash **Jatka uusinta projektia** (**MRU-pudotusvalikon otsikot** vastaavat **Projekti → Lataa viimeisin projekti**, lataa uudelleen jaetun ensisijaisen segmentin kautta oikeinkirjoituksen tarkistuksen istunnon nollauksen jälkeen, lataa toiselta viimeiseltä riviltä).
 - **Testit** — **`checkProjectOsOpenArgv`** toistaa pakatun **electron.launch argv** kylmän avauksen **`FA_E2E_OS_OPEN=1`** erillään tavallisista roiskelaukaisuista.
+
+---
 
 ## 2.4.12 - Versiovirhe
 
@@ -92,6 +98,8 @@
 - **Electron työpöytä**: **`BrowserWindow` `preload`** polku ratkaisee Quasar:n pakatun **`preload/electron-preload.cjs`** artefaktin, joten **`contextBridge`** API-liittimet (**`window.faContentBridge) sen sijaan, että ne ladataan alustavasti hiihtäen tai esilataamalla tiedostonimen uudelleen** kansiot ajautuvat **`dev`**-nippuasettelusta.- **Toiminnonvalvonta**: onnistunut **Latausprojekti** -historiarivit pitävät jonon hyötykuorman tyhjänä, mutta liittävät päättävän esikatselun valitulla **`.faproject`** -polulla ja ladatulla projektin nimellä, joka on kohdistettu sen mukaan, kuinka **Uusi projekti** näyttää yksityiskohdat valmistumisen jälkeen; Kun avaaminen epäonnistuu tiedoston valitsemisen jälkeen, epäonnistuneet rivit voivat sisältää viestin sekä yrittämispolun, kun työpöydän komentotulkki toimittaa sen.
 - **Electron desktop**: **`faRoutingEnv`** odottaa hetken esilatauksen **ylimääräisen ympäristön** tilannekuvaa ennen kuin ohjaa alkuperäisiä valjaiden reittejä välttäen käynnistyskilpailun, jossa silta kiinnittyy ensimmäisen renderöintimaalin jälkeen.
 - **Playwright helpers**: Electron-komponentin ja **E2E**-sarjan johtosarja on jaettu kohtiin **`helpers/playwrightHelpers_universal`**, **`helpers/playwrightHelpers_e2e`** ja **`helpers/playwrightHelpers**jaettuihin soittimien ja `downers helpersin kanssa. **`beforeAll`** lohkot pysyvät yhtenäisinä; **`README`** ja avustajan huomautukset luetellaan päivitetyt tuontipolut.
+
+---
 
 ## 2.4.11 - Versiovirhe
 
@@ -150,6 +158,8 @@
 - **Storybook** työtila **Vite** lisää **`server.fs.allow`** arkiston juureen, jotta **Avainsidon asetukset** **`.vue`**-tiedostot voivat ratkaista sisarusten **`types/`**-sopimusten tuonnin staattisten rakennusten ja visuaalisten kaappausten aikana.- **Storybook** staattinen **visuaalinen regressio** (**`lankatesti:satukirja:visuaalinen`**): **Vite** ratkaisee **Pinia** ja **Vue** arkiston juuresta, joten sisäkkäinen työtila ei lataa toista **Pinia**-kopiota, joka esti dialogien **imountframe-kopion. **Playwright**-valjaat palvelevat staattista rakennetta erillisessä portissa, eikä käytä olemassa olevaa palvelinta uudelleen, joten paikallinen **`lankakirja:run`**-istunto oletusportissa ei voi tyydyttää sieppauksia vahingossa. Epäonnistuneet kaappaukset liittävät silti koko sivun kuvakaappauksen ja lyhyen **JSON**-tunnisteen **Storybook**-juuresta, kun navigointi, renderöintitarkistukset, fontit, peittokuvat tai kuvakaappausvaihe epäonnistuvat.
 - **Käyttäjän ylläpito**: **Vitest** tekniset tiedot: **AppControlMenus**, **AppControlSingleMenu**, **GlobalLanguageSelector** (mukaan lukien oikeinkirjoituksen tarkistuksen päivitysviivepolku), **GlobalWindowButtons**, **Laajenna **App-näytön asetukset** ja App-asetukset** harjoittele yläpalkin valjaat, kielen valinta, ikkunan kromiajastimet ja **Quasar**-valikon napsautuspolut jsdomissa. Multi-stub-valintaikkunan tekniset tiedot käyttävät samaa tiedostotason **ESLint**-poikkeusta, jota on jo sovellettu pinon suojavaljaiden testeihin.- **Contributor-ylläpito**: lisää **Vitest** jsdom-kattavuus **DialogActionMonitor**-valintaikkunalle näyttää päivitys, **DialogImportExportAppConfig** avautuu ja tuo vaiheistus, **DialogKeybindSettings**, kun näppäinsidon määrittelyluettelo on tyhjä, **Window_HouseverFalesmeating** osoitinkohteen koon muuttaminen, **WindowAppStyling**-editorin ohje-työkaluvihjeiden sisältö sekä lataus- ja latausvirhepeittokuvat ja kehysosoittimen johdotus, **MainLayout**-sovelluksen tyylin päivitys, kun **Electron**-silta paljastaa sen tai ei, **AppControlMenus**-alivalikon alivalikon toimintojen hallinta, **Smennointi **App-valikon liipaisin napsautuskäsittelijät, **GlobalLanguageSelector**, kun käyttäjäasetusten silta puuttuu, ja **_FaUserCssInjector**, joka ohittaa kaksinkertaisen tyylin tekstin kirjoittamisen.
 
+---
+
 ## 2.4.10 - Sovellusasetukset, ErrorCard, teematunnukset ja avustajan työkalut
 
 ### Uusia ominaisuuksia
@@ -202,6 +212,8 @@
 - **Electron Playwright** toimii ja liittää **WebM**-näytön tallenteita testiä kohti; avaa **`test-results/playwright-report/index.html`** **`yarn test:components`** tai **`yarn test:e2e`** (tai **`:single`**-skriptien) jälkeen tarkistaaksesi videot kunkin testin **Attachments** (tiedostot kohdassa **`port/da-right-`result). Jokainen Playwright-ajo **korvaa** kyseisen HTML-raportin; **`scripts/playwrightWithArtifactTrim.mjs`** poistaa **`test-results/playwright-artifacts`** näiden lankakomentojen jälkeen, joten scratch-tulostetta ei säilytetä ajojen välillä. Dokumentoitu **README**-, **AGENTS**- ja Cursor **fantasia-testing** / **playwright-tests** -ohjeissa; valinnainen **`FA_PLAYWRIGHT_NO_VIDEO`** ohittaa tallennuksen.
 - Poistettu hajamielinen **HTML** **tekstialue** **Hakemisto**-sivumallista.
 
+---
+
 ## 2.4.9 - Osallistujatyökalut, Pinia-valintaikkunat ja CI-vahvistus
 
 ### Virheenkorjauksia ja optimointeja
@@ -209,6 +221,8 @@
 - Korjattu **Pinia 3** -dialogikulku: **`S_DialogMarkdown`** ja **`S_DialogComponent`** ovat nyt vakioasetusvarastoja (kutsu **`S_DialogMarkdown()`** / **`S_DialogComponent()`** käyttöpaikoissa). **`openDialogMarkdownDocument`**, **`DialogMarkdownDocument`** ja **`DialogAboutFantasiaArchive`** käyttävät suojattuja tarkkailijoita, kun kauppa ei ole aktiivinen (esim. **Storybook**). **`ComponentTesting`** käsittelee puuttuvat **`componentName`**-reitit turvallisesti ja renderöi johtosarjan vasta, kun vastaava SFC on ratkaistu.- Yksinkertaisti **Indeksin** esikatselusivua poistamalla ylimääräisen **Fantasia Mascot** -lohkon oletusreitiltä **`IndexPage`** (pitää reitin kevyenä kuorena paikallisia linkkejä/testausta varten).
 - Nimetty uudelleen ja ryhmitelty **Lanka**-avustajakomentosarjat selvyyden vuoksi: laatuportit **`lanka testbatch:verify`** / **`langan testibatch:varmistaa`**; nukka **`lanka nukka:eslint`**, **`lanka nukka:konekirjoitus`**, **`lanka nukka:tyylilanka`**; Quasar Electron **`lanka kvasaari:build:electron`** / **`lanka kvasaari:dev:electron`**; Playwright **`langatesti:komponentit`** ja kaksoispisteliitetyt **`testi:komponentit:**, **`testi:e2e:**; Storybook dev **`lankatarinakirja:run`** ja staattinen **`lankatarinakirja:build`** (aiemmin **`build-storybook`**). Poistettu vanhentunut **`lankatesti:full`** ja kaksoiskappale **`langan visual:sorybook:ci`**; **GitHub Toiminnot** kutsuvat suoraan **`yarn visual:storybook:test`**. Päivitetty **README**, **AGENTS**, kohdistimen säännöt/taidot, **`package.json`**, **`testRunner_*.mjs`** ja työnkulku.- Paikan päällä oleva Storybook **staattinen tulos** (**`.storybook-workspace/storybook-static/`**), **Playwright** visuaalisen regression konfiguraatio, **`visual-tests/`** (mukaan lukien sitoutuneet tilannevedokset), työtila **`storybook:visual:**encieser**,-devaattori**,-palvelin **`@playwright/test`**) kohdassa **`.storybook-workspace/`**; root **`lanka visual:sorybook:**` delegoi **`lanka --cwd .storybook-workspace`**. Päivitetty polut **`.gitignore`**, **`tsconfig.json`** ja **`lint:eslint`**.
 - Määritä eksplisiittiset pienimpien oikeuksien **`käyttöoikeudet`** (`sisältö: lue`) **`tarkistaa`** ja manuaaliseen **`build`** **GitHub Actions** -työnkulkuihin; lisätty **Dependency Review**, **OSV Scanner** (uudelleenkäytettävät työnkulut + viikoittainen aikataulu **`masterissa`**) ja **Gitleaks** PR/push-hygieniaan.
+
+---
 
 ## 2.4.8 - Pinia 3 ja Vue reititin 5
 
@@ -221,12 +235,16 @@
 - Vähentynyt ei-toimiva Vue varoituskohina komponentin Vitest lähdössä suodattamalla tunnetut Quasar-resoluutio- ja vain testiinjektiovaroitukset jaetuissa testiasetuksissa, pitäen signaalin keskittyneenä toimiviin vioihin.
 - Korjattu CI TypeScript -resoluutio Vue SFC-tuonnille korvaamalla src/env.d.ts-tiedostossa luotu `.quasar`-shim-viittaus in-repo-ilmoituksella `declare module '*.vue'`-ilmoituksella, joten 'yarn verify' onnistuu ilman, että __TK0generated runner_required. välilevyt.
 
+---
+
 ## 2.4.7 - Storybook 10 ja Vite 8 kohdistus
 
 ### Virheenkorjauksia ja optimointeja
 - Päivitetty **`.storybook-workspace`** muotoihin **Storybook 10** ja **Vite 8**, joten komponenttien esikatselut toimivat samalla suurella niputuslinjalla kuin työpöytäsovellus (**`@quasar/app-vite`**), sisäkkäinen **Yarn**-lukitustiedosto päivitettiin, ** ja ifroaligned, mukaan lukien toistettavat **CI-asennukset. **Storybook** / **`eslint-plugin-storybook`** versiot kyseisellä julkaisuperheellä.
 - Päivitetyt **root** ja **`.storybook-workspace`** lukitustiedostot **`lankapäivityksellä`** olemassa olevilla semver-alueilla (erityisesti **Quasar**, **Vue**, **vue-i18n**, **Playwright**, **Sass);** ja niihin liittyvät työkalut;** säilytettiin **`@types/node`** **22.x**-kirjoitusrivillä **Node 22** -moottorille. Päivitetty **README** ja **AGENTS**, joten kirjoittajat näkevät **Storybook 10** **Vite 8:ssa** vanhan split-Vite-sanan sijaan.
 - Lisätty **`debug-storybook.log*`** tiedostoon **`.gitignore`**, joten paikallisia Storybook-diagnostiikkalokeja ei poimita jäljittämättöminä tiedostoina.
+
+---
 
 ## 2.4.6 - Ikkunakromi, Storybook, Stylelint ja DevTools
 
@@ -239,6 +257,8 @@
 - Päivitetty **GitHub Actions** **`verify`** ja manuaalisten **build**-työnkulkujen (**`actions/checkout`**, **`actions/setup-node`**, **`actions/upload-artifact`**) osalta nykyisiin pääversioihin.
 - Todettiin tiedostossa **`quasar.config.ts`**, että **`@electron/remote`**:n **`electron`**-vertaisohjelman odotetaan näkyvän täyttämättömänä Pakkaamattoman **`langan asennus --tuotantoon`**; pakkaus onnistuu silti, koska sovellus toimii paketoidussa Electron-ajotilassa.- Storybook esikatselu rekisteröi Quasar:n **`Dark`**-laajennuksen, **`@quasar/quasar-ui-qmarkdown`** -sovelluslaajennuksen (Quasar:n jälkeen, vastaava käynnistysjärjestys), **Roboto (latin-ext)** ja **`preview-body.html`** /set (**`Dark)** **`body--dark`** pysyy linjassa sovelluksen kanssa; Sass **`additionalData`** ohittaa **`app.scss`** välttääkseen muuttujien kaksoislatauksen. **Dialog** ja **ylävalikko** -komponentit Docs käyttävät **`parameters.docs.story.inline: false`** jälleen, joten Autodocs ei liitä jokaista juttua yhteen asiakirjaan (jokainen **`q-dialog`** avautuu automaattisesti asennuksen yhteydessä, joka pinoaa modaalit, kun **`inline: true`**); jokainen sisäkkäinen Docsin iframe lataa edelleen saman esikatselun CSS-pinon.
 
+---
+
 ## 2.4.5 - Osallistujan työnkulku ja CI
 
 ### Virheenkorjauksia ja optimointeja
@@ -249,6 +269,8 @@
 - Lisätty **GitHub Actions** -työnkulku, joka suorittaa **`yarn verify`** -toiminnon **push**- ja **pull request** -toiminnolla **`master`** / **`main`** -palveluun (mukaan lukien Storybook-työtilan asentaminen, jotta ESLint voi ratkaista `.storybook-workspace/.storybook`).- Päivitetyt **root**- ja **`.storybook-workspace`**-lukitustiedostot **`lankapäivityksellä`** olemassa olevilla semver-alueilla (erityisesti uudemmat **Playwright**, **Quasar**, **Vue**, **vue-i18n**, ja niihin liittyvät työkalut, joissa** ja **Sass sallitaan).
 - Tehty **DevTools** silta-avustajat käyttävät **`getCurrentWindow()`** **`BrowserWindow.getFocusedWindow()`** sijasta, joten **toggle / status** pysyy sidottuna sovellusikkunaan, kun valikot tai DevTools muuttavat käyttöjärjestelmän kohdistusta vakauttamalla __TK3_E**-tarkistuksen.**
 
+---
+
 ## 2.4.4 - Riippuvuudet ja kehitystyökalut
 
 ### Virheenkorjauksia ja optimointeja
@@ -256,6 +278,8 @@
 - Päivitetty "jsdom" versioon 29 DOM-ympäristöä varten Vitest, "eslint-plugin-n" v17:ksi ja päivitetty "@types/node" solmun 22 kirjoitusrivillä.
 - Siirretty nukka- ja tyyppityökalut **ESLint 9** -tasokokoonpanoon (**neostandardi**, **eslint-plugin-vue** v10, **typescript-eslint**), **TypeScript** 6:een ja **Stylelint** 17:ään päivitetyillä jaettavissa olevilla asetuksilla; pienet lähdesäädöt vastaavat tiukempia oletusasetuksia (tuontiattribuutit, liitosvälit, kehitysikkunan URL-suojaus, QMarkdown CSS shim).
 - Kohdistettu **AGENTS**, kohdistinsäännöt ja taidot, jotta vakiotyönkulku ennen vahvistusta ja muutoslokia suoritetaan aina **ESLint**, **TypeScript (`tsc`)**, **Stylelint** ja **yksikkötestit** tässä järjestyksessä. **laatuportti** voi toimia yhtenä ketjutettuna päätekomentona tehokkuuden vuoksi, ja yksittäiset komennot on varattu virheenkorjaukseen. **Build**- ja **Playwright**-tarkistukset pysyvät yhden komennon per pääte.
+
+---
 
 ## 2.4.3 - Lisäriippuvuuspäivitykset ja parannettu testauksen työnkulku
 
@@ -265,6 +289,8 @@
 - Lisätty pysyvä agentti/testausopastus jokaisen validointikomennon suorittamiseen eristetyssä päätteen kutsussa, jotta pitkät testitulokset pysyisivät luettavissa ja helpompi tarkastaa.
 - Kohdista 2.4.3-muutoslokilohko kanonisen package.json-version kanssa ja vahvisti osallistujien ohjeita, joten muutoslokin muokkaukset lukevat aina uudelleen live-package.json-tiedoston ensin välttäen osion/version ajautumista.
 
+---
+
 ## 2.4.2 - Ydinriippuvuuden päivitys ja Quasar/Vite-työnkulun vahvistus
 
 ### Virheenkorjauksia ja optimointeja
@@ -272,12 +298,16 @@
 - Päivitetyt ydinsovellus- ja työkaluriippuvuudet (mukaan lukien Quasar extrat/qmarkdown, Axios, Pinia, Vue Router, Vitest ja valitut ESLint-laajennukset) vähentämään ylläpitoriskiä nykyisessä projektiarkkitehtuurissa.
 - Työkalujen seurantapäivitys Quasar/Vite-työnkulkuun ("@quasar/app-vite", "@intlify/unplugin-vue-i18n", "vite-plugin-checker", "eslint-plugin-vue" ja "@types/lint,", che with full2 unit, komponentti) validointi.
 
+---
+
 ## 2.4.1 - Muutoslokin käytäntölukko ja komponenttien vakaus
 
 ### Virheenkorjauksia ja optimointeja
 - Korjattu "DialogAboutFantasiaArchiven" Playwright-komponenttitestin etsintä välttämällä täydet i18n-latausohjelman tuonnit, jotka vetäisivät markdown-asiakirjat solmupuolen testilataukseen.
 - Päivitetty valintaikkunan sosiaalisten painikkeiden väitteet renderöityjen tarrojen vertaamiseksi, vastaamaan nykyistä käyttöliittymän lähtöä ja pitämään komponenttitestit vakaina.
 - Lukittu projektiopastus **ei koskaan auto-bump-versioihin**; muutoslokin osiot noudattavat nyt tiukasti olemassa olevaa "package.json"-versiota, ellei manuaalista muutosta ole erikseen pyydetty.
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 ja Node 22 -työkaluketju
 
@@ -293,6 +323,8 @@
 - Viritetty **Quasar/electron-builder** konfiguraatio tiukempia kirjoituksia ja pakkausta varten: PWA `workboxMode` kotelo (`GenerateSW`), tyhjä **`bex`** lohko, joka vastaa virtaa Quasar tyyppejä, Linux **`desktop.entry__glu_ 2 TK-1,_buil`** varten electron 6-TK-_buil`** (`env.d.ts` Vue shim-viittaus, vue-i18n-lisäyksen käsittely), joten lint:types pysyy luotettavana.- Korjattu **Dart Sass 2** -poistokohina jaetuissa SCSS-muuttujissa ja vierityspalkin tyyleissä `sass:color':n kautta (korvaa vanhat väriapuohjelmat).
 - **Asennusmuistutus:** **`electron`**-paketti tarvitsee **asennuksen jälkeen** latauksen; elinkaarikomentosarjojen ohittaminen (esimerkiksi `npm install --ignore-scripts`) voi jättää rikkinäisen binaarin, kunnes asennat uudelleen tai suoritat `node node_modules/electron/install.js`.
 
+---
+
 ## 2.3.2 - Storybook asettelut, sivut ja avustajatyökalut
 
 ### Uusia ominaisuuksia
@@ -307,12 +339,16 @@
 - Poistettiin "SocialContactButtons" -sovelluksesta tyhjä, rajattu tyylilohko.
 - Päivitetty Vitest ja Playwright -kattavuus (ulkoisen linkin hallinta, maskottikuva, ikkunasäätimet) vastaamaan nykyistä toimintaa ja valitsimia.
 
+---
+
 ## 2.3.1 - Electron pakkauskuvake ja suosikkikuvake
 
 ### Virheenkorjauksia ja optimointeja
 - Lisätty selkeä Electron Builder-kuvakemääritys kohteille Windows, macOS ja Linux, mukaan lukien Linux työpöydän sisällön metatiedot ja Linux kohdeasetukset.
 - Linkitetty kaikki luodut favicon-koot hakemistossa "index.html", joten renderöijän kuvakeilmoitukset kattavat koko "public/icons/" -joukon.
 - Päivitetty muutoslokin merkintäteksti, jotta vältetään koontivaiheen jäsennysvirheet qmarkdown/Vite-liukuhihnassa Electron-tuotantokoonnusten aikana.
+
+---
 
 ## 2.3.0 - Storybook työtila ja työpöydän kiillotus
 
@@ -325,6 +361,8 @@
 ### Virheenkorjauksia ja optimointeja
 - Korjattu sosiaalisen kontaktin painikkeiden kuvakkeet, jotka eivät lataudu pakatuissa Electron-koonnuksissa ratkaisemalla julkisten kuvien URL-osoitteet suhteellisella pohjalla, kun sovelluksen perus-URL-osoite on "/" tai tyhjä, sen sijaan, että tiedosto://-hakemistossa on juurisuhteellisia URL-osoitteita.
 - Päivitetty Playwright-komponenttien peitto ikkunasäätimille vastaamaan nykyisiä merkintöjä ja esteettömyystarroja.
+
+---
 
 ## 2.2.1 - Tyyppien nimeäminen ja johdonmukaisuuden pyyhkäisy
 
@@ -347,6 +385,8 @@
 - Selkeä AGENTS/Säännöt/taitojen opastus, joten Vitest käsittelee sekä `src/` että `src-electron/` ensiluokkaisina yksikkötestauspinnoina säilyttäen Playwright integraatio-/ajonaikaisena kerroksena.
 - Selvennetyt testidatasäännöt: automaattiset testauslaitteet pysyvät rivissä jokaisessa `*.vitest.test.ts` / `*.playwright.test.ts`:ssa, komponenttien testaushyötykuormat käyttävät `COMPONENT_PROPS'ia mahdollisuuksien mukaan, ja upotetut komponenttitilan valikkotiedot pysyvät rivissä `AppControlMenusissa.- Ratkaistu ESLint-havainnot käynnistyksen ulkoisen linkin Vitest pilaa (`Tapahtuma`-kuuntelijan kirjoittaminen ja pehmustetut lohkot).
 
+---
+
 ## 2.2.0 - Testaus ja agenttityökalut
 
 ### Uusia ominaisuuksia
@@ -358,11 +398,15 @@
 - Korvattiin loput TypeScript "kaikki" merkinnät jaetuissa tyyppimäärityksissä "tuntemattomalla", jotta valikon liipaisin ja Vue komponenttikirjoitus pysyisivät tiukemmin.
 - Lisätty nimenomainen anti-"kaikki" ohjeet Vue-, TypeScript-skripteihin, Vitest- ja Playwright-sääntöihin/taitoon, jotta tuleva koodi pysyy vahvasti kirjoitettuna.
 
+---
+
 ## 2.1.0 - Työkalu ja tekoälyavusteinen kehitys
 
 ### Uusia ominaisuuksia
 - Kursoriprojektin säännöt ja taidot Vue/Quasar-, BEM- ja SCSS-, Playwright- ja Vitest-, Electron-esilatauksille, globaaleille SCSS-, perinteisille Git-sitoumuksille ja en-US-muutoslokin ylläpidolle sidottuna sovellusversioon.
 - AGENTS.md projektin aloituspisteenä tekoälyavusteiselle kehitykselle.
+
+---
 
 ## 2.0.0 - Suuri uudelleenkirjoitus
 

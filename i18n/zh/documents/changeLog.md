@@ -7,6 +7,8 @@
 - **项目设置**：屏幕阅读器用户在整个对话框中都能获得带标签的控件。**世界**和**文档模板**筛选字段及其清除控件、**可用文档模板**筛选器、**世界颜色**和**世界调色板**帮助图标、每个调色板色样以及**世界附录**帮助图标现在以每种受支持的界面语言公开可访问名称。
 - **项目设置**：**世界**和**文档模板**共用的删除确认按钮向辅助技术公开其标签、确认提示和倒计时。
 
+---
+
 ## 2.4.14 - 版本提升
 
 ### 新功能
@@ -16,6 +18,8 @@
 ### 错误修复与优化
 - **项目设置**：**世界**详情行中的**删除世界**与**世界名称**和**世界颜色**字段垂直对齐。
 - **语言选择器**：**Svenska** 现在显示瑞典国旗，而非萨尔瓦多国旗。
+
+---
 
 ## 2.4.13 - 版本提升
 
@@ -44,6 +48,8 @@
 - **Storybook**：**AppControlMenus** Autodocs 组件描述列出当前 **项目管理** 行，以便在菜单更改后与 **`_data/project`** 匹配。
 - **测试** — 端到端 **`checkProjectStyling`** 重命名 **`.faproject`** 夹具基线和套件标题，以便 **自定义项目 CSS** 流程描述 Monaco 实时预览、SQLite 持久性、清除样式表和每个项目隔离，而不是不透明的 **alpha** / **beta** 标签。组件线束 **`WindowProjectStyling.playwright.test`** 涵盖浮动镶边、冷加载 **Monaco**、帮助面板主题列表以及 **关闭而不保存** 将存储的项目 CSS 留空。- **测试** — **`checkProjectManagementFlow`** 端到端现在断言启动**恢复最新项目**（**MRU 下拉标签**匹配**项目 → 加载最近的项目**，在拼写检查会话重置后通过拆分主段重新加载，从另一个最近的行加载）。
 - **测试** — **`checkProjectOsOpenArgv`** 重放打包的 **electron.launch argv** 冷打开 **`FA_E2E_OS_OPEN=1`** 与普通仅启动启动隔离。
+
+---
 
 ## 2.4.12 - 版本提升
 
@@ -92,6 +98,8 @@
 - **Electron 桌面**：**`BrowserWindow` `preload`** 路径解析为 Quasar 的打包 **`preload/ Electron-preload.cjs`** 工件，因此 **`contextBridge`** API (**`window.faContentBridgeAPIs`**) 可靠地初始化，而不是在文件名或文件夹偏离 **`dev`** 包布局时默默地跳过预加载。- **操作监视器**：成功的**加载项目**历史行将队列有效负载保持为空，但附加带有所选**`.faproject`**路径和加载项目名称的结束预览，与完成后**新项目**显示详细信息的方式保持一致；当您选择文件后打开失败时，失败的行可以包含消息以及桌面 shell 提供的尝试路径。
 - **Electron 桌面**：**`faRoutingEnv`** 在转向初始线束路线之前短暂等待预加载 **额外环境** 快照，避免在第一次渲染器绘制后桥连接的启动竞赛。
 - **Playwright helpers**：Electron组件和**E2E**套件的Harness代码被分割在**`helpers/playwrightHelpers_universal`**、**`helpers/playwrightHelpers_e2e`**和**`helpers/playwrightHelpers_component`**下，共享启动和拆卸帮助程序，因此串行**`beforeAll`**块保持统一； **`自述文件`** 和贡献者注释列出了更新的导入路径。
+
+---
 
 ## 2.4.11 - 版本提升
 
@@ -150,6 +158,8 @@
 - **Storybook** 工作区 **Vite** 为存储库根添加 **`server.fs.allow`**，因此 **Keybind 设置** **`.vue`** 文件可以在静态构建和视觉捕获期间解析兄弟 **`types/`** 合约导入。- **Storybook** 静态 **视觉回归**（**`yarn 测试：故事书：视觉`**）：**Vite** 从存储库根解析 **Pinia** 和 **Vue**，因此嵌套工作区不会加载第二个 **Pinia** 副本，从而阻止对话故事安装在 **iframe** 中。 **Playwright** 线束在专用端口上提供静态构建服务，并且不会重用那里的现有服务器，因此默认端口上的本地 **`yarn Storybook:run`** 会话无法满足意外捕获。当导航、渲染检查、字体、覆盖或屏幕截图步骤失败时，失败的捕获仍会附加全页屏幕截图和 **Storybook** 根的简短 **JSON** 探针。
 - **贡献者维护**：**Vitest** **AppControlMenus**、**AppControlSingleMenu**、**GlobalLanguageSelector** 规范（包括拼写检查刷新延迟路径）、**GlobalWindowButtons**、**ErrorCard**、**应用程序设置** 设置块和扩展 **对话框** 设置屏幕练习顶栏线束分支、语言选择、​​窗口镶边计时器和 jsdom 中的 **Quasar** 菜单单击路径。多存根对话框规范使用已应用于堆栈防护线束测试的相同文件级 **ESLint** 异常。- **贡献者维护**：更多 **Vitest** jsdom 覆盖 **DialogActionMonitor** 对话框显示刷新、**DialogImportExportAppConfig** 打开并导入暂存、**DialogKeybindSettings** 当键绑定定义列表为空时、**_FaFloatingWindowFrameResizeHandles** 悬停和每个调整大小指针目标、**WindowAppStyling** 编辑器帮助工具提示内容以及加载和加载错误覆盖和框架指针连接， **MainLayout** 应用程序样式在 **Electron** 桥暴露或不暴露时刷新，**AppControlMenus** 组件测试降价菜单触发器，**AppControlSingleMenu** 没有单击处理程序的子菜单行，**GlobalLanguageSelector** 当用户设置桥不存在时，以及 **_FaUserCssInjector** 跳过重复的样式文本写入。
 
+---
+
 ## 2.4.10 - 应用程序设置、ErrorCard、主题令牌和贡献者工具
 
 ### 新功能
@@ -202,6 +212,8 @@
 - **Electron Playwright** 每次测试运行附加 **WebM** 屏幕录制；在 **`yarn test:components`** 或 **`yarn test:e2e`**（或 **`:single`** 脚本）之后打开 **`test-results/playwright-report/index.html`**，以查看每个测试的 **附件** 下的视频（**`test-results/playwright-report/data/`** 下的文件）。每次 Playwright 运行都会**替换**该 HTML 报告； **`scripts/playwrightWithArtifactTrim.mjs`** 在这些纱线命令之后删除 **`test-results/playwright-artifacts`**，因此在运行之间不会保留暂存输出。记录在 **README**、**AGENTS** 和 Cursor **fantasia-testing** / **playwright-tests** 指南中；可选 **`FA_PLAYWRIGHT_NO_VIDEO`** 跳过录制。
 - 从 **Index** 页面模板中删除了杂散的 **HTML** **textarea**。
 
+---
+
 ## 2.4.9 - 贡献者工具、Pinia 对话框和 CI 强化
 
 ### 错误修复和优化
@@ -209,6 +221,8 @@
 - 修复了 **Pinia 3** 对话框流程：**`S_DialogMarkdown`** 和 **`S_DialogComponent`** 现在是标准设置存储（在使用站点调用 **`S_DialogMarkdown()`** / **`S_DialogComponent()`**）。 **`openDialogMarkdownDocument`**、**`DialogMarkdownDocument`** 和 **`DialogAboutFantasiaArchive`** 在商店不活动时使用受保护的观察程序（例如 **Storybook**）。 **`ComponentTesting`** 安全地处理缺少的 **`componentName`** 路由，并仅在解析匹配的 SFC 后才渲染线束。- 通过从默认 **`IndexPage`** 路由中删除额外的 **Fantasia Mascot** 块来简化 **Index** 预览页面（将路由保留为本地链接/测试的轻量级外壳）。
 - 为了清晰起见，重命名并分组了 **Yarn** 贡献者脚本：质量门 **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**； lint **`纱线 lint:eslint`**, **`纱线 lint:typescript`**, **`纱线 lint:stylelint`**; Quasar Electron **`纱线类星体：构建：电子`** / **`纱线类星体：dev：电子`**; Playwright **`yarn test:components`** 和冒号后缀 **`test:components:**`**, **`test:e2e:**`**; Storybook dev **`yarnstorybook:run`** 和静态 **`yarnstorybook:build`**（以前的 **`build-storybook`**）。删除了过时的 **`yarn test:full`** 和重复的 **`yarn Visual:storybook:ci`**； **GitHub Actions** 直接调用**`yarn Visual:storybook:test`**。更新了 **README**、**AGENTS**、光标规则/技能、**`package.json`**、**`testRunner_*.mjs`** 和工作流程。- 在 **`.storybook-workspace/`** 下并置 Storybook **静态输出** (**`.storybook-workspace/storybook-static/`**)、**Playwright** 视觉回归配置、**`visual-tests/`** （包括提交的快照）、工作区 **`storybook:visual:**`** 脚本和 VRT devDependency (**`http-server`**、**`@playwright/test`**) 下的 **`.storybook-workspace/`** ； root **`yarn Visual:storybook:**`** 代表具有 **`yarn --cwd .storybook-workspace`**。更新了 **`.gitignore`**、**`tsconfig.json`** 和 **`lint:eslint`** 路径。
 - 在 **`验证`** 和手动 **`构建`** **GitHub 操作**工作流程上设置显式最低权限 **`权限`**（`内容：读取`）；添加了**依赖项审查**、**OSV 扫描程序**（可重用工作流程 + **`master`** 上的每周计划）和 **Gitleaks** 用于 PR/推送卫生。
+
+---
 
 ## 2.4.8 - Pinia 3 和 Vue 路由器 5
 
@@ -221,12 +235,16 @@
 - 通过过滤共享测试设置中已知的 Quasar 分辨率和仅测试注入警告，减少组件 Vitest 输出中不可操作的 Vue 警告噪声，使信号集中于可操作的故障。
 - 修复了 Vue SFC 导入的 CI TypeScript 解析，通过用存储库内的“declare module '*.vue'”声明替换“src/env.d.ts”中生成的“.quasar”垫片引用，因此“yarn verify”在干净的 GitHub 运行器上成功，无需本地/生成的“.quasar”垫片文件。
 
+---
+
 ## 2.4.7 - Storybook 10 和 Vite 8 对齐
 
 ### 错误修复和优化
 - 将 **`.storybook-workspace`** 升级到 **Storybook 10** 和 **Vite 8**，以便组件预览在与桌面应用程序 (**`@quasar/app-vite`**) 相同的主要捆绑程序线上运行，刷新嵌套 **Yarn** 锁定文件以实现可重复安装（包括 **CI** 冻结安装），并将根 **Storybook** / **`eslint-plugin-storybook`** 版本与该版本对齐家庭。
 - 在现有 semver 范围内更新 **root** 和 **`.storybook-workspace`** 锁定文件，并使用 **`yarn 升级`**（特别是 **Quasar**、**Vue**、**vue-i18n**、**Playwright**、**Sass** 和相关工具）；将 **`@types/node`** 保留在 **Node 22** 引擎的 **22.x** 类型行上。更新了 **README** 和 **AGENTS**，以便贡献者在 **Vite 8** 上看到 **Storybook 10**，而不是旧的 split-Vite 措辞。
 - 将 **`debug-storybook.log**`** 添加到 **`.gitignore`**，因此本地 Storybook 诊断日志不会被拾取为未跟踪文件。
+
+---
 
 ## 2.4.6 - 窗口镶边、Storybook、Stylelint 和 DevTools
 
@@ -239,6 +257,8 @@
 - 将 **`verify`** 上的 **GitHub Actions** 和手动 **build** 工作流程（**`actions/checkout`**、**`actions/setup-node`**、**`actions/upload-artifact`**）更新为当前主要版本。
 - 在 **`quasar.config.ts`** 中指出，**`@ Electron/remote`** 的 **`electron`** 对等点预计在 UnPackages **`yarn install --product`** 期间显示为未满足；打包仍然成功，因为应用程序在捆绑的 Electron 运行时上运行。- Storybook 预览版注册 Quasar 的 **`Dark`** 插件、**`@quasar/quasar-ui-qmarkdown`** 应用程序插件（在 Quasar 之后，匹配启动顺序）、**Roboto (latin-ext)** 和 **`preview-body.html`** / **`Dark.set(true)`** 因此 **`body--dark`** 与应用程序保持一致； Sass **`additionalData`** 跳过 **`app.scss`** 以避免双重加载变量。 **Dialog** 和 **top-menu** 组件文档再次使用 **`parameters.docs.story.inline: false`**，因此 Autodocs 不会将每个故事挂载到一个文档中（每个 **`q-dialog`** 在挂载时自动打开，当 **`inline: true`** 时堆叠模态）；每个嵌套的文档 iframe 仍加载相同的预览 CSS 堆栈。
 
+---
+
 ## 2.4.5 - 贡献者工作流程和 CI
 
 ### 错误修复和优化
@@ -249,6 +269,8 @@
 - 添加了 **GitHub Actions** 工作流程，该工作流程在 **push** 和 **pull request** 上运行 **`yarn verify`** 到 **`master`** / **`main`**（包括安装 Storybook 工作区，以便 ESLint 可以解析 `.storybook-workspace/.storybook`）。- 在现有 semver 范围内更新了 **root** 和 **`.storybook-workspace`** 锁定文件，并使用 **`yarn 升级`**（特别是较新的 **Playwright**、**Quasar**、**Vue**、**vue-i18n**、**Sass** 以及范围允许的相关工具）。
 - 使 **DevTools** 桥接助手使用 **`getCurrentWindow()`** 而不是 **`BrowserWindow.getFocusedWindow()`**，以便当菜单或 DevTools 更改操作系统焦点时，**切换/状态** 保持与应用程序窗口关联，从而稳定 DevTools **E2E** 检查。
 
+---
+
 ## 2.4.4 - 依赖项和开发工具
 
 ### 错误修复和优化
@@ -256,6 +278,8 @@
 - 将 Vitest DOM 环境的 `jsdom` 升级到 v29，将 `eslint-plugin-n` 升级到 v17，并在 Node 22 类型行上刷新了 `@types/node`。
 - 将 lint 和类型工具迁移到 **ESLint 9** 平面配置（**neostandard**、**eslint-plugin-vue** v10、**typescript-eslint**）、**TypeScript** 6 和 **Stylelint** 17，并更新了可共享配置；小源调整匹配更严格的默认值（导入属性、联合间距、开发窗口 URL 保护、QMarkdown CSS shim）。
 - 对齐**代理**、游标规则和技能，以便标准预提交和预更改日志工作流程始终按顺序运行**ESLint**、**TypeScript (`tsc`)**、**Stylelint** 和 **单元测试**；为了提高效率，**质量门**可以作为一个链接的终端命令运行，并为调试失败保留单独的命令。 **构建**和 **Playwright** 检查每个终端保留一个命令。
+
+---
 
 ## 2.4.3 - 额外的依赖项更新和改进的测试工作流程
 
@@ -265,6 +289,8 @@
 - 添加了持久代理/测试指南，以在隔离的终端调用中运行每个验证命令，以保持长测试输出可读且更易于审核。
 - 将“2.4.3”变更日志块与规范的“package.json”版本保持一致，并加强了贡献者指导，因此变更日志编辑始终首先重新读取实时“package.json”，避免部分/版本漂移。
 
+---
+
 ## 2.4.2 - 核心依赖刷新和Quasar/Vite工作流程验证
 
 ### 错误修复和优化
@@ -272,12 +298,16 @@
 - 更新了核心应用程序和工具依赖项（包括 Quasar extras/qmarkdown、Axios、Pinia、Vue Router、Vitest 和选定的 ESLint 插件），以降低维护风险，同时保持在当前项目架构内。
 - 对 Quasar/Vite 工作流程（`@quasar/app-vite`、`@intlify/unplugin-vue-i18n`、`vite-plugin-checker`、`eslint-plugin-vue` 和 `@types/node`）应用了后续工具更新，具有完整的 lint、类型检查、单元、组件、E2E 和构建验证。
 
+---
+
 ## 2.4.1 - 变更日志策略锁定和组件测试稳定性
 
 ### 错误修复和优化
 - 通过避免将 Markdown 文档拉入节点端测试加载的完整 i18n 加载器导入，修复了“DialogAboutFantasiaArchive”的 Playwright 组件测试发现。
 - 更新了对话框社交按钮断言以比较渲染的标签、匹配当前的 UI 输出并保持组件测试稳定。
 - 将项目指南锁定为**从不自动更新版本**；除非明确请求手动更改，否则变更日志部分现在严格遵循现有的“package.json”版本。
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 和 Node 22 工具链
 
@@ -293,6 +323,8 @@
 - 调整 **Quasar/ Electron-builder** 配置以实现更严格的类型和打包：PWA `workboxMode` 外壳（`GenerateSW`），空 **`bex`** 块匹配当前 Quasar 类型，Linux **`desktop.entry`** 用于电子构建器 26，加上 TypeScript 项目胶水（`env.d.ts` Vue shim 参考，vue-i18n 增强处理），因此 `lint:types` 保持可靠。- 通过 Quasar 变量和滚动条样式中的 `sass:color` 解决了共享 SCSS 中的 **Dart Sass 2** 弃用噪音（替换旧的颜色助手）。
 - **安装提醒：**` Electron`** 软件包需要其 **postinstall** 下载；跳过生命周期脚本（例如“npm install --ignore-scripts”）可能会留下损坏的二进制文件，直到您重新安装或运行“node node_modules/electron/install.js”。
 
+---
+
 ## 2.3.2 - Storybook 布局、页面和贡献者工具
 
 ### 新功能
@@ -307,12 +339,16 @@
 - 从样式 linting 显示的“SocialContactButtons”中删除了一个空范围样式块。
 - 更新了 Vitest 和 Playwright 覆盖范围（外部链接管理器、吉祥物图像、窗口控件）以匹配当前行为和选择器。
 
+---
+
 ## 2.3.1 - Electron 包装图标和图标覆盖率
 
 ### 错误修复和优化
 - 为 Windows、macOS 和 Linux 添加了显式 Electron Builder 图标配置，包括 Linux 桌面条目元数据和 Linux 目标设置。
 - 在“index.html”中链接所有生成的图标大小，以便渲染器图标声明覆盖完整的“public/icons/”集。
 - 更新了变更日志 Markdown 措辞，以避免在 Electron 生产构建期间 qmarkdown/Vite 管道中的构建时解析失败。
+
+---
 
 ## 2.3.0 - Storybook 工作区和桌面优化
 
@@ -325,6 +361,8 @@
 ### 错误修复和优化
 - 当应用程序基 URL 为“/”或空时，通过解析具有相对基数的公共图像 URL（而不是 file:// 下的根相对 URL），修复了社交联系按钮图标未在打包的 Electron 版本中加载的问题。
 - 更新了窗口控件的 Playwright 组件覆盖范围，以匹配当前的标记和辅助功能标签。
+
+---
 
 ## 2.2.1 - 类型命名和一致性扫描
 
@@ -347,6 +385,8 @@
 - 澄清了代理/规则/技能指南，因此 Vitest 明确将 `src/` 和 `src-electron/` 视为一流的单元测试表面，同时保留 Playwright 作为集成/运行时层。
 - 澄清了测试数据规则：自动测试装置在每个“*.vitest.test.ts”/“*.playwright.test.ts”中保持内联，组件测试有效负载在可能的情况下使用“COMPONENT_PROPS”，嵌入式组件模式菜单数据在“AppControlMenus”中保持内联以用于对话框触发器。- 解决了引导外部链接 Vitest 模拟中的 ESLint 发现（“事件”监听器输入和填充块）。
 
+---
+
 ## 2.2.0 - 测试和代理工具
 
 ### 新功能
@@ -358,11 +398,15 @@
 - 将共享类型声明中剩余的 TypeScript `any` 注释替换为 `unknown`，以保持菜单触发器和 Vue 组件类型更加严格。
 - 为 Vue、TypeScript 脚本、Vitest 和 Playwright 规则/技能添加了明确的反“任何”指南，以保持未来代码的强类型化。
 
+---
+
 ## 2.1.0 - 工具和人工智能辅助开发
 
 ### 新功能
 - Vue/Quasar、BEM 和范围 SCSS、Playwright 和 Vitest、Electron 预加载、全局 SCSS、常规 Git 提交以及与应用程序版本相关的 en-US 变更日志维护的光标项目规则和技能。
 - AGENTS.md作为AI辅助开发的项目入口点。
+
+---
 
 ## 2.0.0 - 大重写
 

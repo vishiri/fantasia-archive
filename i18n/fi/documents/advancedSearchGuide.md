@@ -57,6 +57,8 @@ Edistyneen hakutoiminnon lisäksi Fantasia Archive tarjoaa myös välittömän s
     - "^f" - Näyttää vain asiakirjat, joissa "On valmis" on valittuna
     - "^m" - Näyttää vain asiakirjat, joissa "On pieni asiakirja" on valittuna ja jotka ovat yleensä näkymättömiä ja suodatettu pois
 
+---
+
 ## Koko haun suodatus
 
 Tämä ominaisuus on tarkoitettu enimmäkseen niille, jotka tarvitsevat täyden mittakaavan haun, joka voi indeksoida minkä tahansa asiakirjan minkä tahansa kentän löytääkseen arvot lähes kaikkialla tiedoissa. Täyshaun suodatuksen avulla voit rajata tuloksia hakemalla koko asiakirjatietokannasta ja paikantamalla tarvitsemasi tiedot.

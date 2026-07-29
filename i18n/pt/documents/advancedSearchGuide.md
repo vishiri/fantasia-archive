@@ -57,6 +57,8 @@ Além da funcionalidade de pesquisa avançada, Fantasia Archive também oferece 
     - `^f` - Exibe apenas documentos com `Finalizado` marcado
     - `^m` - Exibe apenas documentos com a opção `É um documento secundário` marcada, que normalmente são invisíveis e filtrados
 
+---
+
 ## Filtragem de pesquisa completa
 
 Esse recurso destina-se principalmente àqueles que precisam de uma pesquisa em grande escala que possa rastrear qualquer campo em qualquer documento para corresponder a valores em quase qualquer lugar dos dados. A filtragem de pesquisa completa permite restringir os resultados pesquisando todo o banco de dados de documentos e identificando o que você precisa.

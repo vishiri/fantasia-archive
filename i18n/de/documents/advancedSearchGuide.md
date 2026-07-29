@@ -57,6 +57,8 @@ Zusätzlich zur erweiterten Suchfunktion bietet Fantasia Archive auch eine sofor
     - „^f“ – Zeigt nur Dokumente an, bei denen „Ist fertig“ aktiviert ist
     - „^m“ – Zeigt nur Dokumente an, bei denen „Ist ein untergeordnetes Dokument“ aktiviert ist, die normalerweise unsichtbar sind und herausgefiltert werden
 
+---
+
 ## Vollständige Suchfilterung
 
 Diese Funktion ist vor allem für diejenigen gedacht, die eine umfassende Suche benötigen, die jedes Feld in jedem Dokument durchsuchen kann, um Werte an fast jeder beliebigen Stelle in den Daten abzugleichen. Mit der vollständigen Suchfilterung können Sie die Ergebnisse eingrenzen, indem Sie die gesamte Dokumentdatenbank durchsuchen und genau das finden, was Sie benötigen.

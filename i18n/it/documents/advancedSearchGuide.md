@@ -57,6 +57,8 @@ Oltre alla funzionalità di ricerca avanzata, Fantasia Archive offre anche un fi
     - `^f` - Visualizza solo i documenti con la spunta su "È finito".
     - `^m` - Visualizza solo i documenti con la spunta su "È un documento minore", che normalmente sono invisibili e filtrati
 
+---
+
 ## Filtraggio della ricerca completa
 
 Questa funzionalità è pensata principalmente per coloro che necessitano di una ricerca su vasta scala in grado di eseguire la scansione di qualsiasi campo in qualsiasi documento per far corrispondere valori quasi ovunque nei dati. Il filtraggio della ricerca completa ti consente di restringere i risultati effettuando una ricerca nell'intero database di documenti e individuando ciò di cui hai bisogno.

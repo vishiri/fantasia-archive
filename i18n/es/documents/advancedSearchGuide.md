@@ -57,6 +57,8 @@ Además de la funcionalidad de búsqueda avanzada, Fantasia Archive también ofr
     - `^f`: muestra solo los documentos con "Está terminado" marcado
     - `^m`: muestra solo los documentos con la opción "Es un documento menor" marcado, que normalmente son invisibles y están filtrados.
 
+---
+
 ## Filtrado de búsqueda completa
 
 Esta característica está destinada principalmente a aquellos que necesitan una búsqueda a gran escala que pueda rastrear cualquier campo en cualquier documento para hacer coincidir valores en casi cualquier parte de los datos. El filtrado de búsqueda completa le permite limitar los resultados buscando en toda la base de datos de documentos y señalando lo que necesita.

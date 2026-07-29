@@ -57,6 +57,8 @@ En plus de la fonctionnalité de recherche avancée, Fantasia Archive offre éga
     - `^f` - Affiche uniquement les documents avec la case `Est terminé` cochée
     - `^m` - Affiche uniquement les documents avec la case `Est-ce un document mineur` coché, qui sont normalement invisibles et filtrés
 
+---
+
 ## Filtrage de recherche complète
 
 Cette fonctionnalité est principalement destinée à ceux qui ont besoin d'une recherche à grande échelle capable d'explorer n'importe quel champ de n'importe quel document pour faire correspondre les valeurs presque n'importe où dans les données. Le filtrage de recherche complète vous permet d'affiner les résultats en recherchant dans l'ensemble de la base de données de documents et en identifiant ce dont vous avez besoin.

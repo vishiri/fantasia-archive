@@ -57,6 +57,8 @@ Förutom den avancerade sökfunktionen erbjuder Fantasia Archive även omedelbar
     - `^f` - Visar endast dokument med `Är klar` markerat
     - `^m` - Visar endast dokument med `Är ett mindre dokument` markerat, som normalt är osynliga och filtrerade bort
 
+---
+
 ## Helsökningsfiltrering
 
 Den här funktionen är främst avsedd för dem som behöver fullskalig sökning som kan genomsöka vilket fält som helst i vilket dokument som helst för att matcha värden nästan var som helst i datan. Fullständig sökningsfiltrering låter dig begränsa resultaten genom att söka i hela dokumentdatabasen och hitta vad du behöver.

@@ -1,5 +1,5 @@
 # Vinkkejä, temppuja ja triviaa
------------
+----------
 
 - Kun kirjoitat @-kirjaimen, kun muokkaat suuria tekstikenttiä, voit linkittää muihin asiakirjoihin suoraan tekstieditorissa!
 - `Ctrl+Shift+F` avaa etsinnän nykyisessä asiakirjassa, kun tarvitset tietyn sanan sivulla!

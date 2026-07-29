@@ -7,6 +7,8 @@
 - **Impostazioni progetto**: gli utenti di lettori di schermo ottengono controlli etichettati in tutto il dialogo. I campi di filtro **Mondi** e **Modelli di documento**, i loro controlli di cancellazione, il filtro **Modelli di documento disponibili**, le icone di aiuto **Colore mondo** e **Tavolozza colori mondo**, ogni campione della tavolozza e l'icona di aiuto **Appendice del mondo** ora espongono nomi accessibili in ogni lingua di interfaccia supportata.
 - **Impostazioni progetto**: il pulsante condiviso di conferma eliminazione usato da **Mondi** e **Modelli di documento** espone la sua etichetta, la richiesta di conferma e il conto alla rovescia alle tecnologie assistive.
 
+---
+
 ## 2.4.14 - Versione bump
 
 ### Nuove funzionalità
@@ -16,6 +18,8 @@
 ### Correzioni di bug e ottimizzazioni
 - **Impostazioni progetto**: **Elimina mondo** nella riga dettaglio **Mondi** si allinea verticalmente con **Nome mondo** e **Colore mondo**.
 - **Selettore lingua**: **Svenska** mostra ora la bandiera della Svezia invece di quella di El Salvador.
+
+---
 
 ## 2.4.13 - Versione bump
 
@@ -44,6 +48,8 @@
 - **Storybook**: **AppControlMenus** La descrizione del componente Autodoc elenca le righe correnti di **Gestione progetti** in modo che corrispondano a **`_data/project`** dopo le modifiche al menu.
 - **Test** — **`checkProjectStyling`** end-to-end rinomina **`.faproject`** le baseline delle apparecchiature e i titoli delle suite in modo che il flusso **Progetto personalizzato CSS** descriva l'anteprima live di Monaco, la persistenza di SQLite, la cancellazione del foglio di stile e l'isolamento per progetto invece delle etichette opache **alpha** / **beta**. Il cablaggio del componente **`WindowProjectStyling.playwright.test`** copre il cromo mobile, **Monaco** caricato a freddo, l'elenco dei temi del pannello della guida e **Chiudi senza salvare** lasciando vuoto il progetto memorizzato CSS.- **Test** — **`checkProjectManagementFlow`** end-to-end ora asserisce splash **Riprendi l'ultimo progetto** (**Le etichette a discesa MRU** corrispondono a **Progetto → Carica progetto recente**, ricarica tramite il segmento primario diviso dopo il ripristino della sessione di controllo ortografico, carica da un'altra riga recente).
 - **Test** — **`checkProjectOsOpenArgv`** riproduce il pacchetto **electron.launch argv** con apertura a freddo con **`FA_E2E_OS_OPEN=1`** isolato dai normali lanci solo splash.
+
+---
 
 ## 2.4.12 - Versione bump
 
@@ -92,6 +98,8 @@
 - **Electron desktop**: il percorso **`BrowserWindow` `preload`** si risolve nell'artefatto **`preload/electron-preload.cjs`** del pacchetto Quasar in modo che le API **`contextBridge`** (**`window.faContentBridgeAPIs`**) vengano inizializzate in modo affidabile invece di saltare silenziosamente il precaricamento quando nomi di file o cartelle derivano dal bundle **`dev`** disposizione.- **Monitor azioni**: le righe della cronologia di **Caricamento progetto** riuscite mantengono vuoto il payload di accodamento ma allegano un'anteprima di chiusura con il percorso **`.faproject`** scelto e il nome del progetto caricato, in linea con il modo in cui **Nuovo progetto** presenta i dettagli dopo il completamento; quando l'apertura fallisce dopo aver selezionato un file, le righe non riuscite possono includere il messaggio più il percorso tentato quando la shell del desktop lo fornisce.
 - **Electron desktop**: **`faRoutingEnv`** attende brevemente lo snapshot precaricato dell'**ambiente extra** prima di gestire i percorsi iniziali del cablaggio, evitando una corsa di avvio in cui il ponte si attacca dopo la prima verniciatura del renderer.
 - **Playwright helpers**: il codice di cablaggio per il componente Electron e le suite **E2E** è suddiviso in **`helpers/playwrightHelpers_universal`**, **`helpers/playwrightHelpers_e2e`** e **`helpers/playwrightHelpers_component`**, con aiutanti di lancio e smontaggio condivisi in modo che i blocchi seriali **`beforeAll`** rimangano uniformi; **`README`** e le note del contributore elencano i percorsi di importazione aggiornati.
+
+---
 
 ## 2.4.11 - Versione bump
 
@@ -150,6 +158,8 @@
 - **Storybook** workspace **Vite** aggiunge **`server.fs.allow`** per la root del repository in modo che le **Impostazioni keybind** **`.vue`** file possano risolvere le importazioni di contratti **`types/`** fratelli durante build statiche e acquisizioni visive.- **Storybook** **regressione visiva statica** (**`yarn test:storybook:visual`**): **Vite** risolve **Pinia** e **Vue** dalla radice del repository in modo che l'area di lavoro nidificata non carichi una seconda copia **Pinia** che impediva il montaggio delle storie di dialogo nell'**iframe**. Il cablaggio **Playwright** serve la build statica su una porta dedicata e non riutilizza un server esistente lì, quindi una sessione locale **`yarn storybook:run`** sulla porta predefinita non può soddisfare le acquisizioni accidentali. Le acquisizioni non riuscite allegano comunque uno screenshot dell'intera pagina e un breve sondaggio **JSON** della root **Storybook** quando la navigazione, i controlli di rendering, i caratteri, le sovrapposizioni o il passaggio dello screenshot non riescono.
 - **Manutenzione del collaboratore**: **Vitest** specifiche per **AppControlMenus**, **AppControlSingleMenu**, **GlobalLanguageSelector** (incluso il percorso di ritardo dell'aggiornamento del controllo ortografico), **GlobalWindowButtons**, **ErrorCard**, **Impostazioni app** blocchi di impostazione e schermate espanse delle impostazioni di **dialogo** che esercitano i rami del cablaggio della barra superiore, la selezione della lingua, i timer di Chrome delle finestre e **Quasar** percorsi di clic del menu in jsdom. Le specifiche della finestra di dialogo multi-stub utilizzano la stessa eccezione **ESLint** a livello di file già applicata ai test di cablaggio di protezione dello stack.- **Manutenzione del collaboratore**: maggiore copertura **Vitest** jsdom per **DialogActionMonitor** aggiornamento della finestra di dialogo, **DialogImportExportAppConfig** apre e importa staging, **DialogKeybindSettings** quando l'elenco delle definizioni di associazione di tasti è vuoto, **_FaFloatingWindowFrameResizeHandles** passaggio del mouse e ogni destinazione del puntatore di ridimensionamento, descrizione comando dell'editor **WindowAppStyling** contenuto più caricamento, sovrapposizioni di errore di caricamento e cablaggio del puntatore del frame, aggiornamento dello stile dell'app **MainLayout** quando il bridge **Electron** lo espone o meno, trigger del menu markdown per il test dei componenti **AppControlMenus**, righe del sottomenu **AppControlSingleMenu** senza gestori di clic, **GlobalLanguageSelector** quando il bridge delle impostazioni utente è assente e **_FaUserCssInjector** salto del testo di stile duplicato scrive.
 
+---
+
 ## 2.4.10 - Impostazioni dell'app, ErrorCard, token del tema e strumenti del collaboratore
 
 ### Nuove funzionalità
@@ -202,6 +212,8 @@
 - **Electron Playwright** esegue allega registrazioni dello schermo **WebM** per test; aprire **`test-results/playwright-report/index.html`** dopo **`yarn test:components`** o **`yarn test:e2e`** (o gli script **`:single`**) per rivedere i video negli **Allegati** di ciascun test (file in **`test-results/playwright-report/data/`**). Ogni esecuzione Playwright **sostituisce** il report HTML; **`scripts/playwrightWithArtifactTrim.mjs`** rimuove **`test-results/playwright-artifacts`** dopo questi comandi di filo in modo che l'output di scratch non venga mantenuto tra le esecuzioni. Documentato nelle linee guida **README**, **AGENTS** e Cursor **fantasia-testing** / **playwright-test**; opzionale **`FA_PLAYWRIGHT_NO_VIDEO`** salta la registrazione.
 - Rimosso un **HTML** **textarea** vagante dal modello di pagina **Indice**.
 
+---
+
 ## 2.4.9 - Strumenti del collaboratore, finestre di dialogo Pinia e rafforzamento della CI
 
 ### Correzioni di bug e ottimizzazioni
@@ -209,6 +221,8 @@
 - Risolto il problema con il flusso di dialogo **Pinia 3**: **`S_DialogMarkdown`** e **`S_DialogComponent`** sono ora archivi di configurazione standard (chiama **`S_DialogMarkdown()`** / **`S_DialogComponent()`** nei siti di utilizzo). **`openDialogMarkdownDocument`**, **`DialogMarkdownDocument`** e **`DialogAboutFantasiaArchive`** utilizzano osservatori sorvegliati quando un negozio non è attivo (ad esempio **Storybook**). **`ComponentTesting`** gestisce gli instradamenti **`componentName`** mancanti in modo sicuro ed esegue il rendering del cablaggio solo dopo aver risolto un SFC corrispondente.- Semplificata la pagina di anteprima **Index** rimuovendo il blocco aggiuntivo **Fantasia Mascot** dal percorso predefinito **`IndexPage`** (mantiene il percorso come una shell leggera per collegamenti/test locali).
 - Script dei contributori **Yarn** rinominati e raggruppati per maggiore chiarezza: controlli di qualità **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**; lint **`yarn lint:eslint`**, **`yarn lint:typescript`**, **`yarn lint:stylelint`**; Quasar Electron **`yarn quasar:build:elettrone`** / **`yarn quasar:dev:elettrone`**; Playwright **`yarn test:components`** e con suffisso due punti **`test:components:*`**, **`test:e2e:*`**; Storybook dev **`yarn storybook:run`** e statico **`yarn storybook:build`** (precedentemente **`build-storybook`**). Rimossi **`yarn test:full`** obsoleti e duplicati **`yarn visual:storybook:ci`**; **GitHub Le azioni** chiamano direttamente **`yarn visual:storybook:test`**. Aggiornati **README**, **AGENTS**, regole/competenze del cursore, **`package.json`**, **`testRunner_*.mjs`** e flussi di lavoro.- Storybook **output statico** (**`.storybook-workspace/storybook-static/`**), **Playwright** configurazione di regressione visiva, **`visual-tests/`** (incluse le istantanee memorizzate), spazio di lavoro **`storybook:visual:*`** script e VRT devDependencies (**`http-server`**, **`@playwright/test`**) in **`.storybook-workspace/`**; root **`yarn visual:storybook:*`** delega con **`yarn --cwd .storybook-workspace`**. Aggiornati i percorsi **`.gitignore`**, **`tsconfig.json`** e **`lint:eslint`**.
 - Imposta espliciti **`permessi`** (`contents: read`) con privilegi minimi espliciti sui flussi di lavoro **`verify`** e manuali **`build`** **GitHub Actions**; aggiunti **Revisione delle dipendenze**, **OSV Scanner** (flussi di lavoro riutilizzabili + pianificazione settimanale su **`master`**) e **Gitleaks** per l'igiene PR/push.
+
+---
 
 ## 2.4.8 - Pinia 3 e Vue Router 5
 
@@ -221,12 +235,16 @@
 - Ridotto il rumore di avviso Vue non utilizzabile nell'output del componente Vitest filtrando la risoluzione Quasar nota e gli avvisi di iniezione di solo test nella configurazione di test condivisa, mantenendo il segnale concentrato sugli errori che richiedono azioni.
 - Risolta la risoluzione CI TypeScript per le importazioni SFC Vue sostituendo il riferimento shim `.quasar` generato in `src/env.d.ts` con una dichiarazione in-repo `declare module '*.vue'`, quindi `yarn verify` ha esito positivo sui corridori GitHub puliti senza richiedere file shim `.quasar` locali/generati.
 
+---
+
 ## 2.4.7 - Allineamento Storybook 10 e Vite 8
 
 ### Correzioni di bug e ottimizzazioni
 - Aggiornato **`.storybook-workspace`** a **Storybook 10** e **Vite 8** in modo che le anteprime dei componenti vengano eseguite sulla stessa linea di bundle principale dell'app desktop (**`@quasar/app-vite`**), aggiornato il file di blocco nidificato **Yarn** per installazioni riproducibili (incluse le installazioni bloccate **CI**) e root allineato **Storybook** / **`eslint-plugin-storybook`** versioni con quella famiglia di rilascio.
 - File di lock **root** e **`.storybook-workspace`** aggiornati con **`yarn upgrade`** all'interno degli intervalli di semver esistenti (in particolare **Quasar**, **Vue**, **vue-i18n**, **Playwright**, **Sass** e strumenti correlati); mantenuto **`@types/node`** sulla riga di digitazione **22.x** per il motore **Node 22**. Aggiornati **README** e **AGENTS** in modo che i contributori vedano **Storybook 10** su **Vite 8** invece della vecchia dicitura split-Vite.
 - Aggiunto **`debug-storybook.log*`** a **`.gitignore`** in modo che i log diagnostici Storybook locali non vengano rilevati come file non tracciati.
+
+---
 
 ## 2.4.6 - Finestra cromata, Storybook, Stylelint e DevTools
 
@@ -239,6 +257,8 @@
 - Aggiornate **GitHub Actions** su **`verify`** e flussi di lavoro manuali **build** (**`actions/checkout`**, **`actions/setup-node`**, **`actions/upload-artifact`**) alle versioni principali attuali.
 - Notato in **`quasar.config.ts`** che si prevede che il peer **`electron`** di **`@electron/remote`** venga visualizzato come non soddisfatto durante UnPackaged **`yarn install --production`**; la creazione della confezione riesce comunque perché l'app viene eseguita sul runtime Electron in bundle.- L'anteprima di Storybook registra il plugin **`Dark`** di Quasar, il plugin dell'app **`@quasar/quasar-ui-qmarkdown`** (dopo Quasar, ordine di avvio corrispondente), **Roboto (latin-ext)** e **`preview-body.html`** / **`Dark.set(true)`** in modo che **`body--dark`** rimanga allineato con l'app; Sass **`additionalData`** salta **`app.scss`** per evitare il doppio caricamento delle variabili. I documenti del componente **Dialog** e **top-menu** utilizzano di nuovo **`parameters.docs.story.inline: false`** in modo che Autodocs non monti ogni storia in un documento (ciascun **`q-dialog`** si apre automaticamente al momento del montaggio, che sovrappone le modalità quando **`inline: true`**); ogni iframe di documenti nidificati carica comunque lo stesso stack di anteprima CSS.
 
+---
+
 ## 2.4.5 - Flusso di lavoro del collaboratore e CI
 
 ### Correzioni di bug e ottimizzazioni
@@ -249,6 +269,8 @@
 - Aggiunto un flusso di lavoro **GitHub Actions** che esegue **`yarn verify`** su **push** e **pull request** a **`master`** / **`main`** (inclusa l'installazione dello spazio di lavoro Storybook in modo che ESLint possa risolvere `.storybook-workspace/.storybook`).- File di lock **root** e **`.storybook-workspace`** aggiornati con **`yarn upgrade`** all'interno degli intervalli di semver esistenti (in particolare i più recenti **Playwright**, **Quasar**, **Vue**, **vue-i18n**, **Sass** e strumenti correlati dove gli intervalli sono consentiti).
 - Gli aiutanti del bridge **DevTools** utilizzano **`getCurrentWindow()`** invece di **`BrowserWindow.getFocusedWindow()`** in modo che **toggle/status** rimanga legato alla finestra dell'app quando i menu o DevTools cambiano il focus del sistema operativo, stabilizzando il controllo DevTools **E2E**.
 
+---
+
 ## 2.4.4 - Dipendenze e strumenti di sviluppo
 
 ### Correzioni di bug e ottimizzazioni
@@ -256,6 +278,8 @@
 - Aggiornato `jsdom` alla v29 per l'ambiente DOM Vitest, `eslint-plugin-n` alla v17 e aggiornato `@types/node` sulla riga di digitazione del Nodo 22.
 - Strumenti lint e tipi migrati alla configurazione flat **ESLint 9** (**neostandard**, **eslint-plugin-vue** v10, **typescript-eslint**), **TypeScript** 6 e **Stylelint** 17 con configurazioni condivisibili aggiornate; piccole modifiche al codice sorgente corrispondono a valori predefiniti più rigorosi (attributi di importazione, spaziatura dell'unione, protezione URL della finestra di sviluppo, QMarkdown CSS shim).
 - **AGENTI**, regole del cursore e competenze allineati in modo che il flusso di lavoro standard di pre-commit e pre-changelog esegua sempre **ESLint**, **TypeScript (`tsc`)**, **Stylelint** e **unit test** in quest'ordine; il **quality gate** può essere eseguito come un comando terminale concatenato per efficienza, con comandi individuali riservati al debug degli errori. I controlli **Build** e **Playwright** prevedono un comando per terminale.
+
+---
 
 ## 2.4.3 - Aggiornamenti aggiuntivi delle dipendenze e flusso di lavoro di test migliorato
 
@@ -265,6 +289,8 @@
 - Aggiunte indicazioni persistenti sull'agente/test per eseguire ciascun comando di convalida in un'invocazione terminale isolata per mantenere gli output dei test lunghi leggibili e più facili da controllare.
 - Allineato il blocco del log delle modifiche "2.4.3" con la versione canonica di "package.json" e rafforzata la guida per i contributori in modo che le modifiche del log delle modifiche rileggano sempre prima "package.json" live, evitando deviazioni di sezione/versione.
 
+---
+
 ## 2.4.2 - Aggiornamento delle dipendenze principali e convalida del flusso di lavoro Quasar/Vite
 
 ### Correzioni di bug e ottimizzazioni
@@ -272,12 +298,16 @@
 - Dipendenze dell'app principale e degli strumenti aggiornati (inclusi Quasar extra/qmarkdown, Axios, Pinia, Vue Router, Vitest e plug-in ESLint selezionati) per ridurre i rischi di manutenzione rimanendo nell'attuale architettura del progetto.
 - Applicato un aggiornamento degli strumenti di follow-up per il flusso di lavoro Quasar/Vite (`@quasar/app-vite`, `@intlify/unplugin-vue-i18n`, `vite-plugin-checker`, `eslint-plugin-vue` e `@types/node`) con lint completo, controllo del tipo, unità, componente, E2E e convalida della build.
 
+---
+
 ## 2.4.1 - Blocco delle policy del log delle modifiche e verifica della stabilità dei componenti
 
 ### Correzioni di bug e ottimizzazioni
 - Risolto il problema con il rilevamento del test dei componenti Playwright per `DialogAboutFantasiaArchive` evitando le importazioni complete del caricatore i18n che inseriscono documenti di markdown nel caricamento del test lato nodo.
 - Aggiornate le asserzioni dei pulsanti social della finestra di dialogo per confrontare le etichette visualizzate, corrispondere all'output corrente dell'interfaccia utente e mantenere stabili i test dei componenti.
 - Guida del progetto bloccata per **non eseguire mai il bumping automatico delle versioni**; Le sezioni del registro delle modifiche ora seguono rigorosamente la versione esistente di "package.json" a meno che non venga esplicitamente richiesta una modifica manuale.
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 e toolchain Node 22
 
@@ -293,6 +323,8 @@
 - Configurazione **Quasar/electron-builder** ottimizzata per digitazioni e pacchetti più rigorosi: involucro PWA `workboxMode` (`GenerateSW`), blocco **`bex`** vuoto corrispondente ai tipi Quasar attuali, Linux **`desktop.entry`** per Electron-Builder 26, più collante del progetto TypeScript (`env.d.ts` Vue riferimento shim, gestione dell'aumento vue-i18n) in modo che `lint:types` rimanga affidabile.- Risolto il problema relativo alla deprecazione di **Dart Sass 2** in SCSS condiviso tramite `sass:color` nelle variabili Quasar e negli stili della barra di scorrimento (in sostituzione degli helper colore legacy).
 - **Promemoria installazione:** il pacchetto **`electron`** necessita del download **postinstallazione**; saltare gli script del ciclo di vita (ad esempio `npm install --ignore-scripts`) può lasciare un file binario danneggiato finché non si reinstalla o si esegue `node node_modules/electron/install.js`.
 
+---
+
 ## 2.3.2 - Storybook layout, pagine e strumenti per i contributori
 
 ### Nuove funzionalità
@@ -307,12 +339,16 @@
 - Rimosso un blocco di stile con ambito vuoto da "SocialContactButtons" emerso dal linting dello stile.
 - Copertura Vitest e Playwright aggiornata (gestore dei collegamenti esterni, immagine della mascotte, controlli delle finestre) per corrispondere al comportamento e ai selettori attuali.
 
+---
+
 ## 2.3.1 - Icona del pacchetto Electron e copertura della favicon
 
 ### Correzioni di bug e ottimizzazioni
 - Aggiunta la configurazione esplicita dell'icona Electron Builder per Windows, macOS e Linux, inclusi i metadati della voce desktop Linux e la configurazione della destinazione Linux.
 - Collegate tutte le dimensioni delle favicon generate in `index.html` in modo che le dichiarazioni delle icone del renderer coprano l'intero set `public/icons/`.
 - Aggiornata la dicitura del markdown del registro delle modifiche per evitare errori di analisi in fase di compilazione nella pipeline qmarkdown/Vite durante le build di produzione Electron.
+
+---
 
 ## 2.3.0 - Storybook area di lavoro e rifinitura del desktop
 
@@ -325,6 +361,8 @@
 ### Correzioni di bug e ottimizzazioni
 - Risolto il problema con le icone dei pulsanti dei contatti social che non venivano caricate nelle build Electron in pacchetto risolvendo gli URL di immagini pubbliche con una base relativa quando l'URL di base dell'app è "/" o vuoto, invece degli URL relativi alla radice in file://.
 - Aggiornata la copertura dei componenti Playwright per i controlli delle finestre in modo che corrispondano al markup corrente e alle etichette di accessibilità.
+
+---
 
 ## 2.2.1 - Denominazione del tipo e scansione della coerenza
 
@@ -347,6 +385,8 @@
 - Chiarite le indicazioni su AGENTS/regole/competenze in modo che Vitest tratti esplicitamente sia `src/` che `src-electron/` come superfici di test unitario di prima classe mantenendo Playwright come livello di integrazione/runtime.
 - Regole dei dati di test chiarite: i dispositivi di test automatizzati rimangono in linea in ogni `*.vitest.test.ts` / `*.playwright.test.ts`, i payload di test dei componenti utilizzano `COMPONENT_PROPS` ove possibile e i dati del menu in modalità componente incorporati rimangono in linea in "AppControlMenus" per i trigger di dialogo.- Risolti i problemi ESLint nei mock del collegamento esterno di avvio Vitest (digitazione del listener `Event` e blocchi imbottiti).
 
+---
+
 ## 2.2.0 - Test e strumenti dell'agente
 
 ### Nuove funzionalità
@@ -357,6 +397,8 @@
 ### Correzioni di bug e ottimizzazioni
 - Sostituite le restanti annotazioni TypeScript "any" nelle dichiarazioni di tipo condiviso con "unknown" per mantenere la digitazione del trigger di menu e del componente Vue più rigorosa.
 - Aggiunta una guida esplicita anti-`any` agli script Vue, TypeScript, Vitest e Playwright regole/abilità per mantenere il codice futuro fortemente tipizzato.
+
+---
 
 ## 2.1.0 - Strumenti e sviluppo assistito dall'intelligenza artificiale
 

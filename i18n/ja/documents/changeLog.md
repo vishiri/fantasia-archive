@@ -7,6 +7,8 @@
 - **プロジェクト設定**: スクリーンリーダーのユーザーはダイアログ全体でラベル付きのコントロールを利用できるようになりました。**世界**と**ドキュメントテンプレート**のフィルターフィールド、それらのクリアコントロール、**利用可能なドキュメントテンプレート**フィルター、**世界の色**と**世界のカラーパレット**のヘルプアイコン、各パレットのスウォッチ、および**世界の付録**のヘルプアイコンが、サポートされているすべてのインターフェイス言語でアクセシブルな名前を公開するようになりました。
 - **プロジェクト設定**: **世界**と**ドキュメントテンプレート**で使用される共有の削除確認ボタンが、そのラベル、確認プロンプト、カウントダウンを支援技術に公開します。
 
+---
+
 ## 2.4.14 - バージョンバンプ
 
 ### 新機能
@@ -16,6 +18,8 @@
 ### バグ修正と最適化
 - **プロジェクト設定**: **世界を削除**は**世界**詳細行で**世界名**と**世界の色**に縦方向で揃います。
 - **言語セレクター**: **Svenska**はエルサルバドルではなくスウェーデンの国旗を表示します。
+
+---
 
 ## 2.4.13 - バージョンバンプ
 
@@ -44,6 +48,8 @@
 - **Storybook**: **AppControlMenus** Autodocs コンポーネントの説明には、現在の **プロジェクト管理** 行がリストされているため、メニュー変更後の **`_data/project`** と一致します。
 - **テスト** — エンドツーエンドの **`checkProjectStyling`** は **`.faproject`** フィクスチャ ベースラインとスイート タイトルを変更します。そのため、**カスタム プロジェクト CSS** フローは、Monaco ライブ プレビュー、SQLite 永続化、スタイルシートのクリア、および不透明な **alpha** / **beta** ラベルの代わりにプロジェクトごとの分離を記述します。コンポーネント ハーネス **`WindowProjectStyling.playwright.test`** は、フローティング クロム、コールドロードされた **Monaco**、ヘルプ パネルのテーマ リスト、および保存されたプロジェクト CSS を空にしたまま **保存せずに閉じる** をカバーします。- **テスト** — **`checkProjectManagementFlow`** エンドツーエンドでスプラッシュ **最新プロジェクトの再開** がアサートされるようになりました (**MRU ドロップダウン ラベル** は **プロジェクト → 最近のプロジェクトをロード** と一致し、スペルチェック セッションのリセット後に分割されたプライマリ セグメントを通じて再ロードし、別の最近の行からロードします)。
 - **テスト** - **`checkProjectOsOpenArgv`** は、通常のスプラッシュのみの起動から分離された **`FA_E2E_OS_OPEN=1`** でパッケージ化された **electron.launch argv** コールド オープンをリプレイします。
+
+---
 
 ## 2.4.12 - バージョンバンプ
 
@@ -92,6 +98,8 @@
 - **Electron デスクトップ**: **`BrowserWindow` `preload`** パスは Quasar のパッケージ化された **`preload/electron-preload.cjs`** アーティファクトに解決されるため、ファイル名またはフォルダーがデスクトップから移動した場合に、**`contextBridge`** API (**`window.faContentBridgeAPIs`**) がプリロードを自動的にスキップするのではなく、確実に初期化されます。 **`dev`** バンドル レイアウト。- **アクション モニター**: 成功した **プロジェクトのロード** 履歴行はエンキュー ペイロードを空のままにしますが、選択した **`.faproject`** パスとロードされたプロジェクト名を含む終了プレビューを添付します。これは、**新しいプロジェクト** が完了後に詳細を表示する方法に合わせて行われます。ファイルを選択した後に開くことができない場合、失敗した行にはメッセージと、デスクトップ シェルが提供する試行されたパスが含まれる可能性があります。
 - **Electron デスクトップ**: **`faRoutingEnv`** は、最初のハーネス ルートをステアリングする前にプリロード **追加環境** スナップショットを短時間待機し、最初のレンダラー ペイント後にブリッジが接続される起動競合を回避します。
 - **Playwright ヘルパー**: Electron コンポーネントおよび **E2E** スイートのハーネス コードは、**`helpers/playwrightHelpers_universal`**、**`helpers/playwrightHelpers_e2e`**、および **`helpers/playwrightHelpers_component`** に分割されており、起動ヘルパーとティアダウン ヘルパーが共有されるため、シリアル **`beforeAll`** ブロックは均一に保たれます。 **「README」** と寄稿者のメモには、更新されたインポート パスがリストされています。
+
+---
 
 ## 2.4.11 - バージョンアップ
 
@@ -150,6 +158,8 @@
 - **Storybook** ワークスペース **Vite** は、リポジトリ ルートに **`server.fs.allow`** を追加します。これにより、**キーバインド設定** **`.vue`** ファイルは、静的ビルドおよびビジュアル キャプチャ中に兄弟 **`types/`** コントラクト インポートを解決できるようになります。- **Storybook** 静的 **ビジュアル回帰** (**`yarn test:storybook:visual`**): **Vite** は、リポジトリ ルートから **Pinia** と **Vue** を解決するため、ネストされたワークスペースは、ダイアログ ストーリーが **iframe** にマウントされるのを妨げる 2 番目の **Pinia** コピーをロードしません。 **Playwright** ハーネスは専用ポート上で静的ビルドを提供し、そこで既存のサーバーを再利用しないため、デフォルト ポート上のローカル **`yarn storybook:run`** セッションが誤ってキャプチャを満たすことはできません。ナビゲーション、レンダリング チェック、フォント、オーバーレイ、またはスクリーンショットのステップが失敗した場合でも、失敗したキャプチャには、フルページのスクリーンショットと **Storybook** ルートの短い **JSON** プローブが添付されます。
 - **共同作成者メンテナンス**: **AppControlMenus**、**AppControlSingleMenu**、**GlobalLanguageSelector** (スペルチェック更新遅延パスを含む)、**GlobalWindowButtons**、**ErrorCard**、**アプリ設定** 設定ブロック、および拡張された **ダイアログ** 設定画面の **Vitest** 仕様により、トップバーのハーネス分岐、言語選択、ウィンドウ クロム タイマーが実行されます。 **Quasar** メニューをクリックすると、jsdom のパスが表示されます。マルチスタブ ダイアログの仕様では、スタック ガード ハーネス テストにすでに適用されているものと同じファイル レベルの **ESLint** 例外が使用されます。- **コントリビューター メンテナンス**: **DialogActionMonitor** ダイアログ表示の更新に関する **Vitest** jsdom カバレッジの詳細、**DialogImportExportAppConfig** が開いてステージングをインポート、キーバインド定義リストが空の場合の **DialogKeybindSettings**、**_FaFloatingWindowFrameResizeHandles** ホバーとすべてのサイズ変更ポインター ターゲット、**WindowAppStyling** エディター ヘルプツールチップ コンテンツ、読み込みおよび読み込みエラーのオーバーレイ、およびフレーム ポインターの配線、**Electron** ブリッジが公開するかどうかに応じた **MainLayout** アプリのスタイルの更新、**AppControlMenus** コンポーネント テストのマークダウン メニュー トリガー、クリック ハンドラーのない **AppControlSingleMenu** サブメニュー行、ユーザー設定ブリッジが存在しない場合の **GlobalLanguageSelector**、および重複スタイルのスキップを行う **_FaUserCssInjector**テキストが書きます。
 
+---
+
 ## 2.4.10 - アプリ設定、ErrorCard、テーマ トークン、および共同作成者ツール
 
 ### 新機能
@@ -202,6 +212,8 @@
 - **Electron Playwright** は、テストごとに **WebM** 画面記録を添付して実行します。 **`yarn test:components`** または **`yarn test:e2e`** (または **`:single`** スクリプト) の後に **`test-results/playwright-report/index.html`** を開き、各テストの **添付ファイル** の下にあるビデオ (**`test-results/playwright-report/data/`** の下にあるファイル) を確認します。 Playwright を実行するたびに、その HTML レポートが **置き換えられます**。 **`scripts/playwrightWithArtifactTrim.mjs`** は、これらの糸コマンドの後に **`test-results/playwright-artifacts`** を削除するため、実行間でスクラッチ出力が保持されません。 **README**、**AGENTS**、および Cursor **fantasia-testing** / **playwright-tests** ガイダンスに文書化されています。オプションの **`FA_PLAYWRIGHT_NO_VIDEO`** は録画をスキップします。
 - **インデックス** ページ テンプレートから不要な **HTML** **textarea** を削除しました。
 
+---
+
 ## 2.4.9 - Contributor ツール、Pinia ダイアログ、および CI の強化
 
 ### バグ修正と最適化
@@ -209,6 +221,8 @@
 - **Pinia 3** ダイアログ フローを修正: **`S_DialogMarkdown`** および **`S_DialogComponent`** は標準セットアップ ストアになりました (使用サイトで **`S_DialogMarkdown()`** / **`S_DialogComponent()`** を呼び出します)。 **`openDialogMarkdownDocument`**、**`DialogMarkdownDocument`**、および **`DialogAboutFantasiaArchive`** は、ストアがアクティブでないときに保護されたウォッチャーを使用します (例: **Storybook**)。 **`ComponentTesting`** は、不足している **`componentName`** ルートを安全に処理し、一致する SFC が解決された後にのみハーネスをレンダリングします。- デフォルトの **`IndexPage`** ルートから余分な **Fantasia Mascot** ブロックを削除することで、**Index** プレビュー ページを簡素化しました (ルートをローカル リンク/テスト用の軽量シェルとして保持します)。
 - わかりやすくするために **Yarn** コントリビューター スクリプトの名前を変更してグループ化しました: 品質ゲート **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**; lint **`yarn lint:eslint`**、**`yarn lint:typescript`**、**`yarn lint:stylelint`**; Quasar Electron **`糸クェーサー:ビルド:電子`** / **`糸クェーサー:dev:電子`**; Playwright **`yarn test:components`** およびコロン接尾辞付き **`test:components:*`**, **`test:e2e:*`**; Storybook dev **`yarn storybook:run`** および静的 **`yarn storybook:build`** (以前の **`build-storybook`**)。廃止された **`yarn test:full`** と重複した **`yarn Visual:storybook:ci`** を削除しました。 **GitHub アクション**は **`yarn Visual:storybook:test`** を直接呼び出します。 **README**、**AGENTS**、カーソル ルール/スキル、**`package.json`**、**`testRunner_*.mjs`**、およびワークフローを更新しました。- 併置された Storybook **静的出力** (**`.storybook-workspace/storybook-static/`**)、**Playwright** ビジュアル回帰構成、**`visual-tests/`** (コミットされたスナップショットを含む)、ワークスペース **`storybook:visual:*`** スクリプト、および VRT devDependency (**`http-server`**、 **`@playwright/test`**) **`.storybook-workspace/`** の下; root **`yarn Visual:storybook:*`** は **`yarn --cwd .storybook-workspace`** でデリゲートします。 **`.gitignore`**、**`tsconfig.json`**、および **`lint:eslint`** のパスを更新しました。
 - **`verify`** および手動 **`build`** **GitHub アクション** ワークフローに明示的な最小特権 **`permissions`** (`contents: read`) を設定します。 **依存関係のレビュー**、**OSV スキャナ** (再利用可能なワークフロー + **`master`** の週次スケジュール)、および PR/プッシュの衛生管理のための **Gitleaks** を追加しました。
+
+---
 
 ## 2.4.8 - Pinia 3 および Vue ルーター 5
 
@@ -221,12 +235,16 @@
 - 共有テスト設定で既知の Quasar 解像度とテストのみの注入警告をフィルタリングすることで、コンポーネント Vitest 出力の対処不可能な Vue 警告ノイズを削減し、対処可能な障害に信号を集中させます。
 - `src/env.d.ts` 内の生成された `.quasar` シム参照をリポジトリ内の `declare module '*.vue'` 宣言に置き換えることにより、Vue SFC インポートの CI TypeScript 解決を修正しました。これにより、ローカル/生成された `.quasar` shim ファイルを必要とせずに、クリーンな GitHub ランナーで `yarn verify` が成功します。
 
+---
+
 ## 2.4.7 - Storybook 10 と Vite 8 の位置合わせ
 
 ### バグ修正と最適化
 - **`.storybook-workspace`** を **Storybook 10** および **Vite 8** にアップグレードし、コンポーネント プレビューがデスクトップ アプリ (**`@quasar/app-vite`**) と同じメジャー バンドラー ラインで実行されるようにし、再現可能なインストール (**CI** 凍結インストールを含む) のためにネストされた **Yarn** ロックファイルを更新し、ルート **Storybook** / **`eslint-plugin-storybook`** バージョンはそのリリース ファミリーに含まれます。
 - 既存のサーバー範囲内の **`yarn upgrade`** を使用して **root** および **`.storybook-workspace`** ロックファイルを更新しました (特に **Quasar**、**Vue**、**vue-i18n**、**Playwright**、**Sass**、および関連ツール)。 **Node 22** エンジンの **22.x** タイピング行に **`@types/node`** を保持しました。 **README** と **AGENTS** を更新し、投稿者には古い Split-Vite の文言ではなく **Vite 8** の **Storybook 10** が表示されるようにしました。
 - **`debug-storybook.log*`** を **`.gitignore`** に追加したため、ローカル Storybook 診断ログは追跡されていないファイルとして選択されません。
+
+---
 
 ## 2.4.6 - ウィンドウクロム、Storybook、Stylelint、および DevTools
 
@@ -239,6 +257,8 @@
 - **`verify`** および手動 **build** ワークフロー (**`actions/checkout`**、**`actions/setup-node`**、**`actions/upload-artifact`**) の **GitHub アクション**を現在のメジャー バージョンに更新しました。
 - **`quasar.config.ts`** で、**`@electron/remote`** の **`electron`** ピアは、UnPackaged **`yarn install --production`** 中に unmet として表示されることが期待されることに注意しました。アプリはバンドルされた Electron ランタイムで実行されるため、パッケージ化は引き続き成功します。- Storybook プレビューは、Quasar の **`Dark`** プラグイン、**`@quasar/quasar-ui-qmarkdown`** アプリ プラグイン (Quasar の後、ブート順序に一致)、**Roboto (latin-ext)**、および **`preview-body.html`** / **`Dark.set(true)`** を登録するため、**`body--dark`** は常に一致した状態になります。アプリ。 Sass **`AdditionalData`** は、変数の二重読み込みを避けるために **`app.scss`** をスキップします。 **Dialog** および **top-menu** コンポーネントのドキュメントは **`parameters.docs.story.inline: false`** を再度使用するため、Autodocs は 1 つのドキュメント内のすべてのストーリーをマウントしません (各 **`q-dialog`** はマウント時に自動的に開き、**`inline: true`** のときにモーダルがスタックされます)。ネストされた各 Docs iframe は引き続き同じプレビュー CSS スタックを読み込みます。
 
+---
+
 ## 2.4.5 - 寄稿者のワークフローと CI
 
 ### バグ修正と最適化
@@ -249,6 +269,8 @@
 - **push** および **pull request** で **`yarn verify`** を実行する **GitHub アクション** ワークフローを **`master`** / **`main`** に追加しました (ESLint が `.storybook-workspace/.storybook` を解決できるようにするための Storybook ワークスペースのインストールを含む)。- 既存のサーバー範囲内の **`yarn upgrade`** を使用して **root** および **`.storybook-workspace`** ロックファイルを更新しました (特に新しい **Playwright**、*Quasar**、**Vue**、**vue-i18n**、**Sass**、および範囲が許可されている関連ツール)。
 - **DevTools** ブリッジ ヘルパーが **`BrowserWindow.getFocusedWindow()`** の代わりに **`getCurrentWindow()`** を使用するようにしました。これにより、メニューまたは DevTools が OS フォーカスを変更するときに **トグル / ステータス** がアプリ ウィンドウに関連付けられたままになり、DevTools **E2E** チェックが安定します。
 
+---
+
 ## 2.4.4 - 依存関係と開発ツール
 
 ### バグ修正と最適化
@@ -256,6 +278,8 @@
 - Vitest DOM 環境用に `jsdom` を v29 にアップグレードし、`eslint-plugin-n` を v17 にアップグレードし、Node 22 の型指定行の `@types/node` を更新しました。
 - lint と型ツールを **ESLint 9** フラット構成 (**neostandard**、**eslint-plugin-vue** v10、**typescript-eslint**)、**TypeScript** 6、および **Stylelint** 17 に移行し、共有可能な構成を更新しました。ソースの小さな調整は、より厳密なデフォルト (インポート属性、ユニオン間隔、開発ウィンドウの URL ガード、QMarkdown CSS シム) と一致します。
 - **エージェント**、カーソル ルール、およびスキルを調整して、標準のコミット前および変更ログ前のワークフローが常に **ESLint**、**TypeScript (`tsc`)**、**Stylelint**、**単体テスト**をこの順序で実行できるようにします。 **品質ゲート**は、効率性を高めるために 1 つの連鎖した端末コマンドとして実行でき、個々のコマンドはデバッグ失敗用に予約されています。 **Build** および **Playwright** チェックは、端末ごとに 1 つのコマンドのままです。
+
+---
 
 ## 2.4.3 - 追加の依存関係の更新とテスト ワークフローの改善
 
@@ -265,6 +289,8 @@
 - 永続的なエージェント/テスト ガイダンスを追加して、分離されたターミナル呼び出しで各検証コマンドを実行し、長いテスト出力を読みやすく監査しやすくしました。
 - `2.4.3` 変更ログ ブロックを正規の `package.json` バージョンに合わせ、コントリビューター ガイダンスを強化しました。これにより、変更ログの編集は常に最初にライブの `package.json` を再読み込みし、セクション/バージョンのドリフトを回避します。
 
+---
+
 ## 2.4.2 - コアの依存関係の更新と Quasar/Vite ワークフローの検証
 
 ### バグ修正と最適化
@@ -272,12 +298,16 @@
 - コア アプリとツールの依存関係 (Quasar extras/qmarkdown、Axios、Pinia、Vue Router、Vitest、および選択された ESLint プラグインを含む) を更新し、現在のプロジェクト アーキテクチャ内に留まりながらメンテナンスのリスクを軽減します。
 - Quasar/Vite ワークフロー (`@quasar/app-vite`、`@intlify/unplugin-vue-i18n`、`vite-plugin-checker`、`eslint-plugin-vue`、および `@types/node`) に、完全な lint、typecheck、unit、component、E2E、およびビルド検証を備えたフォローアップ ツールの更新を適用しました。
 
+---
+
 ## 2.4.1 - 変更ログポリシーのロックとコンポーネントテストの安定性
 
 ### バグ修正と最適化
 - ノード側のテスト読み込みにマークダウン ドキュメントをプルする完全な i18n ローダー インポートを回避することで、`DialogAboutFantasiaArchive` の Playwright コンポーネント テスト検出を修正しました。
 - ダイアログのソーシャル ボタン アサーションを更新して、レンダリングされたラベルを比較し、現在の UI 出力と一致させ、コンポーネント テストの安定性を維持しました。
 - **バージョンを自動バンプしない**ようにプロジェクト ガイダンスをロックしました。手動変更が明示的に要求されない限り、変更ログ セクションは既存の「package.json」バージョンに厳密に従います。
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 および Node 22 ツールチェーン
 
@@ -293,6 +323,8 @@
 - より厳密な型指定とパッケージ化のために **Quasar/electron-builder** 構成を調整しました: PWA `workboxMode` ケーシング (`GenerateSW`)、現在の Quasar タイプに一致する空の **`bex`** ブロック、electron-builder 26 用の Linux **`desktop.entry`**、プラス TypeScript プロジェクト グルー (`env.d.ts` Vue shim)参照、vue-i18n 拡張処理)、`lint:types` の信頼性が維持されます。- Quasar 変数およびスクロールバー スタイルの `sass:color` を介して、共有 SCSS の **Dart Sass 2** 非推奨ノイズに対処しました (従来のカラー ヘルパーを置き換えます)。
 - **インストールのリマインダー:** **`electron`** パッケージは **ポストインストール** ダウンロードが必要です。ライフサイクル スクリプト (「npm install --ignore-scripts」など) をスキップすると、再インストールするか「node node_modules/electron/install.js」を実行するまで壊れたバイナリが残る可能性があります。
 
+---
+
 ## 2.3.2 - Storybook レイアウト、ページ、およびコントリビューター ツール
 
 ### 新機能
@@ -307,12 +339,16 @@
 - スタイル lint によって表面化された `SocialContactButtons` から空のスコープ付きスタイル ブロックを削除しました。
 - 現在の動作とセレクターに合わせて、Vitest および Playwright のカバレッジ (外部リンク マネージャー、マスコット イメージ、ウィンドウ コントロール) を更新しました。
 
+---
+
 ## 2.3.1 - Electron パッケージ化アイコンとファビコンの範囲
 
 ### バグ修正と最適化
 - Windows、macOS、Linux 用の明示的な Electron Builder アイコン構成 (Linux デスクトップ エントリ メタデータと Linux ターゲット セットアップを含む) を追加しました。
 - 生成されたすべてのファビコン サイズを `index.html` にリンクし、レンダラー アイコン宣言が完全な `public/icons/` セットをカバーするようにしました。
 - Electron 実稼働ビルド中の qmarkdown/Vite パイプラインでのビルド時の解析エラーを回避するために、変更ログのマークダウンの文言を更新しました。
+
+---
 
 ## 2.3.0 - Storybook ワークスペースとデスクトップの洗練
 
@@ -325,6 +361,8 @@
 ### バグ修正と最適化
 - アプリのベース URL が「/」または空の場合、file:// の下のルート相対 URL ではなく、相対ベースを使用してパブリック イメージ URL を解決することにより、パッケージ化された Electron ビルドで読み込まれないソーシャル コンタクト ボタン アイコンを修正しました。
 - 現在のマークアップとアクセシビリティ ラベルに一致するように、ウィンドウ コントロールの Playwright コンポーネント カバレッジを更新しました。
+
+---
 
 ## 2.2.1 - 型の命名と一貫性スイープ
 
@@ -347,6 +385,8 @@
 - エージェント/ルール/スキルのガイダンスを明確にし、Vitest が Playwright を統合/ランタイム層として維持しながら、`src/` と `src-electron/` の両方をファーストクラスの単体テスト サーフェスとして明示的に扱うようにしました。
 - 明確化されたテストデータ ルール: 自動テスト フィクスチャは各 `*.vitest.test.ts` / `*.playwright.test.ts` でインラインに残り、コンポーネント テスト ペイロードは可能な限り `COMPONENT_PROPS` を使用し、埋め込まれたコンポーネント モード メニュー データはダイアログ トリガー用の `AppControlMenus` にインラインに残ります。- ブート外部リンク Vitest モックでの ESLint の検出結果を解決しました (`Event` リスナーの入力とパッドされたブロック)。
 
+---
+
 ## 2.2.0 - テストとエージェントツール
 
 ### 新機能
@@ -358,11 +398,15 @@
 - メニュー トリガーと Vue コンポーネントの型付けをより厳密にするために、共有型宣言内の残りの TypeScript `any` アノテーションを `unknown` に置き換えました。
 - 今後のコードを厳密に型指定し続けるために、Vue、TypeScript スクリプト、Vitest、および Playwright ルール/スキルに明示的な「any」対策ガイダンスを追加しました。
 
+---
+
 ## 2.1.0 - ツールと AI 支援開発
 
 ### 新機能
 - Vue/Quasar、BEM およびスコープ付き SCSS、Playwright および Vitest、Electron プリロード、グローバル SCSS、従来の Git コミット、およびアプリのバージョンに関連付けられた en-US 変更ログの維持のためのカーソル プロジェクト ルールとスキル。
 - AI 支援開発のプロジェクト エントリ ポイントとしての AGENTS.md。
+
+---
 
 ## 2.0.0 - 大幅な書き換え
 
