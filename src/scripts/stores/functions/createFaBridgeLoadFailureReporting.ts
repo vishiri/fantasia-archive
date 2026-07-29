@@ -1,4 +1,7 @@
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
+
 export function createFaBridgeLoadFailureReporting (deps: {
+  ResultAsync: T_injectedResultAsync
   runFaAction: (
     id: 'reportBridgeLoadFailure',
     payload: { message: string }
@@ -14,9 +17,12 @@ export function createFaBridgeLoadFailureReporting (deps: {
   const hydrateFromBridgeOrReport = async (
     action: () => Promise<unknown>
   ): Promise<void> => {
-    try {
-      await action()
-    } catch (error) {
+    const result = await deps.ResultAsync.fromPromise(
+      action(),
+      (error): unknown => error
+    )
+    if (result.isErr()) {
+      const error = result.error
       const message = error instanceof Error ? error.message : String(error)
       reportFaBridgeLoadFailure(message)
     }

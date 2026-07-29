@@ -1,3 +1,4 @@
+import { ResultAsync } from 'neverthrow'
 import type { ComputedRef } from 'vue'
 
 import { scheduleFaLocaleTranslationsMenuInputFocus } from 'app/src/scripts/localeTranslations/functions/scheduleFaLocaleTranslationsMenuInputFocus'
@@ -16,6 +17,7 @@ export function createFaLocaleTranslationsInputPresentationWiring (deps: {
 
   function focusPreferredLanguageInput (): void {
     scheduleFaLocaleTranslationsMenuInputFocus({
+      ResultAsync,
       focusMenuInput: () => {
         const focusFn = deps.readPreferredLanguageInputFocus()
         if (focusFn !== null) {

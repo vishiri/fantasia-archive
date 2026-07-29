@@ -76,8 +76,8 @@ export function createRendererAppInternals (deps: {
       path: '/'
     })
 
-    void (async () => {
-      try {
+    void Promise.resolve()
+      .then(async () => {
         await deps.waitForSkipWelcomeScreenBridgeWhenElectron()
         await deps.refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch()
         const skippedWelcomeScreen = await deps.tryRunSkipWelcomeScreenOnLaunch()
@@ -85,10 +85,10 @@ export function createRendererAppInternals (deps: {
           return
         }
         deps.runFaAction('showStartupTipsNotification', undefined)
-      } finally {
+      })
+      .finally(() => {
         deps.markWelcomeScreenAutoLoadBootCompletion()
-      }
-    })()
+      })
   }
 
   return {

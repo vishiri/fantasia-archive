@@ -1,3 +1,4 @@
+import { ResultAsync } from 'neverthrow'
 import { computed, nextTick, ref } from 'vue'
 
 import {
@@ -14,7 +15,7 @@ import {
   resolveFaLocaleTranslationsMenuPresentation
 } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleTranslationsMenuPresentation'
 import { resolveFaLocaleTranslationsMenuAnchorElement } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleTranslationsMenuAnchorElement'
-import { scheduleFaLocaleTranslationsMenuInputFocus } from 'app/src/scripts/localeTranslations/functions/scheduleFaLocaleTranslationsMenuInputFocus'
+import { scheduleFaLocaleTranslationsMenuInputFocus as scheduleFaLocaleTranslationsMenuInputFocusImpl } from 'app/src/scripts/localeTranslations/functions/scheduleFaLocaleTranslationsMenuInputFocus'
 import {
   resolveFaLocaleSingularPluralDisplayTranslation,
   resolveFaLocaleSingularPluralDisplayTranslationLanguageCode,
@@ -47,5 +48,8 @@ export const useFaLocaleTranslationsInputSingularPlural = createUseFaLocaleTrans
   resolveFaLocaleStringTranslationLanguageCode,
   resolveFaLocaleTranslationsMenuAnchorElement,
   resolveFaLocaleTranslationsMenuPresentation,
-  scheduleFaLocaleTranslationsMenuInputFocus
+  scheduleFaLocaleTranslationsMenuInputFocus: (options) => scheduleFaLocaleTranslationsMenuInputFocusImpl({
+    ...options,
+    ResultAsync
+  })
 })

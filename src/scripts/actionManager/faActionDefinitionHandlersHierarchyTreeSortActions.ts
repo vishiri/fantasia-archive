@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerDomain'
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeDocumentSortBucket } from 'app/types/I_faProjectHierarchyTreeDomain'
@@ -70,9 +72,8 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
     ) {
       throw new Error('Project hierarchy sort bridge is unavailable')
     }
-    let buckets
-    try {
-      buckets = await runProjectHierarchyTreeDocumentSort({
+    const sortResult = await ResultAsync.fromPromise(
+      runProjectHierarchyTreeDocumentSort({
         direction: payload.direction,
         key: payload.key,
         listPlacementDocumentChildren: (listInput) => api.listPlacementDocumentChildren(listInput),
@@ -81,8 +82,11 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
         },
         root,
         scope: payload.scope
-      })
-    } catch (error) {
+      }),
+      (error): unknown => error
+    )
+    if (sortResult.isErr()) {
+      const error = sortResult.error
       if (hasSortCompletedBuckets(error)) {
         const partialTreeNodeIds = error.completedBuckets.map(
           resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId
@@ -93,6 +97,7 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
       }
       throw error
     }
+    const buckets = sortResult.value
     const treeNodeIds = buckets.map(resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId)
     deps.S_FaProjectHierarchyTree().refreshHierarchyTreeNodes(treeNodeIds)
     return {

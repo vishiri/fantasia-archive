@@ -86,11 +86,9 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
       return
     }
     refreshLayoutInFlight = applyLayoutFromBridge()
-    try {
-      await refreshLayoutInFlight
-    } finally {
+    await refreshLayoutInFlight.finally(() => {
       refreshLayoutInFlight = null
-    }
+    })
   }
 
   async function refreshUiState (): Promise<void> {

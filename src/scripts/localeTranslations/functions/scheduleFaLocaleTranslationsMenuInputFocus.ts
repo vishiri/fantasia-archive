@@ -1,7 +1,10 @@
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
+
 /**
  * Focus locale translations menu input after Quasar menu content mounts (nextTick + rAF retry).
  */
 export function scheduleFaLocaleTranslationsMenuInputFocus (deps: {
+  ResultAsync: T_injectedResultAsync
   focusMenuInput: () => void
   nextTick: () => Promise<void>
   requestAnimationFrame: (callback: () => void) => number
@@ -10,12 +13,18 @@ export function scheduleFaLocaleTranslationsMenuInputFocus (deps: {
     console.error('[faLocaleTranslations] nextTick chain failed', err)
   }
 
-  void deps.nextTick().then(() => {
-    deps.focusMenuInput()
-    deps.requestAnimationFrame(() => {
-      void deps.nextTick().then(() => {
-        deps.focusMenuInput()
-      }).catch(logNextTickFailure)
-    })
-  }).catch(logNextTickFailure)
+  void deps.ResultAsync.fromPromise(deps.nextTick(), (error): unknown => error).match(
+    () => {
+      deps.focusMenuInput()
+      deps.requestAnimationFrame(() => {
+        void deps.ResultAsync.fromPromise(deps.nextTick(), (error): unknown => error).match(
+          () => {
+            deps.focusMenuInput()
+          },
+          logNextTickFailure
+        )
+      })
+    },
+    logNextTickFailure
+  )
 }

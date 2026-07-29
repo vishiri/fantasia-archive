@@ -1,10 +1,12 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 
 /**
  * Resolves template, world, and parent placement for tab-menu copy and add-under flows.
  * Persisted tabs omit templateId on the tab row; load it from the project database.
  */
 export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
+  ResultAsync: T_injectedResultAsync
   getDocumentById: (documentId: string) => Promise<{
     parentDocumentId: string | null
     templateId: string | null
@@ -30,13 +32,15 @@ export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
     }
   }
 
-  let document
-  try {
-    document = await deps.getDocumentById(deps.sourceTab.documentId)
-  } catch {
+  const documentResult = await deps.ResultAsync.fromPromise(
+    deps.getDocumentById(deps.sourceTab.documentId),
+    (error): unknown => error
+  )
+  if (documentResult.isErr()) {
     return null
   }
 
+  const document = documentResult.value
   const templateId = deps.sourceTab.templateId ?? document.templateId
   const worldId = deps.sourceTab.worldId ?? document.worldId
   if (templateId === null || templateId === undefined || worldId === undefined) {

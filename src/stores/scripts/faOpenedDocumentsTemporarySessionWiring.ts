@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import {
   applyTemporaryOpenedDocumentParent,
@@ -27,10 +29,14 @@ export async function reconcileTemporaryOpenedDocumentTabFromSnapshot (
     return null
   }
 
-  try {
-    await api.getWorldById(worldId)
-    await api.getDocumentTemplateById(templateId)
-  } catch {
+  const worldAndTemplateResult = await ResultAsync.fromPromise(
+    (async () => {
+      await api.getWorldById(worldId)
+      await api.getDocumentTemplateById(templateId)
+    })(),
+    (error): unknown => error
+  )
+  if (worldAndTemplateResult.isErr()) {
     return null
   }
 
@@ -39,10 +45,12 @@ export async function reconcileTemporaryOpenedDocumentTabFromSnapshot (
     return tab
   }
 
-  try {
-    await api.getDocumentById(parentDocumentId)
+  const parentResult = await ResultAsync.fromPromise(
+    api.getDocumentById(parentDocumentId),
+    (error): unknown => error
+  )
+  if (parentResult.isOk()) {
     return tab
-  } catch {
-    return applyTemporaryOpenedDocumentParent(tab, null)
   }
+  return applyTemporaryOpenedDocumentParent(tab, null)
 }

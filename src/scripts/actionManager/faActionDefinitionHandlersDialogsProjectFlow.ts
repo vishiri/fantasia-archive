@@ -28,59 +28,63 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
   async function handleCreateNewProject (
     payload: I_faActionPayloadMap['createNewProject']
   ): Promise<void> {
-    try {
-      const outcome = await deps.S_FaActiveProject().createProjectFromUserInput(payload.projectName)
-      if (outcome === 'canceled') {
-        throw new deps.FaActionUserCanceledError()
-      }
-      deps.notifyFaProjectCreatedPositive()
-      const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
-      if (projectHydrated) {
-        maybeAutoOpenProjectNoteboardAfterHydrate(deps)
-      }
-      await deps.S_FaProjectSidebar().refreshProjectSidebar()
-      await deps.S_FaProjectStyling().refreshProjectStyling()
-    } finally {
-      await deps.S_FaRecentProjects().refreshRecentProjects()
-    }
-  }
-
-  async function handleLoadExistingProject (
-    payload: I_faActionPayloadMap['loadExistingProject']
-  ): Promise<{ payloadPreview: string } | void> {
-    try {
-      const pathArg = payload.filePath
-      const outcome =
-      pathArg !== undefined && pathArg.length > 0
-        ? await deps.S_FaActiveProject().openProjectFromKnownPath(pathArg)
-        : await deps.S_FaActiveProject().openProjectFromUserDialog()
-      if (outcome === 'canceled' || outcome === 'superseded') {
-        throw new deps.FaActionUserCanceledError()
-      }
-      if (outcome === 'opened') {
-        deps.notifyFaProjectLoadedPositive()
+    await Promise.resolve()
+      .then(async () => {
+        const outcome = await deps.S_FaActiveProject().createProjectFromUserInput(payload.projectName)
+        if (outcome === 'canceled') {
+          throw new deps.FaActionUserCanceledError()
+        }
+        deps.notifyFaProjectCreatedPositive()
         const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
         if (projectHydrated) {
           maybeAutoOpenProjectNoteboardAfterHydrate(deps)
         }
         await deps.S_FaProjectSidebar().refreshProjectSidebar()
         await deps.S_FaProjectStyling().refreshProjectStyling()
-      }
-      if (outcome === 'reused' && payload.resumeActiveSession !== true) {
-        deps.notifyFaProjectAlreadyActiveWarning()
-      }
-      const snap = deps.S_FaActiveProject().activeProject
-      if (snap === null) {
-        throw new Error('Project open returned no active project snapshot.')
-      }
-      const payloadPreview = deps.buildFaActionPayloadPreview({
-        filePath: snap.filePath,
-        projectName: snap.name
       })
-      return { payloadPreview }
-    } finally {
-      await deps.S_FaRecentProjects().refreshRecentProjects()
-    }
+      .finally(async () => {
+        await deps.S_FaRecentProjects().refreshRecentProjects()
+      })
+  }
+
+  async function handleLoadExistingProject (
+    payload: I_faActionPayloadMap['loadExistingProject']
+  ): Promise<{ payloadPreview: string } | void> {
+    return await Promise.resolve()
+      .then(async () => {
+        const pathArg = payload.filePath
+        const outcome =
+        pathArg !== undefined && pathArg.length > 0
+          ? await deps.S_FaActiveProject().openProjectFromKnownPath(pathArg)
+          : await deps.S_FaActiveProject().openProjectFromUserDialog()
+        if (outcome === 'canceled' || outcome === 'superseded') {
+          throw new deps.FaActionUserCanceledError()
+        }
+        if (outcome === 'opened') {
+          deps.notifyFaProjectLoadedPositive()
+          const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+          if (projectHydrated) {
+            maybeAutoOpenProjectNoteboardAfterHydrate(deps)
+          }
+          await deps.S_FaProjectSidebar().refreshProjectSidebar()
+          await deps.S_FaProjectStyling().refreshProjectStyling()
+        }
+        if (outcome === 'reused' && payload.resumeActiveSession !== true) {
+          deps.notifyFaProjectAlreadyActiveWarning()
+        }
+        const snap = deps.S_FaActiveProject().activeProject
+        if (snap === null) {
+          throw new Error('Project open returned no active project snapshot.')
+        }
+        const payloadPreview = deps.buildFaActionPayloadPreview({
+          filePath: snap.filePath,
+          projectName: snap.name
+        })
+        return { payloadPreview }
+      })
+      .finally(async () => {
+        await deps.S_FaRecentProjects().refreshRecentProjects()
+      })
   }
 
   async function handleShowStartupTipsNotification (): Promise<void> {

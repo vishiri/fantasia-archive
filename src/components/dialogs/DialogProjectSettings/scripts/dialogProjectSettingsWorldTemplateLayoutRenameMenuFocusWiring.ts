@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import { scheduleFaLocaleTranslationsMenuInputFocus } from 'app/src/scripts/localeTranslations/functions/scheduleFaLocaleTranslationsMenuInputFocus'
 
 /**
@@ -9,6 +11,7 @@ export function scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputF
   requestAnimationFrame: (callback: () => void) => number
 }): void {
   scheduleFaLocaleTranslationsMenuInputFocus({
+    ResultAsync,
     focusMenuInput: deps.focusRenameInput,
     nextTick: deps.nextTick,
     requestAnimationFrame: deps.requestAnimationFrame

@@ -1,8 +1,10 @@
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 
 export function createUseFaFloatingWindowFramePersist (deps: {
+  ResultAsync: T_injectedResultAsync
   debounce: <T extends (...args: never[]) => void>(
     fn: T,
     wait: number
@@ -30,9 +32,12 @@ export function createUseFaFloatingWindowFramePersist (deps: {
       if (!opts.windowModel.value) {
         return
       }
-      try {
-        await opts.persistFrame()
-      } catch (error) {
+      const result = await deps.ResultAsync.fromPromise(
+        opts.persistFrame(),
+        (error): unknown => error
+      )
+      if (result.isErr()) {
+        const error = result.error
         const message = error instanceof Error ? error.message : String(error)
         void deps.runFaAction(opts.failureActionId, { message })
       }

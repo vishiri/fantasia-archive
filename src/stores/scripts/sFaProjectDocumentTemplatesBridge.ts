@@ -33,23 +33,26 @@ export async function faProjectDocumentTemplatesFetchFreshForDialog (): Promise<
   if (typeof api?.listDocumentTemplatesForProjectSettings !== 'function') {
     throw new Error('projectContent.listDocumentTemplatesForProjectSettings is unavailable')
   }
-  try {
-    const result = await api.listDocumentTemplatesForProjectSettings()
-    return result.items.map((template) => ({
-      documentCount: template.documentCount,
-      icon: template.icon,
-      id: template.id,
-      titlePluralTranslations: template.titlePluralTranslations,
-      titleSingularTranslations: template.titleSingularTranslations,
-      worldAppendixTranslations: template.worldAppendixTranslations
-    }))
-  } catch (error: unknown) {
+  const readResult = await ResultAsync.fromPromise(
+    api.listDocumentTemplatesForProjectSettings(),
+    (error): unknown => error
+  )
+  if (readResult.isErr()) {
+    const error = readResult.error
     console.error('[Project Settings] listDocumentTemplatesForProjectSettings failed', error)
     if (error instanceof Error) {
       throw error
     }
     throw new Error('listDocumentTemplatesForProjectSettings failed')
   }
+  return readResult.value.items.map((template) => ({
+    documentCount: template.documentCount,
+    icon: template.icon,
+    id: template.id,
+    titlePluralTranslations: template.titlePluralTranslations,
+    titleSingularTranslations: template.titleSingularTranslations,
+    worldAppendixTranslations: template.worldAppendixTranslations
+  }))
 }
 
 /**

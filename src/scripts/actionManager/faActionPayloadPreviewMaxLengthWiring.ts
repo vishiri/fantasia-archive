@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH } from './functions/faActionPayloadPreviewLimits'
@@ -8,14 +10,16 @@ import { resolveFaActionPayloadPreviewMaxLengthForLogging } from './functions/re
  * Error and warning rows ignore the setting and always use an unlimited preview length.
  */
 export function resolveFaActionPayloadPreviewMaxLength (isErrorOrWarning = false): number {
-  try {
-    const settings = S_FaUserSettings().settings
-    return resolveFaActionPayloadPreviewMaxLengthForLogging(
-      settings?.logFullActivityPayload === true,
-      isErrorOrWarning,
-      FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH
-    )
-  } catch {
+  const settingsResult = Result.fromThrowable(
+    () => S_FaUserSettings().settings,
+    (): undefined => undefined
+  )()
+  if (settingsResult.isErr()) {
     return FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH
   }
+  return resolveFaActionPayloadPreviewMaxLengthForLogging(
+    settingsResult.value?.logFullActivityPayload === true,
+    isErrorOrWarning,
+    FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH
+  )
 }

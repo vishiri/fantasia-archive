@@ -1,6 +1,8 @@
+import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 export async function loadFaIconPickerMergedCatalogForMenu (deps: {
+  ResultAsync: T_injectedResultAsync
   catalogCache: I_ref<string[] | null>
   catalogLoadError: I_ref<string | null>
   isCatalogLoading: I_ref<boolean>
@@ -18,14 +20,17 @@ export async function loadFaIconPickerMergedCatalogForMenu (deps: {
   deps.isCatalogLoading.value = true
   deps.catalogLoadError.value = null
 
-  try {
-    const catalog = await deps.loadFaIconPickerMergedCatalogAsync()
-    deps.catalogCache.value = catalog
-    deps.loadedCatalog.value = catalog
-  } catch (error) {
+  const loadResult = await deps.ResultAsync.fromPromise(
+    deps.loadFaIconPickerMergedCatalogAsync(),
+    (error): unknown => error
+  )
+  if (loadResult.isOk()) {
+    deps.catalogCache.value = loadResult.value
+    deps.loadedCatalog.value = loadResult.value
+  } else {
+    const error = loadResult.error
     deps.catalogLoadError.value = error instanceof Error ? error.message : String(error)
     deps.loadedCatalog.value = []
-  } finally {
-    deps.isCatalogLoading.value = false
   }
+  deps.isCatalogLoading.value = false
 }
