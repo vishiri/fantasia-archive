@@ -396,6 +396,7 @@ export default [...neostandard({
     'src-electron/mainScripts/projectManagement/faProjectCreateRunWiring.ts'
   ],
   rules: {
+    // paths = app/ alias; patterns = relative ./ ../ bypass of same getters
     'no-restricted-imports': ['error', {
       paths: [
         {
@@ -412,6 +413,21 @@ export default [...neostandard({
           name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring',
           importNames: ['replaceFaProjectActiveDatabase'],
           message: 'replaceFaProjectActiveDatabase is only for open, create, and reconnect paths; see .cursor/rules/fa-project-database-access.mdc.'
+        }
+      ],
+      patterns: [
+        {
+          group: [
+            './**/faProjectActiveDatabaseWiring',
+            '../**/faProjectActiveDatabaseWiring',
+            '**/faProjectActiveDatabaseWiring'
+          ],
+          importNames: [
+            'getFaProjectActiveDatabase',
+            'getFaProjectLastKnownActiveProjectFilePath',
+            'replaceFaProjectActiveDatabase'
+          ],
+          message: 'Relative imports of restricted active-DB getters are blocked; use runWithFaProjectDatabase* or allowlisted open/create/reconnect wiring — see .cursor/rules/fa-project-database-access.mdc.'
         }
       ]
     }]

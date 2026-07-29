@@ -45,6 +45,7 @@
     "audit:policy": "node .utility-scripts/policyComplianceAudit.mjs",
     "audit:scss-literals": "node .utility-scripts/auditScssConsumerLiterals.mjs",
     "audit:quasar-component-tokens": "node .utility-scripts/auditQuasarComponentTokens.mjs",
+    "audit:quasar-variables": "node .utility-scripts/auditQuasarVariablesUsage.mjs",
     "audit:domain-policy": "node .utility-scripts/domainPolicyGrep.mjs",
     "audit:full": "node .utility-scripts/runFullProjectAudit.mjs",
     "audit:yagni": "node .utility-scripts/auditYagni.mjs",
