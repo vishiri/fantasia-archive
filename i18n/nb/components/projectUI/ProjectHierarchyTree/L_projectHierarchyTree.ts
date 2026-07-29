@@ -24,5 +24,5 @@ export default {
     documentCount: 'Antall dokumenter:',
     totalCount: 'Antall dokumenter og kategorier:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

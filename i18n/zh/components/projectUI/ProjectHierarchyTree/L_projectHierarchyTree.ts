@@ -24,5 +24,5 @@ export default {
     documentCount: '文档数量：',
     totalCount: '文档与类别数量：'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

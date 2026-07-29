@@ -24,5 +24,5 @@ export default {
     documentCount: 'Αριθμός εγγράφων:',
     totalCount: 'Αριθμός εγγράφων και κατηγοριών:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

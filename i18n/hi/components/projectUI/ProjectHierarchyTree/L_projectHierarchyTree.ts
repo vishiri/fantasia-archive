@@ -24,5 +24,5 @@ export default {
     documentCount: 'दस्तावेज़ संख्या:',
     totalCount: 'दस्तावेज़ और श्रेणी संख्या:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

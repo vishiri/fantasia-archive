@@ -24,5 +24,5 @@ export default {
     documentCount: 'Asiakirjojen määrä:',
     totalCount: 'Asiakirjojen ja kategorioiden määrä:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

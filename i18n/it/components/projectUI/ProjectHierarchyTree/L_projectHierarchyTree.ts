@@ -24,5 +24,5 @@ export default {
     documentCount: 'Conteggio documenti:',
     totalCount: 'Conteggio documenti e categorie:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

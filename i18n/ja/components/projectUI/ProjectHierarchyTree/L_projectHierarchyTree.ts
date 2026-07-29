@@ -24,5 +24,5 @@ export default {
     documentCount: 'ドキュメント数:',
     totalCount: 'ドキュメントとカテゴリ数:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }

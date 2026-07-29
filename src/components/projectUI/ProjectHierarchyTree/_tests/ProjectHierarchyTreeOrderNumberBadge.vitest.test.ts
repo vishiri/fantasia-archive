@@ -12,7 +12,7 @@ const orderNumberBadgeI18n = createI18n({
     'en-US': {
       projectUI: {
         projectHierarchyTree: {
-          orderNumberBadgeTooltip: 'Order priority of the document'
+          orderNumberBadgeTooltip: 'Custom order of the document'
         }
       }
     }
@@ -39,5 +39,5 @@ test('Test that ProjectHierarchyTreeOrderNumberBadge renders label on solid badg
   expect(badge.text()).toContain('12')
   expect(badge.classes()).toContain('projectHierarchyTreeOrderNumberBadge')
   expect(wrapper.find('[data-test-locator="order-number-badge-tooltip"]').text())
-    .toBe('Order priority of the document')
+    .toBe('Custom order of the document')
 })

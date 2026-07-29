@@ -24,5 +24,5 @@ export default {
     documentCount: 'عدد المستندات:',
     totalCount: 'عدد المستندات والفئات:'
   },
-  orderNumberBadgeTooltip: 'Order priority of the document'
+  orderNumberBadgeTooltip: 'Custom order of the document'
 }
