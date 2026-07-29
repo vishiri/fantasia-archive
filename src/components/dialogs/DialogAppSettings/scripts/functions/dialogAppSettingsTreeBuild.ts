@@ -8,14 +8,22 @@ import type {
   T_dialogAppSettingsTranslate
 } from 'app/types/I_dialogAppSettings'
 
-const ACCESSIBILITY_CATEGORY_KEY = 'accessibility'
-const DEVELOPER_SETTINGS_CATEGORY_KEY = 'developerSettings'
-const APP_SETTINGS_PAGE_CATEGORY_TITLE_PREFIX = 'page:'
 const APP_THEME_SETTING_KEY = 'appTheme'
 
-function isAppSettingsPageCategoryTitle (categoryTitle: string): boolean {
-  return categoryTitle.trim().toLocaleLowerCase().startsWith(APP_SETTINGS_PAGE_CATEGORY_TITLE_PREFIX)
-}
+/**
+ * Vertical tab order for Fantasia Archive Settings.
+ * Unknown keys sort after this list, by title (or key when title empty).
+ */
+const APP_SETTINGS_CATEGORY_TAB_ORDER = [
+  'visualAccessibility',
+  'hierarchicalTree',
+  'popupsFloatingWindows',
+  'documentViewEdit',
+  'projectOverview',
+  'welcomeScreen',
+  'accessibility',
+  'developerSettings'
+] as const
 
 function appSettingsCategorySortLabel (categoryKey: string, categoryTitle: string): string {
   if (categoryTitle !== '') {
@@ -24,9 +32,17 @@ function appSettingsCategorySortLabel (categoryKey: string, categoryTitle: strin
   return categoryKey
 }
 
+function appSettingsCategoryTabRank (categoryKey: string): number {
+  const index = (APP_SETTINGS_CATEGORY_TAB_ORDER as readonly string[]).indexOf(categoryKey)
+  if (index === -1) {
+    return APP_SETTINGS_CATEGORY_TAB_ORDER.length
+  }
+  return index
+}
+
 /**
- * Tab order: Page-prefixed categories first (alphabetical by title), then other categories
- * (alphabetical by title), then accessibility, then developerSettings last.
+ * Tab order: Visuals, Tree, Popups, Pages (Document / Overview / Welcome), Accessibility,
+ * then developerSettings last. Unknown category keys sort after known ones by title.
  */
 export function compareAppSettingsCategoryOrder (
   categoryA: string,
@@ -38,21 +54,8 @@ export function compareAppSettingsCategoryOrder (
     return 0
   }
 
-  const rank = (key: string, title: string): number => {
-    if (key === DEVELOPER_SETTINGS_CATEGORY_KEY) {
-      return 3
-    }
-    if (key === ACCESSIBILITY_CATEGORY_KEY) {
-      return 2
-    }
-    if (isAppSettingsPageCategoryTitle(title)) {
-      return 0
-    }
-    return 1
-  }
-
-  const rankA = rank(categoryA, categoryTitleA)
-  const rankB = rank(categoryB, categoryTitleB)
+  const rankA = appSettingsCategoryTabRank(categoryA)
+  const rankB = appSettingsCategoryTabRank(categoryB)
   if (rankA !== rankB) {
     return rankA - rankB
   }

@@ -3,6 +3,7 @@ export default {
   saveButton: 'Save settings',
   closeButton: 'Close without saving',
   settingsSearchPlaceholder: 'Search the settings...',
+  settingsSearchClearAriaLabel: 'Clear settings search',
   searchNoResultsTitle: 'No search match',
   searchNoResultsDescription:
     'Fantasia sadly didn\'t find any settings you were looking for. Perhaps try a different search term?',

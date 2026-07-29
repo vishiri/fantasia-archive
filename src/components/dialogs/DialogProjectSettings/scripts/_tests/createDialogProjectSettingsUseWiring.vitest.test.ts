@@ -34,6 +34,9 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
       updateWorldTemplateLayout: vi.fn()
     }),
     createDialogProjectSettingsRefs: () => ({
+      baselineDocumentTemplates: ref(null),
+      baselineSettings: ref(null),
+      baselineWorlds: ref(null),
       dialogModel: ref(false),
       documentName: ref(''),
       localDocumentTemplates: ref(null),
@@ -58,6 +61,7 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
   expect(api.hasGeneralSettingsValidationError.value).toBe(true)
   expect(api.hasWorldsSettingsValidationError.value).toBe(false)
   expect(api.hasDocumentTemplatesSettingsValidationError.value).toBe(true)
+  expect(api.isDirty.value).toBe(false)
   expect(api.isSaveDisabled.value).toBe(true)
   expect(api.saveValidationErrorsTooltip.value.flatText).toBe('')
 })

@@ -5,6 +5,7 @@ import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProj
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 
+import { captureDialogProjectSettingsBaselines } from './dialogProjectSettingsDialogBaselineWiring'
 import { mapDialogProjectSettingsDocumentTemplatesToSnapshot } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSettingsDialogSaveValidation'
 import { mapDialogProjectSettingsWorldsToSnapshot } from './dialogProjectSettingsWorldsSnapshotDraft'
@@ -19,11 +20,21 @@ export async function persistDialogProjectSettingsDraft (deps: {
     }
   ) => Promise<boolean>
 }, params: {
+  baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+  baselineSettings: Ref<I_faProjectSettingsRoot | null>
+  baselineWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
   localSettings: Ref<I_faProjectSettingsRoot | null>
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
 }): Promise<boolean> {
-  const { localDocumentTemplates, localSettings, localWorlds } = params
+  const {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds
+  } = params
   if (
     localSettings.value === null ||
     localWorlds.value === null ||
@@ -45,13 +56,25 @@ export async function persistDialogProjectSettingsDraft (deps: {
   const documentTemplatesSnapshot = mapDialogProjectSettingsDocumentTemplatesToSnapshot(
     localDocumentTemplates.value
   )
-  return deps.runFaActionAwait('saveProjectSettings', {
+  const saved = await deps.runFaActionAwait('saveProjectSettings', {
     documentTemplates: documentTemplatesSnapshot,
     settings: {
       projectName: trimmedName
     },
     worlds: worldsSnapshot
   })
+  if (!saved) {
+    return false
+  }
+  captureDialogProjectSettingsBaselines({
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds
+  })
+  return true
 }
 
 export async function saveDialogProjectSettingsDraftWithoutClosing (
@@ -71,13 +94,27 @@ export async function saveDialogProjectSettingsDraftAndClose (deps: {
     }
   ) => Promise<boolean>
 }, params: {
+  baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+  baselineSettings: Ref<I_faProjectSettingsRoot | null>
+  baselineWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
   dialogModel: Ref<boolean>
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
   localSettings: Ref<I_faProjectSettingsRoot | null>
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
 }): Promise<void> {
-  const { dialogModel, localDocumentTemplates, localSettings, localWorlds } = params
+  const {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
+    dialogModel,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds
+  } = params
   const saved = await persistDialogProjectSettingsDraft(deps, {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
     localDocumentTemplates,
     localSettings,
     localWorlds

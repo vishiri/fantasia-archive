@@ -3,6 +3,7 @@ export default {
   saveButton: 'Spara inställningar',
   closeButton: 'Stäng utan att spara',
   settingsSearchPlaceholder: 'Sök i inställningarna...',
+  settingsSearchClearAriaLabel: 'Rensa inställningssökning',
   searchNoResultsTitle: 'Ingen sökmatchning',
   searchNoResultsDescription: 'Fantasia hittade tyvärr inga inställningar du letade efter. Kanske prova en annan sökterm?',
   appOptionsCategories: {

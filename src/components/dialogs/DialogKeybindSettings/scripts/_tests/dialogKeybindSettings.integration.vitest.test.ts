@@ -221,7 +221,9 @@ test('createDialogKeybindSettingsSync onSaveMain returns false when saveKeybindS
   runFaActionAwaitMock.mockResolvedValueOnce(false)
   const keybindsStore = S_FaKeybinds()
   const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
+  const baselineOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
   const { onSaveMain, syncWorkingFromStore } = createDialogKeybindSettingsSync({
+    baselineOverrides,
     filter: ref(''),
     keybindsStore,
     workingOverrides
@@ -257,8 +259,10 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
   const keybindsStore = S_FaKeybinds()
   await keybindsStore.refreshKeybinds()
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
+  const baselineOverrides = ref<I_faKeybindsRoot['overrides']>({})
   const filter = ref<string | null | undefined>('typed-filter')
   const { onSaveMain, onCloseMain, syncWorkingFromStore, initializeForOpen } = createDialogKeybindSettingsSync({
+    baselineOverrides,
     filter,
     keybindsStore,
     workingOverrides

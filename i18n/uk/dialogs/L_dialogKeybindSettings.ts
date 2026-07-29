@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia, на жаль, не знайшла жодної клавіатури, яку ви шукали. Спробувати інший термін пошуку?',
   filterNoResultsTitle: 'Клавіатури не знайдено',
+  filterClearAriaLabel: 'Очистити фільтр комбінацій клавіш',
   filterPlaceholder: 'Фільтр клавіш…',
   saveButton: 'Зберегти налаштування',
   tableEmptyHint: 'Комбінації клавіш недоступні.',

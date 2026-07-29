@@ -3,6 +3,7 @@ export default {
   saveButton: 'Сохранить настройки',
   closeButton: 'Закрыть без сохранения',
   settingsSearchPlaceholder: 'Найдите настройки...',
+  settingsSearchClearAriaLabel: 'Очистить поиск настроек',
   searchNoResultsTitle: 'Нет совпадений в поиске',
   searchNoResultsDescription: 'К сожалению, Fantasia не нашла нужных вам настроек. Возможно, попробуйте другой поисковый запрос?',
   appOptionsCategories: {

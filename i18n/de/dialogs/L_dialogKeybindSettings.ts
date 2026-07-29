@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia hat leider keine Tastenkombinationen gefunden, nach denen Sie gesucht haben. Versuchen Sie es mit einem anderen Suchbegriff?',
   filterNoResultsTitle: 'Keine Tastenkombinationen gefunden',
+  filterClearAriaLabel: 'Tastenkürzel-Filter löschen',
   filterPlaceholder: 'Tastenkombinationen filtern…',
   saveButton: 'Einstellungen speichern',
   tableEmptyHint: 'Es sind keine Tastaturkürzel verfügbar.',

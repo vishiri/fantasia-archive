@@ -248,6 +248,7 @@ export type T_useDialogKeybindSettingsResult = {
   captureOpen: I_ref<boolean>
   filter: I_ref<string | null | undefined>
   initializeForOpen: () => void
+  isDirty: I_computedRef<boolean>
   onCaptureClear: () => void
   onCaptureSet: () => void
   onCloseMain: () => void
@@ -272,6 +273,7 @@ export type T_dialogKeybindSettingsStateFactoryBindings = {
   ) => {
     capture: T_createDialogKeybindSettingsCaptureResult
     filter: I_ref<string | null | undefined>
+    isDirty: I_computedRef<boolean>
     sync: T_dialogKeybindSettingsSyncApi
     table: ReturnType<T_dialogKeybindSettingsStateFactoryDeps['createDialogKeybindSettingsTableState']>
     workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
@@ -279,6 +281,7 @@ export type T_dialogKeybindSettingsStateFactoryBindings = {
   createDialogKeybindSettingsSync: (
     stateDeps: T_dialogKeybindSettingsStateFactoryDeps,
     params: {
+      baselineOverrides: I_ref<I_faKeybindsRoot['overrides']>
       filter: I_ref<string | null | undefined>
       keybindsStore: {
         snapshot: { store: { overrides: I_faKeybindsRoot['overrides'] } } | null
@@ -327,6 +330,7 @@ export type T_useDialogKeybindSettingsViewResult = {
   dialogModel: I_ref<boolean>
   documentName: I_ref<T_dialogName>
   filter: I_ref<string | null | undefined>
+  isDirty: I_computedRef<boolean>
   noDataShowsFilterMiss: I_computedRef<boolean>
   onCaptureClear: () => void
   onCaptureSet: () => void
@@ -465,30 +469,7 @@ export type T_dialogKeybindSettingsViewFactoryDeps = {
     saveMain: () => Promise<void>
   }
   translate: (key: string) => string
-  useDialogKeybindSettings: () => {
-    captureOpen: I_ref<boolean>
-    filter: I_ref<string | null | undefined>
-    initializeForOpen: () => void
-    onCaptureClear: () => void
-    onCaptureSet: () => void
-    onCloseMain: () => void
-    onOpenCapture: (row: I_dialogKeybindSettingsRow) => void
-    onSaveMain: () => Promise<boolean>
-    captureActionName: I_ref<string>
-    captureError: I_ref<boolean>
-    captureErrorMessage: I_ref<string>
-    captureInfoMessage: I_ref<string>
-    captureLabel: I_ref<string>
-    pendingChord: I_ref<I_faChordSerialized | null>
-    tableColumns: I_computedRef<Array<{
-      align: 'left'
-      classes: string
-      field: string
-      label: string
-      name: string
-    }>>
-    tableRows: I_computedRef<I_dialogKeybindSettingsRow[]>
-  }
+  useDialogKeybindSettings: () => T_useDialogKeybindSettingsResult
   useDialogKeybindSettingsTableChrome: (dialogModel: I_ref<boolean>) => {
     bodySectionRef: I_ref<I_vueComponentPublicInstance | null>
     dialogKeybindSettingsTableHeightStyle: I_computedRef<Record<string, string> | undefined>

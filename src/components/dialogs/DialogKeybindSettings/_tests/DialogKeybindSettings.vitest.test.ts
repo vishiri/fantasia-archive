@@ -120,13 +120,22 @@ const dialogKeybindSettingsQInputStub = defineComponent({
         :value="modelValue"
         @input="onInput"
       />
+      <slot name="append" />
     </div>
   `
+})
+
+const dialogKeybindSettingsQBtnStub = defineComponent({
+  name: 'QBtn',
+  inheritAttrs: true,
+  emits: ['click'],
+  template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\', $event)"><slot /></button>'
 })
 
 const dialogKeybindSettingsMountOptions = {
   global: {
     components: {
+      QBtn: dialogKeybindSettingsQBtnStub,
       QIcon: defineComponent({
         name: 'QIcon',
         props: {
@@ -320,6 +329,30 @@ test('Test that DialogKeybindSettings forwards q-dialog v-model and filter input
   await filterInputs[0]!.setValue('app')
   await flushPromises()
 
+  w.unmount()
+})
+
+/**
+ * Non-empty filter shows the flat secondary clear control; click clears the filter ref.
+ */
+test('Test that DialogKeybindSettings clears filter via flat clear control', async () => {
+  const w = mount(DialogKeybindSettings, {
+    ...dialogKeybindSettingsMountOptions,
+    props: { directInput: 'KeybindSettings' }
+  })
+
+  await flushPromises()
+
+  const filterInputs = w.findAll('input')
+  await filterInputs[0]!.setValue('app')
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="dialogKeybindSettings-filterClear"]').exists()).toBe(true)
+  await w.get('[data-test-locator="dialogKeybindSettings-filterClear"]').trigger('click')
+  await flushPromises()
+
+  expect(filterInputs[0]!.element).toMatchObject({ value: '' })
+  expect(w.find('[data-test-locator="dialogKeybindSettings-filterClear"]').exists()).toBe(false)
   w.unmount()
 })
 

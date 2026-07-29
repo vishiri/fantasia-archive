@@ -1,7 +1,7 @@
 <template>
   <q-dialog
     v-model="dialogModel"
-    persistent
+    :persistent="isDirty"
     :class="['dialogComponent', documentName]"
     aria-labelledby="dialogProjectSettings-title"
   >
@@ -134,14 +134,15 @@ defineOptions({
 const props = defineProps<I_dialogProjectSettingsProps>()
 
 const {
-  currentLanguageCode,
   addDocumentTemplate,
   addWorld,
+  currentLanguageCode,
   dialogModel,
   documentName,
   hasDocumentTemplatesSettingsValidationError,
   hasGeneralSettingsValidationError,
   hasWorldsSettingsValidationError,
+  isDirty,
   isSaveDisabled,
   localDocumentTemplates,
   localSettings,

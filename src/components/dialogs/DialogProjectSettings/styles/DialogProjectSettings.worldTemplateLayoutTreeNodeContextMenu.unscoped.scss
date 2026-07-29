@@ -39,3 +39,15 @@
     padding-right: 0;
   }
 }
+
+/*
+ * Tree group/document rename hosts FaLocaleTranslationsInput as menuPanel — shell chrome
+ * lives on this outer body (inner menuBody stays padding 0 / transparent). Match field-menu fantasy.
+ */
+body.fa-appTheme--fantasy {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu.q-menu .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody {
+    background-color: faLocaleTranslationsInput.$faLocaleTranslationsInput-menu-backgroundColor-fantasy;
+    padding: 0 0 0 faLocaleTranslationsInput.$faLocaleTranslationsInput-menu-body-padding-x;
+  }
+}

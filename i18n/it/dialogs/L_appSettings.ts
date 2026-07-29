@@ -3,6 +3,7 @@ export default {
   saveButton: 'Salva impostazioni',
   closeButton: 'Chiudi senza salvare',
   settingsSearchPlaceholder: 'Cerca nelle impostazioni...',
+  settingsSearchClearAriaLabel: 'Cancella ricerca impostazioni',
   searchNoResultsTitle: 'Nessuna corrispondenza di ricerca',
   searchNoResultsDescription: 'Fantasia purtroppo non ha trovato nessuna ambientazione che stavi cercando. Forse provare un termine di ricerca diverso?',
   appOptionsCategories: {

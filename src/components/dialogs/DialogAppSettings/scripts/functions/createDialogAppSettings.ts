@@ -16,6 +16,7 @@ export function createDialogAppSettings (deps: {
   APP_SETTINGS_OPTIONS: Record<string, { category: string; subcategory: string }>
   S_DialogComponent: () => I_dialogComponentStoreLike
   S_FaUserSettings: () => T_appSettingsFaUserSettingsStoreForSync
+  areFaJsonSnapshotsEqual: (left: unknown, right: unknown) => boolean
   buildAppSettingsRenderTree: (
     translate: { t: (key: string) => string; te: (key: string) => boolean },
     options: Record<string, { category: string; subcategory: string }>,
@@ -75,6 +76,7 @@ export function createDialogAppSettings (deps: {
       searchFilteredAppSettingsTree: ComputedRef<T_appSettingsRenderTree>
     }
     createDialogAppSettingsDialogActions: (params: {
+      baselineSettings: Ref<I_faUserSettings | null>
       dialogModel: Ref<boolean>
       documentName: Ref<string>
       localSettings: Ref<I_faUserSettings | null>
@@ -91,6 +93,7 @@ export function createDialogAppSettings (deps: {
       documentName: Ref<string>
       hasActiveSearchQuery: ComputedRef<boolean>
       hasSearchNoMatchingSettings: ComputedRef<boolean>
+      isDirty: ComputedRef<boolean>
       localSettings: Ref<I_faUserSettings | null>
       appSettingsTree: Ref<T_appSettingsRenderTree>
       saveAndCloseDialog: () => Promise<void>
@@ -244,6 +247,7 @@ export function createDialogAppSettings (deps: {
   }
 
   function createDialogAppSettingsRefs (): {
+    baselineSettings: Ref<I_faUserSettings | null>
     dialogModel: Ref<boolean>
     documentName: Ref<string>
     localSettings: Ref<I_faUserSettings | null>
@@ -254,10 +258,12 @@ export function createDialogAppSettings (deps: {
     const dialogModel = deps.ref(false)
     const documentName = deps.ref('')
     const localSettings = deps.ref<I_faUserSettings | null>(null)
+    const baselineSettings = deps.ref<I_faUserSettings | null>(null)
     const appSettingsTree = deps.ref<T_appSettingsRenderTree>({})
     const searchSettingsQuery = deps.ref<string | null>('')
     const selectedCategoryTab = deps.ref<string>('')
     return {
+      baselineSettings,
       dialogModel,
       documentName,
       localSettings,
@@ -268,6 +274,7 @@ export function createDialogAppSettings (deps: {
   }
 
   function createDialogAppSettingsDialogActions (params: {
+    baselineSettings: Ref<I_faUserSettings | null>
     dialogModel: Ref<boolean>
     documentName: Ref<string>
     localSettings: Ref<I_faUserSettings | null>
@@ -280,6 +287,7 @@ export function createDialogAppSettings (deps: {
       updateLocalSetting: (settingKey: string, updatedValue: T_appSettingsSettingUpdateValue) => void
     } {
     const {
+      baselineSettings,
       dialogModel,
       documentName,
       localSettings,
@@ -287,6 +295,14 @@ export function createDialogAppSettings (deps: {
       props,
       searchSettingsQuery
     } = params
+
+    function captureBaselineFromLocalSettings (): void {
+      if (localSettings.value === null) {
+        baselineSettings.value = null
+        return
+      }
+      baselineSettings.value = JSON.parse(JSON.stringify(localSettings.value)) as I_faUserSettings
+    }
 
     function openDialog (input: T_dialogName): void {
       documentName.value = input
@@ -302,16 +318,20 @@ export function createDialogAppSettings (deps: {
           nextSettings,
           deps.appThemeValues
         )
+        captureBaselineFromLocalSettings()
         return
       }
 
-      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree)
+      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree).then(() => {
+        captureBaselineFromLocalSettings()
+      })
     }
 
     async function saveAndCloseDialog (): Promise<void> {
       if (localSettings.value !== null) {
         const plainSettingsSnapshot: I_faUserSettings = { ...deps.toRaw(localSettings.value) }
         await deps.runFaActionAwait('saveAppSettings', { settings: plainSettingsSnapshot })
+        captureBaselineFromLocalSettings()
       }
 
       dialogModel.value = false
@@ -354,6 +374,7 @@ export function createDialogAppSettings (deps: {
     const refs = createDialogAppSettingsRefs()
     deps.registerComponentDialogStackGuard(refs.dialogModel)
     const {
+      baselineSettings,
       dialogModel,
       documentName,
       localSettings,
@@ -366,6 +387,7 @@ export function createDialogAppSettings (deps: {
       searchSettingsQuery
     })
     const actions = createDialogAppSettingsDialogActions({
+      baselineSettings,
       dialogModel,
       documentName,
       localSettings,
@@ -384,11 +406,18 @@ export function createDialogAppSettings (deps: {
         deps.S_FaUserSettings().clearAppSettingsDialogPreview()
       }
     })
+    const isDirty = deps.computed((): boolean => {
+      if (localSettings.value === null || baselineSettings.value === null) {
+        return false
+      }
+      return !deps.areFaJsonSnapshotsEqual(localSettings.value, baselineSettings.value)
+    })
     return {
       dialogModel,
       documentName,
       hasActiveSearchQuery: searchComputed.hasActiveSearchQuery,
       hasSearchNoMatchingSettings: searchComputed.hasSearchNoMatchingSettings,
+      isDirty,
       localSettings,
       appSettingsTree,
       saveAndCloseDialog: actions.saveAndCloseDialog,

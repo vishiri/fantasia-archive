@@ -3,6 +3,7 @@ export default {
   saveButton: 'حفظ الإعدادات',
   closeButton: 'إغلاق بدون حفظ',
   settingsSearchPlaceholder: 'بحث في الإعدادات...',
+  settingsSearchClearAriaLabel: 'مسح بحث الإعدادات',
   searchNoResultsTitle: 'لا يوجد تطابق في البحث',
   searchNoResultsDescription: 'Fantasia للأسف لم تجد أي إعدادات كنت تبحث عنها. ربما حاول استخدام مصطلح بحث مختلف؟',
   appOptionsCategories: {

@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia fant dessverre ikke noen tastebindinger du lette etter. Prøv et annet søkeord?',
   filterNoResultsTitle: 'Ingen nøkkelbindinger funnet',
+  filterClearAriaLabel: 'Tøm hurtigtastfilter',
   filterPlaceholder: 'Filtrer nøkkelbindinger...',
   saveButton: 'Lagre innstillinger',
   tableEmptyHint: 'Ingen tastatursnarveier er tilgjengelige.',

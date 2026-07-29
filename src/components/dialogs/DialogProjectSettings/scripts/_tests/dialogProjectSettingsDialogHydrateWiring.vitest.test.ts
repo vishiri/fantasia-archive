@@ -9,6 +9,14 @@ import { hydrateDialogProjectSettingsDrafts } from '../dialogProjectSettingsDial
 
 const templateRow = buildDialogProjectSettingsDocumentTemplateDraft()
 
+function emptyBaselines () {
+  return {
+    baselineDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null),
+    baselineSettings: ref<I_faProjectSettingsRoot | null>(null),
+    baselineWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  }
+}
+
 /**
  * hydrateDialogProjectSettingsDrafts
  * Uses direct snapshots when provided and fetches only missing draft slices.
@@ -36,6 +44,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   const localSettings = ref<I_faProjectSettingsRoot | null>(null)
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
+  const baselines = emptyBaselines()
 
   await hydrateDialogProjectSettingsDrafts({
     faProjectDocumentTemplatesFetchFreshForDialog: fetchTemplates,
@@ -43,6 +52,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
     faProjectWorldsFetchFreshForDialog: fetchWorlds,
     getCurrentLanguageCode: () => 'en-US'
   }, {
+    ...baselines,
     localDocumentTemplates,
     localSettings,
     localWorlds,
@@ -57,6 +67,9 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   expect(localDocumentTemplates.value).toEqual([templateRow])
   expect(localSettings.value?.projectName).toBe('Fetched')
   expect(localWorlds.value?.[0]!?.displayNameTranslations).toEqual({ 'en-US': 'Fetched world' })
+  expect(baselines.baselineSettings.value?.projectName).toBe('Fetched')
+  expect(baselines.baselineWorlds.value).toEqual(localWorlds.value)
+  expect(baselines.baselineDocumentTemplates.value).toEqual(localDocumentTemplates.value)
 })
 
 /**
@@ -76,6 +89,7 @@ test('Test that hydrateDialogProjectSettingsDrafts fetches document templates fr
     faProjectWorldsFetchFreshForDialog: vi.fn(async () => []),
     getCurrentLanguageCode: () => 'en-US'
   }, {
+    ...emptyBaselines(),
     localDocumentTemplates,
     localSettings: ref<I_faProjectSettingsRoot | null>(null),
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>(null),
@@ -145,6 +159,7 @@ test('Test that hydrateDialogProjectSettingsDrafts localizes world template layo
     faProjectWorldsFetchFreshForDialog: fetchWorlds,
     getCurrentLanguageCode: () => 'de'
   }, {
+    ...emptyBaselines(),
     localDocumentTemplates,
     localSettings: ref<I_faProjectSettingsRoot | null>(null),
     localWorlds,

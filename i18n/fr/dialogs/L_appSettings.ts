@@ -3,6 +3,7 @@ export default {
   saveButton: 'Enregistrer les paramètres',
   closeButton: 'Fermer sans enregistrer',
   settingsSearchPlaceholder: 'Recherchez les paramètres...',
+  settingsSearchClearAriaLabel: 'Effacer la recherche de paramètres',
   searchNoResultsTitle: 'Aucune correspondance de recherche',
   searchNoResultsDescription: 'Fantasia n\'a malheureusement trouvé aucun paramètre que vous recherchiez. Essayez peut-être un terme de recherche différent ?',
   appOptionsCategories: {

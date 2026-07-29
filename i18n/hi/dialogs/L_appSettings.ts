@@ -3,6 +3,7 @@ export default {
   saveButton: 'सेटिंग्स सेव करें',
   closeButton: 'बिना सहेजे बंद करें',
   settingsSearchPlaceholder: 'सेटिंग्स खोजें...',
+  settingsSearchClearAriaLabel: 'सेटिंग्स खोज साफ़ करें',
   searchNoResultsTitle: 'कोई खोज मिलान नहीं',
   searchNoResultsDescription: 'दुख की बात है कि फंतासिया को कोई भी सेटिंग नहीं मिली जिसे आप ढूंढ रहे थे। शायद कोई भिन्न खोज शब्द आज़माएँ?',
   appOptionsCategories: {

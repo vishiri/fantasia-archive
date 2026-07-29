@@ -8,6 +8,8 @@
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem {
+  transition: $qMenu-item-hover-colorTransition;
+
   &:hover:not([aria-disabled='true']),
   &:focus:not([aria-disabled='true']) {
     color: $dialogProjectSettings-worldColorPalette-contextMenu-hoverColor;
@@ -22,11 +24,13 @@
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuLabel {
+  transition: $qMenu-item-hover-colorTransition;
   white-space: nowrap;
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon {
   font-size: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+  transition: $qMenu-item-hover-colorTransition;
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuSeparator {

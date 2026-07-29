@@ -71,15 +71,16 @@ const dialogAppSettingsQInputStub = defineComponent({
         :value="modelValue ?? ''"
         @input="onInput"
       />
-      <button
-        type="button"
-        class="dialogAppSettings__searchClearStub"
-        @click="$emit('update:modelValue', null)"
-      >
-        clear
-      </button>
+      <slot name="append" />
     </div>
   `
+})
+
+const dialogAppSettingsQBtnStub = defineComponent({
+  name: 'QBtn',
+  inheritAttrs: true,
+  emits: ['click'],
+  template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\', $event)"><slot /></button>'
 })
 
 const dialogAppSettingsQDialogStub = defineComponent({
@@ -177,6 +178,7 @@ const appSettingsQuasarStubTags = new Set([
 const appSettingsDialogMountOptions = {
   global: {
     components: {
+      QBtn: dialogAppSettingsQBtnStub,
       QDialog: dialogAppSettingsQDialogStub,
       QIcon: dialogAppSettingsQIconStub,
       QInput: dialogAppSettingsQInputStub,
@@ -354,7 +356,7 @@ test('Test that DialogAppSettings hides empty state visually when search returns
  * DialogAppSettings
  * Clearing the settings search should emit a null query from the debounced input stand-in.
  */
-test('Test that DialogAppSettings clears settings search to null via stub clear control', async () => {
+test('Test that DialogAppSettings clears settings search to null via flat clear control', async () => {
   const w = mount(DialogAppSettings, {
     props: { directInput: 'AppSettings' },
     ...appSettingsDialogMountOptions
@@ -369,13 +371,12 @@ test('Test that DialogAppSettings clears settings search to null via stub clear 
   })
   await flushPromises()
 
-  await w.get('.dialogAppSettings__searchClearStub').trigger('click')
+  await w.get('[data-test-locator="dialogAppSettings-settingsSearchClear"]').trigger('click')
   await flushPromises()
 
   expect(w.get('.dialogComponent').classes()).not.toContain('hasActiveSearchQuery')
   w.unmount()
 })
-
 /**
  * DialogAppSettings
  * Vertical tabs should accept category selection updates from the QTabs stand-in.

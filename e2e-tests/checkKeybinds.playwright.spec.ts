@@ -284,6 +284,47 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await closeAppSettingsDialog(appWindow)
     })
 
+    await test.step('Default app settings open chord dismisses when clean', async () => {
+      await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
+      await expect(appSettingsTitle).toBeVisible()
+      await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
+      await expect(appSettingsTitle).toBeHidden({
+        timeout: 15_000
+      })
+    })
+
+    await test.step('Default app settings open chord stays sticky when dirty', async () => {
+      await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
+      await expect(appSettingsTitle).toBeVisible()
+      const searchInput = appWindow.locator('.dialogAppSettings__settingsSearchWrapper input').first()
+      await searchInput.click()
+      await searchInput.fill('show document')
+      await appWindow.waitForTimeout(400)
+      const settingRow = appWindow.locator(
+        '[data-test-locator="dialogAppSettings-search-setting-showDocumentID"]'
+      )
+      await expect(settingRow).toBeVisible({
+        timeout: 15_000
+      })
+      const toggle = settingRow.locator('.q-toggle').first()
+      await toggle.click()
+      await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
+      await expect(appSettingsTitle).toBeVisible()
+      await closeAppSettingsDialog(appWindow)
+    })
+
+    await test.step('Default action monitor open chord dismisses when already open', async () => {
+      await pressDefaultOpenActionMonitorChord(appWindow)
+      const root = appWindow.locator('.dialogActionMonitor')
+      await expect(root).toBeVisible({
+        timeout: 15_000
+      })
+      await pressDefaultOpenActionMonitorChord(appWindow)
+      await expect(root).toBeHidden({
+        timeout: 15_000
+      })
+    })
+
     await test.step('Default custom app CSS opens then closes', async () => {
       await triggerGlobalShortcut(appWindow, defaultChord.openAppStyling)
       await expect(appStylingTitle).toBeVisible({

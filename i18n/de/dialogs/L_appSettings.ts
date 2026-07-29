@@ -3,6 +3,7 @@ export default {
   saveButton: 'Einstellungen speichern',
   closeButton: 'Schließen ohne zu speichern',
   settingsSearchPlaceholder: 'Durchsuchen Sie die Einstellungen...',
+  settingsSearchClearAriaLabel: 'Einstellungssuche löschen',
   searchNoResultsTitle: 'Kein Suchtreffer',
   searchNoResultsDescription: 'Fantasia hat leider keine Einstellungen gefunden, nach denen Sie gesucht haben. Versuchen Sie es vielleicht mit einem anderen Suchbegriff?',
   appOptionsCategories: {

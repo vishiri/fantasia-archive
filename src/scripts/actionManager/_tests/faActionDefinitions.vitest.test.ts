@@ -53,6 +53,8 @@ const {
   setProjectNoteboardWindowOpenMock,
   tipsNotificationMock,
   toggleDevToolsMock,
+  tryDismissFaComponentDialogIfOpenMock,
+  tryDismissFaMarkdownDocumentIfOpenMock,
   updateKeybindsMock,
   updateAppStylingMock,
   updateSettingsMock,
@@ -85,6 +87,8 @@ const {
   setProjectNoteboardWindowOpenMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
+  tryDismissFaComponentDialogIfOpenMock: vi.fn((): boolean => false),
+  tryDismissFaMarkdownDocumentIfOpenMock: vi.fn((): boolean => false),
   updateKeybindsMock: vi.fn(async () => true),
   updateAppStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined),
@@ -194,6 +198,8 @@ vi.mock('app/src/stores/S_FaUserSettings', () => ({
 vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', () => ({
   openDialogComponent: openDialogComponentMock,
   openDialogMarkdownDocument: openDialogMarkdownDocumentMock,
+  tryDismissFaComponentDialogIfOpen: tryDismissFaComponentDialogIfOpenMock,
+  tryDismissFaMarkdownDocumentIfOpen: tryDismissFaMarkdownDocumentIfOpenMock,
   toggleDevTools: toggleDevToolsMock,
   tipsTricksTriviaNotification: tipsNotificationMock
 }))
@@ -225,6 +231,10 @@ beforeEach(() => {
   minimizeWindowMock.mockReset()
   openDialogComponentMock.mockReset()
   openDialogMarkdownDocumentMock.mockReset()
+  tryDismissFaComponentDialogIfOpenMock.mockReset()
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(false)
+  tryDismissFaMarkdownDocumentIfOpenMock.mockReset()
+  tryDismissFaMarkdownDocumentIfOpenMock.mockReturnValue(false)
   refreshWebContentsMock.mockReset()
   refreshWebContentsMock.mockImplementation(async () => true)
   resizeWindowMock.mockReset()
@@ -349,12 +359,20 @@ test('Test that toggleDeveloperTools handler delegates to toggleDevTools', () =>
 
 test('Test that openKeybindSettingsDialog handler opens the KeybindSettings dialog', () => {
   definitionFor('openKeybindSettingsDialog').handler(undefined)
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('KeybindSettings')
   expect(openDialogComponentMock).toHaveBeenCalledWith('KeybindSettings')
 })
 
 test('Test that openAppSettingsDialog handler opens the AppSettings dialog', () => {
   definitionFor('openAppSettingsDialog').handler(undefined)
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('AppSettings')
   expect(openDialogComponentMock).toHaveBeenCalledWith('AppSettings')
+})
+
+test('Test that openAppSettingsDialog handler dismisses when AppSettings is already open', () => {
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValueOnce(true)
+  definitionFor('openAppSettingsDialog').handler(undefined)
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
 
 test('Test that openAppStylingWindow handler opens the WindowAppStyling surface', () => {
@@ -483,6 +501,7 @@ test('Test that toggleHierarchicalTree handler flips hideHierarchyTree silently'
 
 test('Test that openAdvancedSearchGuideDialog handler opens the advancedSearchGuide markdown document', () => {
   definitionFor('openAdvancedSearchGuideDialog').handler(undefined)
+  expect(tryDismissFaMarkdownDocumentIfOpenMock).toHaveBeenCalledWith('advancedSearchGuide')
   expect(openDialogMarkdownDocumentMock).toHaveBeenCalledWith('advancedSearchGuide')
 })
 
@@ -508,6 +527,7 @@ test('Test that openTipsTricksTriviaDialog handler opens the tipsTricksTrivia ma
 
 test('Test that openActionMonitorDialog handler opens the ActionMonitor dialog', () => {
   definitionFor('openActionMonitorDialog').handler(undefined)
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('ActionMonitor')
   expect(openDialogComponentMock).toHaveBeenCalledWith('ActionMonitor')
 })
 

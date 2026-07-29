@@ -5,7 +5,6 @@
       <q-input
         :model-value="props.searchSettingsQuery"
         :placeholder="$t('dialogs.appSettings.settingsSearchPlaceholder')"
-        clearable
         dense
         dark
         debounce="300"
@@ -14,6 +13,22 @@
       >
         <template #prepend>
           <q-icon name="search" />
+        </template>
+        <template
+          v-if="showsSettingsSearchClear"
+          #append
+        >
+          <q-btn
+            color="secondary"
+            dense
+            flat
+            icon="mdi-close"
+            round
+            size="sm"
+            :aria-label="$t('dialogs.appSettings.settingsSearchClearAriaLabel')"
+            data-test-locator="dialogAppSettings-settingsSearchClear"
+            @click.stop="clearSettingsSearchQuery"
+          />
         </template>
       </q-input>
     </div>
@@ -27,12 +42,13 @@
       }"
       active-color="primary-bright"
       indicator-color="primary-bright"
-      @update:model-value="emit('update:selectedCategoryTab', $event)"
+      @update:model-value="onSelectedCategoryTabUpdate"
     >
       <q-tab
         v-for="(category, categoryKey) in appSettingsTree"
         :key="categoryKey"
         :class="{ 'fa-text-muted': categoryKey !== props.selectedCategoryTab }"
+        :disable="hasActiveSearchQuery"
         :name="categoryKey"
         :label="category.title"
         :data-test-locator="`dialogAppSettings-tab-${categoryKey}`"
@@ -42,6 +58,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
 
 const props = defineProps<{
@@ -56,12 +74,27 @@ const emit = defineEmits<{
   'update:selectedCategoryTab': [value: string]
 }>()
 
+const showsSettingsSearchClear = computed(
+  () => (props.searchSettingsQuery ?? '').length > 0
+)
+
 function emitSearchQueryFromInput (value: string | number | null): void {
   if (value === null || value === undefined) {
     emit('update:searchSettingsQuery', null)
     return
   }
   emit('update:searchSettingsQuery', String(value))
+}
+
+function clearSettingsSearchQuery (): void {
+  emit('update:searchSettingsQuery', null)
+}
+
+function onSelectedCategoryTabUpdate (value: unknown): void {
+  if (props.hasActiveSearchQuery) {
+    return
+  }
+  emit('update:selectedCategoryTab', String(value))
 }
 </script>
 
@@ -72,12 +105,36 @@ function emitSearchQueryFromInput (value: string | number | null): void {
 
 .dialogAppSettings__tabs {
   /* Above painted vertical separator so right-edge glow can overlap it. */
+  filter: grayscale(0);
+  opacity: 1;
   position: relative;
+  transition:
+    filter $dialogAppSettings-tabsNonInteractive-transitionDuration
+    $dialogAppSettings-tabsNonInteractive-transitionTiming,
+    opacity $dialogAppSettings-tabsNonInteractive-transitionDuration
+    $dialogAppSettings-tabsNonInteractive-transitionTiming;
   z-index: $faTabEdgeGlow-zIndex;
 }
 
+/* Search on: grey fade + not-allowed cursor; clicks blocked via :disable + emit guard. */
 .dialogAppSettings__tabs--nonInteractive {
-  pointer-events: none;
+  cursor: not-allowed;
+  filter: grayscale($dialogAppSettings-tabsNonInteractive-grayscale);
+  opacity: $dialogAppSettings-tabsNonInteractive-opacity;
+
+  :deep(.q-tab) {
+    cursor: not-allowed;
+
+    /* Parent already fades; avoid stacking Quasar .disabled opacity. */
+    &.disabled {
+      opacity: 1 !important;
+    }
+
+    /* Kill fantasy edge glow while faded. */
+    &::after {
+      opacity: 0 !important;
+    }
+  }
 }
 
 .dialogAppSettings__settingsSearchInput {
@@ -89,33 +146,7 @@ function emitSearchQueryFromInput (value: string | number | null): void {
   position: absolute;
   right: $dialogAppSettings-settingsSearchWrapper-right;
   top: $dialogAppSettings-settingsSearchWrapper-top;
-  width:
-    min(
-      #{$dialogAppSettings-settingsSearchWrapper-widthMax},
-      calc(100vw - #{$dialogAppSettings-settingsSearchWrapper-widthViewportSubtract})
-    );
+  width: $dialogAppSettings-settingsSearchWrapper-width !important;
   z-index: $dialogAppSettings-settingsSearchWrapper-zIndex;
-
-  &::before {
-    border-bottom-left-radius: $dialogAppSettings-settingsSearchWrapper-before-borderBottomLeftRadius;
-    box-shadow: $dialogAppSettings-settingsSearchWrapper-before-boxShadow;
-    content: "";
-    inset: $dialogAppSettings-settingsSearchWrapper-before-inset;
-    opacity: 0;
-    position: absolute;
-    transition: $dialogAppSettings-settingsSearchWrapper-transition;
-    z-index: 0;
-  }
-
-  &::after {
-    content: "";
-    height: $dialogAppSettings-settingsSearchWrapper-after-height;
-    left: $dialogAppSettings-settingsSearchWrapper-after-left;
-    opacity: 0;
-    position: absolute;
-    right: $dialogAppSettings-settingsSearchWrapper-after-right;
-    top: $dialogAppSettings-settingsSearchWrapper-after-top;
-    transition: $dialogAppSettings-settingsSearchWrapper-transition;
-  }
 }
 </style>

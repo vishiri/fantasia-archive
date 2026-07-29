@@ -3,6 +3,7 @@ export default {
   saveButton: 'Αποθήκευση ρυθμίσεων',
   closeButton: 'Κλείσιμο χωρίς αποθήκευση',
   settingsSearchPlaceholder: 'Αναζήτηση στις ρυθμίσεις...',
+  settingsSearchClearAriaLabel: 'Καθαρισμός αναζήτησης ρυθμίσεων',
   searchNoResultsTitle: 'Καμία αντιστοίχιση αναζήτησης',
   searchNoResultsDescription: 'Η Fantasia δυστυχώς δεν βρήκε καμία ρύθμιση που ψάχνατε. Ίσως δοκιμάσετε έναν διαφορετικό όρο αναζήτησης;',
   appOptionsCategories: {

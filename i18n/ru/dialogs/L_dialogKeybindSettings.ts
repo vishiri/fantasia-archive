@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'К сожалению, Fantasia не нашла нужных вам сочетаний клавиш. Попробуйте другой поисковый запрос?',
   filterNoResultsTitle: 'Привязки клавиш не найдены',
+  filterClearAriaLabel: 'Очистить фильтр сочетаний клавиш',
   filterPlaceholder: 'Фильтровать сочетания клавиш…',
   saveButton: 'Сохранить настройки',
   tableEmptyHint: 'Сочетания клавиш недоступны.',

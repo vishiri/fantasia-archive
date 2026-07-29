@@ -105,6 +105,7 @@ function onDialogModel (open: boolean): void {
 
 <style lang="scss" scoped>
 .dialogKeybindSettingsCapture {
+  /* Light surface; real beat of dialog-shell !important lives in quasarComponentsAdjustments. */
   background: $dialogKeybindSettingsCapture-cardBackground;
   color: $dialogKeybindSettingsCapture-text;
   max-height: calc(100vh - #{$dialogKeybindSettingsCapture-card-maxHeightViewportSubtract}) !important;
@@ -132,6 +133,30 @@ function onDialogModel (open: boolean): void {
     position: absolute;
     right: $dialogKeybindSettingsCapture-closeButton-inset;
     top: $dialogKeybindSettingsCapture-closeButton-inset;
+  }
+}
+</style>
+
+<style lang="scss">
+/* Fantasy: capture close keeps flat Quasar focus-helper wash (no gold edge glow). */
+body.desktop.fa-appTheme--fantasy .dialogKeybindSettingsCapture__close.q-btn--flat.q-focusable:focus > .q-focus-helper {
+  background: currentcolor;
+  opacity: $qFocusable-focusHelper-opacity !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+body.desktop.fa-appTheme--fantasy .dialogKeybindSettingsCapture__close.q-btn--flat.q-hoverable:hover > .q-focus-helper,
+body.desktop.fa-appTheme--fantasy .dialogKeybindSettingsCapture__close.q-btn--flat.q-manual-focusable--focused > .q-focus-helper {
+  background: currentcolor;
+  opacity: $qFocusable-hoverHelper-opacity !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
   }
 }
 </style>

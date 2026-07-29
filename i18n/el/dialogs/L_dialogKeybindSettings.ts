@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Η Fantasia δυστυχώς δεν βρήκε κανένα keybinds που ψάχνατε. Δοκιμάστε έναν διαφορετικό όρο αναζήτησης;',
   filterNoResultsTitle: 'Δεν βρέθηκαν κλειδιά',
+  filterClearAriaLabel: 'Καθαρισμός φίλτρου συντομεύσεων',
   filterPlaceholder: 'Φιλτράρισμα κλειδιών…',
   saveButton: 'Αποθήκευση ρυθμίσεων',
   tableEmptyHint: 'Δεν υπάρχουν διαθέσιμες συντομεύσεις πληκτρολογίου.',

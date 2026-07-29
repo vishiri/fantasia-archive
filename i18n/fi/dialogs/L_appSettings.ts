@@ -3,6 +3,7 @@ export default {
   saveButton: 'Tallenna asetukset',
   closeButton: 'Sulje tallentamatta',
   settingsSearchPlaceholder: 'Hae asetuksista...',
+  settingsSearchClearAriaLabel: 'Tyhjennä asetushaku',
   searchNoResultsTitle: 'Ei hakua',
   searchNoResultsDescription: 'Fantasia ei valitettavasti löytänyt etsimiäsi asetuksia. Ehkä kokeile toista hakusanaa?',
   appOptionsCategories: {

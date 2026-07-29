@@ -3,6 +3,7 @@ export default {
   saveButton: 'Зберегти налаштування',
   closeButton: 'Закрити без збереження',
   settingsSearchPlaceholder: 'Пошук налаштувань...',
+  settingsSearchClearAriaLabel: 'Очистити пошук налаштувань',
   searchNoResultsTitle: 'Пошуковий збіг відсутній',
   searchNoResultsDescription: 'Fantasia, на жаль, не знайшла параметрів, які ви шукали. Можливо, спробуйте інший пошуковий термін?',
   appOptionsCategories: {

@@ -1,7 +1,7 @@
 <template>
   <q-dialog
     v-model="dialogModel"
-    persistent
+    :persistent="isDirty"
     :class="[
       'dialogComponent',
       `${documentName}`,
@@ -12,19 +12,6 @@
     <q-card
       :class="['dialogComponent__wrapper', 'dialogAppSettings', `${documentName}`]"
     >
-      <!-- Scrim must be a direct child of .dialogComponent__wrapper (position: relative) so inset:0 covers the full card; nesting under .dialogAppSettings__body does not. -->
-      <Transition
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-        :duration="200"
-      >
-        <div
-          v-if="hasActiveSearchQuery"
-          class="dialogAppSettings__tabsSearchOverlay"
-          data-test-locator="dialogAppSettings-tabsSearchOverlay"
-        />
-      </Transition>
-
       <!-- Title: fixed, does not scroll with tab content -->
       <h5
         id="dialogAppSettings-title"
@@ -101,6 +88,7 @@ const {
   documentName,
   hasActiveSearchQuery,
   hasSearchNoMatchingSettings,
+  isDirty,
   appSettingsTree,
   saveAndCloseDialog,
   searchFilteredAppSettingsTree,
@@ -132,32 +120,8 @@ const {
     overflow: hidden;
   }
 
-  .dialogAppSettings__tabsSearchOverlay {
-    background: $dialogAppSettings-scrimDark;
-    inset: 0;
-    pointer-events: none;
-    position: absolute;
-    z-index: $dialogAppSettings-tabsSearchOverlay-zIndex;
-  }
-
   .q-tabs--vertical .q-tab {
     padding: 0 $dialogAppSettings-verticalTab-paddingX;
-  }
-
-  &.hasActiveSearchQuery {
-    .dialogAppSettings__settingsSearchWrapper {
-      &::after {
-        background: $dialogAppSettings-gradientTop;
-        content: "";
-        opacity: 1;
-      }
-
-      &::before {
-        background-color: $dialogAppSettings-surface-backgroundColor;
-        content: "";
-        opacity: 1;
-      }
-    }
   }
 
   .dialogAppSettings__cardActions {

@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: '残念ながら、Fantasia ではお探しのキーバインドが見つかりませんでした。別の検索語を試してみますか?',
   filterNoResultsTitle: 'キーバインドが見つかりません',
+  filterClearAriaLabel: 'キーバインドフィルターをクリア',
   filterPlaceholder: 'フィルターキーバインド…',
   saveButton: '設定の保存',
   tableEmptyHint: '使用できるキーボード ショートカットはありません。',

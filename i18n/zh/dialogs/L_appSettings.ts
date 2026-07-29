@@ -3,6 +3,7 @@ export default {
   saveButton: '保存设置',
   closeButton: '关闭而不保存',
   settingsSearchPlaceholder: '搜索设置...',
+  settingsSearchClearAriaLabel: '清除设置搜索',
   searchNoResultsTitle: '没有搜索匹配',
   searchNoResultsDescription: '遗憾的是，Fantasia 没有找到您需要的任何设置。也许尝试不同的搜索词？',
   appOptionsCategories: {

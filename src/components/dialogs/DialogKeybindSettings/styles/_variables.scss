@@ -4,6 +4,7 @@
 $dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
 $dialogKeybindSettings-card-width: 1200px;
 $dialogKeybindSettings-filterEmpty-padding: 16px 24px 24px;
+$dialogKeybindSettings-filterInput-width: 250px;
 $dialogKeybindSettings-table-col-default-width: 200px;
 $dialogKeybindSettings-table-col-name-width: 200px;
 $dialogKeybindSettings-table-col-user-width: 200px;
@@ -24,6 +25,8 @@ $dialogKeybindSettingsCapture-fieldLabel-marginTop: 7px;
 $dialogKeybindSettingsCapture-fieldRow-marginTop: 20px;
 $dialogKeybindSettingsCapture-helpIcon-marginLeft: 10px;
 $dialogKeybindSettingsCapture-helpIcon-top: 4px;
+/* Light capture card: grey/dark circle (global FaHelpTooltipIcon circle is white for dark chrome). */
+$dialogKeybindSettingsCapture-helpIcon-color: fa-v('dark', $dark);
 $dialogKeybindSettingsCapture-keybindUpdateField-maxWidth: 550px;
 $dialogKeybindSettingsCapture-srStatus-dimensionalSize: 1px;
 $dialogKeybindSettingsCapture-text: fa-v('dark', $dark);
@@ -31,7 +34,10 @@ $dialogKeybindSettingsCapture-title-fontSize: 1.15rem;
 $dialogKeybindSettingsCapture-title-marginTop: 8px;
 $dialogKeybindSettingsCapture-titleText: fa-v('dark', $dark);
 $dialogKeybindSettingsCapture-tooltip-background: fa-v('white', $white);
+/* Fantasy: parchment q-tooltip owns surface; shell must not paint a nested card. */
+$dialogKeybindSettingsCapture-tooltip-background-fantasy: transparent;
 $dialogKeybindSettingsCapture-tooltip-border: 1px solid fa-v('dark', $dark);
+$dialogKeybindSettingsCapture-tooltip-border-fantasy: none;
 $dialogKeybindSettingsCapture-tooltip-fontSize: 13px;
 $dialogKeybindSettingsCapture-tooltip-fontWeight: 500;
 $dialogKeybindSettingsCapture-tooltip-footnote-marginTop: 10px;
@@ -39,4 +45,5 @@ $dialogKeybindSettingsCapture-tooltip-heading-marginBottom: 6px;
 $dialogKeybindSettingsCapture-tooltip-list-paddingLeft: 1.1rem;
 $dialogKeybindSettingsCapture-tooltip-listItem-marginVertical: 2px;
 $dialogKeybindSettingsCapture-tooltip-padding: 12px 14px;
+$dialogKeybindSettingsCapture-tooltip-padding-fantasy: 0;
 $dialogKeybindSettingsCapture-tooltip-text: fa-v('dark', $dark);

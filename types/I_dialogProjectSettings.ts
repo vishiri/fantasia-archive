@@ -19,6 +19,48 @@ export interface I_dialogProjectSettingsProps {
 }
 
 /** Injected dependencies for createDialogProjectSettingsUseHook. */
+export type T_dialogProjectSettingsDialogActionsApi = {
+  addDocumentTemplate: () => void
+  addWorld: () => void
+  openDialog: (input: T_dialogName) => void
+  removeDocumentTemplate: (id: string) => void
+  removeWorld: (id: string) => void
+  saveAndCloseDialog: () => Promise<void>
+  saveWithoutClosingDialog: () => Promise<void>
+  updateDocumentTemplateTitleTranslations: (
+    id: string,
+    titleTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
+  updateDocumentTemplateIcon: (id: string, icon: string) => void
+  updateDocumentTemplateWorldAppendixTranslations: (
+    id: string,
+    worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+  ) => void
+  updateWorldColor: (id: string, color: string) => void
+  updateWorldColorPallete: (id: string, colorPallete: string) => void
+  updateWorldDisplayNameTranslations: (
+    id: string,
+    displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+  ) => void
+  updateWorldTemplateLayout: (
+    id: string,
+    templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
+  ) => void
+}
+
+export type T_dialogProjectSettingsDialogActionsParams = {
+  baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+  baselineSettings: Ref<I_faProjectSettingsRoot | null>
+  baselineWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
+  dialogModel: Ref<boolean>
+  documentName: Ref<string>
+  localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+  localSettings: Ref<I_faProjectSettingsRoot | null>
+  localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
+  props: I_dialogProjectSettingsProps
+  selectedCategoryTab: Ref<string>
+}
+
 export type T_dialogProjectSettingsUseHookDeps = {
   buildDialogProjectSettingsSaveValidationTooltipForDraft: (
     projectName: string,
@@ -27,44 +69,12 @@ export type T_dialogProjectSettingsUseHookDeps = {
   ) => I_dialogProjectSettingsSaveValidationTooltipContent
   computed: <T>(getter: () => T) => ComputedRef<T>
   createDialogProjectSettingsDialogActions: (
-    params: {
-      dialogModel: Ref<boolean>
-      documentName: Ref<string>
-      localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
-      localSettings: Ref<I_faProjectSettingsRoot | null>
-      localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
-      props: I_dialogProjectSettingsProps
-      selectedCategoryTab: Ref<string>
-    }
-  ) => {
-    addDocumentTemplate: () => void
-    addWorld: () => void
-    openDialog: (input: T_dialogName) => void
-    removeDocumentTemplate: (id: string) => void
-    removeWorld: (id: string) => void
-    saveAndCloseDialog: () => Promise<void>
-    saveWithoutClosingDialog: () => Promise<void>
-    updateDocumentTemplateTitleTranslations: (
-      id: string,
-      titleTranslations: I_faLocaleSingularPluralTranslations
-    ) => void
-    updateDocumentTemplateIcon: (id: string, icon: string) => void
-    updateDocumentTemplateWorldAppendixTranslations: (
-      id: string,
-      worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
-    ) => void
-    updateWorldColor: (id: string, color: string) => void
-    updateWorldColorPallete: (id: string, colorPallete: string) => void
-    updateWorldDisplayNameTranslations: (
-      id: string,
-      displayNameTranslations: I_faProjectWorldDisplayNameTranslations
-    ) => void
-    updateWorldTemplateLayout: (
-      id: string,
-      templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
-    ) => void
-  }
+    params: T_dialogProjectSettingsDialogActionsParams
+  ) => T_dialogProjectSettingsDialogActionsApi
   createDialogProjectSettingsRefs: () => {
+    baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+    baselineSettings: Ref<I_faProjectSettingsRoot | null>
+    baselineWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
     dialogModel: Ref<boolean>
     documentName: Ref<string>
     localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>

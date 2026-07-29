@@ -1,6 +1,7 @@
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import type { T_dialogProjectSettingsUseHookDeps } from 'app/types/I_dialogProjectSettings'
 
+import { createDialogProjectSettingsIsDirtyComputed } from './createDialogProjectSettingsIsDirtyComputedWiring'
 import { createDialogProjectSettingsValidationComputeds } from './createDialogProjectSettingsValidationComputedsWiring'
 import { registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher } from './dialogProjectSettingsLanguageLayoutLabelsSyncWatcher'
 
@@ -13,6 +14,9 @@ export function useDialogProjectSettingsImpl (
   const refs = deps.createDialogProjectSettingsRefs()
   deps.registerComponentDialogStackGuard(refs.dialogModel)
   const {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
     dialogModel,
     documentName,
     localDocumentTemplates,
@@ -21,6 +25,9 @@ export function useDialogProjectSettingsImpl (
     selectedCategoryTab
   } = refs
   const actions = deps.createDialogProjectSettingsDialogActions({
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
     dialogModel,
     documentName,
     localDocumentTemplates,
@@ -63,6 +70,17 @@ export function useDialogProjectSettingsImpl (
     watch: deps.watch
   })
 
+  const isDirty = createDialogProjectSettingsIsDirtyComputed({
+    computed: deps.computed
+  }, {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds
+  })
+
   return {
     addDocumentTemplate: actions.addDocumentTemplate,
     addWorld: actions.addWorld,
@@ -72,6 +90,7 @@ export function useDialogProjectSettingsImpl (
     hasDocumentTemplatesSettingsValidationError: validation.hasDocumentTemplatesSettingsValidationError,
     hasGeneralSettingsValidationError: validation.hasGeneralSettingsValidationError,
     hasWorldsSettingsValidationError: validation.hasWorldsSettingsValidationError,
+    isDirty,
     isSaveDisabled: validation.isSaveDisabled,
     localDocumentTemplates,
     localSettings,

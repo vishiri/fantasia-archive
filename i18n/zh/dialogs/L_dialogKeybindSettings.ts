@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: '遗憾的是，Fantasia 没有找到您正在寻找的任何按键绑定。尝试不同的搜索词？',
   filterNoResultsTitle: '未找到按键绑定',
+  filterClearAriaLabel: '清除快捷键筛选',
   filterPlaceholder: '过滤器按键绑定...',
   saveButton: '保存设置',
   tableEmptyHint: '没有可用的键盘快捷键。',

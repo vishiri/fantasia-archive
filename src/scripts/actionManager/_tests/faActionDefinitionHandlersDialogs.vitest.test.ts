@@ -4,12 +4,16 @@ import { beforeEach, expect, test, vi } from 'vitest'
 const {
   openDialogComponentMock,
   openDialogMarkdownDocumentMock,
+  tryDismissFaComponentDialogIfOpenMock,
+  tryDismissFaMarkdownDocumentIfOpenMock,
   mockActiveProjectGate,
   canOpenFloatingWindowWhileNoModalMock
 } = vi.hoisted(() => {
   return {
     openDialogComponentMock: vi.fn(),
     openDialogMarkdownDocumentMock: vi.fn(),
+    tryDismissFaComponentDialogIfOpenMock: vi.fn((): boolean => false),
+    tryDismissFaMarkdownDocumentIfOpenMock: vi.fn((): boolean => false),
     mockActiveProjectGate: {
       hasActiveProject: true
     },
@@ -34,11 +38,15 @@ vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', a
   return {
     ...actual,
     openDialogComponent: openDialogComponentMock,
-    openDialogMarkdownDocument: openDialogMarkdownDocumentMock
+    openDialogMarkdownDocument: openDialogMarkdownDocumentMock,
+    tryDismissFaComponentDialogIfOpen: tryDismissFaComponentDialogIfOpenMock,
+    tryDismissFaMarkdownDocumentIfOpen: tryDismissFaMarkdownDocumentIfOpenMock
   }
 })
 
 import {
+  handleOpenActionMonitorDialog,
+  handleOpenAdvancedSearchGuideDialog,
   handleOpenAppSettingsDialog,
   handleOpenAppStylingWindow,
   handleOpenKeybindSettingsDialog,
@@ -49,6 +57,10 @@ import {
 beforeEach(() => {
   openDialogComponentMock.mockReset()
   openDialogMarkdownDocumentMock.mockReset()
+  tryDismissFaComponentDialogIfOpenMock.mockReset()
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(false)
+  tryDismissFaMarkdownDocumentIfOpenMock.mockReset()
+  tryDismissFaMarkdownDocumentIfOpenMock.mockReturnValue(false)
   mockActiveProjectGate.hasActiveProject = true
   canOpenFloatingWindowWhileNoModalMock.mockReset()
   canOpenFloatingWindowWhileNoModalMock.mockReturnValue(true)
@@ -60,7 +72,18 @@ beforeEach(() => {
  */
 test('Test that handleOpenKeybindSettingsDialog opens KeybindSettings', async () => {
   await handleOpenKeybindSettingsDialog()
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('KeybindSettings')
   expect(openDialogComponentMock).toHaveBeenCalledWith('KeybindSettings')
+})
+
+/**
+ * handleOpenKeybindSettingsDialog
+ * Skips open when tryDismiss reports the dialog already open.
+ */
+test('Test that handleOpenKeybindSettingsDialog dismisses when already open', async () => {
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(true)
+  await handleOpenKeybindSettingsDialog()
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -69,7 +92,18 @@ test('Test that handleOpenKeybindSettingsDialog opens KeybindSettings', async ()
  */
 test('Test that handleOpenAppSettingsDialog opens AppSettings', async () => {
   await handleOpenAppSettingsDialog()
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('AppSettings')
   expect(openDialogComponentMock).toHaveBeenCalledWith('AppSettings')
+})
+
+/**
+ * handleOpenAppSettingsDialog
+ * Skips open when tryDismiss reports the dialog already open.
+ */
+test('Test that handleOpenAppSettingsDialog dismisses when already open', async () => {
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(true)
+  await handleOpenAppSettingsDialog()
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -116,7 +150,19 @@ test('Test that handleOpenProjectStylingWindow skips when floating windows canno
  */
 test('Test that handleOpenProjectSettingsDialog opens ProjectSettings when a project is active', async () => {
   await handleOpenProjectSettingsDialog()
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('ProjectSettings')
   expect(openDialogComponentMock).toHaveBeenCalledWith('ProjectSettings')
+})
+
+/**
+ * handleOpenProjectSettingsDialog
+ * Dismisses when already open even without an active project gate check after dismiss.
+ */
+test('Test that handleOpenProjectSettingsDialog dismisses when already open', async () => {
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(true)
+  mockActiveProjectGate.hasActiveProject = false
+  await handleOpenProjectSettingsDialog()
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -127,4 +173,44 @@ test('Test that handleOpenProjectSettingsDialog skips without an active project'
   mockActiveProjectGate.hasActiveProject = false
   await handleOpenProjectSettingsDialog()
   expect(openDialogComponentMock).not.toHaveBeenCalled()
+})
+
+/**
+ * handleOpenActionMonitorDialog
+ * Opens Action Monitor when it is not already open.
+ */
+test('Test that handleOpenActionMonitorDialog opens ActionMonitor', async () => {
+  await handleOpenActionMonitorDialog()
+  expect(tryDismissFaComponentDialogIfOpenMock).toHaveBeenCalledWith('ActionMonitor')
+  expect(openDialogComponentMock).toHaveBeenCalledWith('ActionMonitor')
+})
+
+/**
+ * handleOpenActionMonitorDialog
+ * Skips open when tryDismiss reports the dialog already open.
+ */
+test('Test that handleOpenActionMonitorDialog dismisses when already open', async () => {
+  tryDismissFaComponentDialogIfOpenMock.mockReturnValue(true)
+  await handleOpenActionMonitorDialog()
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
+})
+
+/**
+ * handleOpenAdvancedSearchGuideDialog
+ * Opens the advanced search guide markdown document when closed.
+ */
+test('Test that handleOpenAdvancedSearchGuideDialog opens advancedSearchGuide', async () => {
+  await handleOpenAdvancedSearchGuideDialog()
+  expect(tryDismissFaMarkdownDocumentIfOpenMock).toHaveBeenCalledWith('advancedSearchGuide')
+  expect(openDialogMarkdownDocumentMock).toHaveBeenCalledWith('advancedSearchGuide')
+})
+
+/**
+ * handleOpenAdvancedSearchGuideDialog
+ * Skips open when tryDismiss reports the markdown document already open.
+ */
+test('Test that handleOpenAdvancedSearchGuideDialog dismisses when already open', async () => {
+  tryDismissFaMarkdownDocumentIfOpenMock.mockReturnValue(true)
+  await handleOpenAdvancedSearchGuideDialog()
+  expect(openDialogMarkdownDocumentMock).not.toHaveBeenCalled()
 })

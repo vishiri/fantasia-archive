@@ -40,64 +40,59 @@
       </q-tab-panel>
     </q-tab-panels>
 
-    <Transition
-      enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut"
+    <div
+      v-if="hasActiveSearchQuery"
+      class="dialogAppSettings__searchAllSettingsPanel q-tab-panel q-pa-none"
+      data-test-locator="dialogAppSettings-searchAllSettingsPanel"
     >
-      <div
-        v-if="hasActiveSearchQuery"
-        class="dialogAppSettings__searchAllSettingsPanel q-tab-panel q-pa-none"
-        data-test-locator="dialogAppSettings-searchAllSettingsPanel"
-      >
-        <div class="dialogAppSettings__panelBody">
+      <div class="dialogAppSettings__panelBody">
+        <div
+          class="dialogAppSettings__panelHeader"
+          aria-hidden="true"
+        >
+          <h5 class="dialogAppSettings__categoryTitle text-bold q-my-none text-h6">
+            &nbsp;
+          </h5>
+        </div>
+        <div class="dialogAppSettings__panelScroll hasScrollbar">
           <div
-            class="dialogAppSettings__panelHeader"
-            aria-hidden="true"
+            v-show="hasSearchNoMatchingSettings"
+            class="dialogAppSettings__searchEmpty flex flex-center"
+            data-test-locator="dialogAppSettings-searchNoResults"
           >
-            <h5 class="dialogAppSettings__categoryTitle text-bold q-my-none text-h6">
-              &nbsp;
-            </h5>
+            <ErrorCard
+              :title="$t('dialogs.appSettings.searchNoResultsTitle')"
+              :details="$t('dialogs.appSettings.searchNoResultsDescription')"
+              image-name="reading"
+              :width="650"
+            />
           </div>
-          <div class="dialogAppSettings__panelScroll hasScrollbar">
-            <div
-              v-show="hasSearchNoMatchingSettings"
-              class="dialogAppSettings__searchEmpty flex flex-center"
-              data-test-locator="dialogAppSettings-searchNoResults"
+          <div
+            v-show="!hasSearchNoMatchingSettings"
+            class="dialogAppSettings__panelScrollInner q-py-sm"
+          >
+            <template
+              v-for="(category, categoryKey, categoryIndex) in searchFilteredAppSettingsTree"
+              :key="categoryKey"
             >
-              <ErrorCard
-                :title="$t('dialogs.appSettings.searchNoResultsTitle')"
-                :details="$t('dialogs.appSettings.searchNoResultsDescription')"
-                image-name="reading"
-                :width="650"
+              <DialogAppSettingsCategoryPanel
+                display-mode="search"
+                :category="category"
+                :category-key="String(categoryKey)"
+                @update-setting="(k, v) => emit('update-setting', k, v)"
               />
-            </div>
-            <div
-              v-show="!hasSearchNoMatchingSettings"
-              class="dialogAppSettings__panelScrollInner q-py-sm"
-            >
-              <template
-                v-for="(category, categoryKey, categoryIndex) in searchFilteredAppSettingsTree"
-                :key="categoryKey"
-              >
-                <DialogAppSettingsCategoryPanel
-                  display-mode="search"
-                  :category="category"
-                  :category-key="String(categoryKey)"
-                  @update-setting="(k, v) => emit('update-setting', k, v)"
-                />
 
-                <q-separator
-                  v-if="showNonLastTopCategorySeparator(searchFilteredAppSettingsTree, categoryIndex)"
-                  horizontal
-                  class="q-my-lg"
-                  color="primary"
-                />
-              </template>
-            </div>
+              <q-separator
+                v-if="showNonLastTopCategorySeparator(searchFilteredAppSettingsTree, categoryIndex)"
+                horizontal
+                class="dialogAppSettings__searchCategoryDivider fa-painted-divider--horizontal"
+                color="primary"
+              />
+            </template>
           </div>
         </div>
       </div>
-    </Transition>
+    </div>
   </div>
 </template>
 
@@ -144,28 +139,14 @@ const emit = defineEmits<{
   overflow: hidden;
   position: absolute;
   z-index: $dialogAppSettings-searchPanel-zIndex;
+}
 
-  &::before {
-    background: $dialogAppSettings-gradientTop;
-    content: '';
-    height: $dialogAppSettings-gradientBar-height;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 0;
-  }
-
-  &::after {
-    background: $dialogAppSettings-gradientBottom;
-    bottom: 0;
-    content: '';
-    height: $dialogAppSettings-gradientBar-height;
-    left: 0;
-    position: absolute;
-    right: 0;
-    z-index: 0;
-  }
+/* Match category horizontal inset (content + subcategory painted dividers sit inside padding). */
+.dialogAppSettings__searchCategoryDivider {
+  box-sizing: border-box;
+  margin-block: $dialogAppSettings-searchCategoryDivider-marginBlock;
+  margin-inline: $dialogAppSettings-category-paddingX;
+  width: calc(100% - #{2 * $dialogAppSettings-category-paddingX});
 }
 
 .dialogAppSettings__tabPanelsRoot {

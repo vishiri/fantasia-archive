@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia للأسف لم تجد أي روابط مفاتيح كنت تبحث عنها. هل تريد تجربة مصطلح بحث مختلف؟',
   filterNoResultsTitle: 'لم يتم العثور على روابط مفاتيح',
+  filterClearAriaLabel: 'مسح عامل تصفية اختصارات المفاتيح',
   filterPlaceholder: 'تصفية روابط المفاتيح...',
   saveButton: 'حفظ الإعدادات',
   tableEmptyHint: 'لا تتوفر أي اختصارات لوحة المفاتيح.',

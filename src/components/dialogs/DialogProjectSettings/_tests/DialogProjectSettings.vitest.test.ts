@@ -204,13 +204,17 @@ test('Test that DialogProjectSettings mounts with direct snapshot and shows proj
 
   await flushPromises()
 
-  expect(w.find('.q-dialog-stub').attributes('data-persistent')).toBe('true')
+  expect(w.find('.q-dialog-stub').attributes('data-persistent')).toBe('false')
   expect(w.find('[data-test-locator="dialogProjectSettings-title"]').text()).toContain(
     'dialogs.projectSettings.title'
   )
   const nameInput = w.find('[data-test-locator="dialogProjectSettings-input-projectName"]')
   expect(nameInput.exists()).toBe(true)
   expect((nameInput.element as HTMLInputElement).value).toBe('Snapshot Name')
+
+  await nameInput.setValue('Edited Name')
+  await flushPromises()
+  expect(w.find('.q-dialog-stub').attributes('data-persistent')).toBe('true')
 })
 
 /**

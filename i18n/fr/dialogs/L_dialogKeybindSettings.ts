@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia n\'a malheureusement pas trouvé les raccourcis clavier que vous recherchiez. Essayez un autre terme de recherche ?',
   filterNoResultsTitle: 'Aucun raccourci clavier trouvé',
+  filterClearAriaLabel: 'Effacer le filtre de raccourcis',
   filterPlaceholder: 'Filtrer les raccourcis clavier…',
   saveButton: 'Enregistrer les paramètres',
   tableEmptyHint: 'Aucun raccourci clavier n\'est disponible.',

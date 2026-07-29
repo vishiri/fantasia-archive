@@ -85,6 +85,9 @@ function buildActionBindings (
   overrides?: Partial<Parameters<typeof createDialogProjectSettingsDialogActions>[0]>
 ): Parameters<typeof createDialogProjectSettingsDialogActions>[0] {
   return {
+    baselineDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null),
+    baselineSettings: ref<I_faProjectSettingsRoot | null>(null),
+    baselineWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>(null),
     dialogModel: ref(false),
     documentName: ref(''),
     localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([]),

@@ -3,6 +3,7 @@ export default {
   saveButton: 'Guardar configuración',
   closeButton: 'Cerrar sin guardar',
   settingsSearchPlaceholder: 'Busca en la configuración...',
+  settingsSearchClearAriaLabel: 'Borrar búsqueda de configuración',
   searchNoResultsTitle: 'No hay resultados de búsqueda',
   searchNoResultsDescription: 'Lamentablemente, Fantasia no encontró ninguna configuración que estaba buscando. ¿Quizás probar con un término de búsqueda diferente?',
   appOptionsCategories: {

@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia hittade tyvärr inga nyckelbindningar du letade efter. Testa en annan sökterm?',
   filterNoResultsTitle: 'Inga nyckelbindningar hittades',
+  filterClearAriaLabel: 'Rensa kortkommando-filter',
   filterPlaceholder: 'Filtrera nyckelbindningar...',
   saveButton: 'Spara inställningar',
   tableEmptyHint: 'Inga kortkommandon är tillgängliga.',

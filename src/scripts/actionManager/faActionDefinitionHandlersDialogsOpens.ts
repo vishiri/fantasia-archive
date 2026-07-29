@@ -18,14 +18,23 @@ export function buildFaActionDefinitionHandlersDialogsOpens (
     handleOpenNewProjectDialog: () => Promise<void>
   } {
   async function handleOpenKeybindSettingsDialog (): Promise<void> {
+    if (deps.tryDismissFaComponentDialogIfOpen('KeybindSettings')) {
+      return
+    }
     deps.openDialogComponent('KeybindSettings')
   }
 
   async function handleOpenAppSettingsDialog (): Promise<void> {
+    if (deps.tryDismissFaComponentDialogIfOpen('AppSettings')) {
+      return
+    }
     deps.openDialogComponent('AppSettings')
   }
 
   async function handleOpenProjectSettingsDialog (): Promise<void> {
+    if (deps.tryDismissFaComponentDialogIfOpen('ProjectSettings')) {
+      return
+    }
     if (!deps.S_FaActiveProject().hasActiveProject) {
       return
     }
@@ -47,6 +56,9 @@ export function buildFaActionDefinitionHandlersDialogsOpens (
   }
 
   async function handleOpenAdvancedSearchGuideDialog (): Promise<void> {
+    if (deps.tryDismissFaMarkdownDocumentIfOpen('advancedSearchGuide')) {
+      return
+    }
     deps.openDialogMarkdownDocument('advancedSearchGuide')
   }
 
@@ -67,6 +79,9 @@ export function buildFaActionDefinitionHandlersDialogsOpens (
   }
 
   async function handleOpenActionMonitorDialog (): Promise<void> {
+    if (deps.tryDismissFaComponentDialogIfOpen('ActionMonitor')) {
+      return
+    }
     deps.openDialogComponent('ActionMonitor')
   }
 

@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Lamentablemente, Fantasia no encontró ninguna combinación de teclas que estaba buscando. ¿Probar con un término de búsqueda diferente?',
   filterNoResultsTitle: 'No se encontraron combinaciones de teclas',
+  filterClearAriaLabel: 'Borrar filtro de atajos',
   filterPlaceholder: 'Filtrar combinaciones de teclas...',
   saveButton: 'Guardar configuración',
   tableEmptyHint: 'No hay atajos de teclado disponibles.',

@@ -1,4 +1,4 @@
-import type { I_ref } from 'app/types/I_vueCompositionShims'
+import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
 import type { T_createDialogKeybindSettingsCaptureResult } from 'app/types/I_dialogKeybindSettings'
 import type { T_dialogKeybindSettingsStateModuleDeps } from 'app/types/I_dialogKeybindSettings'
@@ -8,6 +8,8 @@ import type {
 } from 'app/types/I_dialogKeybindSettingsFactories'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/faJsonSnapshotsEqual'
+
 function cloneOverridesPlain (o: I_faKeybindsRoot['overrides']): I_faKeybindsRoot['overrides'] {
   return JSON.parse(JSON.stringify(o)) as I_faKeybindsRoot['overrides']
 }
@@ -15,6 +17,7 @@ function cloneOverridesPlain (o: I_faKeybindsRoot['overrides']): I_faKeybindsRoo
 export function createDialogKeybindSettingsSync (
   deps: T_dialogKeybindSettingsStateModuleDeps,
   params: {
+    baselineOverrides: I_ref<I_faKeybindsRoot['overrides']>
     filter: I_ref<string | null | undefined>
     keybindsStore: {
       snapshot: { store: { overrides: I_faKeybindsRoot['overrides'] } } | null
@@ -23,14 +26,20 @@ export function createDialogKeybindSettingsSync (
   }
 ): T_dialogKeybindSettingsSyncApi {
   const {
+    baselineOverrides,
     filter,
     keybindsStore,
     workingOverrides
   } = params
 
+  function captureBaselineFromWorking (): void {
+    baselineOverrides.value = cloneOverridesPlain(workingOverrides.value)
+  }
+
   function syncWorkingFromStore (): void {
     const o = keybindsStore.snapshot?.store.overrides ?? {}
     workingOverrides.value = cloneOverridesPlain(o)
+    captureBaselineFromWorking()
   }
 
   function initializeForOpen (): void {
@@ -66,12 +75,14 @@ export function createDialogKeybindSettingsStateBundle (
 ): {
     capture: T_createDialogKeybindSettingsCaptureResult
     filter: I_ref<string | null | undefined>
+    isDirty: I_computedRef<boolean>
     sync: T_dialogKeybindSettingsSyncApi
     table: ReturnType<typeof deps.createDialogKeybindSettingsTableState>
     workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
   } {
   const keybindsStore = deps.getKeybindsStore()
   const workingOverrides = deps.ref<I_faKeybindsRoot['overrides']>({})
+  const baselineOverrides = deps.ref<I_faKeybindsRoot['overrides']>({})
   const filter = deps.ref<string | null | undefined>('')
   const platform = deps.computed(() => keybindsStore.snapshot?.platform ?? 'win32')
 
@@ -89,14 +100,20 @@ export function createDialogKeybindSettingsStateBundle (
   })
 
   const sync = createDialogKeybindSettingsSync(deps, {
+    baselineOverrides,
     filter,
     keybindsStore,
     workingOverrides
   })
 
+  const isDirty = deps.computed((): boolean => {
+    return !areFaJsonSnapshotsEqual(workingOverrides.value, baselineOverrides.value)
+  })
+
   return {
     capture,
     filter,
+    isDirty,
     sync,
     table,
     workingOverrides
@@ -122,6 +139,7 @@ export function useDialogKeybindSettingsFromDeps (
     captureOpen: s.capture.captureOpen,
     filter: s.filter,
     initializeForOpen: s.sync.initializeForOpen,
+    isDirty: s.isDirty,
     onCaptureClear: s.capture.onCaptureClear,
     onCaptureSet: s.capture.onCaptureSet,
     onCloseMain: s.sync.onCloseMain,

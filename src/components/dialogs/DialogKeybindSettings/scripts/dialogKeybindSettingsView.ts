@@ -51,6 +51,7 @@ export function useDialogKeybindSettingsViewFromDeps (
     dialogModel,
     documentName,
     filter: state.filter,
+    isDirty: state.isDirty,
     noDataShowsFilterMiss,
     onCaptureClear: state.onCaptureClear,
     onCaptureSet: state.onCaptureSet,

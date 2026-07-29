@@ -45,7 +45,7 @@
       <q-separator
         v-if="showNonLastSeparator(category.subCategories, subCategoryIndex)"
         horizontal
-        class="q-mt-md"
+        class="q-mt-md fa-painted-divider--horizontal"
         color="primary"
       />
     </div>

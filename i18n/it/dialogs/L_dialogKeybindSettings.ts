@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia purtroppo non ha trovato nessuna combinazione di tasti che stavi cercando. Provare un termine di ricerca diverso?',
   filterNoResultsTitle: 'Nessuna combinazione di tasti trovata',
+  filterClearAriaLabel: 'Cancella filtro scorciatoie',
   filterPlaceholder: 'Filtra combinazioni di tasti...',
   saveButton: 'Salva impostazioni',
   tableEmptyHint: 'Non sono disponibili scorciatoie da tastiera.',

@@ -55,6 +55,8 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   runFaAction: <TId extends T_faActionId>(id: TId, payload: I_faActionPayloadMap[TId]) => void
   openDialogComponent: (name: T_dialogName) => void
   openDialogMarkdownDocument: (name: T_documentName) => void
+  tryDismissFaComponentDialogIfOpen: (name: T_dialogName) => boolean
+  tryDismissFaMarkdownDocumentIfOpen: (name: T_documentName) => boolean
   canOpenFloatingWindowWhileNoModal: () => boolean
   notifyFaProjectAlreadyActiveWarning: () => void
   notifyFaProjectCreatedPositive: () => void

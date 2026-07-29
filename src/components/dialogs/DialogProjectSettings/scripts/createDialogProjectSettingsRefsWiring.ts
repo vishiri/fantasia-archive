@@ -7,6 +7,9 @@ export function createDialogProjectSettingsRefsWiring (deps: {
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB: string
   ref: <T>(value: T) => Ref<T>
 }): {
+    baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+    baselineSettings: Ref<I_faProjectSettingsRoot | null>
+    baselineWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
     dialogModel: Ref<boolean>
     documentName: Ref<string>
     localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
@@ -19,8 +22,14 @@ export function createDialogProjectSettingsRefsWiring (deps: {
   const localDocumentTemplates = deps.ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
   const localSettings = deps.ref<I_faProjectSettingsRoot | null>(null)
   const localWorlds = deps.ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  const baselineDocumentTemplates = deps.ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
+  const baselineSettings = deps.ref<I_faProjectSettingsRoot | null>(null)
+  const baselineWorlds = deps.ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
   const selectedCategoryTab = deps.ref<string>(deps.FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
   return {
+    baselineDocumentTemplates,
+    baselineSettings,
+    baselineWorlds,
     dialogModel,
     documentName,
     localDocumentTemplates,

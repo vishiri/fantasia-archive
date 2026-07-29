@@ -3,7 +3,7 @@
     v-model="dialogModel"
     :class="['dialogComponent', documentName]"
     aria-labelledby="dialogKeybindSettings-title"
-    persistent
+    :persistent="isDirty"
     @hide="onCloseMain"
   >
     <q-card :class="['dialogComponent__wrapper', documentName, 'dialogKeybindSettings__card']">
@@ -36,7 +36,7 @@
           <template #top-right>
             <q-input
               v-model="filter"
-              clearable
+              class="dialogKeybindSettings__filterInput"
               dark
               debounce="300"
               dense
@@ -44,6 +44,22 @@
             >
               <template #prepend>
                 <q-icon name="search" />
+              </template>
+              <template
+                v-if="showsFilterClear"
+                #append
+              >
+                <q-btn
+                  color="secondary"
+                  dense
+                  flat
+                  icon="mdi-close"
+                  round
+                  size="sm"
+                  :aria-label="$t('dialogs.keybindSettings.filterClearAriaLabel')"
+                  data-test-locator="dialogKeybindSettings-filterClear"
+                  @click.stop="clearFilter"
+                />
               </template>
             </q-input>
           </template>
@@ -157,6 +173,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 import DialogKeybindSettingsCaptureDialog from './DialogKeybindSettingsCaptureDialog.vue'
@@ -180,6 +198,7 @@ const {
   dialogModel,
   documentName,
   filter,
+  isDirty,
   noDataShowsFilterMiss,
   onCaptureClear,
   onCaptureSet,
@@ -191,6 +210,12 @@ const {
   tableRows,
   userKeybindButtonLabel
 } = useDialogKeybindSettingsView(props)
+
+const showsFilterClear = computed(() => (filter.value ?? '').length > 0)
+
+function clearFilter (): void {
+  filter.value = null
+}
 </script>
 <style lang="scss" scoped>
 @use '../../../css/quasar.variables.scss' as *;
@@ -202,6 +227,10 @@ const {
   min-height: 100%;
   padding: $dialogKeybindSettings-filterEmpty-padding;
   width: 100%;
+}
+
+.dialogKeybindSettings__filterInput {
+  width: $dialogKeybindSettings-filterInput-width !important;
 }
 </style>
 

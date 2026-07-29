@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'दुख की बात है कि फंतासिया को कोई भी कीबाइंड नहीं मिला जिसकी आप तलाश कर रहे थे। कोई भिन्न खोज शब्द आज़माएँ?',
   filterNoResultsTitle: 'कोई कीबाइंड नहीं मिला',
+  filterClearAriaLabel: 'कीबाइंड फ़िल्टर साफ़ करें',
   filterPlaceholder: 'कीबाइंड फ़िल्टर करें...',
   saveButton: 'सेटिंग्स सेव करें',
   tableEmptyHint: 'कोई भी कीबोर्ड शॉर्टकट उपलब्ध नहीं है.',

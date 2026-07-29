@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Fantasia ei valitettavasti löytänyt etsimiäsi näppäinsidoksia. Kokeile toista hakutermiä?',
   filterNoResultsTitle: 'Näppäimiä ei löytynyt',
+  filterClearAriaLabel: 'Tyhjennä pikanäppäinsuodatin',
   filterPlaceholder: 'Suodata näppäinsidoksia…',
   saveButton: 'Tallenna asetukset',
   tableEmptyHint: 'Pikanäppäimiä ei ole saatavilla.',

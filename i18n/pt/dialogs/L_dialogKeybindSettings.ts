@@ -42,6 +42,7 @@ export default {
   },
   filterNoResultsDescription: 'Infelizmente, Fantasia não encontrou nenhum atalho de teclado que você estava procurando. Tentar um termo de pesquisa diferente?',
   filterNoResultsTitle: 'Nenhum atalho de teclado encontrado',
+  filterClearAriaLabel: 'Limpar filtro de atalhos',
   filterPlaceholder: 'Filtrar atalhos de teclado…',
   saveButton: 'Salvar configurações',
   tableEmptyHint: 'Nenhum atalho de teclado está disponível.',

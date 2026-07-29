@@ -13,11 +13,13 @@ import { createDialogAppSettings } from './functions/createDialogAppSettings'
 import { buildAppSettingsRenderTree } from './functions/dialogAppSettingsTreeBuild'
 import { filterAppSettingsTreeForSearch } from './functions/dialogAppSettingsSearch'
 import { updateLocalAppSettingsField } from './functions/dialogAppSettingsUpdateLocalField'
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/faJsonSnapshotsEqual'
 
 const dialogAppSettingsApi = createDialogAppSettings({
   APP_SETTINGS_OPTIONS,
   S_DialogComponent,
   S_FaUserSettings,
+  areFaJsonSnapshotsEqual,
   appThemeValues: FA_USER_SETTINGS_APP_THEME_VALUES,
   buildAppSettingsRenderTree,
   computed,

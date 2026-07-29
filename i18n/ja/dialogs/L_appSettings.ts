@@ -3,6 +3,7 @@ export default {
   saveButton: '設定を保存する',
   closeButton: '保存せずに閉じる',
   settingsSearchPlaceholder: '設定を検索してください...',
+  settingsSearchClearAriaLabel: '設定の検索をクリア',
   searchNoResultsTitle: '検索一致なし',
   searchNoResultsDescription: '残念ながら、Fantasia ではお探しの設定が見つかりませんでした。別の検索語を試してみてはいかがでしょうか?',
   appOptionsCategories: {

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import type { Ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
@@ -33,9 +34,15 @@ beforeEach(() => {
 })
 
 function createDialogAppSettingsDialogActionsParams (
-  params: Parameters<typeof createDialogAppSettingsDialogActions>[0]
+  params: Omit<Parameters<typeof createDialogAppSettingsDialogActions>[0], 'baselineSettings'> & {
+    baselineSettings?: Ref<I_faUserSettings | null>
+  }
 ): Parameters<typeof createDialogAppSettingsDialogActions>[0] {
-  return params
+  const baselineSettings = params.baselineSettings ?? ref<I_faUserSettings | null>(null)
+  return {
+    ...params,
+    baselineSettings
+  }
 }
 
 function createAppSettingsStoreMock (
@@ -87,6 +94,39 @@ test('openDialog builds tree from directSettingsSnapshot when provided', () => {
   expect(searchSettingsQuery.value).toBe('')
   expect(localSettings.value).not.toBe(null)
   expect(Object.keys(appSettingsTree.value).length).toBeGreaterThan(0)
+})
+
+/**
+ * createDialogAppSettingsDialogActions
+ * openDialog captures a baseline used for dirty stickiness.
+ */
+test('openDialog captures baselineSettings from directSettingsSnapshot', () => {
+  const dialogModel = ref(false)
+  const documentName = ref('')
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const baselineSettings = ref<I_faUserSettings | null>(null)
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+  const searchSettingsQuery = ref<string | null>('')
+
+  const { openDialog, updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      baselineSettings,
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {
+        directSettingsSnapshot: { ...FA_USER_SETTINGS_DEFAULTS }
+      },
+      searchSettingsQuery
+    })
+  )
+
+  openDialog('AppSettings')
+
+  expect(baselineSettings.value).toEqual(localSettings.value)
+  updateLocalSetting('showDocumentID', !(localSettings.value?.showDocumentID ?? false))
+  expect(baselineSettings.value).not.toEqual(localSettings.value)
 })
 
 /**

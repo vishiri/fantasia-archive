@@ -43,6 +43,7 @@ export default {
   filterNoResultsDescription:
     'Fantasia sadly didn\'t find any keybinds you were looking for. Try a different search term?',
   filterNoResultsTitle: 'No Keybinds Found',
+  filterClearAriaLabel: 'Clear keybind filter',
   filterPlaceholder: 'Filter Keybinds…',
   saveButton: 'Save Settings',
   tableEmptyHint: 'No keyboard shortcuts are available.',

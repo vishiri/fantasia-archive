@@ -90,15 +90,17 @@ test('Test that compareAppSettingsCategoryOrder sorts by category key when title
 
 /**
  * compareAppSettingsCategoryOrder
- * Puts Page categories first, then other categories alphabetically by title, then accessibility, then developerSettings.
+ * Visuals, Tree, Popups, Pages, Accessibility, then developerSettings.
  */
-test('Test that compareAppSettingsCategoryOrder orders page categories first then ordinary accessibility and developer last', () => {
+test('Test that compareAppSettingsCategoryOrder orders visuals tree popups pages accessibility then developer last', () => {
   const keys = [
     'developerSettings',
     'documentViewEdit',
     'accessibility',
     'hierarchicalTree',
+    'popupsFloatingWindows',
     'projectOverview',
+    'visualAccessibility',
     'welcomeScreen'
   ]
 
@@ -107,7 +109,9 @@ test('Test that compareAppSettingsCategoryOrder orders page categories first the
     developerSettings: 'Developer settings',
     documentViewEdit: 'Page: Document view/edit',
     hierarchicalTree: 'Hierarchical tree',
+    popupsFloatingWindows: 'Popups & floating windows',
     projectOverview: 'Page: Project overview',
+    visualAccessibility: 'Visuals & app-wide functionality',
     welcomeScreen: 'Page: Welcome Screen'
   }
 
@@ -116,10 +120,12 @@ test('Test that compareAppSettingsCategoryOrder orders page categories first the
   )
 
   expect(ordered).toEqual([
+    'visualAccessibility',
+    'hierarchicalTree',
+    'popupsFloatingWindows',
     'documentViewEdit',
     'projectOverview',
     'welcomeScreen',
-    'hierarchicalTree',
     'accessibility',
     'developerSettings'
   ])
@@ -193,21 +199,24 @@ test('Test that toSortedRecord returns empty object for empty input', () => {
 
 /**
  * buildAppSettingsRenderTree
- * Category tabs: Page categories first, ordinary keys alphabetically, accessibility, then developerSettings.
+ * Category tabs: Visuals, Tree, Popups, Pages, Accessibility, then developerSettings.
  */
-test('Test that buildAppSettingsRenderTree orders page categories first and pins accessibility then developerSettings at the end', () => {
+test('Test that buildAppSettingsRenderTree orders visuals tree popups pages accessibility then developerSettings', () => {
   const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS
   })
   const keys = Object.keys(tree)
 
-  expect(keys.slice(0, 3)).toEqual([
+  expect(keys).toEqual([
+    'visualAccessibility',
+    'hierarchicalTree',
+    'popupsFloatingWindows',
     'documentViewEdit',
     'projectOverview',
-    'welcomeScreen'
+    'welcomeScreen',
+    'accessibility',
+    'developerSettings'
   ])
-  expect(keys[keys.length - 1]).toBe('developerSettings')
-  expect(keys[keys.length - 2]).toBe('accessibility')
 })
 
 /**

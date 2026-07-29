@@ -10,7 +10,9 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import {
   openDialogComponent,
   openDialogMarkdownDocument,
-  tipsTricksTriviaNotification
+  tipsTricksTriviaNotification,
+  tryDismissFaComponentDialogIfOpen,
+  tryDismissFaMarkdownDocumentIfOpen
 } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { maybeAutoOpenFilledNoteboard } from 'app/src/scripts/floatingWindows/functions/shouldAutoOpenFilledNoteboard'
@@ -44,6 +46,8 @@ export const faActionDefinitionHandlersDialogsDeps = {
   },
   openDialogComponent,
   openDialogMarkdownDocument,
+  tryDismissFaComponentDialogIfOpen,
+  tryDismissFaMarkdownDocumentIfOpen,
   canOpenFloatingWindowWhileNoModal,
   maybeAutoOpenFilledNoteboard,
   notifyFaProjectAlreadyActiveWarning,

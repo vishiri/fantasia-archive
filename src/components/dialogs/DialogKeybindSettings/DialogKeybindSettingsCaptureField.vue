@@ -103,6 +103,11 @@ const {
   opacity: 0.95;
   right: 0;
   top: $dialogKeybindSettingsCapture-helpIcon-top;
+
+  /* Light capture surface: dark/grey circle, not global white (dark-chrome default). */
+  :deep(.faHelpTooltipIcon__circle) {
+    color: $dialogKeybindSettingsCapture-helpIcon-color;
+  }
 }
 
 .dialogKeybindSettingsCapture__keybindUpdateField {
@@ -147,11 +152,25 @@ const {
 </style>
 
 <style lang="scss">
-.dialogKeybindSettingsCapture__tooltip {
+/*
+ * Flat global .q-tooltip adds accent fill + padding — that becomes the “halo” outside the
+ * black shell border. Beat it so the bordered shell is the tip edge.
+ * Fantasy keeps parchment chrome; shell fill/border stripped below.
+ */
+body.fa-appTheme--flat .q-tooltip.dialogKeybindSettingsCapture__tooltip {
+  background: transparent;
   border-radius: 0;
+  box-shadow: none;
   font-size: $dialogKeybindSettingsCapture-tooltip-fontSize;
   font-weight: $dialogKeybindSettingsCapture-tooltip-fontWeight;
   padding: 0;
+  text-align: left;
+}
+
+body.fa-appTheme--fantasy .q-tooltip.dialogKeybindSettingsCapture__tooltip {
+  border-radius: 0;
+  font-size: $dialogKeybindSettingsCapture-tooltip-fontSize;
+  font-weight: $dialogKeybindSettingsCapture-tooltip-fontWeight;
   text-align: left;
 }
 
@@ -178,5 +197,24 @@ const {
   border: $dialogKeybindSettingsCapture-tooltip-border;
   color: $dialogKeybindSettingsCapture-tooltip-text;
   padding: $dialogKeybindSettingsCapture-tooltip-padding;
+}
+
+body.fa-appTheme--fantasy .dialogKeybindSettingsCapture__tooltipShell {
+  background: $dialogKeybindSettingsCapture-tooltip-background-fantasy;
+  border: $dialogKeybindSettingsCapture-tooltip-border-fantasy;
+  color: inherit;
+  padding: $dialogKeybindSettingsCapture-tooltip-padding-fantasy;
+}
+
+/* Capture popup is a light card under both skins — keep flat grey circle, not fantasy diamond. */
+body.fa-appTheme--fantasy .dialogKeybindSettingsCapture__helpIcon {
+  .faHelpTooltipIcon__circle {
+    color: $dialogKeybindSettingsCapture-helpIcon-color;
+    display: inline-block;
+  }
+
+  .faHelpTooltipIcon__diamond {
+    display: none;
+  }
 }
 </style>
