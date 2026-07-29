@@ -30,6 +30,9 @@
 - **Document workspace**: **Extra HTML classes** field on each open document tab stores space-separated CSS class names applied live on the document workspace page (styled via **Custom Project CSS**). Preview mode is read-only; edit mode saves with the document. **Copy document** keeps the value on the new tab.
 - **Workspace sidebar**: Template placement rows in the hierarchy tree show document and category count badges with a tooltip breakdown (**Document count**, **Category count**, and **Document & categories count**).
 - **App control bar**: Left strip buttons open **Keybind Settings**, **Advanced Search Guide**, and **Tips, Tricks & Trivia** (hidden when **Disable app control bar guides** is on). **Toggle tree** hides the workspace hierarchy sidebar and search field so the document area uses the full width; your last sidebar width restores when you show the tree again. **Toggle app noteboard** and **Toggle project noteboard** open or close those noteboard windows. **Quick search** and **Quick add** stay as placeholders for now.
+- **Dialogs**: Pressing the same keyboard shortcut that opened **App Settings**, **Project Settings**, **Keybind Settings**, **Action Monitor**, or **Advanced Search Guide** again runs the same **Escape** attempt Quasar would. **App Settings**, **Project Settings**, and **Keybind Settings** stay sticky (shake / refuse) only while they have unsaved edits; when clean, Escape, outside click, and that same open shortcut dismiss them. **Action Monitor** and **Advanced Search Guide** always dismiss. Nested menus or keybind capture still take **Escape** first when they are on Quasar’s escape stack.
+- **App controls**: **Toggle App Noteboard** and **Toggle Project Noteboard** show a small primary-colored corner dot on the app control bar and in the **App controls** / **Project** menus when that noteboard has saved text (empty noteboards show no dot; the project dot appears only while a project is open).
+- **Fantasia Archive Settings** and **Keybind Settings**: Search and filter fields use a dedicated clear control with accessible **Clear settings search** / **Clear keybind filter** labels instead of Quasar’s default clearable field. Category tabs in **Fantasia Archive Settings** stay disabled while search is active.
 - **App Settings**: **Hide hierarchical tree** under **Hierarchical tree** saves whether the workspace sidebar starts hidden (same as **Toggle tree** on the app control bar).
 - **Keybind Settings**: **Toggle Hierarchical Tree** (**Ctrl+Alt+Shift+T** by default) matches the app control bar **Toggle tree** button.
 - **App control bar**: Right strip adds **Copy current document** and **Add new document under this** beside edit/save (same icons as the tab context menu), for the active workspace document.
@@ -47,7 +50,11 @@
 - **Workspace sidebar**: Hierarchy tree row hover chrome hugs icon and label padding, stays visible while pressed or when the row matches the active document tab, and world glyph shading applies only in the fantasy theme.
 - **Social contact buttons**: Native browser title tooltips are removed; labels and icon alt text remain.
 - **Forms**: Readonly dark text fields keep the framed L-corner chrome but fill with a subtle diagonal hatch and muted text so they read as non-editable (no lock icon).
-- **Theme**: Dark Quasar fields use a thin grey box frame with bottom L-corner marks; fantasy-theme tooltips and notifications use parchment framing; outline/flat buttons and vertical tabs pick up soft edge-glow accents in fantasy; Quasar material ripple feedback is off app-wide.
+- **Theme**: Dark Quasar fields use a thin grey box frame with bottom L-corner marks; fantasy-theme tooltips and notifications use parchment framing; outline/flat buttons and vertical tabs pick up soft edge-glow accents in fantasy. Quasar material ripples stay enabled app-wide; the fantasy skin hides them in CSS. Fantasy scrollbars, menu row hover glow, markdown guide headings, tables, and confirmation dialog chrome align with the fantasy palette tokens.
+- **Welcome screen**: **Resume Latest Project** / **Resume Current Project** stays disabled and keeps its label while the recent project load finishes, so the primary segment no longer flickers mid-open. Splash header chrome matches the menu-button bar color.
+- **App Noteboard** and **Project Noteboard**: **Close** no longer shows the toggle shortcut under the button label.
+- **Delete** and **Discard changes** confirmation dialogs share one fantasy-styled content layout (left-aligned body, consistent card chrome).
+- **Workspace sidebar**: Hierarchy tree rows with custom document text or background colors no longer paint a duplicate solid background behind the themed row chrome.
 - **Project overview**: The tip card **Did you know** heading renders in capital letters.
 - **Project Settings**: World template layout placements report separate **document** and **category** counts (aligned with hierarchy tree placement badges).
 - **Help affordances**: Shared diamond **help** tooltip icon wraps help copy on settings rows and related controls.
@@ -112,6 +119,8 @@
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.
+
+---
 
 ## 2.4.14 - Version bump
 
@@ -193,6 +202,8 @@
 - **Project Settings**: Adding a document template pre-fills both singular and plural title for the active interface language, so a new tab no longer shows a missing-translation warning before you edit titles.
 - **Project Settings**: **Save settings**, **Save without closing**, and the save validation error icon sit in one footer row with consistent spacing so button labels stay on one line on wide layouts.
 
+---
+
 ## 2.4.13 - Version bump
 
 ### New features
@@ -255,6 +266,8 @@
 - **Tests** — End-to-end **`checkProjectStyling`** renames **`.faproject`** fixture baselines and suite titles so the **Custom Project CSS** flow describes Monaco live preview, SQLite persistence, clearing the stylesheet, and per-project isolation instead of opaque **alpha** / **beta** labels. Component harness **`WindowProjectStyling.playwright.test`** covers floating chrome, cold-loaded **Monaco**, the help panel theme list, and **Close without saving** leaving stored project CSS empty.
 - **Tests** — **`checkProjectManagementFlow`** end-to-end now asserts splash **Resume Latest Project** (**MRU dropdown labels** match **Project → Load recent project**, reload through the split primary segment after the spellcheck session reset, load from another recent row).
 - **Tests** — **`checkProjectOsOpenArgv`** replays packaged **electron.launch argv** cold opens with **`FA_E2E_OS_OPEN=1`** isolated from ordinary splash-only launches.
+
+---
 
 ## 2.4.12 - Version bump
 
@@ -327,6 +340,8 @@
 - **Action Monitor**: successful **Load project** history rows keep the enqueue payload empty but attach a closing preview with the chosen **`.faproject`** path and loaded project name, aligned with how **New project** surfaces detail after completion; when opening fails after you pick a file, failed rows can include the message plus the attempted path when the desktop shell supplies it.
 - **Electron desktop**: **`faRoutingEnv`** waits briefly for the preload **extra environment** snapshot before steering initial harness routes, avoiding a startup race where the bridge attaches after first renderer paint.
 - **Playwright helpers**: Harness code for Electron component and **E2E** suites is split under **`helpers/playwrightHelpers_universal`**, **`helpers/playwrightHelpers_e2e`**, and **`helpers/playwrightHelpers_component`**, with shared launch and teardown helpers so serial **`beforeAll`** blocks stay uniform; **`README`** and contributor notes list the updated import paths.
+
+---
 
 ## 2.4.11 - Version bump
 
@@ -424,6 +439,8 @@
 - **Contributor maintenance**: **Vitest** specs for **AppControlMenus**, **AppControlSingleMenu**, **GlobalLanguageSelector** (including the spellcheck refresh delay path), **GlobalWindowButtons**, **ErrorCard**, **App settings** setting blocks, and expanded **dialog** settings screens exercise top-bar harness branches, language picking, window chrome timers, and **Quasar** menu click paths in jsdom. Multi-stub dialog specs use the same file-level **ESLint** exception already applied to stack-guard harness tests.
 - **Contributor maintenance**: more **Vitest** jsdom coverage for **DialogActionMonitor** dialog show refresh, **DialogImportExportAppConfig** opens and import staging, **DialogKeybindSettings** when the keybind definition list is empty, **_FaFloatingWindowFrameResizeHandles** hover and every resize pointer target, **WindowAppStyling** editor help tooltip content plus loading and load-error overlays and frame pointer wiring, **MainLayout** app styling refresh when the **Electron** bridge exposes it or not, **AppControlMenus** component-testing markdown menu trigger, **AppControlSingleMenu** submenu rows without click handlers, **GlobalLanguageSelector** when the user-settings bridge is absent, and **_FaUserCssInjector** skipping duplicate style text writes.
 
+---
+
 ## 2.4.10 - App settings, ErrorCard, theme tokens, and contributor tooling
 
 ### New features
@@ -508,6 +525,8 @@
 - **Electron Playwright** runs attach **WebM** screen recordings per test; open **`test-results/playwright-report/index.html`** after **`yarn test:components`** or **`yarn test:e2e`** (or the **`:single`** scripts) to review videos under each test’s **Attachments** (files under **`test-results/playwright-report/data/`**). Each Playwright run **replaces** that HTML report; **`scripts/playwrightWithArtifactTrim.mjs`** removes **`test-results/playwright-artifacts`** after those yarn commands so scratch output is not kept between runs. Documented in **README**, **AGENTS**, and Cursor **fantasia-testing** / **playwright-tests** guidance; optional **`FA_PLAYWRIGHT_NO_VIDEO`** skips recording.
 - Removed a stray **HTML** **textarea** from the **Index** page template.
 
+---
+
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 
 ### Bugfixes & Optimizations
@@ -517,6 +536,8 @@
 - Renamed and grouped **Yarn** contributor scripts for clarity: quality gates **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**; lint **`yarn lint:eslint`**, **`yarn lint:typescript`**, **`yarn lint:stylelint`**; Quasar Electron **`yarn quasar:build:electron`** / **`yarn quasar:dev:electron`**; Playwright **`yarn test:components`** and colon-suffixed **`test:components:*`**, **`test:e2e:*`**; Storybook dev **`yarn storybook:run`** and static **`yarn storybook:build`** (formerly **`build-storybook`**). Removed obsolete **`yarn test:full`** and duplicate **`yarn visual:storybook:ci`**; **GitHub Actions** call **`yarn visual:storybook:test`** directly. Updated **README**, **AGENTS**, Cursor rules/skills, **`package.json`**, **`testRunner_*.mjs`**, and workflows.
 - Colocated Storybook **static output** (**`.storybook-workspace/storybook-static/`**), **Playwright** visual-regression config, **`visual-tests/`** (including committed snapshots), workspace **`storybook:visual:*`** scripts, and VRT devDependencies (**`http-server`**, **`@playwright/test`**) under **`.storybook-workspace/`**; root **`yarn visual:storybook:*`** delegates with **`yarn --cwd .storybook-workspace`**. Updated **`.gitignore`**, **`tsconfig.json`**, and **`lint:eslint`** paths.
 - Set explicit least-privilege **`permissions`** (`contents: read`) on **`verify`** and manual **`build`** **GitHub Actions** workflows; added **Dependency Review**, **OSV Scanner** (reusable workflows + weekly schedule on **`master`**), and **Gitleaks** for PR/push hygiene.
+
+---
 
 ## 2.4.8 - Pinia 3 and Vue Router 5
 
@@ -530,12 +551,16 @@
 - Reduced non-actionable Vue warning noise in component Vitest output by filtering known Quasar-resolution and test-only injection warnings in shared test setup, keeping signal focused on actionable failures.
 - Fixed CI TypeScript resolution for Vue SFC imports by replacing the generated `.quasar` shim reference in `src/env.d.ts` with an in-repo `declare module '*.vue'` declaration, so `yarn verify` succeeds on clean GitHub runners without requiring local/generated `.quasar` shim files.
 
+---
+
 ## 2.4.7 - Storybook 10 and Vite 8 alignment
 
 ### Bugfixes & Optimizations
 - Upgraded **`.storybook-workspace`** to **Storybook 10** and **Vite 8** so component previews run on the same major bundler line as the desktop app (**`@quasar/app-vite`**), refreshed the nested **Yarn** lockfile for reproducible installs (including **CI** frozen installs), and aligned root **Storybook** / **`eslint-plugin-storybook`** versions with that release family.
 - Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (notably **Quasar**, **Vue**, **vue-i18n**, **Playwright**, **Sass**, and related tooling); kept **`@types/node`** on the **22.x** typings line for the **Node 22** engine. Updated **README** and **AGENTS** so contributors see **Storybook 10** on **Vite 8** instead of the old split-Vite wording.
 - Added **`debug-storybook.log*`** to **`.gitignore`** so local Storybook diagnostic logs are not picked up as untracked files.
+
+---
 
 ## 2.4.6 - Window chrome, Storybook, Stylelint, and DevTools
 
@@ -551,6 +576,8 @@
 - Noted in **`quasar.config.ts`** that **`@electron/remote`**’s **`electron`** peer is expected to show as unmet during UnPackaged **`yarn install --production`**; packaging still succeeds because the app runs on the bundled Electron runtime.
 - Storybook preview registers Quasar’s **`Dark`** plugin, the **`@quasar/quasar-ui-qmarkdown`** app plugin (after Quasar, matching boot order), **Roboto (latin-ext)**, and **`preview-body.html`** / **`Dark.set(true)`** so **`body--dark`** stays aligned with the app; Sass **`additionalData`** skips **`app.scss`** to avoid double-loading variables. **Dialog** and **top-menu** component Docs use **`parameters.docs.story.inline: false`** again so Autodocs does not mount every story in one document (each **`q-dialog`** auto-opens on mount, which stacked modals when **`inline: true`**); each nested Docs iframe still loads the same preview CSS stack.
 
+---
+
 ## 2.4.5 - Contributor workflow and CI
 
 ### Bugfixes & Optimizations
@@ -562,6 +589,8 @@
 - Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (notably newer **Playwright**, **Quasar**, **Vue**, **vue-i18n**, **Sass**, and related tooling where ranges allowed).
 - Made **DevTools** bridge helpers use **`getCurrentWindow()`** instead of **`BrowserWindow.getFocusedWindow()`** so **toggle / status** stay tied to the app window when menus or DevTools change OS focus, stabilizing the DevTools **E2E** check.
 
+---
+
 ## 2.4.4 - Dependencies and dev tooling
 
 ### Bugfixes & Optimizations
@@ -569,6 +598,8 @@
 - Upgraded `jsdom` to v29 for the Vitest DOM environment, `eslint-plugin-n` to v17, and refreshed `@types/node` on the Node 22 typings line.
 - Migrated lint and types tooling to **ESLint 9** flat config (**neostandard**, **eslint-plugin-vue** v10, **typescript-eslint**), **TypeScript** 6, and **Stylelint** 17 with updated shareable configs; small source tweaks match stricter defaults (import attributes, union spacing, dev window URL guard, QMarkdown CSS shim).
 - Aligned **AGENTS**, Cursor rules, and skills so the standard pre-commit and pre-changelog workflow always runs **ESLint**, **TypeScript (`tsc`)**, **Stylelint**, and **unit tests** in that order; the **quality gate** may run as one chained terminal command for efficiency, with individual commands reserved for debugging failures. **Build** and **Playwright** checks stay one command per terminal.
+
+---
 
 ## 2.4.3 - Additional dependency updates and improved testing workflow
 
@@ -578,6 +609,8 @@
 - Added persistent agent/testing guidance to run each validation command in an isolated terminal invocation to keep long test outputs readable and easier to audit.
 - Aligned the `2.4.3` changelog block with the canonical `package.json` version and strengthened contributor guidance so changelog edits always re-read live `package.json` first, avoiding section/version drift.
 
+---
+
 ## 2.4.2 - Core dependency refresh and Quasar/Vite workflow validation
 
 ### Bugfixes & Optimizations
@@ -585,12 +618,16 @@
 - Refreshed core app and tooling dependencies (including Quasar extras/qmarkdown, Axios, Pinia, Vue Router, Vitest, and selected ESLint plugins) to reduce maintenance risk while staying within the current project architecture.
 - Applied a follow-up tooling refresh for the Quasar/Vite workflow (`@quasar/app-vite`, `@intlify/unplugin-vue-i18n`, `vite-plugin-checker`, `eslint-plugin-vue`, and `@types/node`) with full lint, typecheck, unit, component, E2E, and build validation.
 
+---
+
 ## 2.4.1 - Changelog policy lock and component test stability
 
 ### Bugfixes & Optimizations
 - Fixed Playwright component-test discovery for `DialogAboutFantasiaArchive` by avoiding full i18n loader imports that pull markdown documents into Node-side test loading.
 - Updated the dialog social-button assertions to compare rendered labels, matching current UI output and keeping component tests stable.
 - Locked project guidance to **never auto-bump versions**; changelog sections now strictly follow the existing `package.json` version unless a manual change is explicitly requested.
+
+---
 
 ## 2.4.0 - Quasar CLI Vite v2 and Node 22 toolchain
 
@@ -608,6 +645,8 @@
 - Addressed **Dart Sass 2** deprecation noise in shared SCSS via `sass:color` in Quasar variables and scrollbar styles (replacing legacy color helpers).
 - **Install reminder:** the **`electron`** package needs its **postinstall** download; skipping lifecycle scripts (for example `npm install --ignore-scripts`) can leave a broken binary until you reinstall or run `node node_modules/electron/install.js`.
 
+---
+
 ## 2.3.2 - Storybook layouts, pages, and contributor tooling
 
 ### New features
@@ -622,12 +661,16 @@
 - Removed an empty scoped style block from `SocialContactButtons` surfaced by style linting.
 - Refreshed Vitest and Playwright coverage (external link manager, mascot image, window controls) to match current behavior and selectors.
 
+---
+
 ## 2.3.1 - Electron packaging icon and favicon coverage
 
 ### Bugfixes & Optimizations
 - Added explicit Electron Builder icon configuration for Windows, macOS, and Linux, including Linux desktop-entry metadata and Linux target setup.
 - Linked all generated favicon sizes in `index.html` so renderer icon declarations cover the full `public/icons/` set.
 - Updated changelog markdown wording to avoid build-time parsing failures in the qmarkdown/Vite pipeline during Electron production builds.
+
+---
 
 ## 2.3.0 - Storybook workspace and desktop polish
 
@@ -640,6 +683,8 @@
 ### Bugfixes & Optimizations
 - Fixed social contact button icons not loading in packaged Electron builds by resolving public image URLs with a relative base when the app base URL is "/" or empty, instead of root-relative URLs under file://.
 - Updated Playwright component coverage for window controls to match current markup and accessibility labels.
+
+---
 
 ## 2.2.1 - Type naming and consistency sweep
 
@@ -664,6 +709,8 @@
 - Clarified test-data rules: automated-test fixtures stay inline in each `*.vitest.test.ts` / `*.playwright.test.ts`, component-testing payloads use `COMPONENT_PROPS` where possible, and embedded component-mode menu data stays inline in `AppControlMenus` for dialog triggers.
 - Resolved ESLint findings in boot external-link Vitest mocks (`Event` listener typing and padded blocks).
 
+---
+
 ## 2.2.0 - Testing and agent tooling
 
 ### New features
@@ -675,11 +722,15 @@
 - Replaced remaining TypeScript `any` annotations in shared type declarations with `unknown` to keep menu trigger and Vue component typing stricter.
 - Added explicit anti-`any` guidance to Vue, TypeScript scripts, Vitest, and Playwright rules/skills to keep future code strongly typed.
 
+---
+
 ## 2.1.0 - Tooling and AI-assisted development
 
 ### New features
 - Cursor project rules and skills for Vue/Quasar, BEM and scoped SCSS, Playwright and Vitest, Electron preload, global SCSS, conventional Git commits, and en-US changelog upkeep tied to the app version.
 - AGENTS.md as the project entry point for AI-assisted development.
+
+---
 
 ## 2.0.0 - The Big Rewrite
 
