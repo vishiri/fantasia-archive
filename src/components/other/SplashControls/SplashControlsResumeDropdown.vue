@@ -13,6 +13,7 @@
       outline
       split
       type="button"
+      :disable="resumePrimaryBusy"
       :label="resumePrimarySegmentLabel"
       :menu-offset="[0, 0]"
       :toggle-aria-label="$t('splashPage.browseLatestProjects')"
@@ -81,6 +82,7 @@ const {
   recentProjectEntries,
   resumeDropdownArrowTarget,
   resumeDropdownRef,
+  resumePrimaryBusy,
   resumePrimarySegmentLabel,
   showResumeDropdownArrowTooltip,
   splashRecentProjectRowTestLocator

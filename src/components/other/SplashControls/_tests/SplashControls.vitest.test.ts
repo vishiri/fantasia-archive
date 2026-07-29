@@ -44,6 +44,7 @@ vi.mock('app/src/components/other/SplashControls/scripts/functions/resolveSplash
 
 import SplashControls from '../SplashControls.vue'
 import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
+import { SPLASH_RESUME_PRIMARY_BUSY_HOLD_MS } from '../scripts/splashControlsResumeDropdown_manager'
 
 /**
  * SplashControls
@@ -204,6 +205,70 @@ test('Test that resume primary segment shows Resume Current Project and opens ac
 
   tSpy.mockRestore()
 
+  runFaActionMock.mockReset()
+  S_FaActiveProject().clearActiveProject()
+  w.unmount()
+})
+
+/**
+ * SplashControlsResumeDropdown
+ * Primary click disables control and freezes Resume Latest label until busy hold ends.
+ */
+test('Test that resume primary click holds Latest label while busy until hold ends', async () => {
+  vi.useFakeTimers()
+
+  window.faContentBridgeAPIs.projectManagement.getRecentProjects = vi.fn(async () => {
+    return [
+      {
+        filePath: '/newest.faproject',
+        name: 'Newest'
+      }
+    ]
+  })
+
+  runFaActionMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockResolvedValue(false)
+
+  const w = mount(SplashControlsResumeDropdown, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const resumeBtn = w.get('[data-test-locator="splashPage-btn-resume-latest"]')
+  expect(resumeBtn.attributes('disable')).toBe('false')
+  expect(resumeBtn.attributes('label')).toBe('splashPage.resumeLatestProject')
+
+  await resumeBtn.trigger('click')
+  await nextTick()
+  expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledOnce()
+  expect(resumeBtn.attributes('disable')).toBe('true')
+  expect(resumeBtn.attributes('label')).toBe('splashPage.resumeLatestProject')
+
+  S_FaActiveProject().setActiveProject({
+    filePath: '/newest.faproject',
+    id: 'id-newest',
+    name: 'Newest'
+  })
+  await flushPromises()
+  await nextTick()
+
+  expect(resumeBtn.attributes('label')).toBe('splashPage.resumeLatestProject')
+  expect(resumeBtn.attributes('disable')).toBe('true')
+
+  await vi.advanceTimersByTimeAsync(SPLASH_RESUME_PRIMARY_BUSY_HOLD_MS)
+  await flushPromises()
+  await nextTick()
+
+  expect(resumeBtn.attributes('label')).toBe('splashPage.resumeCurrentProject')
+  expect(resumeBtn.attributes('disable')).toBe('false')
+
+  vi.useRealTimers()
   runFaActionMock.mockReset()
   S_FaActiveProject().clearActiveProject()
   w.unmount()

@@ -9,12 +9,18 @@ import {
   computed,
   nextTick,
   onMounted,
+  onUnmounted,
   ref,
   watch
 } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { createSplashControlsResumeDropdown } from './functions/createSplashControlsResumeDropdown'
+import {
+  createSplashResumePrimaryBusyHold,
+  resolveSplashResumePrimaryLabelKey,
+  SPLASH_RESUME_PRIMARY_BUSY_HOLD_MS
+} from './functions/createSplashResumePrimaryBusyHold'
 import {
   resolveSplashResumeDropdownArrowElement as resolveSplashResumeDropdownArrowElementFn
 } from './functions/resolveSplashResumeDropdownArrowElement'
@@ -30,15 +36,25 @@ const splashControlsResumeDropdownApi = createSplashControlsResumeDropdown({
   S_FaActiveProject,
   S_FaRecentProjects,
   S_FaUserSettings,
+  clearTimeout: (id: number) => {
+    globalThis.clearTimeout(id)
+  },
   computed,
+  createSplashResumePrimaryBusyHold,
   i18n,
   nextTick,
   onMounted,
+  onUnmounted,
   openWelcomeScreenAutoLoadProject,
   ref,
   resolveSplashResumeDropdownArrowElement: resolveSplashResumeDropdownArrowElementFn,
   resolveSplashResumeDropdownPrimaryElement: resolveSplashResumeDropdownPrimaryElementFn,
+  resolveSplashResumePrimaryLabelKey,
+  resumePrimaryBusyHoldMs: SPLASH_RESUME_PRIMARY_BUSY_HOLD_MS,
   runFaAction,
+  setTimeout: (handler: () => void, timeout: number) => {
+    return globalThis.setTimeout(handler, timeout) as unknown as number
+  },
   splashRecentProjectRowTestLocator: splashRecentProjectRowTestLocatorFn,
   storeToRefs,
   watch
@@ -50,3 +66,5 @@ export const useSplashControlsResumeDropdown =
 export const resolveSplashResumeDropdownArrowElement = resolveSplashResumeDropdownArrowElementFn
 
 export const splashRecentProjectRowTestLocator = splashRecentProjectRowTestLocatorFn
+
+export { SPLASH_RESUME_PRIMARY_BUSY_HOLD_MS }

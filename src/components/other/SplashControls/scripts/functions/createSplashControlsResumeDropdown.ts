@@ -3,15 +3,33 @@ import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
 import type { T_vueWatch } from 'app/types/I_vueWatchInjected'
 
+type T_splashResumePrimaryLabelKey =
+  'splashPage.resumeCurrentProject' | 'splashPage.resumeLatestProject'
+
+type T_splashResumePrimaryBusyHoldApi = {
+  beginResumePrimaryBusyHold: (activeProject: { filePath?: string } | null) => void
+  clearResumePrimaryBusyTimer: () => void
+  resumePrimaryBusy: I_ref<boolean>
+  resumePrimaryLabelHoldKey: I_ref<T_splashResumePrimaryLabelKey | null>
+}
+
 type T_createSplashControlsResumeDropdownDeps = {
   FA_USER_SETTINGS_DEFAULTS: { hideRecentProjectTooltip: boolean }
   S_FaActiveProject: () => StoreGeneric
   S_FaRecentProjects: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
   computed: <T>(getter: () => T) => I_computedRef<T>
+  createSplashResumePrimaryBusyHold: (deps: {
+    clearTimeout: (id: number) => void
+    ref: <T>(value: T) => I_ref<T>
+    resumePrimaryBusyHoldMs: number
+    setTimeout: (handler: () => void, timeout: number) => number
+  }) => T_splashResumePrimaryBusyHoldApi
+  clearTimeout: (id: number) => void
   i18n: { global: { t: (key: string) => string; locale: { value: string } } }
   nextTick: (fn?: () => void | Promise<void>) => Promise<void>
   onMounted: (hook: () => void) => void
+  onUnmounted: (hook: () => void) => void
   openWelcomeScreenAutoLoadProject: () => void
   ref: <T>(value: T) => I_ref<T>
   resolveSplashResumeDropdownArrowElement: (
@@ -21,10 +39,15 @@ type T_createSplashControlsResumeDropdownDeps = {
   resolveSplashResumeDropdownPrimaryElement: (
     instance: { $el?: unknown } | null
   ) => HTMLElement | null
+  resolveSplashResumePrimaryLabelKey: (
+    activeProject: { filePath?: string } | null
+  ) => T_splashResumePrimaryLabelKey
+  resumePrimaryBusyHoldMs: number
   runFaAction: (
     id: 'loadExistingProject',
     payload: { filePath: string } | { filePath: string; resumeActiveSession: boolean }
   ) => void
+  setTimeout: (handler: () => void, timeout: number) => number
   splashRecentProjectRowTestLocator: (index: number) => string
   storeToRefs: T_piniaStoreToRefs
   watch: T_vueWatch
@@ -90,6 +113,45 @@ function splashControlsOnResumePrimarySegmentClick (
   deps.openWelcomeScreenAutoLoadProject()
 }
 
+function wireSplashControlsResumeDropdownWatches (
+  deps: T_createSplashControlsResumeDropdownDeps,
+  params: {
+    activeProject: I_ref<{ filePath?: string } | null>
+    hasRecentProjects: I_computedRef<boolean>
+    hideRecentProjectTooltip: I_computedRef<boolean>
+    recentProjectEntries: I_ref<I_faRecentProjectEntry[]>
+    syncResumeDropdownArrowTarget: () => void
+  }
+): void {
+  const {
+    activeProject,
+    hasRecentProjects,
+    hideRecentProjectTooltip,
+    recentProjectEntries,
+    syncResumeDropdownArrowTarget
+  } = params
+
+  deps.watch(() => hasRecentProjects.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => hideRecentProjectTooltip.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => activeProject.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => recentProjectEntries.value.length, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => deps.i18n.global.locale.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+}
+
 function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDropdownDeps): {
   hasRecentProjects: I_computedRef<boolean>
   hideRecentProjectTooltip: I_computedRef<boolean>
@@ -99,6 +161,7 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
   resumeDropdownArrowEl: I_ref<HTMLElement | null>
   resumeDropdownArrowTarget: I_computedRef<Element | undefined>
   resumeDropdownRef: I_ref<{ $el?: unknown } | null>
+  resumePrimaryBusy: I_ref<boolean>
   resumePrimarySegmentLabel: I_computedRef<string>
   showResumeDropdownArrowTooltip: I_computedRef<boolean>
   splashRecentProjectRowTestLocator: (index: number) => string
@@ -111,6 +174,17 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
   const faUserSettings = deps.storeToRefs(faUserSettingsStore).settings!
   const recentProjectsStore = deps.S_FaRecentProjects()
   const recentProjectEntries = deps.storeToRefs(recentProjectsStore).entries!
+  const {
+    beginResumePrimaryBusyHold,
+    clearResumePrimaryBusyTimer,
+    resumePrimaryBusy,
+    resumePrimaryLabelHoldKey
+  } = deps.createSplashResumePrimaryBusyHold({
+    clearTimeout: deps.clearTimeout,
+    ref: deps.ref,
+    resumePrimaryBusyHoldMs: deps.resumePrimaryBusyHoldMs,
+    setTimeout: deps.setTimeout
+  })
 
   const hideRecentProjectTooltip = deps.computed(() => {
     return faUserSettings.value?.hideRecentProjectTooltip ??
@@ -133,10 +207,9 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
   })
 
   const resumePrimarySegmentLabel = deps.computed(() => {
-    if (activeProject.value !== null) {
-      return deps.i18n.global.t('splashPage.resumeCurrentProject')
-    }
-    return deps.i18n.global.t('splashPage.resumeLatestProject')
+    const labelKey = resumePrimaryLabelHoldKey.value ??
+      deps.resolveSplashResumePrimaryLabelKey(activeProject.value)
+    return deps.i18n.global.t(labelKey)
   })
 
   const syncResumeDropdownArrowTarget = (): void => {
@@ -148,39 +221,31 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
     })
   }
 
-  deps.watch(() => hasRecentProjects.value, () => {
-    syncResumeDropdownArrowTarget()
-  }, { flush: 'post' })
-
-  deps.watch(() => hideRecentProjectTooltip.value, () => {
-    syncResumeDropdownArrowTarget()
-  }, { flush: 'post' })
-
-  deps.watch(() => activeProject.value, () => {
-    syncResumeDropdownArrowTarget()
-  }, { flush: 'post' })
-
-  deps.watch(() => recentProjectEntries.value.length, () => {
-    syncResumeDropdownArrowTarget()
-  }, { flush: 'post' })
-
-  deps.watch(() => deps.i18n.global.locale.value, () => {
-    syncResumeDropdownArrowTarget()
-  }, { flush: 'post' })
+  wireSplashControlsResumeDropdownWatches(deps, {
+    activeProject,
+    hasRecentProjects,
+    hideRecentProjectTooltip,
+    recentProjectEntries,
+    syncResumeDropdownArrowTarget
+  })
 
   const onLoadRecentProjectByPath = (filePath: string): void => {
     splashControlsOnLoadRecentProjectByPath(deps, filePath)
   }
 
   const onResumePrimarySegmentClick = (): void => {
+    if (resumePrimaryBusy.value === true) {
+      return
+    }
+    beginResumePrimaryBusyHold(activeProject.value)
     splashControlsOnResumePrimarySegmentClick(deps, activeProject)
   }
 
   deps.onMounted(() => {
-    void recentProjectsStore.refreshRecentProjects().then(() => {
-      syncResumeDropdownArrowTarget()
-    })
+    void recentProjectsStore.refreshRecentProjects().then(syncResumeDropdownArrowTarget)
   })
+
+  deps.onUnmounted(clearResumePrimaryBusyTimer)
 
   return {
     hasRecentProjects,
@@ -191,6 +256,7 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
     resumeDropdownArrowEl,
     resumeDropdownArrowTarget,
     resumeDropdownRef,
+    resumePrimaryBusy,
     resumePrimarySegmentLabel,
     showResumeDropdownArrowTooltip,
     splashRecentProjectRowTestLocator: deps.splashRecentProjectRowTestLocator

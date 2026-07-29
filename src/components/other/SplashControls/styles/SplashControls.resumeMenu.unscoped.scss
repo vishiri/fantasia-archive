@@ -1,3 +1,5 @@
+@use '../../../../css/theme/quasar-components/qDialog.variables' as qDialog;
+
 /* Teleported q-menu panel for Resume Latest Project; matches splash slate + gold chrome. */
 
 .splashControls__resumeMenu.q-menu {
@@ -13,6 +15,7 @@
     > .q-focus-helper {
       background: $splashControls-resumeMenu-itemHover-overlayColor;
       opacity: 0 !important;
+      transition: $qMenu-item-hover-focusHelperTransition;
     }
 
     &:hover,
@@ -40,5 +43,22 @@
     background-color: $splashControls-resumeMenu-separatorAlt-backgroundColor;
     height: $splashControls-resumeMenu-separator-height !important;
     opacity: 0.2;
+  }
+}
+
+/* Fantasy: swap global cyan menu rim for gold top bloom + feathers. */
+body.fa-appTheme--fantasy .splashControls__resumeMenu.q-menu {
+  border-color: transparent;
+  box-shadow: $splashControls-resumeMenu-rim-boxShadow !important;
+
+  &::after {
+    background: $splashControls-resumeMenu-rim-after-background;
+  }
+
+  &::before {
+    background-image: $splashControls-resumeMenu-rim-before-backgroundImage;
+    background-position: qDialog.$qDialog-card-rim-before-backgroundPosition;
+    background-repeat: qDialog.$qDialog-card-rim-before-backgroundRepeat;
+    background-size: qDialog.$qDialog-card-rim-before-backgroundSize;
   }
 }
