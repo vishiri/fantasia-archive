@@ -39,6 +39,10 @@ export interface I_faCreateUseProjectAppControlBarDeps {
     resolveShowProjectAppControlBarSaveButtons: I_assembleProjectAppControlBarApiInput['resolveShowProjectAppControlBarSaveButtons']
     resolveProjectAppControlBarSaveButtonColor: I_assembleProjectAppControlBarApiInput['resolveProjectAppControlBarSaveButtonColor']
     runFaAction: I_assembleProjectAppControlBarApiInput['runFaAction']
+    appNoteboardText: I_computedRef<string>
+    hasActiveProject: I_computedRef<boolean>
+    noteboardHasContent: (text: string) => boolean
+    projectNoteboardText: I_computedRef<string>
     projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
     tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
     computed: I_assembleProjectAppControlBarApiInput['computed']
@@ -82,6 +86,7 @@ export interface I_faCreateUseProjectAppControlBarDeps {
   }) => string | null
   getKeybindsSnapshot: () => I_faKeybindsSnapshot | null
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
+  S_FaAppNoteboard: () => StoreGeneric
   S_FaOpenedDocuments: () => StoreGeneric & {
     closeAllTabsWithoutChanges: () => void | Promise<void>
     closeTabsWithoutChangesExcept: (exceptDocumentId: string) => void | Promise<void>
@@ -93,8 +98,11 @@ export interface I_faCreateUseProjectAppControlBarDeps {
     requestCloseTab: (documentId: string) => void
     requestDeleteDocument: (documentId: string) => void
   }
+  S_FaActiveProject: () => StoreGeneric
   S_FaProjectHierarchyTree: () => StoreGeneric
+  S_FaProjectNoteboard: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
+  noteboardHasContent: (text: string) => boolean
   storeToRefs: T_piniaStoreToRefs
   useRoute: () => {
     path: string

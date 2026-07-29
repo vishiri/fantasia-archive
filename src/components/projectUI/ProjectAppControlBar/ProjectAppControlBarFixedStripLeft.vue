@@ -11,7 +11,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           <div class="fa-tooltip-keybind-stack">
@@ -37,7 +36,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           <div class="fa-tooltip-keybind-stack">
@@ -63,7 +61,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           {{ tipsTricksTriviaTooltip }}
@@ -88,7 +85,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           <div class="fa-tooltip-keybind-stack">
@@ -105,16 +101,20 @@
         </q-tooltip>
       </q-btn>
       <q-btn
+        class="projectAppControlBarFixedStripLeft__noteboardButton"
         color="primary-bright"
         data-test-locator="projectAppControlBar-toggleAppNoteboardButton"
         icon="mdi-clipboard-edit-outline"
         outline
         @click="onToggleAppNoteboardClick"
       >
+        <FaCornerContentDot
+          locator="projectAppControlBar-toggleAppNoteboardButton-contentDot"
+          :visible="showAppNoteboardContentDot"
+        />
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           <div class="fa-tooltip-keybind-stack">
@@ -131,16 +131,20 @@
         </q-tooltip>
       </q-btn>
       <q-btn
+        class="projectAppControlBarFixedStripLeft__noteboardButton"
         color="primary-bright"
         data-test-locator="projectAppControlBar-toggleProjectNoteboardButton"
         icon="mdi-notebook-edit-outline"
         outline
         @click="onToggleProjectNoteboardClick"
       >
+        <FaCornerContentDot
+          locator="projectAppControlBar-toggleProjectNoteboardButton-contentDot"
+          :visible="showProjectNoteboardContentDot"
+        />
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           <div class="fa-tooltip-keybind-stack">
@@ -175,7 +179,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           {{ quickSearchTooltip }}
@@ -191,7 +194,6 @@
         <q-tooltip
           anchor="bottom middle"
           class="projectAppControlBar__buttonTooltip"
-          :delay="500"
           self="top middle"
         >
           {{ quickAddTooltip }}
@@ -202,6 +204,8 @@
 </template>
 
 <script setup lang="ts">
+import FaCornerContentDot from 'app/src/components/elements/FaCornerContentDot/FaCornerContentDot.vue'
+
 defineOptions({
   name: 'ProjectAppControlBarFixedStripLeft'
 })
@@ -221,9 +225,11 @@ defineProps<{
   onToggleProjectNoteboardClick: () => void
   quickAddTooltip: string
   quickSearchTooltip: string
+  showAppNoteboardContentDot: boolean
   showContentButtons: boolean
   showFunctionButtons: boolean
   showGuideButtons: boolean
+  showProjectNoteboardContentDot: boolean
   tipsTricksTriviaTooltip: string
   toggleAppNoteboardKeybindLabel: string | null
   toggleAppNoteboardTooltip: string

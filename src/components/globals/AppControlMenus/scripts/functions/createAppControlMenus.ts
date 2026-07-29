@@ -12,9 +12,12 @@ export function createAppControlMenus (deps: {
   buildToolsMenu: (session: I_appMenuBuildSession) => I_appMenuList
   computed: <T>(getter: () => T) => ComputedRef<T>
   getFaActiveProjectStore: () => StoreGeneric
+  getFaAppNoteboardStore: () => StoreGeneric
+  getFaProjectNoteboardStore: () => StoreGeneric
   getFaRecentProjectsStore: () => StoreGeneric
   i18n: { global: { locale: { value: string } } }
   isFantasiaStorybookCanvas: () => boolean
+  noteboardHasContent: (text: string) => boolean
   onMounted: (hook: () => void | Promise<void>) => void
   openDialogMarkdownDocument: (documentName: T_documentName) => void
   readAppControlMenusTestingTypeFromCachedSnapshot: (
@@ -119,6 +122,8 @@ export function createAppControlMenus (deps: {
   function useAppControlMenus () {
     const hasActiveProject = deps.storeToRefs(deps.getFaActiveProjectStore()).hasActiveProject!
     const recentProjectEntries = deps.storeToRefs(deps.getFaRecentProjectsStore()).entries!
+    const appNoteboardText = deps.storeToRefs(deps.getFaAppNoteboardStore()).text!
+    const projectNoteboardText = deps.storeToRefs(deps.getFaProjectNoteboardStore()).text!
 
     const testingType = deps.ref<string | false>(readInitialTestingType())
 
@@ -134,8 +139,12 @@ export function createAppControlMenus (deps: {
       void deps.i18n.global.locale.value
       void hasActiveProject.value
       void recentProjectEntries.value
+      void projectNoteboardText.value
+      const projectNoteboardHasContent = hasActiveProject.value &&
+        deps.noteboardHasContent(projectNoteboardText.value)
       return deps.buildProjectMenu({
         hasActiveProject: hasActiveProject.value,
+        projectNoteboardHasContent,
         recentProjects: recentProjectEntries.value
       })
     })
@@ -151,7 +160,9 @@ export function createAppControlMenus (deps: {
     const tools = deps.computed((): I_appMenuList => {
       void deps.i18n.global.locale.value
       void hasActiveProject.value
+      void appNoteboardText.value
       return deps.buildToolsMenu({
+        appNoteboardHasContent: deps.noteboardHasContent(appNoteboardText.value),
         hasActiveProject: hasActiveProject.value
       })
     })

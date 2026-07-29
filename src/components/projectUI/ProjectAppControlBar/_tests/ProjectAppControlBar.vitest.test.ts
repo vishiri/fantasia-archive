@@ -128,6 +128,8 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
         showGuideButtons: { value: true },
         showFunctionButtons: { value: true },
         showContentButtons: { value: true },
+        showAppNoteboardContentDot: { value: false },
+        showProjectNoteboardContentDot: { value: false },
         hideHierarchyTree: { value: false },
         advancedSearchGuideKeybindLabel: { value: null },
         keyboardShortcutsKeybindLabel: { value: null },

@@ -22,6 +22,7 @@
     <!-- Main menu - Content -->
     <q-menu
       anchor="bottom left"
+      class="appControlSingleMenu__menu"
       dark
       role="menu"
       transition-show="jump-down"
@@ -89,6 +90,10 @@
                 data-test-locator="AppControlSingleMenu-menuItem-icon"
               />
             </q-item-section>
+            <FaCornerContentDot
+              :locator="`AppControlSingleMenu-menuItem-contentDot-${menuItem.itemKey ?? index}`"
+              :visible="menuItem.showContentDot === true"
+            />
 
             <!-- Sub-menu -->
             <q-menu
@@ -100,7 +105,7 @@
               role="menu"
               transition-show="jump-right"
               transition-hide="jump-left"
-              class="-subMenu"
+              class="-subMenu appControlSingleMenu__subMenu"
               data-test-locator="AppControlSingleMenu-menuItem-subMenu"
               @mouseenter="onSubmenuContentEnter"
               @mouseleave="onSubmenuContentLeave"
@@ -183,6 +188,8 @@
 <script setup lang="ts">
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 
+import FaCornerContentDot from 'app/src/components/elements/FaCornerContentDot/FaCornerContentDot.vue'
+
 import { useAppControlSingleMenu, resolveAppControlMenuItemColorClasses } from './scripts/appControlSingleMenu_manager'
 
 const props = defineProps<{
@@ -211,3 +218,4 @@ const {
 </script>
 
 <style lang="scss" scoped src="./styles/AppControlSingleMenu.scoped.scss"></style>
+<style lang="scss" src="./styles/AppControlSingleMenu.menu.unscoped.scss"></style>

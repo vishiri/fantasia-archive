@@ -52,6 +52,7 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
     faMenuItem('appControlMenus.project.items.toggleProjectNoteboard', 'mdi-notebook-edit-outline', {
       conditions: gate,
       keybindCommandId: 'toggleProjectNoteboard',
+      showContentDot: session.projectNoteboardHasContent === true,
       trigger: () => runFaAction('toggleProjectNoteboardWindow', undefined)
     }),
     faMenuItem('appControlMenus.project.items.openProjectCustomCss', 'mdi-language-css3', {

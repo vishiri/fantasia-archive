@@ -13,9 +13,19 @@ export type T_menuItemTrigger = (...args: unknown[]) => unknown | void
  */
 export interface I_appMenuBuildSession {
   /**
+   * True when the app noteboard has non-empty trimmed text.
+   */
+  appNoteboardHasContent?: boolean | undefined
+
+  /**
    * True when the app has a loaded project database for this session.
    */
   hasActiveProject: boolean
+
+  /**
+   * True when the active project noteboard has non-empty trimmed text.
+   */
+  projectNoteboardHasContent?: boolean | undefined
 
   recentProjects?: readonly I_faRecentProjectEntry[] | undefined
 }
@@ -70,6 +80,11 @@ export interface I_appMenuSubItem {
    * Optional second line under the title using the same typography as shortcut hints (for example a file path).
    */
   secondaryHintText?: string | undefined
+
+  /**
+   * When true, menu chrome shows a primary-bright corner presence dot on the row.
+   */
+  showContentDot?: boolean | undefined
 }
 
 export interface I_appMenuItem {
@@ -127,6 +142,11 @@ export interface I_appMenuItem {
    * Optional second line under the title using the same typography as shortcut hints (for example a file path).
    */
   secondaryHintText?: string | undefined
+
+  /**
+   * When true, menu chrome shows a primary-bright corner presence dot on the row.
+   */
+  showContentDot?: boolean | undefined
 }
 
 export interface I_appMenuList {

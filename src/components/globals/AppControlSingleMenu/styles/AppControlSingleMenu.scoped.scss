@@ -1,5 +1,6 @@
 .appControlSingleMenu {
   flex-grow: 1;
+  transition: $appControlSingleMenu-title-colorTransition;
 
   &:hover,
   &:focus {
@@ -20,6 +21,8 @@
   }
 
   &__item {
+    transition: $appControlSingleMenu-item-colorTransition;
+
     &--muted {
       color: $appControlSingleMenu-item-muted-color;
     }

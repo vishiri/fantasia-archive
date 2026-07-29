@@ -16,8 +16,7 @@ const variant: I_faWindowNoteboardVariantConfig = {
   documentNameClass: 'WindowAppNoteboard',
   floatingWindowZLayer: 'noteboard',
   persistFrameSilent: vi.fn(async () => undefined),
-  saveFailureActionId: 'reportAppNoteboardSaveFailure',
-  toggleKeybindCommandId: 'toggleAppNoteboard'
+  saveFailureActionId: 'reportAppNoteboardSaveFailure'
 }
 
 const noteboardStore = {
@@ -48,8 +47,6 @@ function buildFactoryDeps (overrides: Partial<T_faWindowNoteboardFactoryDeps> = 
     FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: {},
     FA_FLOATING_WINDOW_POP_TRANSITION_MS: 280,
     computed,
-    formatFaKeybindCommandLabelFromSnapshot: () => null,
-    getFaKeybindsStore: () => ({ snapshot: null }),
     getNoteboardStore: () => noteboardStore as unknown as StoreGeneric,
     onMounted: (hook) => {
       hook()
@@ -102,12 +99,10 @@ test('createWindowNoteboard wires directInput prop to setWindowOpen', async () =
 
 test('createWindowNoteboard useWindowNoteboard exposes documentNameClass from variant', () => {
   const api = createWindowNoteboard(buildFactoryDeps({
-    formatFaKeybindCommandLabelFromSnapshot: () => 'Ctrl+N',
     onMounted: vi.fn(),
     watch: vi.fn()
   }))
 
   const state = api.useWindowNoteboard({})
   expect(state.documentNameClass).toBe('WindowAppNoteboard')
-  expect(state.noteboardToggleKeybindLabel.value).toBe('Ctrl+N')
 })

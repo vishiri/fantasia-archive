@@ -1,4 +1,3 @@
-import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
@@ -17,5 +16,4 @@ export interface I_faWindowNoteboardVariantConfig {
     y: number
   }) => Promise<void>
   saveFailureActionId: T_faActionId
-  toggleKeybindCommandId: T_faKeybindCommandId
 }

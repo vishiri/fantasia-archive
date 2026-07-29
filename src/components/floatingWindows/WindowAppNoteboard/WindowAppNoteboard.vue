@@ -62,17 +62,7 @@
               data-test-locator="windowAppNoteboard-button-close"
               @click="onClose"
             >
-              <div class="windowAppNoteboard__closeBtn-stack">
-                <span class="windowAppNoteboard__closeBtn-label">
-                  {{ $t('floatingWindows.appNoteboard.close') }}
-                </span><div
-                  v-if="noteboardToggleKeybindLabel !== null"
-                  class="windowAppNoteboard__closeBtn-keybind fa-text-keybind-hint"
-                  data-test-locator="windowAppNoteboard-button-close-keybind"
-                >
-                  ({{ noteboardToggleKeybindLabel }})
-                </div>
-              </div>
+              {{ $t('floatingWindows.appNoteboard.close') }}
             </q-btn>
           </q-card-actions>
         </q-card>
@@ -104,7 +94,6 @@ const {
   documentNameClass,
   frameRef,
   frameStyleWithDialogTransition,
-  noteboardToggleKeybindLabel,
   onClose,
   onFramePointerDown,
   onResizePointerDown,

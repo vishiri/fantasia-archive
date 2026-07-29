@@ -3,11 +3,15 @@ import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
+import { noteboardHasContent } from 'app/src/scripts/floatingWindows/functions/shouldAutoOpenFilledNoteboard'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
 
 import { createUseProjectAppControlBar } from '../functions/createUseProjectAppControlBar'
@@ -57,9 +61,13 @@ export const useProjectAppControlBar = createUseProjectAppControlBar({
   resolveProjectAppControlBarSaveButtonColor,
   formatFaKeybindCommandLabelFromSnapshot,
   getKeybindsSnapshot: getProjectAppControlBarKeybindsSnapshot,
+  noteboardHasContent,
   runFaAction,
+  S_FaActiveProject,
+  S_FaAppNoteboard,
   S_FaOpenedDocuments,
   S_FaProjectHierarchyTree,
+  S_FaProjectNoteboard,
   S_FaUserSettings,
   storeToRefs,
   useRoute

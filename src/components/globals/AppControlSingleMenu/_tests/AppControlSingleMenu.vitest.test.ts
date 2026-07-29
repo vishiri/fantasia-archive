@@ -735,3 +735,38 @@ test('Test that AppControlSingleMenu submenu parent mouseleave runs hover leave 
 
   w.unmount()
 })
+
+/**
+ * AppControlSingleMenu
+ * Rows with showContentDot render the primary-bright corner presence badge.
+ */
+test('Test that AppControlSingleMenu renders content dot when showContentDot is true', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'Unit menu',
+        data: [
+          {
+            conditions: true,
+            icon: 'mdi-clipboard-edit-outline',
+            itemKey: 'app-noteboard',
+            mode: 'item',
+            showContentDot: true,
+            text: 'Toggle App Noteboard'
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  expect(document.body.querySelector(
+    '[data-test-locator="AppControlSingleMenu-menuItem-contentDot-app-noteboard"]'
+  )).not.toBeNull()
+
+  w.unmount()
+})

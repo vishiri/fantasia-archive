@@ -10,9 +10,7 @@ import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightH
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting_manager'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -54,29 +52,10 @@ const appNoteboardPersistedRoundTripSample =
  */
 const selectorList = {
   closeButton: 'windowAppNoteboard-button-close',
-  closeButtonKeybind: 'windowAppNoteboard-button-close-keybind',
   editor: 'windowAppNoteboard-editor',
   frame: 'windowAppNoteboard-frame',
   title: 'windowAppNoteboard-title'
 } as const
-
-function toggleNoteboardKeybindParenText (): string {
-  const chord = formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'toggleAppNoteboard',
-    snapshot: {
-      platform: process.platform as NodeJS.Platform,
-      store: {
-        ...FA_KEYBINDS_STORE_DEFAULTS
-      }
-    }
-  })
-
-  if (chord === null || chord === '') {
-    throw new Error('Expected toggleAppNoteboard chord label for default store')
-  }
-
-  return `(${chord})`
-}
 
 async function openAppNoteboardFromToolsMenu (page: Page): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
@@ -99,10 +78,6 @@ async function waitForNoteboardFloatingWindow (page: Page): Promise<void> {
   await page.waitForTimeout(FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 100)
   const editor = frame.locator(`[data-test-locator="${selectorList.editor}"]`)
   await expect(editor).toBeVisible()
-
-  const closeKeybind = frame.locator(`[data-test-locator="${selectorList.closeButtonKeybind}"]`)
-  await expect(closeKeybind).toHaveCount(1)
-  await expect(closeKeybind).toHaveText(toggleNoteboardKeybindParenText())
 }
 
 test.describe.serial('App noteboard E2E — fresh Playwright profile: type notes and Close', () => {

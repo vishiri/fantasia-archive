@@ -66,14 +66,17 @@ type T_tabSeedRow = {
 }
 
 function mountUseProjectAppControlBar (input: {
+  appNoteboardText?: string
   appSettingsDialogPreview?: { hideHierarchyTree?: boolean } | null
   disableAppControlBar: boolean
   disableAppControlBarContentButtons?: boolean
   disableAppControlBarFunctionButtons?: boolean
   disableAppControlBarGuides?: boolean
+  hasActiveProject?: boolean
   hideHierarchyTree?: boolean
   documentWorkspaceRoute?: boolean
   enterDocumentEditMode?: (documentId: string) => void
+  projectNoteboardText?: string
   projectWorlds?: Array<{ color: string, colorPallete?: string, displayName: string, id: string }>
   requestCloseTab?: (documentId: string) => void
   requestDeleteDocument?: (documentId: string) => void
@@ -116,6 +119,12 @@ function mountUseProjectAppControlBar (input: {
     requestCloseTab: input.requestCloseTab ?? (() => undefined)
   }
   const hierarchyTreeStore = {}
+  const appNoteboardStore = {}
+  const projectNoteboardStore = {}
+  const activeProjectStore = {}
+  const appNoteboardText = ref(input.appNoteboardText ?? '')
+  const projectNoteboardText = ref(input.projectNoteboardText ?? '')
+  const hasActiveProject = ref(input.hasActiveProject === true)
 
   return createUseProjectAppControlBar({
     assembleProjectAppControlBarApi,
@@ -136,9 +145,13 @@ function mountUseProjectAppControlBar (input: {
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction: input.runFaAction ?? vi.fn(),
+    S_FaActiveProject: () => activeProjectStore as never,
+    S_FaAppNoteboard: () => appNoteboardStore as never,
     S_FaOpenedDocuments: () => openedDocumentsStore as never,
     S_FaProjectHierarchyTree: () => hierarchyTreeStore as never,
+    S_FaProjectNoteboard: () => projectNoteboardStore as never,
     S_FaUserSettings: () => userSettingsStore as never,
     storeToRefs: (store: unknown) => {
       if (store === userSettingsStore) {
@@ -151,6 +164,21 @@ function mountUseProjectAppControlBar (input: {
         return {
           activeDocumentId,
           tabs
+        } as never
+      }
+      if (store === appNoteboardStore) {
+        return {
+          text: appNoteboardText
+        } as never
+      }
+      if (store === projectNoteboardStore) {
+        return {
+          text: projectNoteboardText
+        } as never
+      }
+      if (store === activeProjectStore) {
+        return {
+          hasActiveProject
         } as never
       }
       return {
@@ -167,6 +195,41 @@ test('Test that createUseProjectAppControlBar shows the strip when the setting i
   const api = mountUseProjectAppControlBar({ disableAppControlBar: false })
 
   expect(api.showAppControlBar.value).toBe(true)
+  expect(api.showAppNoteboardContentDot.value).toBe(false)
+  expect(api.showProjectNoteboardContentDot.value).toBe(false)
+})
+
+/**
+ * createUseProjectAppControlBar
+ * Noteboard content dots follow store text and require an active project for the project board.
+ */
+test('Test that createUseProjectAppControlBar content dots follow noteboard text and active project', () => {
+  const empty = mountUseProjectAppControlBar({
+    appNoteboardText: '   ',
+    disableAppControlBar: false,
+    hasActiveProject: true,
+    projectNoteboardText: ''
+  })
+  expect(empty.showAppNoteboardContentDot.value).toBe(false)
+  expect(empty.showProjectNoteboardContentDot.value).toBe(false)
+
+  const filledNoProject = mountUseProjectAppControlBar({
+    appNoteboardText: 'app notes',
+    disableAppControlBar: false,
+    hasActiveProject: false,
+    projectNoteboardText: 'project notes'
+  })
+  expect(filledNoProject.showAppNoteboardContentDot.value).toBe(true)
+  expect(filledNoProject.showProjectNoteboardContentDot.value).toBe(false)
+
+  const filledWithProject = mountUseProjectAppControlBar({
+    appNoteboardText: 'app notes',
+    disableAppControlBar: false,
+    hasActiveProject: true,
+    projectNoteboardText: 'project notes'
+  })
+  expect(filledWithProject.showAppNoteboardContentDot.value).toBe(true)
+  expect(filledWithProject.showProjectNoteboardContentDot.value).toBe(true)
 })
 
 test('Test that createUseProjectAppControlBar hides the strip when disableAppControlBar is on', () => {
@@ -310,7 +373,10 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction: vi.fn(),
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
       findTabByDocumentId: () => null,
@@ -324,6 +390,7 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       requestCloseTab: () => undefined
     }) as never,
     S_FaProjectHierarchyTree: () => ({}) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -331,8 +398,10 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       }
       return {
         activeDocumentId,
+        hasActiveProject: ref(false),
         settings,
         tabs,
+        text: ref(''),
         worlds
       } as never
     },
@@ -842,6 +911,7 @@ test('Test that edit and save handlers no-op when no active document is selected
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode,
@@ -855,7 +925,10 @@ test('Test that edit and save handlers no-op when no active document is selected
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaProjectHierarchyTree: () => ({}) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -863,8 +936,10 @@ test('Test that edit and save handlers no-op when no active document is selected
       }
       return {
         activeDocumentId,
+        hasActiveProject: ref(false),
         settings,
         tabs,
+        text: ref(''),
         worlds
       } as never
     },
@@ -999,6 +1074,7 @@ test('Test that activeDocumentTab is null when the active id does not match an o
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
@@ -1012,7 +1088,10 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaProjectHierarchyTree: () => ({}) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -1020,8 +1099,10 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       }
       return {
         activeDocumentId,
+        hasActiveProject: ref(false),
         settings,
         tabs,
+        text: ref(''),
         worlds
       } as never
     },
@@ -1074,6 +1155,7 @@ test('Test that createUseProjectAppControlBar exposes keybind tooltip labels fro
         schemaVersion: 1
       }
     }),
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
@@ -1087,7 +1169,10 @@ test('Test that createUseProjectAppControlBar exposes keybind tooltip labels fro
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaProjectHierarchyTree: () => ({}) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: () => ({
       activeDocumentId: ref(null),
@@ -1134,6 +1219,7 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: vi.fn(),
       findTabByDocumentId: (documentId: string) => {
@@ -1176,7 +1262,10 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
       moveDocumentTab,
       requestCloseTab: vi.fn()
     }) as never,
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaProjectHierarchyTree: () => ({ __faHierarchyTree: true }) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({} as never),
     storeToRefs: ((store: unknown) => {
       if (store !== null && typeof store === 'object' && '__faHierarchyTree' in store) {
@@ -1218,7 +1307,10 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
         } as never
       }
       return {
-        settings: ref({ disableAppControlBar: false })
+        appSettingsDialogPreview: ref(null),
+        hasActiveProject: ref(false),
+        settings: ref({ disableAppControlBar: false }),
+        text: ref('')
       } as never
     }) as never,
     useRoute: () => ({
@@ -1292,6 +1384,7 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
     resolveProjectAppControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
+    noteboardHasContent: (text: string) => text.trim().length > 0,
     runFaAction,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: vi.fn(),
@@ -1305,7 +1398,10 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
       moveDocumentTab,
       requestCloseTab: vi.fn()
     }) as never,
+    S_FaActiveProject: () => ({}) as never,
+    S_FaAppNoteboard: () => ({}) as never,
     S_FaProjectHierarchyTree: () => ({ __faHierarchyTree: true }) as never,
+    S_FaProjectNoteboard: () => ({}) as never,
     S_FaUserSettings: () => ({} as never),
     storeToRefs: ((store: unknown) => {
       if (store !== null && typeof store === 'object' && '__faHierarchyTree' in store) {
@@ -1347,7 +1443,10 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
         } as never
       }
       return {
-        settings: ref({ disableAppControlBar: false })
+        appSettingsDialogPreview: ref(null),
+        hasActiveProject: ref(false),
+        settings: ref({ disableAppControlBar: false }),
+        text: ref('')
       } as never
     }) as never,
     useRoute: () => ({

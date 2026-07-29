@@ -1,0 +1,23 @@
+@use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+@use '../../../../css/globals/faColorGlyph.variables.scss' as glyphVars;
+
+.faCornerContentDot {
+  background-color: $faCornerContentDot-color;
+  border-radius: 50%;
+  height: $faCornerContentDot-size;
+  pointer-events: none;
+  position: absolute;
+  right: $faCornerContentDot-offsetRight;
+  top: $faCornerContentDot-offsetTop;
+  width: $faCornerContentDot-size;
+  /* Above Quasar q-item / q-btn focus-helper overlays. */
+  z-index: 2;
+}
+
+/* Match hierarchy-tree / tab world glyph shading (fantasy only). */
+body.fa-appTheme--fantasy .faCornerContentDot {
+  #{glyphVars.$faColorGlyph-baseVar}: var(--fa-color-primary, #{$primary});
+
+  @include colorGlyph.fa-color-fill-shading;
+}

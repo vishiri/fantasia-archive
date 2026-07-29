@@ -9,7 +9,6 @@ export interface I_faWindowNoteboardComposable {
   frameRef: Ref<HTMLElement | null>
   frameStyleWithDialogTransition: ComputedRef<Record<string, string>>
   h: Ref<number>
-  noteboardToggleKeybindLabel: ComputedRef<string | null>
   onClose: () => void
   onFramePointerDown: () => void
   onResizePointerDown: (edge: T_faFloatingWindowResizeEdge, e: PointerEvent) => void

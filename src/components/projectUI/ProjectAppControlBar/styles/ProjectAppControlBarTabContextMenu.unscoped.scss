@@ -6,6 +6,7 @@
 @use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as *;
 
 .projectAppControlBarTabContextMenu__list {
   background-color: appControlMenus.$appControlMenus-bgColor;
@@ -35,11 +36,13 @@
 .projectAppControlBarTabContextMenu__browseSubmenu.q-menu {
   .projectAppControlBarTabContextMenu__item.q-item {
     align-items: center;
+    transition: $qMenu-item-hover-colorTransition;
 
     &.projectAppControlBarTabContextMenu__item--browseActivator {
       .projectAppControlBarTabContextMenu__primaryLabel,
       .projectAppControlBarTabContextMenu__icon {
         color: $projectAppControlBar-tabContextMenu-browseActivator-color;
+        transition: $qMenu-item-hover-colorTransition;
       }
 
       &:hover:not([aria-disabled='true']),
@@ -145,6 +148,7 @@
   .projectAppControlBarTabContextMenu__item--browseTab.q-hoverable:hover > .q-focus-helper {
     background: var(--projectAppControlBarTab-focusHelperColor);
     opacity: $qFocusable-hoverHelper-opacity !important;
+    transition: $qMenu-item-hover-focusHelperTransition;
 
     &::after,
     &::before {

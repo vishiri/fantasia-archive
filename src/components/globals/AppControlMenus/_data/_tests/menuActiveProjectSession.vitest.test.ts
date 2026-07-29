@@ -61,6 +61,25 @@ test('Test that buildProjectMenu toggle noteboard row dispatches toggleProjectNo
   expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
 })
 
+/**
+ * Project menu
+ * Content presence dot follows projectNoteboardHasContent on the noteboard row.
+ */
+test('Test that buildProjectMenu sets showContentDot from projectNoteboardHasContent', () => {
+  const withoutDot = buildProjectMenu({
+    ...emptyRecentSession(true),
+    projectNoteboardHasContent: false
+  })
+  const withDot = buildProjectMenu({
+    ...emptyRecentSession(true),
+    projectNoteboardHasContent: true
+  })
+  const withoutItems = withoutDot.data.filter((row) => row.mode === 'item')
+  const withItems = withDot.data.filter((row) => row.mode === 'item')
+  expect(withoutItems[4]!.showContentDot).toBe(false)
+  expect(withItems[4]!.showContentDot).toBe(true)
+})
+
 test('Test that buildProjectMenu custom Project CSS row dispatches openProjectStylingDialog', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
@@ -206,4 +225,23 @@ test('Test that buildToolsMenu keeps all tool rows available when hasActiveProje
 
   expect(items.length).toBe(5)
   expect(items.every((row) => row.conditions !== false)).toBe(true)
+})
+
+/**
+ * Tools menu
+ * Content presence dot follows appNoteboardHasContent on the app noteboard row.
+ */
+test('Test that buildToolsMenu sets showContentDot from appNoteboardHasContent', () => {
+  const withoutDot = buildToolsMenu({
+    appNoteboardHasContent: false,
+    hasActiveProject: false
+  })
+  const withDot = buildToolsMenu({
+    appNoteboardHasContent: true,
+    hasActiveProject: false
+  })
+  const withoutItems = withoutDot.data.filter((row) => row.mode === 'item')
+  const withItems = withDot.data.filter((row) => row.mode === 'item')
+  expect(withoutItems[0]!.showContentDot).toBe(false)
+  expect(withItems[0]!.showContentDot).toBe(true)
 })

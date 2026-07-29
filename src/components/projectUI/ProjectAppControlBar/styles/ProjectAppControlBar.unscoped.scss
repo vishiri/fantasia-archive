@@ -64,6 +64,20 @@
 .projectAppControlBarFixedStripLeft {
   align-items: stretch;
   display: flex;
+
+  &__noteboardButton.q-btn {
+    overflow: visible;
+    position: relative;
+
+    .q-btn__content {
+      overflow: visible;
+    }
+
+    .faCornerContentDot {
+      right: $projectAppControlBar-noteboardContentDot-offsetRight;
+      top: $projectAppControlBar-noteboardContentDot-offsetTop;
+    }
+  }
 }
 
 .projectAppControlBar__left {

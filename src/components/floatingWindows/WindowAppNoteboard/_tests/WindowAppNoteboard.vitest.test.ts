@@ -6,10 +6,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 const windowAppNoteboardFrameSpies = vi.hoisted(() => {
   return {
@@ -95,15 +92,6 @@ afterEach(() => {
 })
 
 test('Test that WindowAppNoteboard shows title, editor, and close when opened via directInput', async () => {
-  vi.mocked(window.faContentBridgeAPIs.faKeybinds.getKeybinds).mockResolvedValue({
-    platform: 'win32',
-    store: {
-      ...FA_KEYBINDS_STORE_DEFAULTS
-    }
-  })
-  const keybinds = S_FaKeybinds()
-  await keybinds.refreshKeybinds()
-
   const w = mount(WindowAppNoteboard, {
     global: windowAppNoteboardTestGlobalMount,
     props: { directInput: 'WindowAppNoteboard' }
@@ -112,28 +100,7 @@ test('Test that WindowAppNoteboard shows title, editor, and close when opened vi
   expect(w.find('[data-test-locator="windowAppNoteboard-title"]').text()).toContain(noteboardMessages.title)
   expect(w.find('[data-test-locator="windowAppNoteboard-editor"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="windowAppNoteboard-button-close"]').exists()).toBe(true)
-
-  const expectedToggleLabel = formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'toggleAppNoteboard',
-    snapshot: keybinds.snapshot
-  })
-  const keybindRow = w.find('[data-test-locator="windowAppNoteboard-button-close-keybind"]')
-  expect(expectedToggleLabel).not.toBeNull()
-  expect(keybindRow.exists()).toBe(true)
-  expect(keybindRow.text()).toBe(`(${expectedToggleLabel})`)
-  w.unmount()
-})
-
-test('Test that WindowAppNoteboard hides close keybind hint when keybind snapshot is not loaded', () => {
-  const keybinds = S_FaKeybinds()
-  expect(keybinds.snapshot).toBeNull()
-
-  const w = mount(WindowAppNoteboard, {
-    global: windowAppNoteboardTestGlobalMount,
-    props: { directInput: 'WindowAppNoteboard' }
-  })
-
-  expect(w.find('[data-test-locator="windowAppNoteboard-button-close-keybind"]').exists()).toBe(false)
+  expect(w.find('[data-test-locator="windowAppNoteboard-button-close"]').text()).toContain(noteboardMessages.close)
   w.unmount()
 })
 

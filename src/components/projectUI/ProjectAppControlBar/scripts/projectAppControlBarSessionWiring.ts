@@ -152,6 +152,15 @@ export function assembleProjectAppControlBarApi (
     return !input.isAppControlBarContentButtonsDisabled.value
   })
 
+  const showAppNoteboardContentDot = input.computed(() => {
+    return input.noteboardHasContent(input.appNoteboardText.value)
+  })
+
+  const showProjectNoteboardContentDot = input.computed(() => {
+    return input.hasActiveProject.value &&
+      input.noteboardHasContent(input.projectNoteboardText.value)
+  })
+
   const showDocumentTabs = input.computed(() => {
     return input.resolveShowDocumentTabs(input.tabs.value.length)
   })
@@ -222,6 +231,8 @@ export function assembleProjectAppControlBarApi (
     showGuideButtons,
     showFunctionButtons,
     showContentButtons,
+    showAppNoteboardContentDot,
+    showProjectNoteboardContentDot,
     hideHierarchyTree: input.hideHierarchyTree,
     ...activeDocumentStateApi,
     ...worldTabIndicatorApi,

@@ -6,9 +6,7 @@ import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universa
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting_manager'
 import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
@@ -49,31 +47,12 @@ const noteboardThreeLineSample =
  */
 const selectorList = {
   closeButton: 'windowAppNoteboard-button-close',
-  closeButtonKeybind: 'windowAppNoteboard-button-close-keybind',
   editor: 'windowAppNoteboard-editor',
   frame: 'windowAppNoteboard-frame',
   title: 'windowAppNoteboard-title'
 } as const
 
 const noteboardDirectInput: T_dialogName = 'WindowAppNoteboard'
-
-function toggleNoteboardKeybindParenText (): string {
-  const chord = formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'toggleAppNoteboard',
-    snapshot: {
-      platform: process.platform as NodeJS.Platform,
-      store: {
-        ...FA_KEYBINDS_STORE_DEFAULTS
-      }
-    }
-  })
-
-  if (chord === null || chord === '') {
-    throw new Error('Expected toggleAppNoteboard chord label for default store')
-  }
-
-  return `(${chord})`
-}
 
 async function readNoteboardFromBridge (page: Page): Promise<I_faAppNoteboardRoot> {
   return await page.evaluate(async () => {
@@ -141,10 +120,6 @@ test.describe.serial('App noteboard floating window chrome, persistence, and clo
     const closeButton = frame.locator(`[data-test-locator="${selectorList.closeButton}"]`)
     await expect(closeButton).toHaveCount(1)
     await expect(closeButton).toContainText(noteboardMessages.close)
-
-    const closeKeybind = frame.locator(`[data-test-locator="${selectorList.closeButtonKeybind}"]`)
-    await expect(closeKeybind).toHaveCount(1)
-    await expect(closeKeybind).toHaveText(toggleNoteboardKeybindParenText())
   })
 
   /**

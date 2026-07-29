@@ -1,4 +1,3 @@
-import type { I_faKeybindsSnapshot, T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { T_useFaFloatingWindowFrameInjected } from 'app/types/I_useFaFloatingWindowFrameInjected'
 import type { I_faWindowNoteboardVariantConfig } from 'app/types/I_faWindowNoteboardVariantConfig'
 import type { I_faWindowNoteboardComposable } from 'app/types/I_faWindowAppNoteboardComposable'
@@ -10,11 +9,6 @@ export function createWindowNoteboardUse (deps: {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: Record<string, string | boolean>
   FA_FLOATING_WINDOW_POP_TRANSITION_MS: number
   computed: <T>(getter: () => T) => ComputedRef<T>
-  formatFaKeybindCommandLabelFromSnapshot: (input: {
-    commandId: T_faKeybindCommandId | undefined
-    snapshot: I_faKeybindsSnapshot | null
-  }) => string | null
-  getFaKeybindsStore: () => { snapshot: I_faKeybindsSnapshot | null }
   getNoteboardStore: () => StoreGeneric
   storeToRefs: T_piniaStoreToRefs
   useFaFloatingWindowFrame: T_useFaFloatingWindowFrameInjected
@@ -35,13 +29,6 @@ export function createWindowNoteboardUse (deps: {
   return function useWindowNoteboard (props: { directInput?: T_dialogName | undefined }) {
     const noteboardStore = deps.getNoteboardStore()
     const variant = deps.variant
-
-    const noteboardToggleKeybindLabel = deps.computed((): string | null => {
-      return deps.formatFaKeybindCommandLabelFromSnapshot({
-        commandId: variant.toggleKeybindCommandId,
-        snapshot: deps.getFaKeybindsStore().snapshot
-      })
-    })
 
     const windowModel = deps.storeToRefs(noteboardStore).isWindowOpen!
     const noteboardRoot = deps.storeToRefs(noteboardStore).root!
@@ -82,7 +69,6 @@ export function createWindowNoteboardUse (deps: {
       frameRef: frame.frameRef,
       frameStyleWithDialogTransition,
       h: frame.h,
-      noteboardToggleKeybindLabel,
       onClose,
       onFramePointerDown: frame.onFramePointerDown,
       onResizePointerDown: frame.onResizePointerDown,

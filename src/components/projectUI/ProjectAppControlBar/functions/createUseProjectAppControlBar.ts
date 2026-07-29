@@ -11,6 +11,9 @@ export function createUseProjectAppControlBar (
     const { settings, appSettingsDialogPreview } = deps.storeToRefs(deps.S_FaUserSettings())!
     const { activeDocumentId, tabs } = deps.storeToRefs(deps.S_FaOpenedDocuments())!
     const { worlds: projectWorlds } = deps.storeToRefs(deps.S_FaProjectHierarchyTree())!
+    const { text: appNoteboardText } = deps.storeToRefs(deps.S_FaAppNoteboard())!
+    const { text: projectNoteboardText } = deps.storeToRefs(deps.S_FaProjectNoteboard())!
+    const { hasActiveProject } = deps.storeToRefs(deps.S_FaActiveProject())!
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
 
     const isAppControlBarDisabled = deps.computed(() => {
@@ -87,6 +90,10 @@ export function createUseProjectAppControlBar (
         resolveShowProjectAppControlBarDeleteButton: deps.resolveShowProjectAppControlBarDeleteButton,
         resolveShowProjectAppControlBarSaveButtons: deps.resolveShowProjectAppControlBarSaveButtons,
         resolveProjectAppControlBarSaveButtonColor: deps.resolveProjectAppControlBarSaveButtonColor,
+        appNoteboardText: appNoteboardText!,
+        hasActiveProject: hasActiveProject!,
+        noteboardHasContent: deps.noteboardHasContent,
+        projectNoteboardText: projectNoteboardText!,
         projectWorlds: projectWorlds!,
         runFaAction: deps.runFaAction,
         tabs: tabs!

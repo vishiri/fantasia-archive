@@ -2,8 +2,28 @@ import { expect, test } from 'vitest'
 
 import {
   maybeAutoOpenFilledNoteboard,
+  noteboardHasContent,
   shouldAutoOpenFilledNoteboard
 } from '../shouldAutoOpenFilledNoteboard'
+
+/**
+ * noteboardHasContent
+ * Empty and whitespace-only strings do not count as content.
+ */
+test('Test that noteboardHasContent is false for empty or whitespace text', () => {
+  expect(noteboardHasContent('')).toBe(false)
+  expect(noteboardHasContent('   ')).toBe(false)
+  expect(noteboardHasContent('\n\t')).toBe(false)
+})
+
+/**
+ * noteboardHasContent
+ * Any non-empty trimmed text counts as content.
+ */
+test('Test that noteboardHasContent is true for filled text', () => {
+  expect(noteboardHasContent('note')).toBe(true)
+  expect(noteboardHasContent('  note  ')).toBe(true)
+})
 
 /**
  * shouldAutoOpenFilledNoteboard

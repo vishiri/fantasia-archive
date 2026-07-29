@@ -1,0 +1,34 @@
+@use './variables' as *;
+
+/* Teleported App Control menus.
+ * Must use class= on q-menu — content-class is not a QMenu prop
+ * (inheritAttrs false; attr never becomes CSS class).
+ */
+
+body.fa-appTheme--fantasy .appControlSingleMenu__menu.q-menu {
+  margin-top: $appControlSingleMenu-menu-offsetTop-fantasy !important;
+}
+
+/* Side submenu: darker panel than root (match tree Sort By / tab Browse). */
+.appControlSingleMenu__subMenu.q-menu {
+  background-color: $appControlSingleMenu-subMenu-bgColor;
+
+  .appControlSingleMenu__list {
+    background-color: $appControlSingleMenu-subMenu-bgColor;
+  }
+}
+
+body.fa-appTheme--fantasy .appControlSingleMenu__subMenu.q-menu {
+  margin-left: $appControlSingleMenu-subMenu-offsetLeft-fantasy !important;
+}
+
+/* Content-dot host: teleported menus need unscoped position (scoped can miss portaled rows). */
+.appControlSingleMenu__menu .appControlSingleMenu__item {
+  overflow: visible;
+  position: relative;
+
+  .faCornerContentDot {
+    right: $appControlSingleMenu-contentDot-offsetRight;
+    top: $appControlSingleMenu-contentDot-offsetTop;
+  }
+}

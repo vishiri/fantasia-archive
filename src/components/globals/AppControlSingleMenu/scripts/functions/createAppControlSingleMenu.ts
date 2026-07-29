@@ -33,8 +33,8 @@ function createAppControlSingleMenuSubmenuHover (deps: T_createAppControlSingleM
   function clearHideTimer (): void {
     if (hideTimer !== null) {
       clearTimeout(hideTimer)
-      hideTimer = null
     }
+    hideTimer = null
   }
 
   function scheduleHide (): void {

@@ -52,6 +52,8 @@ export interface I_projectAppControlBarComposableApi {
   showGuideButtons: I_computedRef<boolean>
   showFunctionButtons: I_computedRef<boolean>
   showContentButtons: I_computedRef<boolean>
+  showAppNoteboardContentDot: I_computedRef<boolean>
+  showProjectNoteboardContentDot: I_computedRef<boolean>
   hideHierarchyTree: I_computedRef<boolean>
   advancedSearchGuideKeybindLabel: I_computedRef<string | null>
   keyboardShortcutsKeybindLabel: I_computedRef<string | null>
@@ -119,6 +121,10 @@ export interface I_assembleProjectAppControlBarApiInput {
     hasUnsavedChanges: boolean
   }) => T_projectAppControlBarSaveButtonColor
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
+  appNoteboardText: I_computedRef<string>
+  hasActiveProject: I_computedRef<boolean>
+  noteboardHasContent: (text: string) => boolean
+  projectNoteboardText: I_computedRef<string>
   projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
   tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
 }

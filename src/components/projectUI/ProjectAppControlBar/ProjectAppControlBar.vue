@@ -62,9 +62,11 @@
       :show-delete-document-button="showDeleteDocumentButton"
       :show-document-structure-buttons="showDocumentStructureButtons"
       :show-app-control-bar="showAppControlBar"
+      :show-app-noteboard-content-dot="showAppNoteboardContentDot"
       :show-edit-document-button="showEditDocumentButton"
       :show-function-buttons="showFunctionButtons"
       :show-guide-buttons="showGuideButtons"
+      :show-project-noteboard-content-dot="showProjectNoteboardContentDot"
       :show-save-document-buttons="showSaveDocumentButtons"
       :tips-tricks-trivia-tooltip="tipsTricksTriviaTooltip"
       :toggle-app-noteboard-keybind-label="toggleAppNoteboardKeybindLabel"
@@ -158,12 +160,14 @@ const {
   showDeleteDocumentButton,
   showDocumentStructureButtons,
   showAppControlBar,
+  showAppNoteboardContentDot,
   showContentButtons,
   showDocumentTabs,
   showWorldTabIndicators,
   showEditDocumentButton,
   showFunctionButtons,
   showGuideButtons,
+  showProjectNoteboardContentDot,
   showSaveDocumentButtons,
   saveDocumentButtonColor,
   toggleAppNoteboardKeybindLabel,

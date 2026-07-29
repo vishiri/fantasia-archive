@@ -36,8 +36,6 @@ export function createAssembledWindowNoteboard (input: {
     FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: deps.FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
     FA_FLOATING_WINDOW_POP_TRANSITION_MS: deps.FA_FLOATING_WINDOW_POP_TRANSITION_MS,
     computed: input.computed,
-    formatFaKeybindCommandLabelFromSnapshot: deps.formatFaKeybindCommandLabelFromSnapshot,
-    getFaKeybindsStore: deps.getFaKeybindsStore,
     getNoteboardStore: deps.getNoteboardStore,
     storeToRefs: deps.storeToRefs,
     useFaFloatingWindowFrame: deps.useFaFloatingWindowFrame,

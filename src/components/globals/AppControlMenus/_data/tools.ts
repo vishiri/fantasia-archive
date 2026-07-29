@@ -10,10 +10,11 @@ import {
 
 // TODO - add functionality for all buttons and conditions
 
-function buildToolsMenuData (_session: I_appMenuBuildSession): I_appMenuItem[] {
+function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
   return [
     faMenuItem('appControlMenus.tools.items.appNoteBoard', 'mdi-clipboard-edit-outline', {
       keybindCommandId: 'toggleAppNoteboard',
+      showContentDot: session.appNoteboardHasContent === true,
       trigger: () => runFaAction('toggleAppNoteboardWindow', undefined)
     }),
     faMenuItem('appControlMenus.tools.items.appStyling', 'mdi-language-css3', {

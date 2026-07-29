@@ -1,4 +1,3 @@
-import type { I_faKeybindsSnapshot, T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { T_useFaFloatingWindowFrameInjected } from 'app/types/I_useFaFloatingWindowFrameInjected'
 import type { I_faWindowNoteboardVariantConfig } from 'app/types/I_faWindowNoteboardVariantConfig'
@@ -56,11 +55,6 @@ export type T_faWindowNoteboardFactoryParts = {
     FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: Record<string, string | boolean>
     FA_FLOATING_WINDOW_POP_TRANSITION_MS: number
     computed: <T>(getter: () => T) => ComputedRef<T>
-    formatFaKeybindCommandLabelFromSnapshot: (input: {
-      commandId: T_faKeybindCommandId | undefined
-      snapshot: I_faKeybindsSnapshot | null
-    }) => string | null
-    getFaKeybindsStore: () => { snapshot: I_faKeybindsSnapshot | null }
     getNoteboardStore: () => StoreGeneric
     storeToRefs: T_piniaStoreToRefs
     useFaFloatingWindowFrame: T_useFaFloatingWindowFrameInjected
@@ -85,11 +79,6 @@ export type T_faWindowNoteboardFactoryDeps = {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: Record<string, string | boolean>
   FA_FLOATING_WINDOW_POP_TRANSITION_MS: number
   computed: <T>(getter: () => T) => ComputedRef<T>
-  formatFaKeybindCommandLabelFromSnapshot: (input: {
-    commandId: T_faKeybindCommandId | undefined
-    snapshot: I_faKeybindsSnapshot | null
-  }) => string | null
-  getFaKeybindsStore: () => { snapshot: I_faKeybindsSnapshot | null }
   getNoteboardStore: () => StoreGeneric
   onMounted: (hook: () => void) => void
   storeToRefs: T_piniaStoreToRefs

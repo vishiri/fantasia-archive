@@ -70,22 +70,4 @@
   &__closeBtn {
     min-width: auto;
   }
-
-  &__closeBtn-keybind {
-    font-size: $windowProjectNoteboard-closeBtn-keybind-fontSize;
-    font-weight: 600;
-    margin-top: $windowProjectNoteboard-closeBtn-keybind-marginTop;
-    text-shadow: none;
-  }
-
-  &__closeBtn-label {
-    white-space: nowrap;
-  }
-
-  &__closeBtn-stack {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
 }

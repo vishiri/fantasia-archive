@@ -26,9 +26,11 @@
             :on-toggle-project-noteboard-click="onToggleProjectNoteboardClick"
             :quick-add-tooltip="quickAddTooltip"
             :quick-search-tooltip="quickSearchTooltip"
+            :show-app-noteboard-content-dot="showAppNoteboardContentDot"
             :show-content-buttons="showContentButtons"
             :show-function-buttons="showFunctionButtons"
             :show-guide-buttons="showGuideButtons"
+            :show-project-noteboard-content-dot="showProjectNoteboardContentDot"
             :tips-tricks-trivia-tooltip="tipsTricksTriviaTooltip"
             :toggle-app-noteboard-keybind-label="toggleAppNoteboardKeybindLabel"
             :toggle-app-noteboard-tooltip="toggleAppNoteboardTooltip"
@@ -110,6 +112,7 @@ defineProps<{
   saveDocumentKeepEditModeTooltip: string
   saveDocumentKeybindLabel: string | null
   saveDocumentTooltip: string
+  showAppNoteboardContentDot: boolean
   showContentButtons: boolean
   showDeleteDocumentButton: boolean
   showDocumentStructureButtons: boolean
@@ -117,6 +120,7 @@ defineProps<{
   showEditDocumentButton: boolean
   showFunctionButtons: boolean
   showGuideButtons: boolean
+  showProjectNoteboardContentDot: boolean
   showSaveDocumentButtons: boolean
   tipsTricksTriviaTooltip: string
   toggleAppNoteboardKeybindLabel: string | null
