@@ -127,6 +127,7 @@
 
 .projectAppControlBarTabs--header {
   background-color: transparent;
+  display: flex;
   flex: 1 1 auto;
   max-width: 100%;
   min-height: mainLayout.$mainLayout-appHeader-heightPx;
@@ -142,13 +143,16 @@
 }
 
 .projectAppControlBarTabs__tabs {
+  height: 100%;
   max-width: 100%;
   overflow: hidden;
   width: 100%;
 }
 
 .projectAppControlBarTabs__tabTransitionGroup {
+  align-items: stretch;
   display: flex;
+  height: 100%;
 }
 
 /* animate.css base; TransitionGroup :duration overrides animation-duration per enter/leave. */
@@ -162,11 +166,32 @@
 }
 
 .projectAppControlBarTabs__tab.q-tab {
+  background-color: $projectAppControlBar-tabDefaultBackgroundColor;
+  cursor: grab;
+  margin-inline-end: $projectAppControlBar-tabMarginInlineEndPx;
   max-width: $projectAppControlBar-tabWidthPx;
   /* overflow visible: absolute unsaved feather hangs top-right without clip */
   overflow: visible;
   position: relative;
+  /* q-route-tab is an <a>; block Chromium native link-drag so Sortable forceFallback wins first try. */
+  -webkit-user-drag: none;
   width: $projectAppControlBar-tabWidthPx;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  * {
+    -webkit-user-drag: none;
+  }
+}
+
+.projectAppControlBarTabs__tab.q-tab:first-child {
+  margin-inline-start: $projectAppControlBar-tabFirstMarginInlineStartPx;
+}
+
+.projectAppControlBarTabs__tab.q-tab--active:not(.projectAppControlBarTabs__tab--customDocumentBackground) {
+  background-color: $projectAppControlBar-tabActiveBackgroundColor;
 }
 
 .projectAppControlBarTabs__tab--customDocumentBackground.q-tab {
@@ -175,6 +200,7 @@
 
 .projectAppControlBarTabs__tabWorldIndicator {
   align-items: center;
+  color: var(--fa-color-glyph-base);
   display: inline-flex;
   font-size: $projectAppControlBar-tabWorldIndicator-fontSize;
   height: $projectAppControlBar-tabWorldIndicator-fontSize;
@@ -194,22 +220,47 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
 
 .tabsWrapper {
   &.q-tabs--dense .q-tab {
+    height: mainLayout.$mainLayout-appHeader-heightPx;
     min-height: mainLayout.$mainLayout-appHeader-heightPx;
+  }
+
+  .q-tabs__content {
+    height: 100%;
   }
 
   .q-tab {
     --projectAppControlBarTab-focusHelperColor: currentcolor;
 
+    border-bottom: $projectAppControlBar-tabBottomBorderWidthPx solid $projectAppControlBar-tabBottomBorderColor;
     color: $projectAppControlBar-tabContent-color;
     padding: 0 $projectAppControlBar-tabPadding-inlinePx;
     transition:
       background-color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
+      border-bottom-color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
       color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
       opacity $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase;
   }
 
+  .q-tab--active {
+    border-bottom-color: transparent;
+  }
+
+  .projectAppControlBarTabs__tab.q-tab--active:not(.projectAppControlBarTabs__tab--customAppearance) {
+    .projectAppControlBarTabs__deadMarker,
+    .projectAppControlBarTabs__finishedMarker,
+    .projectAppControlBarTabs__tabLabelText,
+    .q-tab__icon,
+    .q-tab__label {
+      color: $projectAppControlBar-tabActiveContentColor;
+    }
+  }
+
   .projectAppControlBarTabs__tab--withWorldIndicator.q-tab {
     padding-inline-start: calc(#{$projectAppControlBar-tabPadding-inlinePx} + #{$projectAppControlBar-tabWorldIndicator-extraPaddingInlineStartPx});
+
+    .q-tab__icon {
+      margin-inline-start: $projectAppControlBar-tabWorldIndicator-iconMarginInlineStartPx;
+    }
   }
 
   .projectAppControlBarTabs__tab--withUnsavedAlert.q-tab {
@@ -217,32 +268,33 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
   }
 
   .q-tab__content {
+    align-items: center;
+    box-sizing: border-box;
+    height: 100%;
     justify-content: flex-start;
     max-width: $projectAppControlBar-tabContent-widthPx;
+    min-height: 0;
     min-width: 0;
     /* label/ellipsis clip on children; keep visible for absolute alert overlay */
     overflow: visible;
+    /* Quasar default padding 4px 0 biases dense 36px header tabs off-center. */
+    padding-bottom: 0;
+    padding-top: 0;
     text-align: left;
     width: $projectAppControlBar-tabContent-widthPx;
   }
 
   .q-tab__indicator {
-    height: $projectAppControlBar-tabIndicator-heightPx;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .q-tab--active .q-tab__indicator {
-    background-color: var(--projectAppControlBarTab-textColor, #{$projectAppControlBar-tabContent-color});
-    opacity: 1;
-    transform-origin: left /* rtl:ignore */;
+    display: none;
   }
 
   .q-tab .q-tab__icon {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
-    --fa-q-icon-display-glyph-font-size: #{$projectAppControlBar-tabIcon-glyphFontSize};
-    --fa-q-icon-display-mdi-font-size: #{$projectAppControlBar-tabIcon-glyphFontSize};
+    /* Same glyph sizing as ProjectHierarchyTreeNode__icon--layoutKind. */
+    --fa-q-icon-display-glyph-font-size: #{$projectAppControlBar-tabIcon-boxSize};
+    --fa-q-icon-display-mdi-fit-scale: 1;
+    --fa-q-icon-display-mdi-font-size: #{$projectAppControlBar-tabIcon-boxSize};
 
     align-items: center;
     color: $projectAppControlBar-tabContent-color;
@@ -251,12 +303,20 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     font-size: $projectAppControlBar-tabIcon-boxSize;
     height: $projectAppControlBar-tabIcon-boxSize;
     justify-content: center;
+    margin-inline-end: $projectAppControlBar-tabIcon-marginInlineEndPx;
     max-height: $projectAppControlBar-tabIcon-boxSize;
     max-width: $projectAppControlBar-tabIcon-boxSize;
     transition:
       color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
       opacity $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase;
     width: $projectAppControlBar-tabIcon-boxSize;
+
+    /* Dense header tabs: drop FA/MDI glyph top nudge from shared display mixin. */
+    &.fa-brands::before,
+    &.fa-regular::before,
+    &.fa-solid::before {
+      margin-top: 0;
+    }
 
     &:not(.fa-brands, .fa-regular, .fa-solid) {
       margin-top: 0;
@@ -342,5 +402,11 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     &::before {
       opacity: 0 !important;
     }
+  }
+
+  .projectAppControlBarTabs__tab.q-tab--active.q-focusable:focus > .q-focus-helper,
+  .projectAppControlBarTabs__tab.q-tab--active.q-hoverable:hover > .q-focus-helper {
+    background: transparent;
+    opacity: 0 !important;
   }
 }

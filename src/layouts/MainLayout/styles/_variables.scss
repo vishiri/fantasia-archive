@@ -7,6 +7,7 @@
 $mainLayout-appHeader-backgroundColor: fa-v('dark-middle', $dark-middle);
 /* Splash / non-workspace: match AppControlMenus bar ($dark), not page/header middle. */
 $mainLayout-appHeader-backgroundColor-welcome: appControlMenus.$appControlMenus-barBackgroundColor;
+$mainLayout-appHeader-menusMinWidthWithDocumentTabs: appControlMenus.$appControlMenus-barMinWidthWithDocumentTabs;
 $mainLayout-appHeader-chromeRightReserveBasePx: calc(#{globalWindowButtons.$globalWindowButtons-totalWidth} + #{globalLanguageSelector.$globalLanguageSelector-gap} + #{globalLanguageSelector.$globalLanguageSelector-trigger-outerSizePx});
 $mainLayout-appHeader-chromeRightReserveWithSpellcheckPx: calc(#{$mainLayout-appHeader-chromeRightReserveBasePx} + #{globalLanguageSelector.$globalLanguageSelector-spellcheckRefresh-gap} + #{globalLanguageSelector.$globalLanguageSelector-diameter});
 $mainLayout-appHeader-zIndex: 7000;

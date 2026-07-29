@@ -32,6 +32,7 @@ export interface I_projectAppControlBarComposableApi {
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
   onTabMoveClick: (documentId: string, direction: 'left' | 'right') => void
+  onTabReorder: (fromIndex: number, toIndex: number) => void
   openedDocumentTabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
   resolveDocumentTabRoute: (documentId: string) => string
   resolveDocumentTabLabel: (tab: I_faOpenedDocumentTab) => string
@@ -87,6 +88,7 @@ export interface I_assembleProjectAppControlBarApiInput {
   hideHierarchyTree: I_computedRef<boolean>
   findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
   moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
+  reorderDocumentTabs: (fromIndex: number, toIndex: number) => void
   requestCloseTab: (documentId: string) => void
   requestDeleteDocument: (documentId: string) => void
   closeAllTabsWithoutChanges: () => void | Promise<void>

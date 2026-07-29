@@ -17,6 +17,7 @@
       :on-tab-force-close-all-click="onTabForceCloseAllClick"
       :on-tab-force-close-all-except-click="onTabForceCloseAllExceptClick"
       :on-tab-move-click="onTabMoveClick"
+      :on-tab-reorder="onTabReorder"
       :opened-document-tabs="openedDocumentTabs"
       :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
       :resolve-document-tab-display-icon="resolveDocumentTabDisplayIcon"
@@ -148,6 +149,7 @@ const {
   onTabForceCloseAllClick,
   onTabForceCloseAllExceptClick,
   onTabMoveClick,
+  onTabReorder,
   openedDocumentTabs,
   resolveDocumentTabLabel,
   resolveDocumentTabAppearanceChrome,

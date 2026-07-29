@@ -83,6 +83,10 @@ Sortable root not component root → **`useDraggable(el, list, options)`** or **
 
 Vertical category tabs reuse **`faDragDrop_manager`** (**`faVerticalDraggableTabsSortableDragOptions`**, document drag cursor from **`faDragDropDocumentDragCursorWiring.ts`**, **`hideNativeSortableDragGhost`**, **`resolveFaVerticalDraggableTabIdUnderPoint`**) + **`faVerticalDraggableTabListPointerHoverWiring.ts`** + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Reusable element **`FaVerticalDraggableTabList`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
 
+### Horizontal open document tabs (**`ProjectAppControlBarOpenedTabs`**)
+
+Workspace header strip: **`VueDraggable`** horizontal over **`q-route-tab`** children. Reuse Sortable forceFallback + **`hideNativeSortableDragGhost`** / document drag cursor from **`faDragDrop_manager`**. Feature wiring: **`projectAppControlBarTabsSortableDragOptionsWiring`**, edge scroll **`projectAppControlBarTabsDragEdgeScroll*`** (Quasar tabs content **`overflow: hidden`**), wheel **`projectAppControlBarTabsWheelScroll*`**. Domain: **`openedDocumentTabReorder`** → store **`reorderDocumentTabs`**. Native link drag off: **`draggable="false"`** on route tabs.
+
 **Pointer hover (not CSS `:hover`):** Sortable sticky `:hover` wrong after reorder → **`FaVerticalDraggableTabList`** tracks **`pointerHoverItemId`** via **`pointermove`** / **`pointerleave`**; tab slot gets **`isPointerHovered`** → **`faVerticalDraggableTabs__tab--pointerHover`**. After drag **`end`**, clear hover then resync from last client point after **`FA_VERTICAL_DRAGGABLE_TABS_SORTABLE_ANIMATION_MS`**. Flat skin: Quasar-like wash; fantasy: gold edge glow on pointer class.
 
 #### Vertical draggable tab strips (reusable column)

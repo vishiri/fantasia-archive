@@ -3,7 +3,11 @@
     v-if="showDocumentTabs"
     :to="FA_PROJECT_APP_CONTROL_BAR_HEADER_MOUNT_SELECTOR"
   >
-    <div class="projectAppControlBarTabs projectAppControlBarTabs--header">
+    <div
+      ref="tabsRootRef"
+      class="projectAppControlBarTabs projectAppControlBarTabs--header"
+      @wheel="onProjectAppControlBarTabsWheel"
+    >
       <q-tabs
         align="left"
         class="projectAppControlBarTabs__tabs tabsWrapper"
@@ -14,16 +18,18 @@
         no-caps
         outside-arrows
       >
-        <TransitionGroup
-          appear
+        <VueDraggable
+          v-model="sortableTabs"
+          v-bind="projectAppControlBarTabsSortableDragOptions"
+          :animation="PROJECT_APP_CONTROL_BAR_TABS_SORTABLE_ANIMATION_MS"
           class="projectAppControlBarTabs__tabTransitionGroup"
-          :duration="PROJECT_APP_CONTROL_BAR_TAB_TRANSITION_MS"
-          :enter-active-class="PROJECT_APP_CONTROL_BAR_TAB_ENTER_ACTIVE_CLASS"
-          :leave-active-class="PROJECT_APP_CONTROL_BAR_TAB_LEAVE_ACTIVE_CLASS"
-          tag="div"
+          :set-data="setOpenedTabsNativeSortableDragGhost"
+          :touch-start-threshold="5"
+          @end="onTabsDragEndWithCursorClear"
+          @start="onTabsDragStart"
         >
           <q-route-tab
-            v-for="tab in openedDocumentTabs"
+            v-for="tab in sortableTabs"
             :key="tab.documentId"
             :alert="tab.hasUnsavedChanges"
             alert-icon="mdi-feather"
@@ -39,6 +45,7 @@
                 showWorldTabIndicators && resolveTabWorldIndicatorColor(tab) !== null
             }"
             :data-test-locator="`projectAppControlBar-tab-${tab.documentId}`"
+            draggable="false"
             :icon="resolveDocumentTabDisplayIcon(tab)"
             :name="tab.documentId"
             :ripple="false"
@@ -104,7 +111,7 @@
               :tab="tab"
             />
           </q-route-tab>
-        </TransitionGroup>
+        </VueDraggable>
       </q-tabs>
     </div>
   </Teleport>
@@ -112,6 +119,7 @@
 
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
@@ -120,17 +128,24 @@ import ProjectAppControlBarTabContextMenu from './ProjectAppControlBarTabContext
 import ProjectAppControlBarTabWorldIndicator from './ProjectAppControlBarTabWorldIndicator.vue'
 
 import {
-  PROJECT_APP_CONTROL_BAR_TAB_ENTER_ACTIVE_CLASS,
-  PROJECT_APP_CONTROL_BAR_TAB_LEAVE_ACTIVE_CLASS,
-  PROJECT_APP_CONTROL_BAR_TAB_TRANSITION_MS
-} from './functions/projectAppControlBarTabTransition'
-import { FA_PROJECT_APP_CONTROL_BAR_HEADER_MOUNT_SELECTOR } from './scripts/projectAppControlBar_manager'
+  FA_PROJECT_APP_CONTROL_BAR_HEADER_MOUNT_SELECTOR,
+  PROJECT_APP_CONTROL_BAR_TABS_SORTABLE_ANIMATION_MS,
+  VueDraggable,
+  applyFaVerticalDraggableTabsDocumentDragCursor,
+  clearFaVerticalDraggableTabsDocumentDragCursor,
+  hideNativeSortableDragGhost,
+  onProjectAppControlBarTabsWheel,
+  projectAppControlBarTabsSortableDragOptions,
+  startProjectAppControlBarTabsDragEdgeScroll,
+  stopProjectAppControlBarTabsDragEdgeScroll,
+  useProjectAppControlBarOpenedTabsSortable
+} from './scripts/projectAppControlBar_manager'
 
 defineOptions({
   name: 'ProjectAppControlBarOpenedTabs'
 })
 
-defineProps<{
+const props = defineProps<{
   activeDocumentTabName: string | undefined
   moveDocumentTabLeftKeybindLabel: string | null
   moveDocumentTabRightKeybindLabel: string | null
@@ -147,6 +162,7 @@ defineProps<{
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
   onTabMoveClick: (documentId: string, direction: 'left' | 'right') => void
+  onTabReorder: (fromIndex: number, toIndex: number) => void
   openedDocumentTabs: readonly I_faOpenedDocumentTab[]
   resolveDocumentTabAppearanceChrome: (
     tab: I_faOpenedDocumentTab
@@ -159,4 +175,51 @@ defineProps<{
   showDocumentTabs: boolean
   showWorldTabIndicators: boolean
 }>()
+
+const tabsRootRef = ref<HTMLElement | null>(null)
+
+function getOpenedDocumentTabs (): readonly I_faOpenedDocumentTab[] {
+  return props.openedDocumentTabs
+}
+
+const {
+  onTabsDragEnd,
+  sortableTabs
+} = useProjectAppControlBarOpenedTabsSortable({
+  getOpenedDocumentTabs,
+  onTabReorder: props.onTabReorder
+})
+
+function setOpenedTabsNativeSortableDragGhost (dataTransfer: DataTransfer): void {
+  hideNativeSortableDragGhost(dataTransfer)
+}
+
+function onTabsDragStart (event: unknown): void {
+  applyFaVerticalDraggableTabsDocumentDragCursor()
+  let initialPointerClientX: number | undefined
+  if (
+    typeof event === 'object' &&
+    event !== null &&
+    'originalEvent' in event
+  ) {
+    const originalEvent = (event as { originalEvent?: Event }).originalEvent
+    if (
+      originalEvent instanceof MouseEvent ||
+      originalEvent instanceof PointerEvent
+    ) {
+      initialPointerClientX = originalEvent.clientX
+    }
+  }
+  startProjectAppControlBarTabsDragEdgeScroll(tabsRootRef.value, initialPointerClientX)
+}
+
+function onTabsDragEndWithCursorClear (event: { newIndex?: number | undefined, oldIndex?: number | undefined }): void {
+  stopProjectAppControlBarTabsDragEdgeScroll()
+  clearFaVerticalDraggableTabsDocumentDragCursor()
+  onTabsDragEnd(event)
+}
+
+onBeforeUnmount(() => {
+  stopProjectAppControlBarTabsDragEdgeScroll()
+})
 </script>

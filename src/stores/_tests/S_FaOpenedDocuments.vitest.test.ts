@@ -481,6 +481,55 @@ test('Test that S_FaOpenedDocuments moveDocumentTab moves the requested tab with
   expect(store.activeDocumentId).toBe('doc-1')
 })
 
+test('Test that S_FaOpenedDocuments reorderDocumentTabs moves by index without changing activeDocumentId', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      },
+      {
+        ...baseTab,
+        documentId: 'doc-3',
+        persistenceState: 'persisted',
+        tabLabel: 'Place'
+      }
+    ]
+  })
+
+  store.reorderDocumentTabs(0, 2)
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2', 'doc-3', 'doc-1'])
+  expect(store.activeDocumentId).toBe('doc-1')
+})
+
+test('Test that S_FaOpenedDocuments reorderDocumentTabs no-ops for invalid indexes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+
+  store.reorderDocumentTabs(0, 0)
+  store.reorderDocumentTabs(0, 5)
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2'])
+  expect(store.activeDocumentId).toBe('doc-1')
+})
+
 test('Test that S_FaOpenedDocuments requestCloseTab defers dirty tabs', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()

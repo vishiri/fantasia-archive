@@ -13,6 +13,7 @@ import {
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose
 } from '../openedDocumentTabDomain'
+import { reorderOpenedDocumentTabsByIndex } from '../openedDocumentTabReorder'
 import { computeOpenedDocumentHasUnsavedChanges } from '../openedDocumentTabAppearance'
 
 const sampleTab: I_faOpenedDocumentTab = {
@@ -436,4 +437,39 @@ test('Test that moveOpenedDocumentTabByOffset returns null when a sparse tab row
   ]
 
   expect(moveOpenedDocumentTabByOffset(tabs, 'doc-1', 1)).toBeNull()
+})
+
+test('Test that reorderOpenedDocumentTabsByIndex moves a tab across the list', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-1'
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-2'
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-3'
+    }
+  ]
+  const reordered = reorderOpenedDocumentTabsByIndex(tabs, 0, 2)
+  expect(reordered?.map((tab) => tab.documentId)).toEqual(['doc-2', 'doc-3', 'doc-1'])
+})
+
+test('Test that reorderOpenedDocumentTabsByIndex returns null for invalid or unchanged indexes', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-1'
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-2'
+    }
+  ]
+  expect(reorderOpenedDocumentTabsByIndex(tabs, 0, 0)).toBeNull()
+  expect(reorderOpenedDocumentTabsByIndex(tabs, -1, 1)).toBeNull()
+  expect(reorderOpenedDocumentTabsByIndex(tabs, 0, 5)).toBeNull()
 })

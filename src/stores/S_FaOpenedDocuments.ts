@@ -54,6 +54,7 @@ import {
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+import { reorderOpenedDocumentTabsByIndex } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabReorder'
 import {
   normalizeOpenedDocumentAppearanceColorFromDb,
   normalizeOpenedDocumentParentIdFromDb,
@@ -1405,6 +1406,15 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     tabs.value = nextTabs
   }
 
+  function reorderDocumentTabs (fromIndex: number, toIndex: number): void {
+    const nextTabs = reorderOpenedDocumentTabsByIndex(tabs.value, fromIndex, toIndex)
+    if (nextTabs === null) {
+      return
+    }
+
+    tabs.value = nextTabs
+  }
+
   function moveActiveDocumentTab (direction: 'left' | 'right'): void {
     const documentId = activeDocumentId.value
     if (documentId === null) {
@@ -1459,6 +1469,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     enterDocumentEditMode,
     moveActiveDocumentTab,
     moveDocumentTab,
+    reorderDocumentTabs,
     openFromTree,
     pendingCloseDocumentId: readonly(pendingCloseDocumentId),
     pendingDeleteDocumentId: readonly(pendingDeleteDocumentId),

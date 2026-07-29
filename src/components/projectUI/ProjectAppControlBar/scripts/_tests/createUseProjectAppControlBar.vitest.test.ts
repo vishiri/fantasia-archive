@@ -116,6 +116,7 @@ function mountUseProjectAppControlBar (input: {
     forceCloseAllTabs: async () => undefined,
     forceCloseAllTabsExcept: async () => undefined,
     moveDocumentTab: vi.fn(),
+    reorderDocumentTabs: vi.fn(),
     requestCloseTab: input.requestCloseTab ?? (() => undefined)
   }
   const hierarchyTreeStore = {}
@@ -387,6 +388,7 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       forceCloseAllTabs: async () => undefined,
       forceCloseAllTabsExcept: async () => undefined,
       moveDocumentTab: () => undefined,
+      reorderDocumentTabs: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
     S_FaProjectHierarchyTree: () => ({}) as never,
@@ -923,6 +925,7 @@ test('Test that edit and save handlers no-op when no active document is selected
       forceCloseAllTabs: async () => undefined,
       forceCloseAllTabsExcept: async () => undefined,
       moveDocumentTab: () => undefined,
+      reorderDocumentTabs: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
     S_FaActiveProject: () => ({}) as never,
@@ -1086,6 +1089,7 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       forceCloseAllTabs: async () => undefined,
       forceCloseAllTabsExcept: async () => undefined,
       moveDocumentTab: () => undefined,
+      reorderDocumentTabs: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
     S_FaActiveProject: () => ({}) as never,
@@ -1167,6 +1171,7 @@ test('Test that createUseProjectAppControlBar exposes keybind tooltip labels fro
       forceCloseAllTabs: async () => undefined,
       forceCloseAllTabsExcept: async () => undefined,
       moveDocumentTab: () => undefined,
+      reorderDocumentTabs: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
     S_FaActiveProject: () => ({}) as never,
@@ -1260,6 +1265,7 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
       forceCloseAllTabs,
       forceCloseAllTabsExcept,
       moveDocumentTab,
+      reorderDocumentTabs: vi.fn(),
       requestCloseTab: vi.fn()
     }) as never,
     S_FaActiveProject: () => ({}) as never,
@@ -1334,6 +1340,7 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
 
 test('Test that createUseProjectAppControlBar tab copy and move handlers delegate to the opened documents store', async () => {
   const moveDocumentTab = vi.fn()
+  const reorderDocumentTabs = vi.fn()
   const runFaAction = vi.fn()
   const findTabByDocumentId = vi.fn((documentId: string) => {
     return documentId === 'doc-a'
@@ -1396,6 +1403,7 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
       forceCloseAllTabs: async () => undefined,
       forceCloseAllTabsExcept: async () => undefined,
       moveDocumentTab,
+      reorderDocumentTabs,
       requestCloseTab: vi.fn()
     }) as never,
     S_FaActiveProject: () => ({}) as never,
@@ -1460,6 +1468,9 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
 
   api.onTabMoveClick('doc-a', 'left')
   expect(moveDocumentTab).toHaveBeenCalledWith('doc-a', 'left')
+
+  api.onTabReorder(0, 2)
+  expect(reorderDocumentTabs).toHaveBeenCalledWith(0, 2)
 })
 
 test('Test that createUseProjectAppControlBar exposes world tab indicators only for multi-world projects', () => {

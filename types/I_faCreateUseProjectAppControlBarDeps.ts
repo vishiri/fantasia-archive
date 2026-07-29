@@ -24,6 +24,7 @@ export interface I_faCreateUseProjectAppControlBarDeps {
     hideHierarchyTree: I_computedRef<boolean>
     isOnDocumentWorkspaceRoute: I_computedRef<boolean>
     moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
+    reorderDocumentTabs: (fromIndex: number, toIndex: number) => void
     closeAllTabsWithoutChanges: () => void | Promise<void>
     closeTabsWithoutChangesExcept: (exceptDocumentId: string) => void | Promise<void>
     requestDeleteDocument: (documentId: string) => void

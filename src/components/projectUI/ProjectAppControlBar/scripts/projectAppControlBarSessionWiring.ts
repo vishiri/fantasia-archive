@@ -57,6 +57,7 @@ function buildProjectAppControlBarTabHandlers (input: {
   requestDeleteDocument: (documentId: string) => void
   forceCloseAllTabs: () => void | Promise<void>
   forceCloseAllTabsExcept: (exceptDocumentId: string) => void | Promise<void>
+  reorderDocumentTabs: (fromIndex: number, toIndex: number) => void
   requestCloseTab: (documentId: string) => void
   resolveDocumentTabLabelFromOpenedTab: I_assembleProjectAppControlBarApiInput['resolveDocumentTabLabelFromOpenedTab']
 }): Pick<
@@ -68,6 +69,7 @@ function buildProjectAppControlBarTabHandlers (input: {
   | 'onTabDeleteClick'
   | 'onTabForceCloseAllClick'
   | 'onTabForceCloseAllExceptClick'
+  | 'onTabReorder'
   | 'resolveDocumentTabLabel'
   | 'resolveDocumentTabRoute'
 > {
@@ -118,14 +120,19 @@ function buildProjectAppControlBarTabHandlers (input: {
     onTabCloseClick(documentId)
   }
 
+  function onTabReorder (fromIndex: number, toIndex: number): void {
+    input.reorderDocumentTabs(fromIndex, toIndex)
+  }
+
   return {
     onTabAuxClick,
+    onTabCloseClick,
     onTabCloseAllWithoutChangesClick,
     onTabCloseAllWithoutChangesExceptClick,
-    onTabCloseClick,
     onTabDeleteClick,
     onTabForceCloseAllClick,
     onTabForceCloseAllExceptClick,
+    onTabReorder,
     resolveDocumentTabLabel,
     resolveDocumentTabRoute
   }
@@ -188,6 +195,7 @@ export function assembleProjectAppControlBarApi (
     requestDeleteDocument: input.requestDeleteDocument,
     forceCloseAllTabs: input.forceCloseAllTabs,
     forceCloseAllTabsExcept: input.forceCloseAllTabsExcept,
+    reorderDocumentTabs: input.reorderDocumentTabs,
     requestCloseTab: input.requestCloseTab,
     resolveDocumentTabLabelFromOpenedTab: input.resolveDocumentTabLabelFromOpenedTab
   })

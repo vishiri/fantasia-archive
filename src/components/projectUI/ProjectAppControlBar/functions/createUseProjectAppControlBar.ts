@@ -64,6 +64,9 @@ export function createUseProjectAppControlBar (
         moveDocumentTab: (documentId: string, direction: 'left' | 'right') => {
           openedDocumentsStore.moveDocumentTab(documentId, direction)
         },
+        reorderDocumentTabs: (fromIndex: number, toIndex: number) => {
+          openedDocumentsStore.reorderDocumentTabs(fromIndex, toIndex)
+        },
         closeAllTabsWithoutChanges: () => {
           void openedDocumentsStore.closeAllTabsWithoutChanges()
         },

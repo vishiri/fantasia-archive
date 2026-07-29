@@ -29,7 +29,8 @@ const controlBarHandlers = vi.hoisted(() => ({
   onTabDeleteClick: vi.fn(),
   onTabForceCloseAllClick: vi.fn(),
   onTabForceCloseAllExceptClick: vi.fn(),
-  onTabMoveClick: vi.fn()
+  onTabMoveClick: vi.fn(),
+  onTabReorder: vi.fn()
 }))
 
 const {
@@ -72,8 +73,74 @@ const {
 })
 
 vi.mock('../scripts/projectAppControlBar_manager', () => {
+  const { defineComponent, h, ref, watch } = require('vue') as typeof import('vue')
+  const VueDraggable = defineComponent({
+    name: 'VueDraggable',
+    props: {
+      modelValue: {
+        type: Array,
+        default: () => []
+      },
+      setData: {
+        type: Function,
+        default: undefined
+      }
+    },
+    setup (props: { setData?: ((dataTransfer: DataTransfer) => void) | undefined }, { slots }: { slots: { default?: () => unknown } }) {
+      const { onMounted } = require('vue') as typeof import('vue')
+      onMounted(() => {
+        if (typeof props.setData === 'function') {
+          props.setData({
+            setDragImage: () => undefined
+          } as unknown as DataTransfer)
+        }
+      })
+      return () => h('div', { class: 'vue-draggable-stub' }, slots.default?.() as never)
+    }
+  })
   return {
     FA_PROJECT_APP_CONTROL_BAR_HEADER_MOUNT_SELECTOR: '[data-test-locator="mainLayoutHeader"]',
+    PROJECT_APP_CONTROL_BAR_TABS_SORTABLE_ANIMATION_MS: 150,
+    VueDraggable,
+    applyFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
+    clearFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
+    hideNativeSortableDragGhost: vi.fn(),
+    onProjectAppControlBarTabsWheel: vi.fn(),
+    startProjectAppControlBarTabsDragEdgeScroll: vi.fn(),
+    stopProjectAppControlBarTabsDragEdgeScroll: vi.fn(),
+    projectAppControlBarTabsSortableDragOptions: {
+      direction: 'horizontal',
+      filter: '.projectAppControlBarTabs__tabClose',
+      preventOnFilter: true
+    },
+    useProjectAppControlBarOpenedTabsSortable: (input: {
+      getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
+      onTabReorder: (fromIndex: number, toIndex: number) => void
+    }) => {
+      const sortableTabs = ref<I_faOpenedDocumentTab[]>([])
+      watch(
+        () => input.getOpenedDocumentTabs(),
+        (tabs) => {
+          sortableTabs.value = tabs.map((tab) => {
+            return { ...tab }
+          })
+        },
+        {
+          deep: true,
+          immediate: true
+        }
+      )
+      return {
+        sortableTabs,
+        onTabsDragEnd: (event: { newIndex?: number, oldIndex?: number }) => {
+          const { oldIndex, newIndex } = event
+          if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
+            return
+          }
+          input.onTabReorder(oldIndex, newIndex)
+        }
+      }
+    },
     useProjectAppControlBar: () => {
       return {
         activeDocumentTabName: activeDocumentTabNameRef,
@@ -98,6 +165,7 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
         onTabForceCloseAllClick: controlBarHandlers.onTabForceCloseAllClick,
         onTabForceCloseAllExceptClick: controlBarHandlers.onTabForceCloseAllExceptClick,
         onTabMoveClick: controlBarHandlers.onTabMoveClick,
+        onTabReorder: controlBarHandlers.onTabReorder,
         openedDocumentTabs: openedDocumentTabsRef,
         resolveDocumentTabLabel: (tab: { displayNameDraft: string, tabLabel: string }) => {
           return tab.displayNameDraft.length > 0 ? tab.displayNameDraft : tab.tabLabel
@@ -147,22 +215,22 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
       }
     },
     useProjectAppControlBarI18nTooltips: () => {
-      const { ref } = require('vue') as typeof import('vue')
+      const { ref: tooltipRef } = require('vue') as typeof import('vue')
       return {
-        addNewDocumentUnderThisTooltip: ref('Add under'),
-        advancedSearchGuideTooltip: ref('Advanced search guide'),
-        copyCurrentDocumentTooltip: ref('Copy current'),
-        deleteCurrentDocumentTooltip: ref('Delete'),
-        editDocumentTooltip: ref('Edit'),
-        keyboardShortcutsTooltip: ref('Keyboard shortcuts'),
-        quickAddTooltip: ref('Quick add'),
-        quickSearchTooltip: ref('Quick search'),
-        saveDocumentKeepEditModeTooltip: ref('Save keep edit'),
-        saveDocumentTooltip: ref('Save'),
-        tipsTricksTriviaTooltip: ref('Tips'),
-        toggleAppNoteboardTooltip: ref('App noteboard'),
-        toggleHierarchyTreeTooltip: ref('Toggle tree'),
-        toggleProjectNoteboardTooltip: ref('Project noteboard')
+        addNewDocumentUnderThisTooltip: tooltipRef('Add under'),
+        advancedSearchGuideTooltip: tooltipRef('Advanced search guide'),
+        copyCurrentDocumentTooltip: tooltipRef('Copy current'),
+        deleteCurrentDocumentTooltip: tooltipRef('Delete'),
+        editDocumentTooltip: tooltipRef('Edit'),
+        keyboardShortcutsTooltip: tooltipRef('Keyboard shortcuts'),
+        quickAddTooltip: tooltipRef('Quick add'),
+        quickSearchTooltip: tooltipRef('Quick search'),
+        saveDocumentKeepEditModeTooltip: tooltipRef('Save keep edit'),
+        saveDocumentTooltip: tooltipRef('Save'),
+        tipsTricksTriviaTooltip: tooltipRef('Tips'),
+        toggleAppNoteboardTooltip: tooltipRef('App noteboard'),
+        toggleHierarchyTreeTooltip: tooltipRef('Toggle tree'),
+        toggleProjectNoteboardTooltip: tooltipRef('Project noteboard')
       }
     }
   }
@@ -539,6 +607,38 @@ test('Test that ProjectAppControlBar renders finished and dead markers on docume
   expect(tabRoot?.querySelector('.projectAppControlBarTabs__deadMarker')?.textContent).toBe('†')
   expect(tabRoot?.querySelector('.projectAppControlBarTabs__tabLabelText--dead')).not.toBeNull()
   expect(tabRoot?.querySelector('.projectAppControlBarTabs__tabLabelText')?.textContent).toBe('Marked Hero')
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectAppControlBar document tabs disable native HTML5 drag on route tabs', async () => {
+  showDocumentTabsRef.value = true
+  openedDocumentTabsRef.value = [sampleTab]
+
+  const router = await createControlBarRouter()
+  const wrapper = mount(ProjectAppControlBar, {
+    global: {
+      plugins: [testI18n, router],
+      stubs: {
+        DialogDeleteOpenedDocument: true,
+        DialogDiscardOpenedDocumentTab: true,
+        ProjectAppControlBarTabContextMenu: true,
+        ProjectAppControlBarTabWorldIndicator: true,
+        QBtn: true,
+        QRouteTab: {
+          props: ['name'],
+          template: '<div :data-test-locator="\'projectAppControlBar-tab-\' + name"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' },
+        QTooltip: true
+      }
+    }
+  })
+  await flushPromises()
+
+  const tabRoot = document.querySelector('[data-test-locator="projectAppControlBar-tab-doc-1"]')
+  expect(tabRoot).not.toBeNull()
+  expect(tabRoot?.getAttribute('draggable')).toBe('false')
 
   wrapper.unmount()
 })

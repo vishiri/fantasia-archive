@@ -172,6 +172,7 @@
 
   .projectAppControlBarTabContextMenu__browseTabWorldIndicator {
     align-items: center;
+    color: var(--fa-color-glyph-base);
     display: inline-flex;
     font-size: $projectAppControlBar-tabContextMenu-browseTabWorldIndicator-fontSize;
     height: $projectAppControlBar-tabContextMenu-browseTabWorldIndicator-fontSize;

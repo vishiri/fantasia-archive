@@ -194,6 +194,13 @@ const faAppHeaderChromeSpellcheckRefreshVisible = useFaAppHeaderChromeSpellcheck
   width: 100%;
 }
 
+/* Shrink menus 1px when document tabs teleport into the header (room for first-tab start margin). */
+.appHeader__inner:has(.projectAppControlBarTabs) {
+  :deep(.appControlMenus) {
+    min-width: $mainLayout-appHeader-menusMinWidthWithDocumentTabs;
+  }
+}
+
 .appHeader__inner--spellcheckRefreshVisible {
   padding-right: $mainLayout-appHeader-chromeRightReserveWithSpellcheckPx;
 }
