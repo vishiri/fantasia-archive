@@ -17,6 +17,7 @@ import {
 } from './faProjectOpenAlreadyActiveWiring'
 import {
   getFaProjectActiveDatabase,
+  getFaProjectLastKnownActiveProjectFilePath,
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
 } from './faProjectActiveDatabaseWiring'
@@ -34,6 +35,25 @@ import {
   recordRecentProjectEntry,
   removeRecentProjectEntryByPath
 } from './faRecentProjectListRuntimeWiring'
+
+function readFaProjectActiveSnapshotForReuse (
+  preferredFilePath: string
+): I_faProjectManagementActiveSnapshot | null {
+  const activeDbHandle = getFaProjectActiveDatabase()
+  if (activeDbHandle === null) {
+    return null
+  }
+  const mirroredPath = getFaProjectLastKnownActiveProjectFilePath()
+  const filePath =
+    mirroredPath !== null && mirroredPath.length > 0
+      ? mirroredPath
+      : preferredFilePath
+  return {
+    filePath,
+    id: readFaProjectStoredProjectUuid(activeDbHandle),
+    name: readFaProjectStoredDisplayName(activeDbHandle)
+  }
+}
 
 function normalizeFaProjectOpenFailure (e: unknown): Error {
   if (e instanceof Error) {
@@ -172,7 +192,11 @@ export async function runFaProjectOpenFromIpc (
   if (opened.isErr()) {
     const rawErr = opened.error
     if (rawErr instanceof FaProjectOpenRejectedAlreadyActiveError) {
-      return buildFaProjectIdempotentOpenResult(filePath, rawErr)
+      return buildFaProjectIdempotentOpenResult(
+        filePath,
+        rawErr,
+        readFaProjectActiveSnapshotForReuse(filePath)
+      )
     }
     const err = normalizeFaProjectOpenFailure(rawErr)
     console.error('[faProjectManagement] open failed', {

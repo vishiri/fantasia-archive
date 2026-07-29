@@ -7,45 +7,27 @@ import {
   FaProjectOpenRejectedAlreadyActiveError
 } from '../faProjectOpenAlreadyActiveWiring'
 
-const getActiveDbMock = vi.hoisted(() => vi.fn())
-const getLastKnownPathMock = vi.hoisted(() => vi.fn())
-const readUuidMock = vi.hoisted(() => vi.fn())
-const readNameMock = vi.hoisted(() => vi.fn())
 const recordRecentMock = vi.hoisted(() => vi.fn())
-
-vi.mock('../faProjectActiveDatabaseWiring', () => ({
-  getFaProjectActiveDatabase: getActiveDbMock,
-  getFaProjectLastKnownActiveProjectFilePath: getLastKnownPathMock
-}))
-
-vi.mock('../faProjectDbMigrateWiring', () => ({
-  readFaProjectStoredDisplayName: readNameMock,
-  readFaProjectStoredProjectUuid: readUuidMock
-}))
 
 vi.mock('../faRecentProjectListRuntimeWiring', () => ({
   recordRecentProjectEntry: recordRecentMock
 }))
 
 beforeEach(() => {
-  getActiveDbMock.mockReset()
-  getLastKnownPathMock.mockReset()
-  readUuidMock.mockReset()
-  readNameMock.mockReset()
   recordRecentMock.mockReset()
-  getActiveDbMock.mockReturnValue({ tag: 'db' })
-  getLastKnownPathMock.mockReturnValue('D:\\active.faproject')
-  readUuidMock.mockReturnValue('uuid-1')
-  readNameMock.mockReturnValue('Active Name')
 })
 
 /**
  * faProjectOpenAlreadyActiveWiring
- * buildFaProjectIdempotentOpenResult returns opened with idempotentReuse when main still has a handle.
+ * buildFaProjectIdempotentOpenResult returns opened with idempotentReuse when caller supplies a snapshot.
  */
-test('Test that buildFaProjectIdempotentOpenResult returns idempotent opened when active db exists', () => {
+test('Test that buildFaProjectIdempotentOpenResult returns idempotent opened when snapshot exists', () => {
   const rejected = new FaProjectOpenRejectedAlreadyActiveError()
-  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected)
+  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected, {
+    filePath: 'D:\\active.faproject',
+    id: 'uuid-1',
+    name: 'Active Name'
+  })
   expect(r.outcome).toBe('opened')
   expect(r.idempotentReuse).toBe(true)
   expect(r.project?.filePath).toBe('D:\\active.faproject')
@@ -54,12 +36,11 @@ test('Test that buildFaProjectIdempotentOpenResult returns idempotent opened whe
 
 /**
  * faProjectOpenAlreadyActiveWiring
- * buildFaProjectIdempotentOpenResult falls back to ProjectAlreadyOpen error when handle is missing.
+ * buildFaProjectIdempotentOpenResult falls back to ProjectAlreadyOpen error when snapshot is missing.
  */
-test('Test that buildFaProjectIdempotentOpenResult returns error when active db is missing', () => {
-  getActiveDbMock.mockReturnValueOnce(null)
+test('Test that buildFaProjectIdempotentOpenResult returns error when snapshot is missing', () => {
   const rejected = new FaProjectOpenRejectedAlreadyActiveError()
-  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected)
+  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected, null)
   expect(r.outcome).toBe('error')
   expect(r.errorName).toBe(FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE)
   expect(recordRecentMock).not.toHaveBeenCalled()
@@ -67,12 +48,19 @@ test('Test that buildFaProjectIdempotentOpenResult returns error when active db 
 
 /**
  * faProjectOpenAlreadyActiveWiring
- * buildFaProjectIdempotentOpenResult uses the attempted path when main has no mirrored path yet.
+ * buildFaProjectIdempotentOpenResult uses the snapshot filePath supplied by the allowlisted open path.
  */
-test('Test that buildFaProjectIdempotentOpenResult prefers attempted path when mirrored path is empty', () => {
-  getLastKnownPathMock.mockReturnValueOnce('')
+test('Test that buildFaProjectIdempotentOpenResult records the snapshot filePath from the caller', () => {
   const rejected = new FaProjectOpenRejectedAlreadyActiveError()
-  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected)
+  const r = buildFaProjectIdempotentOpenResult('D:\\pick.faproject', rejected, {
+    filePath: 'D:\\pick.faproject',
+    id: 'uuid-1',
+    name: 'Active Name'
+  })
   expect(r.outcome).toBe('opened')
   expect(r.project?.filePath).toBe('D:\\pick.faproject')
+  expect(recordRecentMock).toHaveBeenCalledWith({
+    filePath: 'D:\\pick.faproject',
+    name: 'Active Name'
+  })
 })

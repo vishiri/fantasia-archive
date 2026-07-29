@@ -4,14 +4,6 @@ import {
   type I_faProjectOpenResult
 } from 'app/types/I_faProjectManagementDomain'
 
-import {
-  getFaProjectActiveDatabase,
-  getFaProjectLastKnownActiveProjectFilePath
-} from './faProjectActiveDatabaseWiring'
-import {
-  readFaProjectStoredDisplayName,
-  readFaProjectStoredProjectUuid
-} from './faProjectDbMigrateWiring'
 import { recordRecentProjectEntry } from './faRecentProjectListRuntimeWiring'
 
 /**
@@ -24,33 +16,15 @@ export class FaProjectOpenRejectedAlreadyActiveError extends Error {
   }
 }
 
-function readFaProjectActiveSnapshotForReuse (
-  preferredFilePath: string
-): I_faProjectManagementActiveSnapshot | null {
-  const activeDbHandle = getFaProjectActiveDatabase()
-  if (activeDbHandle === null) {
-    return null
-  }
-  const mirroredPath = getFaProjectLastKnownActiveProjectFilePath()
-  const filePath =
-    mirroredPath !== null && mirroredPath.length > 0
-      ? mirroredPath
-      : preferredFilePath
-  return {
-    filePath,
-    id: readFaProjectStoredProjectUuid(activeDbHandle),
-    name: readFaProjectStoredDisplayName(activeDbHandle)
-  }
-}
-
 /**
  * Maps an already-active open attempt to a successful idempotent IPC result, or a legacy error shape when main has no handle.
+ * Caller (allowlisted open path) supplies the active snapshot — this module does not touch active-DB getters.
  */
 export function buildFaProjectIdempotentOpenResult (
   filePath: string,
-  rejected: FaProjectOpenRejectedAlreadyActiveError
+  rejected: FaProjectOpenRejectedAlreadyActiveError,
+  snapshot: I_faProjectManagementActiveSnapshot | null
 ): I_faProjectOpenResult {
-  const snapshot = readFaProjectActiveSnapshotForReuse(filePath)
   if (snapshot === null) {
     return {
       attemptedFilePath: filePath,

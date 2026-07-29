@@ -18,10 +18,7 @@ export {
 export {
   closeFaProjectActiveDatabase,
   closeFaProjectActiveDatabaseHandleOnly,
-  getFaProjectActiveDatabase,
-  getFaProjectLastKnownActiveProjectFilePath,
   openFaProjectDatabase,
-  replaceFaProjectActiveDatabase,
   unlinkFaProjectFileIfExists
 } from './faProjectActiveDatabaseWiring'
 

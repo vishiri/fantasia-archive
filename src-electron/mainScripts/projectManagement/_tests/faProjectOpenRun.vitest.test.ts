@@ -220,8 +220,23 @@ test('Test that runFaProjectOpenFromIpc returns idempotent opened when project u
   expect(r.outcome).toBe('opened')
   expect(r.idempotentReuse).toBe(true)
   expect(r.project?.name).toBe('Stored Name')
+  expect(r.project?.filePath).toBe('D:\\dl\\open.faproject')
   expect(replaceMock).not.toHaveBeenCalled()
   expect(recordRecentMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * runFaProjectOpenFromIpc
+ * Idempotent reuse falls back to the attempted path when mirrored last-known path is empty.
+ */
+test('Test that runFaProjectOpenFromIpc idempotent reuse prefers attempted path when mirrored path is empty', async () => {
+  getActiveDbMock.mockReturnValue({ tag: 'active-db' } as never)
+  getLastKnownPathMock.mockReturnValueOnce('')
+  readProjectUuidMock.mockReturnValue('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa')
+  const r = await runFaProjectOpenFromIpc({} as never, {})
+  expect(r.outcome).toBe('opened')
+  expect(r.idempotentReuse).toBe(true)
+  expect(r.project?.filePath).toBe('D:\\dl\\open.faproject')
 })
 
 /**
