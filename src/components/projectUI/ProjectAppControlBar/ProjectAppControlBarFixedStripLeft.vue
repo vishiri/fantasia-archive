@@ -172,6 +172,7 @@
       <q-btn
         color="primary-bright"
         data-test-locator="projectAppControlBar-quickSearchButton"
+        disable
         icon="mdi-database-search"
         outline
         @click="onQuickSearchClick"
@@ -187,6 +188,7 @@
       <q-btn
         color="primary-bright"
         data-test-locator="projectAppControlBar-quickAddButton"
+        disable
         icon="mdi-text-box-plus-outline"
         outline
         @click="onQuickAddClick"

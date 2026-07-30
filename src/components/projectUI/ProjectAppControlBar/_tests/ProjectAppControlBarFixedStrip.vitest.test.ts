@@ -305,6 +305,33 @@ test('Test that ProjectAppControlBarFixedStrip hides function and content button
 
 /**
  * ProjectAppControlBarFixedStrip
+ * Quick search and quick add stay disabled until those dialogs ship.
+ */
+test('Test that ProjectAppControlBarFixedStrip disables quick search and quick add buttons', async () => {
+  const wrapper = mount(ProjectAppControlBarFixedStrip, {
+    props: baseProps,
+    global: mountGlobal,
+    attachTo: document.body
+  })
+
+  await flushPromises()
+
+  const quickSearch = document.querySelector(
+    '[data-test-locator="projectAppControlBar-quickSearchButton"]'
+  )
+  const quickAdd = document.querySelector(
+    '[data-test-locator="projectAppControlBar-quickAddButton"]'
+  )
+  expect(quickSearch).not.toBeNull()
+  expect(quickAdd).not.toBeNull()
+  expect(quickSearch?.hasAttribute('disable')).toBe(true)
+  expect(quickAdd?.hasAttribute('disable')).toBe(true)
+
+  wrapper.unmount()
+})
+
+/**
+ * ProjectAppControlBarFixedStrip
  * Applies full-width modifier when hierarchy tree is hidden.
  */
 test('Test that ProjectAppControlBarFixedStrip applies tree hidden modifier class', async () => {
