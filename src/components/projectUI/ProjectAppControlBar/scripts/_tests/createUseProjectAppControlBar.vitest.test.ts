@@ -21,6 +21,7 @@ import {
 } from '../../functions/projectAppControlBarVisibility'
 import { assembleProjectAppControlBarApi } from '../projectAppControlBarSessionWiring'
 import { buildProjectAppControlBarAssembleInput } from '../projectAppControlBarAssembleInput'
+import { createProjectAppControlBarSettingsFlags } from '../../functions/createProjectAppControlBarSettingsFlags'
 
 const projectAppControlBarTestResolveHideHierarchyTree = (
   settings: I_faUserSettings | null,
@@ -31,6 +32,32 @@ const projectAppControlBarTestResolveHideHierarchyTree = (
   }
   if (settings !== null) {
     return settings.hideHierarchyTree
+  }
+  return false
+}
+
+const projectAppControlBarTestResolveHideTabCloseButton = (
+  settings: I_faUserSettings | null,
+  preview: Partial<I_faUserSettings> | null
+): boolean => {
+  if (preview?.hideTabCloseButton !== undefined) {
+    return preview.hideTabCloseButton
+  }
+  if (settings !== null) {
+    return settings.hideTabCloseButton
+  }
+  return false
+}
+
+const projectAppControlBarTestResolveShowTabBarScrollButtons = (
+  settings: I_faUserSettings | null,
+  preview: Partial<I_faUserSettings> | null
+): boolean => {
+  if (preview?.showTabBarScrollButtons !== undefined) {
+    return preview.showTabBarScrollButtons
+  }
+  if (settings !== null) {
+    return settings.showTabBarScrollButtons
   }
   return false
 }
@@ -67,13 +94,19 @@ type T_tabSeedRow = {
 
 function mountUseProjectAppControlBar (input: {
   appNoteboardText?: string
-  appSettingsDialogPreview?: { hideHierarchyTree?: boolean } | null
+  appSettingsDialogPreview?: {
+    hideHierarchyTree?: boolean
+    hideTabCloseButton?: boolean
+    showTabBarScrollButtons?: boolean
+  } | null
   disableAppControlBar: boolean
   disableAppControlBarContentButtons?: boolean
   disableAppControlBarFunctionButtons?: boolean
   disableAppControlBarGuides?: boolean
   hasActiveProject?: boolean
   hideHierarchyTree?: boolean
+  hideTabCloseButton?: boolean
+  showTabBarScrollButtons?: boolean
   documentWorkspaceRoute?: boolean
   enterDocumentEditMode?: (documentId: string) => void
   projectNoteboardText?: string
@@ -90,7 +123,9 @@ function mountUseProjectAppControlBar (input: {
     disableAppControlBarContentButtons: input.disableAppControlBarContentButtons === true,
     disableAppControlBarFunctionButtons: input.disableAppControlBarFunctionButtons === true,
     disableAppControlBarGuides: input.disableAppControlBarGuides === true,
-    hideHierarchyTree: input.hideHierarchyTree === true
+    hideHierarchyTree: input.hideHierarchyTree === true,
+    hideTabCloseButton: input.hideTabCloseButton === true,
+    showTabBarScrollButtons: input.showTabBarScrollButtons === true
   })
   const appSettingsDialogPreview = ref(input.appSettingsDialogPreview ?? null)
   const tabs = ref((input.tabSeed ?? []).map((tab) => ({
@@ -131,7 +166,10 @@ function mountUseProjectAppControlBar (input: {
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: (routePathValue: string) => {
@@ -280,6 +318,30 @@ test('Test that createUseProjectAppControlBar resolves hideHierarchyTree from se
   expect(api.hideHierarchyTree.value).toBe(true)
 })
 
+test('Test that createUseProjectAppControlBar resolves hideTabCloseButton from settings and preview', () => {
+  const api = mountUseProjectAppControlBar({
+    disableAppControlBar: false,
+    hideTabCloseButton: false,
+    appSettingsDialogPreview: {
+      hideTabCloseButton: true
+    }
+  })
+
+  expect(api.hideTabCloseButton.value).toBe(true)
+})
+
+test('Test that createUseProjectAppControlBar resolves showTabBarScrollButtons from settings and preview', () => {
+  const api = mountUseProjectAppControlBar({
+    disableAppControlBar: false,
+    showTabBarScrollButtons: false,
+    appSettingsDialogPreview: {
+      showTabBarScrollButtons: true
+    }
+  })
+
+  expect(api.showTabBarScrollButtons.value).toBe(true)
+})
+
 test('Test that createUseProjectAppControlBar keeps header tabs visible when disableAppControlBar is on', () => {
   const api = mountUseProjectAppControlBar({
     disableAppControlBar: true,
@@ -362,7 +424,10 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-a',
@@ -901,7 +966,10 @@ test('Test that edit and save handlers no-op when no active document is selected
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: () => null,
@@ -1065,7 +1133,10 @@ test('Test that activeDocumentTab is null when the active id does not match an o
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-missing',
@@ -1124,7 +1195,10 @@ test('Test that createUseProjectAppControlBar exposes keybind tooltip labels fro
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-a',
@@ -1209,7 +1283,10 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: (routePathValue: string) => {
@@ -1379,7 +1456,10 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
     assembleProjectAppControlBarApi,
     buildProjectAppControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    createProjectAppControlBarSettingsFlags,
     resolveHideHierarchyTree: projectAppControlBarTestResolveHideHierarchyTree,
+    resolveHideTabCloseButton: projectAppControlBarTestResolveHideTabCloseButton,
+    resolveShowTabBarScrollButtons: projectAppControlBarTestResolveShowTabBarScrollButtons,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-a',

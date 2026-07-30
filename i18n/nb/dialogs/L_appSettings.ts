@@ -266,6 +266,11 @@ export default {
       description: 'Skjuler verktøytipset på feltet Bla gjennom siste prosjekter ved siden av Gjenoppta siste prosjekt på velkomstskjermen.',
       tags: 'prosjekt, last, laster, siste, siste, introduksjon, start, velkommen, verktøytips, popup, verktøytips, pop up',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Skjul sosiale lenker på velkomstskjermen',
       description: 'Skjuler alle sosiale lenker på velkomstskjermen.',
@@ -342,6 +347,11 @@ export default {
       title: 'Vis dokument-ID-er',
       description: 'Hvis dette er aktivert, vil dokumentteksten også vise den interne dokument-ID-verdien.',
       tags: 'feilsøking, intern id, identifikator, utviklerverktøy, feilsøking',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Toppmerker i treet',

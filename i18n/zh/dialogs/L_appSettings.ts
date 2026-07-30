@@ -265,6 +265,11 @@ export default {
       description: '隐藏欢迎屏幕上恢复最新项目旁边的浏览最新项目插入符号上的工具提示。',
       tags: '项目、加载、加载、最新、最近、介绍、开始、欢迎、工具提示、弹出窗口、工具提示、弹出窗口',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: '隐藏欢迎屏幕社交链接',
       description: '隐藏欢迎屏幕上的所有社交链接。',
@@ -341,6 +346,11 @@ export default {
       title: '显示文档 ID',
       description: '如果启用此功能，文档正文还将显示内部文档 ID 值。',
       tags: '调试、内部 ID、标识符、开发工具、故障排除',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: '树中的顶部标签',

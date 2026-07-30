@@ -21,6 +21,7 @@ import { noteboardHasContent } from 'app/src/scripts/floatingWindows/functions/s
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
 
 import { createUseProjectAppControlBar } from '../functions/createUseProjectAppControlBar'
+import { createProjectAppControlBarSettingsFlags } from '../functions/createProjectAppControlBarSettingsFlags'
 import { createUseProjectAppControlBarOpenedTabsSortable } from '../functions/createUseProjectAppControlBarOpenedTabsSortable'
 import {
   resolveProjectAppControlBarSaveButtonColor,
@@ -42,6 +43,9 @@ import {
 import { assembleProjectAppControlBarApi } from './projectAppControlBarSessionWiring'
 import { createProjectAppControlBarI18nTooltips } from './projectAppControlBarI18nTooltipsWiring'
 import { resolveProjectAppControlBarHideHierarchyTree } from './projectAppControlBarHideHierarchyTreeWiring'
+import { resolveProjectAppControlBarHideTabCloseButton } from './projectAppControlBarHideTabCloseButtonWiring'
+import { resolveProjectAppControlBarShowTabBarScrollButtons } from './projectAppControlBarShowTabBarScrollButtonsWiring'
+import { useProjectAppControlBarTabsInlineEndBlend } from './projectAppControlBarTabsInlineEndBlendWiring'
 import { onProjectAppControlBarTabsWheel } from './projectAppControlBarTabsWheelScrollWiring'
 import {
   startProjectAppControlBarTabsDragEdgeScroll,
@@ -65,7 +69,8 @@ export {
   onProjectAppControlBarTabsWheel,
   projectAppControlBarTabsSortableDragOptions,
   startProjectAppControlBarTabsDragEdgeScroll,
-  stopProjectAppControlBarTabsDragEdgeScroll
+  stopProjectAppControlBarTabsDragEdgeScroll,
+  useProjectAppControlBarTabsInlineEndBlend
 }
 
 export const useProjectAppControlBarOpenedTabsSortable = createUseProjectAppControlBarOpenedTabsSortable({
@@ -82,7 +87,10 @@ export const useProjectAppControlBar = createUseProjectAppControlBar({
   assembleProjectAppControlBarApi,
   buildProjectAppControlBarAssembleInput,
   computed,
+  createProjectAppControlBarSettingsFlags,
   resolveHideHierarchyTree: resolveProjectAppControlBarHideHierarchyTree,
+  resolveHideTabCloseButton: resolveProjectAppControlBarHideTabCloseButton,
+  resolveShowTabBarScrollButtons: resolveProjectAppControlBarShowTabBarScrollButtons,
   resolveActiveDocumentTabName,
   resolveDocumentTabLabelFromOpenedTab,
   resolveFaDocumentWorkspaceRouteDocumentId,

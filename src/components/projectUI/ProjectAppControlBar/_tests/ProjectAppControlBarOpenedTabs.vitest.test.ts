@@ -96,6 +96,15 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
     },
     startProjectAppControlBarTabsDragEdgeScroll,
     stopProjectAppControlBarTabsDragEdgeScroll,
+    useProjectAppControlBarTabsInlineEndBlend: (input: {
+      watchSource: () => unknown
+    }) => {
+      const { ref: vueRef } = require('vue') as typeof import('vue')
+      input.watchSource()
+      return {
+        tabsScrolledToInlineEnd: vueRef(false)
+      }
+    },
     useProjectAppControlBarOpenedTabsSortable: (input: {
       getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
       onTabReorder: (fromIndex: number, toIndex: number) => void
@@ -157,8 +166,10 @@ afterEach(() => {
 })
 
 async function mountOpenedTabs (input?: {
+  hideTabCloseButton?: boolean
   resolveDocumentTabAppearanceChrome?: (tab: I_faOpenedDocumentTab) => { backgroundColor?: string, color?: string } | undefined
   resolveTabWorldIndicatorColor?: (tab: I_faOpenedDocumentTab) => string | null
+  showTabBarScrollButtons?: boolean
   showWorldTabIndicators?: boolean
   tabs?: I_faOpenedDocumentTab[]
 }) {
@@ -179,6 +190,7 @@ async function mountOpenedTabs (input?: {
   return mount(ProjectAppControlBarOpenedTabs, {
     props: {
       activeDocumentTabName: 'doc-1',
+      hideTabCloseButton: input?.hideTabCloseButton === true,
       moveDocumentTabLeftKeybindLabel: null,
       moveDocumentTabRightKeybindLabel: null,
       ...handlers,
@@ -190,6 +202,7 @@ async function mountOpenedTabs (input?: {
       resolveDocumentTabRoute: (documentId) => `/home/document/${documentId}`,
       resolveTabWorldIndicatorColor: input?.resolveTabWorldIndicatorColor ?? (() => null),
       showDocumentTabs: true,
+      showTabBarScrollButtons: input?.showTabBarScrollButtons === true,
       showWorldTabIndicators: input?.showWorldTabIndicators === true
     },
     global: {
@@ -226,6 +239,7 @@ test('Test that ProjectAppControlBarOpenedTabs hides when showDocumentTabs is fa
   const wrapper = mount(ProjectAppControlBarOpenedTabs, {
     props: {
       activeDocumentTabName: 'doc-1',
+      hideTabCloseButton: false,
       moveDocumentTabLeftKeybindLabel: null,
       moveDocumentTabRightKeybindLabel: null,
       ...handlers,
@@ -237,6 +251,7 @@ test('Test that ProjectAppControlBarOpenedTabs hides when showDocumentTabs is fa
       resolveDocumentTabRoute: (documentId) => `/home/document/${documentId}`,
       resolveTabWorldIndicatorColor: () => null,
       showDocumentTabs: false,
+      showTabBarScrollButtons: false,
       showWorldTabIndicators: false
     },
     global: {
@@ -330,6 +345,40 @@ test('Test that ProjectAppControlBarOpenedTabs close button calls onTabCloseClic
   expect(handlers.onTabCloseClick).toHaveBeenCalledWith('doc-1')
 
   wrapper.unmount()
+})
+
+test('Test that ProjectAppControlBarOpenedTabs hides close button when hideTabCloseButton is on', async () => {
+  const wrapper = await mountOpenedTabs({
+    hideTabCloseButton: true
+  })
+  await flushPromises()
+
+  expect(
+    document.querySelector('[data-test-locator="projectAppControlBar-tabClose-doc-1"]')
+  ).toBeNull()
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectAppControlBarOpenedTabs toggles scroll-button modifier class', async () => {
+  const hidden = await mountOpenedTabs()
+  await flushPromises()
+  expect(
+    document.querySelector('.projectAppControlBarTabs--showScrollButtons')
+  ).toBeNull()
+  expect(
+    document.querySelector('.projectAppControlBarTabs--scrolledToInlineEnd')
+  ).toBeNull()
+  hidden.unmount()
+
+  const shown = await mountOpenedTabs({
+    showTabBarScrollButtons: true
+  })
+  await flushPromises()
+  expect(
+    document.querySelector('.projectAppControlBarTabs--showScrollButtons')
+  ).not.toBeNull()
+  shown.unmount()
 })
 
 test('Test that ProjectAppControlBarOpenedTabs maps auxclick to onTabAuxClick', async () => {

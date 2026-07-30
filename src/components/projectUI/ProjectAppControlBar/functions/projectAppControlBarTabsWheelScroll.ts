@@ -39,3 +39,19 @@ export function resolveProjectAppControlBarTabsWheelScrollLeft (input: {
 
   return nextScrollLeft
 }
+
+/**
+ * True when q-tabs content has no right-side clip (no overflow, or scrolled to inline end).
+ * 1px slack covers sub-pixel scrollLeft vs maxScroll mismatch.
+ */
+export function resolveProjectAppControlBarTabsIsScrolledToInlineEnd (input: {
+  clientWidth: number
+  scrollLeft: number
+  scrollWidth: number
+}): boolean {
+  const maxScroll = input.scrollWidth - input.clientWidth
+  if (maxScroll <= 0) {
+    return true
+  }
+  return input.scrollLeft >= maxScroll - 1
+}

@@ -266,6 +266,11 @@ export default {
       description: 'Αποκρύπτει την επεξήγηση εργαλείου στο πλαίσιο περιήγησης-πιο πρόσφατων έργων δίπλα στη Συνέχιση τελευταίου έργου στην οθόνη καλωσορίσματος.',
       tags: 'έργο, φόρτωση, φόρτωση, πιο πρόσφατο, πρόσφατο, εισαγωγή, έναρξη, καλωσόρισμα, επεξήγηση εργαλείου, αναδυόμενο παράθυρο, συμβουλές εργαλείων, αναδυόμενο παράθυρο',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Απόκρυψη κοινωνικών συνδέσμων οθόνης καλωσορίσματος',
       description: 'Αποκρύπτει όλους τους συνδέσμους κοινωνικής δικτύωσης στην οθόνη καλωσορίσματος.',
@@ -342,6 +347,11 @@ export default {
       title: 'Εμφάνιση αναγνωριστικών εγγράφων',
       description: 'Εάν αυτό είναι ενεργοποιημένο, το σώμα του εγγράφου θα εμφανίσει επίσης την τιμή αναγνωριστικού εσωτερικού εγγράφου.',
       tags: 'εντοπισμός σφαλμάτων, εσωτερικό αναγνωριστικό, αναγνωριστικό, εργαλεία προγραμματισμού, αντιμετώπιση προβλημάτων',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Κορυφαίες ετικέτες στο δέντρο',

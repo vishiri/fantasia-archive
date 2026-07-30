@@ -266,6 +266,11 @@ export default {
       description: 'स्वागत स्क्रीन पर नवीनतम प्रोजेक्ट को फिर से शुरू करने के बगल में ब्राउज़-नवीनतम-प्रोजेक्ट कैरेट पर टूलटिप छुपाता है।',
       tags: 'प्रोजेक्ट, लोड, लोडिंग, नवीनतम, हालिया, परिचय, प्रारंभ, स्वागत, टूलटिप, पॉप-अप, टूलटिप्स, पॉप अप',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'स्वागत स्क्रीन सामाजिक लिंक छिपाएँ',
       description: 'स्वागत स्क्रीन पर सभी सामाजिक लिंक छुपाता है।',
@@ -342,6 +347,11 @@ export default {
       title: 'दस्तावेज़ आईडी दिखाएँ',
       description: 'यदि यह सक्षम है, तो दस्तावेज़ का मुख्य भाग आंतरिक दस्तावेज़ आईडी मान भी दिखाएगा।',
       tags: 'डिबग, आंतरिक आईडी, पहचानकर्ता, विकास उपकरण, समस्या निवारण',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'पेड़ में शीर्ष टैग',

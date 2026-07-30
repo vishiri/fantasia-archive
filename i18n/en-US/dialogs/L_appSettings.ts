@@ -264,6 +264,11 @@ export default {
       description: 'Hides the tooltip on the browse-latest-projects caret beside Resume Latest Project on the welcome screen.',
       tags: 'project, load, loading, latest, recent, intro, start, welcome, tooltip, pop-up, tooltips, pop up'
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Hide welcome screen social links',
       description: 'Hides all the social links on the Welcome screen.',
@@ -340,6 +345,11 @@ export default {
       title: 'TODO - Show document IDs',
       description: 'If this is enabled, the document body will also show the internal document ID value.',
       tags: 'debug, internal id, identifier, dev tools, troubleshooting'
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'TODO - Top tags in tree',

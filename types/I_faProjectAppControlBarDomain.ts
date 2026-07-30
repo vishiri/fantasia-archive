@@ -56,6 +56,8 @@ export interface I_projectAppControlBarComposableApi {
   showAppNoteboardContentDot: I_computedRef<boolean>
   showProjectNoteboardContentDot: I_computedRef<boolean>
   hideHierarchyTree: I_computedRef<boolean>
+  hideTabCloseButton: I_computedRef<boolean>
+  showTabBarScrollButtons: I_computedRef<boolean>
   advancedSearchGuideKeybindLabel: I_computedRef<string | null>
   keyboardShortcutsKeybindLabel: I_computedRef<string | null>
   toggleAppNoteboardKeybindLabel: I_computedRef<string | null>
@@ -86,6 +88,8 @@ export interface I_assembleProjectAppControlBarApiInput {
   isAppControlBarFunctionButtonsDisabled: I_computedRef<boolean>
   isAppControlBarContentButtonsDisabled: I_computedRef<boolean>
   hideHierarchyTree: I_computedRef<boolean>
+  hideTabCloseButton: I_computedRef<boolean>
+  showTabBarScrollButtons: I_computedRef<boolean>
   findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
   moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
   reorderDocumentTabs: (fromIndex: number, toIndex: number) => void

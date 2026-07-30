@@ -266,6 +266,11 @@ export default {
       description: 'Blendet den Tooltip im Cursor zum Durchsuchen der neuesten Projekte neben „Neuestes Projekt fortsetzen“ auf dem Begrüßungsbildschirm aus.',
       tags: 'Projekt, laden, wird geladen, neueste, aktuell, Einführung, Start, Willkommen, Tooltip, Pop-up, Tooltips, Pop-up',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Soziale Links auf dem Begrüßungsbildschirm ausblenden',
       description: 'Versteckt alle sozialen Links auf dem Willkommensbildschirm.',
@@ -342,6 +347,11 @@ export default {
       title: 'Dokument-IDs anzeigen',
       description: 'Wenn dies aktiviert ist, zeigt der Dokumenttext auch den internen Dokument-ID-Wert an.',
       tags: 'Debuggen, interne ID, Kennung, Entwicklungstools, Fehlerbehebung',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Top-Tags im Baum',

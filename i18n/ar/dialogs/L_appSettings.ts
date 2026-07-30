@@ -266,6 +266,11 @@ export default {
       description: 'يخفي تلميح الأداة الموجود في علامة إقحام تصفح أحدث المشاريع بجانب استئناف أحدث مشروع على شاشة الترحيب.',
       tags: 'مشروع، تحميل، جارٍ التحميل، الأحدث، الأخير، مقدمة، بداية، ترحيب، تلميح أداة، نافذة منبثقة، تلميحات أدوات، نافذة منبثقة',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'إخفاء الروابط الاجتماعية لشاشة الترحيب',
       description: 'يخفي جميع الروابط الاجتماعية على شاشة الترحيب.',
@@ -342,6 +347,11 @@ export default {
       title: 'إظهار معرفات المستندات',
       description: 'إذا تم تمكين هذا، فسيعرض نص المستند أيضًا قيمة معرف المستند الداخلي.',
       tags: 'التصحيح، المعرف الداخلي، المعرف، أدوات التطوير، استكشاف الأخطاء وإصلاحها',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'أعلى العلامات في الشجرة',

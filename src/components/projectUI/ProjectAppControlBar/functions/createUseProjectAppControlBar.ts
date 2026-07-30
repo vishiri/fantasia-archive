@@ -16,27 +16,21 @@ export function createUseProjectAppControlBar (
     const { hasActiveProject } = deps.storeToRefs(deps.S_FaActiveProject())!
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
 
-    const isAppControlBarDisabled = deps.computed(() => {
-      return settings!.value?.disableAppControlBar === true
-    })
-
-    const isAppControlBarGuidesDisabled = deps.computed(() => {
-      return settings!.value?.disableAppControlBarGuides === true
-    })
-
-    const isAppControlBarFunctionButtonsDisabled = deps.computed(() => {
-      return settings!.value?.disableAppControlBarFunctionButtons === true
-    })
-
-    const isAppControlBarContentButtonsDisabled = deps.computed(() => {
-      return settings!.value?.disableAppControlBarContentButtons === true
-    })
-
-    const hideHierarchyTree = deps.computed(() => {
-      return deps.resolveHideHierarchyTree(
-        settings!.value,
-        appSettingsDialogPreview!.value
-      )
+    const {
+      hideHierarchyTree,
+      hideTabCloseButton,
+      isAppControlBarContentButtonsDisabled,
+      isAppControlBarDisabled,
+      isAppControlBarFunctionButtonsDisabled,
+      isAppControlBarGuidesDisabled,
+      showTabBarScrollButtons
+    } = deps.createProjectAppControlBarSettingsFlags({
+      appSettingsDialogPreview: appSettingsDialogPreview!,
+      computed: deps.computed,
+      resolveHideHierarchyTree: deps.resolveHideHierarchyTree,
+      resolveHideTabCloseButton: deps.resolveHideTabCloseButton,
+      resolveShowTabBarScrollButtons: deps.resolveShowTabBarScrollButtons,
+      settings: settings!
     })
 
     const isOnDocumentWorkspaceRoute = deps.computed(() => {
@@ -60,6 +54,8 @@ export function createUseProjectAppControlBar (
         isAppControlBarFunctionButtonsDisabled,
         isAppControlBarContentButtonsDisabled,
         hideHierarchyTree,
+        hideTabCloseButton,
+        showTabBarScrollButtons,
         isOnDocumentWorkspaceRoute,
         moveDocumentTab: (documentId: string, direction: 'left' | 'right') => {
           openedDocumentsStore.moveDocumentTab(documentId, direction)

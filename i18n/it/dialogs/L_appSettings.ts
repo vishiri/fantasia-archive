@@ -266,6 +266,11 @@ export default {
       description: 'Nasconde la descrizione comando nell\'area Sfoglia progetti più recenti accanto a Riprendi ultimo progetto nella schermata di benvenuto.',
       tags: 'progetto, caricamento, caricamento in corso, più recente, recente, introduzione, avvio, benvenuto, descrizione comandi, popup, descrizioni comandi, pop up',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Nascondi i collegamenti social della schermata di benvenuto',
       description: 'Nasconde tutti i collegamenti social nella schermata di benvenuto.',
@@ -342,6 +347,11 @@ export default {
       title: 'Mostra gli ID dei documenti',
       description: 'Se abilitato, il corpo del documento mostrerà anche il valore dell\'ID del documento interno.',
       tags: 'debug, ID interno, identificatore, strumenti di sviluppo, risoluzione dei problemi',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Tag principali nell\'albero',

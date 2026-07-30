@@ -129,6 +129,10 @@ I_appSettingsStaticOption
     category: 'welcomeScreen',
     subcategory: 'welcomeScreenBehavior'
   },
+  hideTabCloseButton: {
+    category: 'visualAccessibility',
+    subcategory: 'tabBehavior'
+  },
   hideWelcomeScreenSocials: {
     category: 'welcomeScreen',
     subcategory: 'welcomeScreenBehavior'
@@ -184,6 +188,10 @@ I_appSettingsStaticOption
   showDocumentID: {
     category: 'developerSettings',
     subcategory: 'documentBody'
+  },
+  showTabBarScrollButtons: {
+    category: 'visualAccessibility',
+    subcategory: 'tabBehavior'
   },
   skipWelcomeScreen: {
     category: 'welcomeScreen',

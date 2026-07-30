@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import {
   resolveProjectAppControlBarTabsHorizontalWheelDelta,
+  resolveProjectAppControlBarTabsIsScrolledToInlineEnd,
   resolveProjectAppControlBarTabsWheelScrollLeft
 } from '../projectAppControlBarTabsWheelScroll'
 
@@ -50,4 +51,35 @@ test('Test that resolveProjectAppControlBarTabsWheelScrollLeft returns null when
     scrollLeft: 0,
     scrollWidth: 300
   })).toBeNull()
+})
+
+test('Test that resolveProjectAppControlBarTabsIsScrolledToInlineEnd is true at end or without overflow', () => {
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 200,
+    scrollLeft: 0,
+    scrollWidth: 200
+  })).toBe(true)
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    scrollLeft: 100,
+    scrollWidth: 200
+  })).toBe(true)
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    scrollLeft: 99.5,
+    scrollWidth: 200
+  })).toBe(true)
+})
+
+test('Test that resolveProjectAppControlBarTabsIsScrolledToInlineEnd is false when right side is clipped', () => {
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    scrollLeft: 0,
+    scrollWidth: 300
+  })).toBe(false)
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    scrollLeft: 50,
+    scrollWidth: 300
+  })).toBe(false)
 })

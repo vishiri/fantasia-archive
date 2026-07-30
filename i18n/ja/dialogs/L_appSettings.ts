@@ -265,6 +265,11 @@ export default {
       description: 'ようこそ画面の「最新プロジェクトの再開」の横にある「browse-latest-projects」キャレットのツールチップを非表示にします。',
       tags: 'プロジェクト、ロード、読み込み中、最新、最近、イントロ、開始、ようこそ、ツールヒント、ポップアップ、ツールヒント、ポップアップ',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'ようこそ画面のソーシャル リンクを非表示にする',
       description: 'ようこそ画面上のすべてのソーシャル リンクを非表示にします。',
@@ -341,6 +346,11 @@ export default {
       title: 'ドキュメントIDを表示する',
       description: 'これが有効な場合、ドキュメント本文には内部ドキュメント ID 値も表示されます。',
       tags: 'デバッグ、内部 ID、識別子、開発ツール、トラブルシューティング',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'ツリー内のトップタグ',

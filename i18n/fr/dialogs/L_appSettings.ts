@@ -266,6 +266,11 @@ export default {
       description: 'Masque l’info-bulle sur le curseur Parcourir les derniers projets à côté de Reprendre le dernier projet sur l’écran d’accueil.',
       tags: 'projet, charger, chargement, le plus récent, récent, intro, début, bienvenue, info-bulle, pop-up, info-bulles, pop up',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Masquer les liens sociaux de l’écran d’accueil',
       description: 'Masque tous les liens sociaux sur l’écran de bienvenue.',
@@ -342,6 +347,11 @@ export default {
       title: 'Afficher les identifiants des documents',
       description: 'Si cette option est activée, le corps du document affichera également la valeur de l\'ID interne du document.',
       tags: 'débogage, identifiant interne, identifiant, outils de développement, dépannage',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Balises principales dans l\'arborescence',

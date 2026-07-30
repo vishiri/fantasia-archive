@@ -49,7 +49,9 @@ const {
   showDocumentTabsRef,
   showEditDocumentButtonRef,
   showSaveDocumentButtonsRef,
-  showWorldTabIndicatorsRef
+  showWorldTabIndicatorsRef,
+  hideTabCloseButtonRef,
+  showTabBarScrollButtonsRef
 } = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
   return {
@@ -68,7 +70,9 @@ const {
     showDocumentTabsRef: ref(false),
     showEditDocumentButtonRef: ref(false),
     showSaveDocumentButtonsRef: ref(false),
-    showWorldTabIndicatorsRef: ref(false)
+    showWorldTabIndicatorsRef: ref(false),
+    hideTabCloseButtonRef: ref(false),
+    showTabBarScrollButtonsRef: ref(false)
   }
 })
 
@@ -141,6 +145,14 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
         }
       }
     },
+    useProjectAppControlBarTabsInlineEndBlend: (input: {
+      watchSource: () => unknown
+    }) => {
+      input.watchSource()
+      return {
+        tabsScrolledToInlineEnd: ref(false)
+      }
+    },
     useProjectAppControlBar: () => {
       return {
         activeDocumentTabName: activeDocumentTabNameRef,
@@ -199,6 +211,8 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
         showAppNoteboardContentDot: { value: false },
         showProjectNoteboardContentDot: { value: false },
         hideHierarchyTree: { value: false },
+        hideTabCloseButton: hideTabCloseButtonRef,
+        showTabBarScrollButtons: showTabBarScrollButtonsRef,
         advancedSearchGuideKeybindLabel: { value: null },
         keyboardShortcutsKeybindLabel: { value: null },
         toggleAppNoteboardKeybindLabel: { value: null },
@@ -332,6 +346,8 @@ beforeEach(() => {
   openedDocumentTabsRef.value = []
   activeDocumentTabNameRef.value = 'doc-1'
   showWorldTabIndicatorsRef.value = false
+  hideTabCloseButtonRef.value = false
+  showTabBarScrollButtonsRef.value = false
   resolveTabWorldIndicatorColorRef.value = () => null
   resolveDocumentTabAppearanceChromeRef.value = () => undefined
   resolveDocumentTabInlineStyleRef.value = () => undefined

@@ -54,6 +54,7 @@ export interface I_faUserSettings {
   hideHierarchyTree: boolean
   hidePlushes: boolean
   hideRecentProjectTooltip: boolean
+  hideTabCloseButton: boolean
   hideTooltipsProject: boolean
   hideTooltipsStart: boolean
   hideTreeIconAddUnder: boolean
@@ -76,6 +77,7 @@ export interface I_faUserSettings {
   preventPreviewsTabs: boolean
   preventPreviewsTree: boolean
   showDocumentID: boolean
+  showTabBarScrollButtons: boolean
   skipWelcomeScreen: boolean
   tagsAtTop: boolean
   textShadow: boolean

@@ -266,6 +266,11 @@ export default {
       description: 'Döljer verktygstipset på raden Bläddra-senaste-projekt bredvid Återuppta senaste projekt på välkomstskärmen.',
       tags: 'projekt, ladda, laddar, senaste, senaste, intro, start, välkommen, verktygstips, popup, verktygstips, pop up',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Dölj sociala länkar på välkomstskärmen',
       description: 'Döljer alla sociala länkar på välkomstskärmen.',
@@ -342,6 +347,11 @@ export default {
       title: 'Visa dokument-ID',
       description: 'Om detta är aktiverat kommer dokumentets brödtext också att visa det interna dokumentets ID-värde.',
       tags: 'debug, internt id, identifierare, dev-verktyg, felsökning',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Topptaggar i trädet',

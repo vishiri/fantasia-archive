@@ -49,6 +49,10 @@ $projectAppControlBar-tabWorldIndicator-extraPaddingInlineStartPx: 2px;
 $projectAppControlBar-tabWorldIndicator-iconMarginInlineStartPx: 4px;
 $projectAppControlBar-tabWorldIndicator-offsetLeft: -8px;
 $projectAppControlBar-tabWorldIndicator-offsetTop: 4px;
+/* Right-edge fade into header chrome when scroll arrows hidden (mid of 5-10px). */
+$projectAppControlBar-tabsRegion-endBlendWidthPx: 8px;
+$projectAppControlBar-tabsRegion-endBlendZIndex: 3;
+$projectAppControlBar-tabsRegion-marginInlineEndWhenScrollButtonsHiddenPx: 5px;
 $projectAppControlBar-topOffsetPx: mainLayout.$mainLayout-sidebarSearchRowTopOffsetPx;
 $projectAppControlBar-unsavedTabIconColor: fa-v('warning', $warning);
 $projectAppControlBar-widthOffsetPx: mainLayout.$mainLayout-sidebarMinWidthPx;

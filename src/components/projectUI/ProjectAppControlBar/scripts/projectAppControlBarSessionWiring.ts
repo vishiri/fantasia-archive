@@ -138,9 +138,20 @@ function buildProjectAppControlBarTabHandlers (input: {
   }
 }
 
-export function assembleProjectAppControlBarApi (
-  input: I_assembleProjectAppControlBarApiInput
-): I_projectAppControlBarComposableApi {
+function buildProjectAppControlBarStripVisibilityApi (input: {
+  computed: I_assembleProjectAppControlBarApiInput['computed']
+  isAppControlBarContentButtonsDisabled: I_assembleProjectAppControlBarApiInput['isAppControlBarContentButtonsDisabled']
+  isAppControlBarDisabled: I_assembleProjectAppControlBarApiInput['isAppControlBarDisabled']
+  isAppControlBarFunctionButtonsDisabled: I_assembleProjectAppControlBarApiInput['isAppControlBarFunctionButtonsDisabled']
+  isAppControlBarGuidesDisabled: I_assembleProjectAppControlBarApiInput['isAppControlBarGuidesDisabled']
+  resolveShowAppControlBarStrip: I_assembleProjectAppControlBarApiInput['resolveShowAppControlBarStrip']
+}): Pick<
+  I_projectAppControlBarComposableApi,
+  | 'showAppControlBar'
+  | 'showContentButtons'
+  | 'showFunctionButtons'
+  | 'showGuideButtons'
+> {
   const showAppControlBar = input.computed(() => {
     return input.resolveShowAppControlBarStrip({
       disableAppControlBar: input.isAppControlBarDisabled.value
@@ -157,6 +168,26 @@ export function assembleProjectAppControlBarApi (
 
   const showContentButtons = input.computed(() => {
     return !input.isAppControlBarContentButtonsDisabled.value
+  })
+
+  return {
+    showAppControlBar,
+    showContentButtons,
+    showFunctionButtons,
+    showGuideButtons
+  }
+}
+
+export function assembleProjectAppControlBarApi (
+  input: I_assembleProjectAppControlBarApiInput
+): I_projectAppControlBarComposableApi {
+  const stripVisibilityApi = buildProjectAppControlBarStripVisibilityApi({
+    computed: input.computed,
+    isAppControlBarContentButtonsDisabled: input.isAppControlBarContentButtonsDisabled,
+    isAppControlBarDisabled: input.isAppControlBarDisabled,
+    isAppControlBarFunctionButtonsDisabled: input.isAppControlBarFunctionButtonsDisabled,
+    isAppControlBarGuidesDisabled: input.isAppControlBarGuidesDisabled,
+    resolveShowAppControlBarStrip: input.resolveShowAppControlBarStrip
   })
 
   const showAppNoteboardContentDot = input.computed(() => {
@@ -234,14 +265,13 @@ export function assembleProjectAppControlBarApi (
 
   return {
     openedDocumentTabs: input.tabs,
-    showAppControlBar,
+    ...stripVisibilityApi,
     showDocumentTabs,
-    showGuideButtons,
-    showFunctionButtons,
-    showContentButtons,
     showAppNoteboardContentDot,
     showProjectNoteboardContentDot,
     hideHierarchyTree: input.hideHierarchyTree,
+    hideTabCloseButton: input.hideTabCloseButton,
+    showTabBarScrollButtons: input.showTabBarScrollButtons,
     ...activeDocumentStateApi,
     ...worldTabIndicatorApi,
     ...tabAppearanceChromeApi,

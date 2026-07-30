@@ -266,6 +266,11 @@ export default {
       description: 'Piilottaa työkaluvihjeen Selaa uusimpia projekteja -kohdassa aloitusnäytön Jatka uusinta projektia -kohdan vieressä.',
       tags: 'projekti, lataus, lataus, uusin, viimeisin, johdanto, aloita, tervetuloa, työkaluvinkki, ponnahdusikkuna, työkaluvihjeet, ponnahdusikkuna',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Piilota tervetulonäytön sosiaaliset linkit',
       description: 'Piilottaa kaikki sosiaaliset linkit Tervetuloa-näytölle.',
@@ -342,6 +347,11 @@ export default {
       title: 'Näytä asiakirjatunnukset',
       description: 'Jos tämä on käytössä, asiakirjan rungossa näkyy myös asiakirjan sisäinen tunnus.',
       tags: 'debug, sisäinen tunnus, tunniste, kehittäjätyökalut, vianetsintä',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Top tagit puussa',

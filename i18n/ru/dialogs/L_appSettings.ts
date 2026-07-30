@@ -266,6 +266,11 @@ export default {
       description: 'Скрывает всплывающую подсказку в области просмотра последних проектов рядом с надписью «Возобновить последний проект» на экране приветствия.',
       tags: 'проект, загрузка, загрузка, последний, недавний, вступление, начало, добро пожаловать, подсказка, всплывающее окно, подсказки, всплывающее окно',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Скрыть ссылки на социальные сети на экране приветствия',
       description: 'Скрывает все социальные ссылки на экране приветствия.',
@@ -342,6 +347,11 @@ export default {
       title: 'Показать идентификаторы документов',
       description: 'Если эта опция включена, в тексте документа также будет отображаться значение внутреннего идентификатора документа.',
       tags: 'отладка, внутренний идентификатор, идентификатор, инструменты разработки, устранение неполадок',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Самые популярные теги в дереве',

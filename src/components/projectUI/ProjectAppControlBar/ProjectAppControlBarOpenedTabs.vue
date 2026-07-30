@@ -6,6 +6,10 @@
     <div
       ref="tabsRootRef"
       class="projectAppControlBarTabs projectAppControlBarTabs--header"
+      :class="{
+        'projectAppControlBarTabs--scrolledToInlineEnd': tabsScrolledToInlineEnd,
+        'projectAppControlBarTabs--showScrollButtons': showTabBarScrollButtons
+      }"
       @wheel="onProjectAppControlBarTabsWheel"
     >
       <q-tabs
@@ -75,6 +79,7 @@
               :visible="showWorldTabIndicators"
             />
             <q-btn
+              v-if="!hideTabCloseButton"
               class="projectAppControlBarTabs__tabClose z-max q-ml-auto"
               dense
               flat
@@ -138,7 +143,8 @@ import {
   projectAppControlBarTabsSortableDragOptions,
   startProjectAppControlBarTabsDragEdgeScroll,
   stopProjectAppControlBarTabsDragEdgeScroll,
-  useProjectAppControlBarOpenedTabsSortable
+  useProjectAppControlBarOpenedTabsSortable,
+  useProjectAppControlBarTabsInlineEndBlend
 } from './scripts/projectAppControlBar_manager'
 
 defineOptions({
@@ -147,6 +153,7 @@ defineOptions({
 
 const props = defineProps<{
   activeDocumentTabName: string | undefined
+  hideTabCloseButton: boolean
   moveDocumentTabLeftKeybindLabel: string | null
   moveDocumentTabRightKeybindLabel: string | null
   onTabAddNewDocumentUnderThisClick: (documentId: string) => Promise<void>
@@ -173,6 +180,7 @@ const props = defineProps<{
   resolveDocumentTabRoute: (documentId: string) => string
   resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
   showDocumentTabs: boolean
+  showTabBarScrollButtons: boolean
   showWorldTabIndicators: boolean
 }>()
 
@@ -188,6 +196,13 @@ const {
 } = useProjectAppControlBarOpenedTabsSortable({
   getOpenedDocumentTabs,
   onTabReorder: props.onTabReorder
+})
+
+const { tabsScrolledToInlineEnd } = useProjectAppControlBarTabsInlineEndBlend({
+  tabsRootRef,
+  watchSource: () => {
+    return props.openedDocumentTabs.length
+  }
 })
 
 function setOpenedTabsNativeSortableDragGhost (dataTransfer: DataTransfer): void {

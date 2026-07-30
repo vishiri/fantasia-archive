@@ -135,6 +135,49 @@
   width: 100%;
 }
 
+/*
+ * Default: hide Quasar outside scroll arrows and the 36px side padding they reserve.
+ * Modifier --showScrollButtons restores Quasar defaults when App Settings enables them.
+ */
+.projectAppControlBarTabs:not(.projectAppControlBarTabs--showScrollButtons) {
+  .tabsWrapper.q-tabs--scrollable.q-tabs__arrows--outside.q-tabs--horizontal {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .tabsWrapper .q-tabs__arrow {
+    display: none;
+  }
+}
+
+/*
+ * Scroll buttons off: trailing gap; right-edge fade only while overflow is clipped on the right.
+ * Paint matches .appHeader (fa-v dark-middle) so flat, fantasy, and Custom app CSS stay in sync.
+ */
+.appHeader__tabsRegion:has(.projectAppControlBarTabs:not(.projectAppControlBarTabs--showScrollButtons)) {
+  margin-right: $projectAppControlBar-tabsRegion-marginInlineEndWhenScrollButtonsHiddenPx;
+  position: relative;
+}
+
+.appHeader__tabsRegion:has(
+  .projectAppControlBarTabs:not(
+    .projectAppControlBarTabs--showScrollButtons,
+    .projectAppControlBarTabs--scrolledToInlineEnd
+  )
+)::before {
+  background-color: mainLayout.$mainLayout-appHeader-backgroundColor;
+  content: '';
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000);
+  mask-image: linear-gradient(to right, transparent, #000);
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: $projectAppControlBar-tabsRegion-endBlendWidthPx;
+  z-index: $projectAppControlBar-tabsRegion-endBlendZIndex;
+}
+
 .projectAppControlBar__flowSpacer {
   flex-shrink: 0;
   min-height: $projectAppControlBar-minHeightPx;

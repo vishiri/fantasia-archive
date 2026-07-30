@@ -266,6 +266,11 @@ export default {
       description: 'Приховує спливаючу підказку в рядку browse-latest-projects біля пункту «Відновити останній проект» на екрані привітання.',
       tags: 'проект, завантаження, завантаження, останній, останній, вступ, початок, вітання, підказка, спливаюче вікно, підказки, спливаюче вікно',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Приховати посилання на соціальні екрани привітання',
       description: 'Приховує всі соціальні посилання на екрані привітання.',
@@ -342,6 +347,11 @@ export default {
       title: 'Показати ідентифікатори документів',
       description: 'Якщо це ввімкнено, у тілі документа також відображатиметься значення ідентифікатора внутрішнього документа.',
       tags: 'налагодження, внутрішній ідентифікатор, ідентифікатор, інструменти розробника, усунення несправностей',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Верхні теги в дереві',

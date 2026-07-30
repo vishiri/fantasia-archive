@@ -2,6 +2,7 @@
   <div class="projectAppControlBarHost">
     <ProjectAppControlBarOpenedTabs
       :active-document-tab-name="activeDocumentTabName"
+      :hide-tab-close-button="hideTabCloseButton"
       :move-document-tab-left-keybind-label="moveDocumentTabLeftKeybindLabel"
       :move-document-tab-right-keybind-label="moveDocumentTabRightKeybindLabel"
       :on-tab-add-new-document-under-this-click="onTabAddNewDocumentUnderThisClick"
@@ -26,6 +27,7 @@
       :resolve-document-tab-route="resolveDocumentTabRoute"
       :resolve-tab-world-indicator-color="resolveTabWorldIndicatorColor"
       :show-document-tabs="showDocumentTabs"
+      :show-tab-bar-scroll-buttons="showTabBarScrollButtons"
       :show-world-tab-indicators="showWorldTabIndicators"
     />
     <ProjectAppControlBarFixedStrip
@@ -123,6 +125,7 @@ const {
   keyboardShortcutsKeybindLabel,
   moveDocumentTabLeftKeybindLabel,
   moveDocumentTabRightKeybindLabel,
+  hideTabCloseButton,
   onAddNewDocumentUnderCurrentClick,
   onAdvancedSearchGuideClick,
   onCopyCurrentDocumentClick,
@@ -165,6 +168,7 @@ const {
   showAppNoteboardContentDot,
   showContentButtons,
   showDocumentTabs,
+  showTabBarScrollButtons,
   showWorldTabIndicators,
   showEditDocumentButton,
   showFunctionButtons,

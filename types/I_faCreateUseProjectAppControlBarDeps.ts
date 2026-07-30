@@ -22,6 +22,8 @@ export interface I_faCreateUseProjectAppControlBarDeps {
     isAppControlBarFunctionButtonsDisabled: I_computedRef<boolean>
     isAppControlBarContentButtonsDisabled: I_computedRef<boolean>
     hideHierarchyTree: I_computedRef<boolean>
+    hideTabCloseButton: I_computedRef<boolean>
+    showTabBarScrollButtons: I_computedRef<boolean>
     isOnDocumentWorkspaceRoute: I_computedRef<boolean>
     moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
     reorderDocumentTabs: (fromIndex: number, toIndex: number) => void
@@ -49,7 +51,40 @@ export interface I_faCreateUseProjectAppControlBarDeps {
     computed: I_assembleProjectAppControlBarApiInput['computed']
   }) => I_assembleProjectAppControlBarApiInput
   computed: <T>(getter: () => T) => I_computedRef<T>
+  createProjectAppControlBarSettingsFlags: (input: {
+    appSettingsDialogPreview: I_computedRef<Partial<I_faUserSettings> | null>
+    computed: <T>(getter: () => T) => I_computedRef<T>
+    resolveHideHierarchyTree: (
+      settings: I_faUserSettings | null,
+      preview: Partial<I_faUserSettings> | null
+    ) => boolean
+    resolveHideTabCloseButton: (
+      settings: I_faUserSettings | null,
+      preview: Partial<I_faUserSettings> | null
+    ) => boolean
+    resolveShowTabBarScrollButtons: (
+      settings: I_faUserSettings | null,
+      preview: Partial<I_faUserSettings> | null
+    ) => boolean
+    settings: I_computedRef<I_faUserSettings | null>
+  }) => {
+    hideHierarchyTree: I_computedRef<boolean>
+    hideTabCloseButton: I_computedRef<boolean>
+    isAppControlBarContentButtonsDisabled: I_computedRef<boolean>
+    isAppControlBarDisabled: I_computedRef<boolean>
+    isAppControlBarFunctionButtonsDisabled: I_computedRef<boolean>
+    isAppControlBarGuidesDisabled: I_computedRef<boolean>
+    showTabBarScrollButtons: I_computedRef<boolean>
+  }
   resolveHideHierarchyTree: (
+    settings: I_faUserSettings | null,
+    preview: Partial<I_faUserSettings> | null
+  ) => boolean
+  resolveHideTabCloseButton: (
+    settings: I_faUserSettings | null,
+    preview: Partial<I_faUserSettings> | null
+  ) => boolean
+  resolveShowTabBarScrollButtons: (
     settings: I_faUserSettings | null,
     preview: Partial<I_faUserSettings> | null
   ) => boolean

@@ -266,6 +266,11 @@ export default {
       description: 'Oculta la información sobre herramientas en el cursor de exploración de últimos proyectos junto a Reanudar el último proyecto en la pantalla de bienvenida.',
       tags: 'proyecto, cargar, cargando, último, reciente, introducción, inicio, bienvenido, información sobre herramientas, ventana emergente, información sobre herramientas, ventana emergente',
     },
+    hideTabCloseButton: {
+      title: 'Hide tab close button',
+      description: 'Determines whether the tab close buttons in the opened document list will be shown or not. Please note that this will make the tabs closeable only via middle click or right click and then clicking on the menu.',
+      tags: 'tab close, close button, X button, hide close, middle click, context menu, tab strip'
+    },
     hideWelcomeScreenSocials: {
       title: 'Ocultar enlaces sociales de la pantalla de bienvenida',
       description: 'Oculta todos los enlaces sociales en la pantalla de bienvenida.',
@@ -342,6 +347,11 @@ export default {
       title: 'Mostrar ID de documentos',
       description: 'Si esto está habilitado, el cuerpo del documento también mostrará el valor de ID del documento interno.',
       tags: 'depuración, identificación interna, identificador, herramientas de desarrollo, solución de problemas',
+    },
+    showTabBarScrollButtons: {
+      title: 'Show tab bar scroll buttons',
+      description: 'Determines whether the top tab list scroll buttons should show. Please note that without them, the user is able to scroll on the bar only using the mousewheel.',
+      tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
       title: 'Etiquetas principales en el árbol',
