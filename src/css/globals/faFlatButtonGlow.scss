@@ -47,3 +47,10 @@ body.fa-appTheme--fantasy .q-btn--flat.text-negative:not(.dialogKeybindSettingsC
   --fa-tab-edge-glow-core: #{fa-v('negative', $negative)};
   --fa-tab-edge-glow-deep: color-mix(in srgb, #{fa-v('negative', $negative)} 48%, #{fa-v('black', $black)});
 }
+
+/* Language spellcheck refresh: edge glow matches red spinner icon. */
+body.fa-appTheme--fantasy .q-btn--flat.globalLanguageSelectorSpellcheckRefreshControl__button {
+  --fa-tab-edge-glow-bright: #{fa-v('icon-spellcheck-refresh', $icon-spellcheck-refresh)};
+  --fa-tab-edge-glow-core: #{fa-v('icon-spellcheck-refresh', $icon-spellcheck-refresh)};
+  --fa-tab-edge-glow-deep: color-mix(in srgb, #{fa-v('icon-spellcheck-refresh', $icon-spellcheck-refresh)} 48%, #{fa-v('black', $black)});
+}

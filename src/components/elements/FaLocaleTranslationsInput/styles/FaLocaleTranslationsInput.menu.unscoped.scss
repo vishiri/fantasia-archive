@@ -132,7 +132,17 @@ body.fa-appTheme--fantasy .faLocaleTranslationsInput__scroll {
 }
 
 body.fa-appTheme--fantasy .faLocaleTranslationsInput__rows {
-  padding: $faLocaleTranslationsInput-rows-padding-y-fantasy 0;
+  padding-bottom: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+}
+
+/* No column headers above: breathe under fantasy body zero top padding. */
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__rows {
+  padding-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+}
+
+/* Align pinned aside with first locale row when rows gain fantasy top padding. */
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody--pinnedAside:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__pinnedAsideInput {
+  margin-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
 }
 
 .faLocaleTranslationsInput__row {
@@ -155,12 +165,7 @@ body.fa-appTheme--fantasy .faLocaleTranslationsInput__rows {
 
 body.fa-appTheme--fantasy .faLocaleTranslationsInput__columnHeaders {
   margin-bottom: 0;
-  padding-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
-}
-
-/* Match first scroll row: headers spacer alone omits fantasy rows padding-top. */
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__pinnedAside--singularPlural .faLocaleTranslationsInput__pinnedAsideInput {
-  margin-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+  padding: $faLocaleTranslationsInput-rows-padding-y-fantasy 0;
 }
 
 .faLocaleTranslationsInput__formHeader {
