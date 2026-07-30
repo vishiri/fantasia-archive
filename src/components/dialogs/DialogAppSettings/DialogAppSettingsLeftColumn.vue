@@ -106,6 +106,7 @@ function onSelectedCategoryTabUpdate (value: unknown): void {
 .dialogAppSettings__tabs {
   /* Above painted vertical separator so right-edge glow can overlap it. */
   filter: grayscale(0);
+  min-width: $dialogAppSettings-tabs-minWidth;
   opacity: 1;
   position: relative;
   transition:

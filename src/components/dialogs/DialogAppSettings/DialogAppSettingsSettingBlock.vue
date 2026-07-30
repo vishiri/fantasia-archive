@@ -8,7 +8,7 @@
       :data-test-setting-id="String(settingKey)"
       :data-test-tags="setting.tags"
     >
-      <div class="row items-center no-wrap q-mb-xs">
+      <div class="row items-center no-wrap">
         <div class="dialogAppSettings__settingTitle">
           <span
             class="dialogAppSettings__settingLabel fa-text-label text-body2"
@@ -26,6 +26,7 @@
       </div>
       <q-toggle
         v-if="setting.control === 'toggle'"
+        class="dialogAppSettings__settingToggle"
         color="primary-bright"
         :model-value="setting.value"
         @update:model-value="onToggle"
@@ -88,10 +89,16 @@ const selectLocator = computed(() =>
   props.displayMode === 'tab' ? 'dialogAppSettings-settingSelect' : 'dialogAppSettings-search-settingSelect'
 )
 
+/**
+ * Emit the toggled boolean for this setting key.
+ */
 function onToggle (value: boolean): void {
   emit('update-setting', props.settingKey, value)
 }
 
+/**
+ * Emit a selected string value; ignore non-string model updates.
+ */
 function onSelect (value: string | null | undefined): void {
   if (typeof value !== 'string') {
     return
@@ -119,6 +126,10 @@ function onSelect (value: string | null | undefined): void {
 .dialogAppSettings__settingHelpIcon {
   align-self: flex-start;
   margin-top: $dialogAppSettings-settingHelpIcon-marginTop;
+}
+
+.dialogAppSettings__settingToggle {
+  padding: $dialogAppSettings-settingSelect-paddingBlock $dialogAppSettings-settingSelect-paddingInline;
 }
 
 .dialogAppSettings__settingSelect {
