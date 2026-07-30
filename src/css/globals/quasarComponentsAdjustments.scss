@@ -1,4 +1,6 @@
 @use '../quasar.variables.scss' as *;
+@use './faColorGlyph.mixin.scss' as colorGlyph;
+@use './faColorGlyph.variables.scss' as glyphVars;
 @use './faDialogCyanRim.mixin.scss' as dialogCyanRim;
 @use './faPaintedDivider.mixin.scss' as paintedDivider;
 @use './faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
@@ -845,33 +847,108 @@ body.fa-appTheme--fantasy .q-tooltip {
   @include tooltipParchment.fa-tooltip-parchment-surface;
 }
 
+/* Moon pill toggle (PoC 03): fixed dark track + sliding disc.
+ * Flat = rim only; fantasy adds soft glow on track + thumb. */
 .q-toggle {
-  width: $qToggle-width;
-}
+  width: auto;
 
-.q-toggle--dark .q-toggle__inner {
-  color: var(--fa-color-white);
+  &:focus-visible {
+    outline: $qToggle-focusOutline-width solid $qToggle-focusOutline-color;
+    outline-offset: $qToggle-focusOutline-offset;
+  }
 }
 
 .q-toggle__inner {
-  max-width: $qToggle-inner-maxWidth;
+  font-size: inherit;
+  height: $qToggle-height;
+  max-width: $qToggle-width;
+  min-width: $qToggle-width;
+  padding: 0;
+  position: relative;
   width: $qToggle-width;
 }
 
+.q-toggle__track {
+  background: $qToggle-track-backgroundColor;
+  border-radius: $qToggle-border-radius;
+  box-shadow: $qToggle-track-boxShadow-off;
+  height: 100%;
+  inset: 0;
+  opacity: 1;
+  position: absolute;
+  transition: $qToggle-track-transition;
+  width: 100%;
+}
+
+.q-toggle__inner--truthy .q-toggle__track {
+  background: $qToggle-track-backgroundColor;
+  box-shadow: $qToggle-track-boxShadow-on;
+  opacity: 1;
+}
+
+.q-toggle__thumb {
+  height: $qToggle-thumb-size;
+  left: $qToggle-thumb-inset;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: $qToggle-thumb-transition;
+  width: $qToggle-thumb-size;
+  z-index: 1;
+}
+
+.q-toggle__inner--indet .q-toggle__thumb {
+  left: calc(50% - #{$qToggle-thumb-size} / 2);
+}
+
 .q-toggle__inner--truthy .q-toggle__thumb {
-  left: calc(100% - #{$qToggle-thumb-leftCalcSubtract});
+  left: calc(100% - #{$qToggle-thumb-size} - #{$qToggle-thumb-inset});
 }
 
 .q-toggle__inner--truthy .q-toggle__thumb .q-icon {
   color: var(--fa-color-white);
 }
 
-.q-toggle__thumb {
+.q-toggle__thumb::after {
+  background: $qToggle-thumb-backgroundColor-off;
+  border: none;
+  box-shadow: none;
   transition: $qToggle-thumb-transition;
 }
 
-.q-toggle__thumb::after {
-  background: var(--fa-color-white);
+.q-toggle__inner--truthy .q-toggle__thumb::after {
+  background: $qToggle-thumb-backgroundColor-on;
+  box-shadow: none;
+}
+
+/* Quasar dark skin sets white track color; keep moon palette instead. */
+.q-toggle--dark .q-toggle__inner,
+.q-toggle--dark .q-toggle__inner--truthy {
+  color: inherit;
+}
+
+/* Kill Material hover halo on thumb — moon rim (off) / gold glow (on, fantasy) is the feedback. */
+body.desktop .q-toggle:not(.disabled) .q-toggle__thumb::before {
+  content: none;
+  display: none;
+}
+
+/* Fantasy orbs: moon-disc lighting (angled fill shading); off = silver, on = gold + glow. */
+body.fa-appTheme--fantasy .q-toggle__thumb::after {
+  #{glyphVars.$faColorGlyph-baseVar}: #{$qToggle-thumb-backgroundColor-off};
+
+  @include colorGlyph.fa-color-fill-shading($qToggle-thumb-gradientAngle-fantasy);
+}
+
+body.fa-appTheme--fantasy .q-toggle__inner--truthy .q-toggle__track {
+  box-shadow: $qToggle-track-boxShadow-on-fantasy;
+}
+
+body.fa-appTheme--fantasy .q-toggle__inner--truthy .q-toggle__thumb::after {
+  #{glyphVars.$faColorGlyph-baseVar}: #{$qToggle-thumb-backgroundColor-on};
+
+  @include colorGlyph.fa-color-fill-shading($qToggle-thumb-gradientAngle-fantasy);
+
+  box-shadow: $qToggle-thumb-boxShadow-on-fantasy;
 }
 
 .q-transition--fade-enter-active,

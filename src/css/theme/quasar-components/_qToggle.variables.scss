@@ -1,5 +1,26 @@
-/* QUASAR COMPONENT - Q-TOGGLE */
-$qToggle-inner-maxWidth: 150px;
-$qToggle-thumb-leftCalcSubtract: 30px;
-$qToggle-thumb-transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-$qToggle-width: 100%;
+@use '../../app.palette.scss' as *;
+@use '../../globals/faMicroCornerField.variables.scss' as *;
+
+/* QUASAR COMPONENT - Q-TOGGLE
+ * Moon pill (PoC 03): dark track + sliding disc. Off = rim only; fantasy on-state adds soft glow. */
+$qToggle-border-radius: 999px;
+$qToggle-focusOutline-color: fa-v('primary-bright', $primary-bright);
+$qToggle-focusOutline-offset: 3px;
+$qToggle-focusOutline-width: 2px;
+$qToggle-height: 28px;
+$qToggle-thumb-backgroundColor-off: fa-v('toggle-moon-silver', $toggle-moon-silver);
+$qToggle-thumb-backgroundColor-on: fa-v('primary-bright', $primary-bright);
+$qToggle-thumb-boxShadow-on-fantasy: 0 0 10px color-mix(in srgb, #{fa-v('primary-bright', $primary-bright)} 50%, transparent);
+/* Upper-left light → lower-right shade (sphere / moon disc). */
+$qToggle-thumb-gradientAngle-fantasy: 135deg;
+$qToggle-thumb-inset: 4px;
+$qToggle-thumb-size: 20px;
+$qToggle-thumb-transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease, box-shadow 0.25s ease;
+/* Same wash as dark q-field controls (faMicroCornerField). */
+$qToggle-track-backgroundColor: $faMicroCornerField-control-backgroundColor;
+$qToggle-track-boxShadow-off: inset 0 0 0 1px #{fa-v('toggle-moon-silver', $toggle-moon-silver)};
+$qToggle-track-boxShadow-on: inset 0 0 0 1px color-mix(in srgb, #{fa-v('primary-bright', $primary-bright)} 55%, transparent);
+$qToggle-track-boxShadow-on-fantasy: inset 0 0 0 1px color-mix(in srgb, #{fa-v('primary-bright', $primary-bright)} 55%, transparent),
+  0 0 10px color-mix(in srgb, #{fa-v('primary', $primary)} 35%, transparent);
+$qToggle-track-transition: box-shadow 0.25s ease;
+$qToggle-width: 135px;
