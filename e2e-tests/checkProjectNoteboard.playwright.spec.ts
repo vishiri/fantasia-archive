@@ -113,7 +113,8 @@ const selectorList = {
   nbEditor: 'windowProjectNoteboard-editor',
   nbFrame: 'windowProjectNoteboard-frame',
   nbTitle: 'windowProjectNoteboard-title',
-  resizeHandleSe: '.faFloatingWindowFrameResizeHandles__se',
+  // NW: SE sits near OS window / chrome edge on default 90%x85% open; hit-testing often misses SE.
+  resizeHandleNw: '.faFloatingWindowFrameResizeHandles__nw',
   splashLoad: 'splashPage-btn-load',
   splashNew: 'splashPage-btn-new'
 } as const
@@ -141,11 +142,38 @@ async function waitForProjectNoteboardFrame (page: Page): Promise<Locator> {
     timeout: PROJECT_NOTEBOARD_READY_MS
   })
   const title = frame.locator(`[data-test-locator="${selectorList.nbTitle}"]`)
-  await expect(title).toHaveText(noteboardMessages.title)
+  await expect(title).toHaveText(noteboardMessages.title, {
+    timeout: PROJECT_NOTEBOARD_READY_MS
+  })
   await page.waitForTimeout(FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 100)
   const editor = frame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)
-  await expect(editor).toBeVisible()
+  await expect(editor).toBeVisible({
+    timeout: PROJECT_NOTEBOARD_READY_MS
+  })
   return frame
+}
+
+async function closeProjectNoteboardIfOpen (page: Page): Promise<void> {
+  const frame = page.locator(`[data-test-locator="${selectorList.nbFrame}"]`)
+  if ((await frame.count()) === 0) {
+    return
+  }
+  await frame.locator(`[data-test-locator="${selectorList.nbCloseButton}"]`).click()
+  await expect(frame).toHaveCount(0, {
+    timeout: 15_000
+  })
+}
+
+/**
+ * Opens Project Noteboard from the Project menu only when the frame is not already visible.
+ * Filled project notes auto-open on load; a second toggle would close the window.
+ */
+async function ensureProjectNoteboardOpenFromMenu (appWin: Page): Promise<void> {
+  const frame = appWin.locator(`[data-test-locator="${selectorList.nbFrame}"]`)
+  if ((await frame.count()) > 0) {
+    return
+  }
+  await toggleProjectNoteboardFromMenu(appWin)
 }
 
 function interpolateFaProjectSessionNotify (template: string, projectName: string): string {
@@ -246,9 +274,10 @@ async function readExpectedFloatingOpenLayoutFromViewport (page: Page): Promise<
 async function resizeFloatingFrameTowardMinSquare (page: Page, frame: Locator): Promise<void> {
   const boxBefore = await frame.boundingBox()
   expect(boxBefore).not.toBeNull()
-  const deltaX = targetFrameMinSizePx - boxBefore!.width
-  const deltaY = targetFrameMinSizePx - boxBefore!.height
-  const handle = frame.locator(selectorList.resizeHandleSe)
+  // NW shrink: drag handle toward bottom-right (positive delta reduces w/h for edge 'nw').
+  const deltaX = boxBefore!.width - targetFrameMinSizePx
+  const deltaY = boxBefore!.height - targetFrameMinSizePx
+  const handle = frame.locator(selectorList.resizeHandleNw)
   await expect(handle).toHaveCount(1)
   const hBox = await handle.boundingBox()
   expect(hBox).not.toBeNull()
@@ -256,7 +285,7 @@ async function resizeFloatingFrameTowardMinSquare (page: Page, frame: Locator): 
   const startY = hBox!.y + hBox!.height / 2
   await page.mouse.move(startX, startY)
   await page.mouse.down()
-  await page.mouse.move(startX + deltaX, startY + deltaY)
+  await page.mouse.move(startX + deltaX, startY + deltaY, { steps: 30 })
   await page.mouse.up()
   await expect.poll(async () => {
     const b = await frame.boundingBox()
@@ -462,7 +491,7 @@ test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize
     await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME)
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
 
-    await toggleProjectNoteboardFromMenu(appWindow)
+    await ensureProjectNoteboardOpenFromMenu(appWindow)
     let frame = await waitForProjectNoteboardFrame(appWindow)
 
     await resizeFloatingFrameTowardMinSquare(appWindow, frame)
@@ -589,10 +618,12 @@ test.describe.serial('Project noteboard E2E — cold restart: companion project 
     ))).toBeVisible()
 
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
+    // Baseline notes are filled → auto-open may show the noteboard; close before companion create.
+    await closeProjectNoteboardIfOpen(appWindow)
     await createCompanionProjectForNoteboardIsolation(electronApp, appWindow)
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
 
-    await toggleProjectNoteboardFromMenu(appWindow)
+    await ensureProjectNoteboardOpenFromMenu(appWindow)
     const companionFrame = await waitForProjectNoteboardFrame(appWindow)
     const companionEditor = companionFrame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)
     await fillProjectNoteboardEditorPersist(

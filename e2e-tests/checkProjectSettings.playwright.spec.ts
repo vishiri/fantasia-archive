@@ -134,7 +134,11 @@ async function openProjectSettingsFromMenu (page: Page): Promise<void> {
   await expect(row).toBeVisible({ timeout: 15_000 })
   await expect(row).toBeEnabled()
   await row.click()
-  await dismissOpenMenus(page)
+  await page.waitForTimeout(MENU_ANIMATION_MS)
+  // Do not Escape after open: clean Project Settings dismisses on Escape (persistent only when dirty).
+  await expect(
+    page.locator(`[data-test-locator="${selectorList.title}"]`)
+  ).toBeVisible({ timeout: 15_000 })
 }
 
 async function openLoadRecentSubmenu (page: Page): Promise<void> {

@@ -102,6 +102,7 @@ function backgroundColorMatchesHex (backgroundColor: string, hex: string): boole
 /**
  * Drags a palette swatch row from one index to another.
  * Uses mouse steps so Sortable forceFallback (8px tolerance) registers the drag.
+ * Avoid Escape + scrollIntoViewIfNeeded: dirty Project Settings / open pickers make swatches "not stable".
  */
 export async function dragPaletteSwatch (
   page: Page,
@@ -111,23 +112,44 @@ export async function dragPaletteSwatch (
   const swatchLocator = '[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]'
   const source = page.locator(swatchLocator).nth(fromIndex)
   const target = page.locator(swatchLocator).nth(toIndex)
-  await page.keyboard.press('Escape')
-  await source.scrollIntoViewIfNeeded()
-  await target.scrollIntoViewIfNeeded()
-  await source.hover()
-  await page.waitForTimeout(50)
-  await source.dragTo(target, {
-    force: true,
-    sourcePosition: {
-      x: 8,
-      y: 8
-    },
-    steps: 32,
-    targetPosition: {
-      x: 8,
-      y: 8
+  await expect(source).toBeVisible()
+  await expect(target).toBeVisible()
+
+  let sourceBox: { x: number; y: number; width: number; height: number } | null = null
+  let targetBox: { x: number; y: number; width: number; height: number } | null = null
+  await expect.poll(async () => {
+    const first = await source.boundingBox()
+    const second = await target.boundingBox()
+    if (first === null || second === null) {
+      return false
     }
-  })
+    await page.waitForTimeout(80)
+    const firstAgain = await source.boundingBox()
+    const secondAgain = await target.boundingBox()
+    if (firstAgain === null || secondAgain === null) {
+      return false
+    }
+    const stable = first.x === firstAgain.x &&
+      first.y === firstAgain.y &&
+      second.x === secondAgain.x &&
+      second.y === secondAgain.y
+    if (stable) {
+      sourceBox = firstAgain
+      targetBox = secondAgain
+    }
+    return stable
+  }, { timeout: 15_000 }).toBe(true)
+
+  expect(sourceBox).not.toBeNull()
+  expect(targetBox).not.toBeNull()
+  const startX = sourceBox!.x + 8
+  const startY = sourceBox!.y + 8
+  const endX = targetBox!.x + 8
+  const endY = targetBox!.y + 8
+  await page.mouse.move(startX, startY)
+  await page.mouse.down()
+  await page.mouse.move(endX, endY, { steps: 32 })
+  await page.mouse.up()
   await page.waitForTimeout(400)
 }
 

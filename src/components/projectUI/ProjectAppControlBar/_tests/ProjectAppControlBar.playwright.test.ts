@@ -110,7 +110,6 @@ async function remountAppControlBarAfterStoreSeed (
   await page.waitForFunction(() => {
     return typeof window.__faComponentTestingPatchStores === 'function'
   }, { timeout: 30_000 })
-  await patchFaPlaywrightComponentHarnessStores(page, seed)
   await page.evaluate(async (payload) => {
     const root = document.querySelector('#q-app') as HTMLElement & {
       __vue_app__?: {
@@ -134,6 +133,9 @@ async function remountAppControlBarAfterStoreSeed (
       : '/componentTesting/ProjectAppControlBar'
     await router.replace({ path: routePath })
   }, seed)
+  // Patch after route settle: MainLayout onMounted refreshSettings would otherwise overwrite the seed.
+  await page.waitForTimeout(faFrontendRenderTimer)
+  await patchFaPlaywrightComponentHarnessStores(page, seed)
   await page.waitForTimeout(faFrontendRenderTimer)
 }
 
@@ -219,7 +221,7 @@ test.describe.serial('Project app control bar visibility', () => {
       appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBarTabClose}"]`)
     ).toHaveCount(1)
     await expect(
-      appWindow.getByText('Hero', { exact: true })
+      appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBarTab}"]`).getByText('Hero', { exact: true })
     ).toHaveCount(1)
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBarEditDocumentButton}"]`)
@@ -387,7 +389,7 @@ test.describe.serial('Project app control bar visibility', () => {
       appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBarTabContextMenuBrowseSubmenu}"]`)
     ).toBeVisible()
     await expect(
-      appWindow.getByText('Villain draft', { exact: true })
+      appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBarTabContextMenuBrowseSubmenu}"]`).getByText('Villain draft', { exact: true })
     ).toHaveCount(1)
     await expect(
       appWindow.locator('[data-test-locator="projectAppControlBar-tabContextMenu-browseTab"][data-test-browse-tab-document-id="doc-villain"] .projectAppControlBarTabContextMenu__browseTabUnsavedIcon')

@@ -46,6 +46,9 @@ test('Test that ComponentTestingLayout renders nested default route inside route
 
   expect(w.find('[data-test-layout-child]').exists()).toBe(true)
   expect(w.find('[data-test-layout-child]').text()).toContain('child-route')
+  expect(
+    w.find('[data-test-locator="mainLayout-appControlBarHeaderMount"]').exists()
+  ).toBe(true)
   w.unmount()
 })
 

@@ -201,9 +201,14 @@ test.describe.serial('App settings dialog', () => {
         `[data-test-locator="${appSettingsSelector.category(categoryKey)}"]`
       )
       await expect(categorySection).toBeVisible()
-      await expect(
-        categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`)
-      ).toHaveText(category.title)
+      // Tab mode moves the category title into the sticky panel header (sibling of the body-only category panel).
+      const categoryPanelBody = categorySection.locator(
+        'xpath=ancestor::div[contains(@class,"dialogAppSettings__panelBody")][1]'
+      )
+      const categoryTitle = categoryPanelBody.locator(
+        `[data-test-locator="${selectorList.categoryTitle}"]`
+      )
+      await expect(categoryTitle).toHaveText(category.title)
 
       for (const [subCategoryKey, subCategory] of Object.entries(category.subCategories)) {
         const subSection = categorySection.locator(
@@ -265,7 +270,7 @@ test.describe.serial('App settings dialog', () => {
             })
           }
 
-          await categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`).hover({
+          await categoryTitle.hover({
             force: true
           })
           await appWindow.waitForTimeout(200)

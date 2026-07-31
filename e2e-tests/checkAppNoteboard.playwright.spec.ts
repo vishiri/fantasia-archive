@@ -59,6 +59,11 @@ const selectorList = {
 
 async function openAppNoteboardFromToolsMenu (page: Page): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
+  const frame = page.locator(`[data-test-locator="${selectorList.frame}"]`)
+  // Filled notes auto-open the window on cold start; Tools toggle would close it again.
+  if (await frame.count() > 0) {
+    return
+  }
   const toolsTrigger = page.getByText(toolsMenuMessages.title, { exact: true })
   await expect(toolsTrigger).toBeVisible({ timeout: 20_000 })
   await toolsTrigger.click()

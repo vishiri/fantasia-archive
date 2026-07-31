@@ -188,7 +188,8 @@ test.describe.serial('App styling floating window chrome and persistent close be
     const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
     const helpIcon = frame.locator(`[data-test-locator="${selectorList.helpIcon}"]`)
     await expect(helpIcon).toHaveCount(1)
-    await helpIcon.hover()
+    // Frame chrome can sit outside the Electron viewport; Vue @mouseenter opens the menu (not Playwright hit-testing).
+    await helpIcon.dispatchEvent('mouseenter')
     await appWindow.waitForTimeout(appStylingHelpMenuHoverMs)
 
     const helpMenu = appWindow.locator(`[data-test-locator="${selectorList.helpMenu}"]`)
@@ -204,7 +205,8 @@ test.describe.serial('App styling floating window chrome and persistent close be
     await expect(varList).toBeVisible()
 
     const titleHeading = frame.locator(`[data-test-locator="${selectorList.title}"]`)
-    await titleHeading.hover()
+    await helpIcon.dispatchEvent('mouseleave')
+    await titleHeading.dispatchEvent('mouseenter')
     await appWindow.waitForTimeout(200)
     await expect(helpMenu).toBeVisible()
 
@@ -224,6 +226,9 @@ test.describe.serial('App styling floating window chrome and persistent close be
       expect(backgroundColor.trim().length).toBeGreaterThan(0)
       expect(backgroundColor.toLowerCase()).not.toBe('transparent')
     }
+
+    await appWindow.keyboard.press('Escape')
+    await expect(helpMenu).toHaveCount(0)
   })
 
   /**
