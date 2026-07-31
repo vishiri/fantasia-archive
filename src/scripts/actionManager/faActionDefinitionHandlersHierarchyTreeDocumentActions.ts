@@ -3,8 +3,10 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerDomain'
 
 import { findProjectHierarchyTreeDocumentNodeByDocumentId } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentNodeLookup'
-import { resolveHierarchyTreeDocumentOpenEditSteps } from 'app/src/scripts/openedDocuments/functions/resolveHierarchyTreeDocumentOpenEditSteps'
-import { findOpenedDocumentTabIndexByDocumentId } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+import {
+  findOpenedDocumentTabIndexByDocumentId,
+  resolveHierarchyTreeDocumentOpenEditSteps
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 type T_hierarchyTreeDocumentActionsHandlerDeps = {
   S_FaOpenedDocuments: () => {

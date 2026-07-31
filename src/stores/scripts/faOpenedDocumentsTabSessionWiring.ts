@@ -9,7 +9,7 @@ import {
   findOpenedDocumentTabIndexByDocumentId,
   removeOpenedDocumentTabAtIndex,
   resolveOpenedDocumentTabFocusIndexAfterClose
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 export function resolveFaOpenedDocumentOpenFromTree (deps: {
   documentId: string

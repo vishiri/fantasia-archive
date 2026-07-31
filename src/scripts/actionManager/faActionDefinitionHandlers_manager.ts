@@ -16,10 +16,10 @@ import { faProjectDocumentTemplatesPersistSnapshotFromDialog } from 'app/src/sto
 import { faProjectWorldsPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
 import { navigateToWorkspaceHomeRoute, resolveFaAppRouterCurrentPath } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/functions/faDocumentWorkspacePageTransition'
-import { resolveAdjacentOpenedDocumentTabId } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
 import {
+  resolveAdjacentOpenedDocumentTabId,
   resolveCanEditActiveDocumentViaKeybind
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentWorkspaceKeybindGuards'
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 import {
   resolveShowProjectAppControlBarEditButton
 } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarEditMode'

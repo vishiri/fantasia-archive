@@ -4,7 +4,7 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import {
   applyTemporaryOpenedDocumentParent,
   resolveOpenedDocumentTabIsTemporary
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 type T_projectContentApiForTemporaryTabHydration = {
   getDocumentById: (id: string) => Promise<unknown>

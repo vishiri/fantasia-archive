@@ -7,7 +7,7 @@ import {
   FA_COLOR_CONTRAST_NEGATIVE_HEX,
   FA_DIALOG_PROJECT_SETTINGS_WORLD_COLOR_PALETTE_DUPLICATE_ICON_MIN_CONTRAST_RATIO
 } from 'app/types/I_faColorContrast'
-import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/functions/createFaColorPickerPopoverEmit'
+import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
 import { resolveFaDuplicatePaletteIconQuasarColor } from 'app/src/scripts/faColorContrast/functions/faColorContrast'
 
 import { isDialogProjectSettingsWorldColorPaletteSwatchDuplicate } from './functions/dialogProjectSettingsWorldColorPalette'

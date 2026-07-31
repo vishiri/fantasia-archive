@@ -3,13 +3,17 @@ import { expect, test, vi } from 'vitest'
 import {
   FA_COLOR_CONTRAST_BLACK_HEX,
   FA_COLOR_CONTRAST_NEGATIVE_HEX,
+  FA_COLOR_GLYPH_HIGHLIGHT_BASE_DEFAULT,
+  FA_COLOR_GLYPH_HIGHLIGHT_BASE_MILD,
   FA_DIALOG_PROJECT_SETTINGS_WORLD_COLOR_PALETTE_DUPLICATE_ICON_MIN_CONTRAST_RATIO
 } from 'app/types/I_faColorContrast'
 import {
+  buildFaColorGlyphCssCustomProperties,
   calculateFaColorContrastRatio,
   parseFaColorContrastHexToRgb,
+  resolveFaColorGlyphHighlightBasePercent,
   resolveFaDuplicatePaletteIconQuasarColor
-} from '../functions/faColorContrast'
+} from '../faColorContrast_manager'
 
 /**
  * parseFaColorContrastHexToRgb
@@ -110,4 +114,33 @@ test('Test that resolveFaDuplicatePaletteIconQuasarColor switches to black on lo
     FA_COLOR_CONTRAST_BLACK_HEX,
     FA_DIALOG_PROJECT_SETTINGS_WORLD_COLOR_PALETTE_DUPLICATE_ICON_MIN_CONTRAST_RATIO
   )).toBe('black')
+})
+
+/**
+ * resolveFaColorGlyphHighlightBasePercent
+ * Uses mild highlight for dark hex bases and default for light or non-hex bases.
+ */
+test('Test that resolveFaColorGlyphHighlightBasePercent picks mild for dark hex and default otherwise', () => {
+  expect(resolveFaColorGlyphHighlightBasePercent('#ad3131')).toBe(FA_COLOR_GLYPH_HIGHLIGHT_BASE_MILD)
+  expect(resolveFaColorGlyphHighlightBasePercent('#000000')).toBe(FA_COLOR_GLYPH_HIGHLIGHT_BASE_MILD)
+  expect(resolveFaColorGlyphHighlightBasePercent('#ffd673')).toBe(FA_COLOR_GLYPH_HIGHLIGHT_BASE_DEFAULT)
+  expect(resolveFaColorGlyphHighlightBasePercent('#ffffff')).toBe(FA_COLOR_GLYPH_HIGHLIGHT_BASE_DEFAULT)
+  expect(resolveFaColorGlyphHighlightBasePercent('var(--fa-color-primary-bright)')).toBe(
+    FA_COLOR_GLYPH_HIGHLIGHT_BASE_DEFAULT
+  )
+})
+
+/**
+ * buildFaColorGlyphCssCustomProperties
+ * Sets glyph base and adaptive highlight custom properties together.
+ */
+test('Test that buildFaColorGlyphCssCustomProperties pairs base color with highlight stop', () => {
+  expect(buildFaColorGlyphCssCustomProperties('#ad3131')).toEqual({
+    '--fa-color-glyph-base': '#ad3131',
+    '--fa-color-glyph-highlight-base': FA_COLOR_GLYPH_HIGHLIGHT_BASE_MILD
+  })
+  expect(buildFaColorGlyphCssCustomProperties('#ffd673')).toEqual({
+    '--fa-color-glyph-base': '#ffd673',
+    '--fa-color-glyph-highlight-base': FA_COLOR_GLYPH_HIGHLIGHT_BASE_DEFAULT
+  })
 })

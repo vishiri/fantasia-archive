@@ -60,6 +60,15 @@ export {
   FA_PROJECT_APP_CONTROL_BAR_HEADER_MOUNT_SELECTOR
 }
 
+export { buildFaColorGlyphCssCustomProperties } from 'app/src/scripts/faColorContrast/faColorContrast_manager'
+
+export {
+  resolveProjectAppControlBarTabAppearanceChrome,
+  resolveProjectAppControlBarTabHasUserCustomTextColor,
+  resolveProjectAppControlBarTabInlineStyle,
+  resolveProjectAppControlBarTabShowsStatusMuted
+} from './projectAppControlBarTabAppearanceChromeWiring'
+
 export {
   PROJECT_APP_CONTROL_BAR_TABS_SORTABLE_ANIMATION_MS,
   VueDraggable,

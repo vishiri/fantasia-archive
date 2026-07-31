@@ -1,7 +1,7 @@
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { resolveFaDocumentTreeOrderNumberBadgeLabel } from 'app/src/scripts/openedDocuments/functions/openedDocumentTreeOrderNumber'
+import { resolveFaDocumentTreeOrderNumberBadgeLabel } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 import { resolveProjectHierarchyTreePlacementCountSegments } from '../functions/projectHierarchyTreePlacementCountSegments'
 
 export function createProjectHierarchyTreeNodeDisplayBindings (deps: {

@@ -3,7 +3,7 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faColorPickerInput'
 import { FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH } from 'app/types/I_faProjectWorldDomain'
-import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/functions/createFaColorPickerPopoverEmit'
+import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
 import {
   appendFaProjectWorldColorPalleteHex,
   faProjectWorldColorPalleteContainsHex,

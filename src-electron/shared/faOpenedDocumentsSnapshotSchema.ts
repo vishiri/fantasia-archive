@@ -5,9 +5,11 @@ import {
   FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
   FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION
 } from 'app/types/I_faOpenedDocumentsDomain'
-import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
-import { normalizeOpenedDocumentTabAppearanceColors } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
-import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+import {
+  normalizeOpenedDocumentTabAppearanceColors,
+  normalizeOpenedDocumentTabEditState,
+  normalizeOpenedDocumentTabPersistenceState
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 const faOpenedDocumentTabSchema = z.object({
   documentId: z.string().min(1).max(64),

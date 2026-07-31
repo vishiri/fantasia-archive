@@ -5,23 +5,17 @@ import type {
 } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION } from 'app/types/I_faOpenedDocumentsDomain'
 import {
+  duplicateOpenedDocumentTabs,
   normalizeOpenedDocumentAppearanceColorFromDb,
+  normalizeOpenedDocumentExtraClassesFromDb,
   normalizeOpenedDocumentParentIdFromDb,
   normalizeOpenedDocumentTabAppearanceColors,
+  normalizeOpenedDocumentTabEditState,
+  normalizeOpenedDocumentTabPersistenceState,
+  normalizeOpenedDocumentTreeOrderNumberFromDb,
   recomputeOpenedDocumentTabHasUnsavedChanges
-} from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
-import {
-  normalizeOpenedDocumentTreeOrderNumberFromDb
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTreeOrderNumber'
-import {
-  duplicateOpenedDocumentTabs
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
-import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
-import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
-import {
-  normalizeOpenedDocumentExtraClassesFromDb
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentExtraClasses'
 import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
 export function buildFaOpenedDocumentsSnapshot (input: {

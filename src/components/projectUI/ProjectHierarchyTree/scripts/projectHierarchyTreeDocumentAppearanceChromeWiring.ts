@@ -1,8 +1,10 @@
 import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { resolveFaDocumentAppearanceChromeStyle } from 'app/src/scripts/documentAppearance/functions/faDocumentAppearanceChromeStyle'
-import { resolveFaDocumentStatusLabelColor } from 'app/src/scripts/documentAppearance/functions/resolveFaDocumentStatusLabelColor'
+import {
+  resolveFaDocumentAppearanceChromeStyle,
+  resolveFaDocumentStatusLabelColor
+} from 'app/src/scripts/documentAppearance/documentAppearance_manager'
 
 export function resolveProjectHierarchyTreeDocumentAppearanceChrome (
   node: Pick<

@@ -1,7 +1,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { expect, test } from 'vitest'
 
-import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/functions/createFaColorPickerPopoverEmit'
+import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
 import { resolveFaDuplicatePaletteIconQuasarColor } from 'app/src/scripts/faColorContrast/functions/faColorContrast'
 import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faColorPickerInput'
 import {

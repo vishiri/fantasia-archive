@@ -6,7 +6,7 @@ import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 import { buildProjectAppControlBarTabContextMenuClickHandlers } from '../functions/projectAppControlBarTabContextMenuClickHandlers'
 import { buildProjectAppControlBarTabContextMenuLabels } from '../functions/projectAppControlBarTabContextMenuLabels'
-import { resolveOpenedDocumentTabIsTemporary } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+import { resolveOpenedDocumentTabIsTemporary } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 const PROJECT_APP_CONTROL_BAR_TAB_CONTEXT_MENU_BROWSE_SUBMENU_ROW_INDEX = 0
 

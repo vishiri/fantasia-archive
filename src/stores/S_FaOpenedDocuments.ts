@@ -40,62 +40,48 @@ import { applyFaOpenedDocumentExtraClassesDraft } from 'app/src/stores/scripts/f
 import {
   applyFaOpenedDocumentIsDeadDraft,
   applyFaOpenedDocumentIsFinishedDraft,
-  applyFaOpenedDocumentIsMinorDraft
-} from 'app/src/scripts/openedDocuments/openedDocumentTabStatusFlagDraftWiring'
+  applyFaOpenedDocumentIsMinorDraft,
+  applyTemporaryOpenedDocumentParent,
+  buildTemporaryDocumentParentResolveDocumentIds,
+  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
+  createTemporaryOpenedDocumentTabCopySeed,
+  createTemporaryOpenedDocumentTabSeed,
+  duplicateOpenedDocumentTabs,
+  findOpenedDocumentTabIndexByDocumentId,
+  moveOpenedDocumentTabByOffset,
+  normalizeOpenedDocumentAppearanceColorFromDb,
+  normalizeOpenedDocumentExtraClassesFromDb,
+  normalizeOpenedDocumentParentIdFromDb,
+  normalizeOpenedDocumentTreeOrderNumberFromDb,
+  promoteTemporaryOpenedDocumentTabAfterCreate,
+  recomputeOpenedDocumentTabHasUnsavedChanges,
+  remapOpenedDocumentTabDocumentId,
+  reorderOpenedDocumentTabsByIndex,
+  resolveCopyOfDocumentDisplayName,
+  resolveOpenedDocumentAppearanceColorDraftForPersist,
+  resolveOpenedDocumentExtraClassesDraftForPersist,
+  resolveOpenedDocumentParentIdDraftForPersist,
+  resolveOpenedDocumentParentMoveAppendSortOrder,
+  resolveOpenedDocumentTabDocumentActionContext,
+  resolveOpenedDocumentTabIsTemporary,
+  resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
+  resolveOpenedDocumentTabsAfterForceClose,
+  resolveOpenedDocumentTreeOrderNumberDraftForPersist,
+  resolveTemporaryDocumentParentDocumentIdForSave,
+  resolveTemporaryOpenedDocumentDisplayNameForSave,
+  resolveTemporaryOpenedDocumentParentDocumentId
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 import {
   removeFaOpenedDocumentTabAtIndex,
   resolveFaOpenedDocumentOpenFromTree,
   resolveFaOpenedDocumentsActiveDocumentSyncTarget
 } from 'app/src/stores/scripts/faOpenedDocumentsTabSessionWiring'
 import { reconcileTemporaryOpenedDocumentTabFromSnapshot } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
-import {
-  duplicateOpenedDocumentTabs,
-  findOpenedDocumentTabIndexByDocumentId,
-  moveOpenedDocumentTabByOffset,
-  resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
-  resolveOpenedDocumentTabsAfterForceClose
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
-import { reorderOpenedDocumentTabsByIndex } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabReorder'
-import {
-  normalizeOpenedDocumentAppearanceColorFromDb,
-  normalizeOpenedDocumentParentIdFromDb,
-  recomputeOpenedDocumentTabHasUnsavedChanges,
-  resolveOpenedDocumentAppearanceColorDraftForPersist,
-  resolveOpenedDocumentParentIdDraftForPersist,
-  resolveOpenedDocumentParentMoveAppendSortOrder
-} from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
-import {
-  normalizeOpenedDocumentExtraClassesFromDb,
-  resolveOpenedDocumentExtraClassesDraftForPersist
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentExtraClasses'
-import {
-  normalizeOpenedDocumentTreeOrderNumberFromDb,
-  resolveOpenedDocumentTreeOrderNumberDraftForPersist
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTreeOrderNumber'
-import {
-  applyTemporaryOpenedDocumentParent,
-  promoteTemporaryOpenedDocumentTabAfterCreate,
-  remapOpenedDocumentTabDocumentId,
-  resolveOpenedDocumentTabIsTemporary,
-  resolveTemporaryOpenedDocumentDisplayNameForSave,
-  resolveTemporaryOpenedDocumentParentDocumentId
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
-import {
-  createTemporaryOpenedDocumentTabCopySeed,
-  createTemporaryOpenedDocumentTabSeed
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryTabSeed'
-import {
-  buildTemporaryDocumentParentResolveDocumentIds,
-  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
-  resolveTemporaryDocumentParentDocumentIdForSave
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryParentResolve'
-import { resolveOpenedDocumentTabDocumentActionContext } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDocumentActionContext'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeAddNewDocumentLabel'
 import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
-import { resolveCopyOfDocumentDisplayName } from 'app/src/scripts/openedDocuments/functions/resolveCopyOfDocumentDisplayName'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'

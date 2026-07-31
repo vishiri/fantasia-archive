@@ -1,6 +1,6 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { recomputeOpenedDocumentTabHasUnsavedChanges } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
+import { recomputeOpenedDocumentTabHasUnsavedChanges } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 export function applyFaOpenedDocumentExtraClassesDraft (
   tab: I_faOpenedDocumentTab,

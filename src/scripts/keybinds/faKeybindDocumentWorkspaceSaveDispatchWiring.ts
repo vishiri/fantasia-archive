@@ -4,7 +4,7 @@ import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { resolveFaAppRouterCurrentPath } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/functions/faDocumentWorkspacePageTransition'
-import { resolveCanSaveActiveDocumentViaKeybind } from 'app/src/scripts/openedDocuments/functions/openedDocumentWorkspaceKeybindGuards'
+import { resolveCanSaveActiveDocumentViaKeybind } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 import { resolveShowProjectAppControlBarSaveButtons } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarEditMode'
 
 export function tryResolveFaKeybindDocumentWorkspaceSaveActionDispatch (

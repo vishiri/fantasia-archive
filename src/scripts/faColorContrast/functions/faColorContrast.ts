@@ -1,5 +1,6 @@
 import type {
   I_faColorContrastRgb,
+  I_faColorGlyphCssCustomProperties,
   T_faDialogProjectSettingsWorldColorPaletteDuplicateIconColor
 } from 'app/types/I_faColorContrast'
 
@@ -79,4 +80,38 @@ export function resolveFaDuplicatePaletteIconQuasarColor (
     return 'black'
   }
   return 'negative'
+}
+
+/**
+ * Fantasy glyph highlight helpers. Inject cut + mild/default percents from types via manager.
+ */
+export function createFaColorGlyphCssCustomPropertiesApi (deps: {
+  darkRelativeLuminanceCut: number
+  highlightBaseDefault: string
+  highlightBaseMild: string
+}) {
+  const resolveFaColorGlyphHighlightBasePercent = (baseColor: string): string => {
+    const rgb = parseFaColorContrastHexToRgb(baseColor)
+    if (rgb === null) {
+      return deps.highlightBaseDefault
+    }
+    if (calculateFaColorContrastRelativeLuminance(rgb) < deps.darkRelativeLuminanceCut) {
+      return deps.highlightBaseMild
+    }
+    return deps.highlightBaseDefault
+  }
+
+  const buildFaColorGlyphCssCustomProperties = (baseColor: string): I_faColorGlyphCssCustomProperties => {
+    const glyphBase = baseColor
+    const highlightBase = resolveFaColorGlyphHighlightBasePercent(baseColor)
+    return {
+      '--fa-color-glyph-base': glyphBase,
+      '--fa-color-glyph-highlight-base': highlightBase
+    }
+  }
+
+  return {
+    buildFaColorGlyphCssCustomProperties,
+    resolveFaColorGlyphHighlightBasePercent
+  }
 }

@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { onUnmounted, reactive, ref, watch } from 'vue'
 
 import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faColorPickerInput'
-import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/functions/createFaColorPickerPopoverEmit'
+import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
 
 const pickerEmitDeps = {
   onUnmounted,

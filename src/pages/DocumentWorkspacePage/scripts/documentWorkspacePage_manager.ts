@@ -11,7 +11,7 @@ import {
   resolveOpenedDocumentDisplayNameFromTab,
   resolveOpenedDocumentTabIsInEditMode,
   resolveOpenedDocumentTabIsInPreviewMode
-} from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
+} from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 import { createUseDocumentWorkspacePage } from './createUseDocumentWorkspacePage'
 import { createDocumentWorkspacePageColorPickers } from './functions/createDocumentWorkspacePageColorPickers'

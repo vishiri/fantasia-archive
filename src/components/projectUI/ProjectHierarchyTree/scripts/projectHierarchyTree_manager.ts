@@ -22,6 +22,7 @@ export { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHi
 export { resolveProjectHierarchyTreeWorldDisplayColor } from '../functions/resolveProjectHierarchyTreeWorldDisplayColor'
 export { resolveProjectHierarchyTreeDocumentAppearanceChrome } from './projectHierarchyTreeDocumentAppearanceChromeWiring'
 export { resolveProjectHierarchyTreePlacementDisplayIcon }
+export { buildFaColorGlyphCssCustomProperties } from 'app/src/scripts/faColorContrast/faColorContrast_manager'
 
 export const useProjectHierarchyTree = createUseProjectHierarchyTree({
   S_FaActiveProject,
