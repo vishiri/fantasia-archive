@@ -75,7 +75,7 @@
           </q-item-section>
           <q-item-section avatar>
             <q-icon
-              class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon"
+              class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon fa-color-glyph"
               name="mdi-content-copy"
             />
           </q-item-section>
@@ -100,7 +100,7 @@
           </q-item-section>
           <q-item-section avatar>
             <q-icon
-              class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon"
+              class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon fa-color-glyph"
               name="mdi-delete"
             />
           </q-item-section>
@@ -219,4 +219,4 @@ function onDeleteColor (): void {
 
 <style lang="scss" src="./styles/DialogProjectSettings.worldColorPalette.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.worldColorPaletteContextMenu.unscoped.scss"></style>
-<style lang="scss" src="./styles/dialogProjectSettingsWorldColorPaletteSwatch.scss"></style>
+<style lang="scss" src="./styles/DialogProjectSettings.worldColorPaletteSwatch.unscoped.scss"></style>

@@ -40,10 +40,12 @@
             class="projectAppControlBarTabs__tab"
             :class="{
               'projectAppControlBarTabs__tab--customAppearance':
-                resolveDocumentTabAppearanceChrome(tab) !== undefined,
+                resolveProjectAppControlBarTabHasUserCustomTextColor(tab),
               'projectAppControlBarTabs__tab--customDocumentBackground':
                 resolveDocumentTabAppearanceChrome(tab)?.backgroundColor !== undefined,
               'projectAppControlBarTabs__tab--dead': tab.isDeadDraft === true,
+              'projectAppControlBarTabs__tab--statusMuted':
+                resolveProjectAppControlBarTabShowsStatusMuted(tab),
               'projectAppControlBarTabs__tab--withUnsavedAlert': tab.hasUnsavedChanges,
               'projectAppControlBarTabs__tab--withWorldIndicator':
                 showWorldTabIndicators && resolveTabWorldIndicatorColor(tab) !== null
@@ -141,6 +143,8 @@ import {
   hideNativeSortableDragGhost,
   onProjectAppControlBarTabsWheel,
   projectAppControlBarTabsSortableDragOptions,
+  resolveProjectAppControlBarTabHasUserCustomTextColor,
+  resolveProjectAppControlBarTabShowsStatusMuted,
   startProjectAppControlBarTabsDragEdgeScroll,
   stopProjectAppControlBarTabsDragEdgeScroll,
   useProjectAppControlBarOpenedTabsSortable,

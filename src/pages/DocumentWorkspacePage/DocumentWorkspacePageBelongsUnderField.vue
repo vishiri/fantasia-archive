@@ -23,7 +23,7 @@
         name="mdi-arrow-right-bold"
         size="17px"
         color="amber-14"
-        class="documentWorkspacePageBelongsUnderField__oneWayIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
+        class="documentWorkspacePageBelongsUnderField__oneWayIcon documentWorkspacePage__fieldTitleIcon documentWorkspacePage__fieldHelpIcon fa-color-glyph q-ml-md"
         data-test-locator="documentWorkspacePage-belongsUnderOneWayIcon"
         :data-test-tooltip-text="oneWayRelationshipTooltip"
       >

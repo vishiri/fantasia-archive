@@ -1,6 +1,14 @@
+@use 'sass:color';
+@use '../../app.palette.scss' as *;
+
 /* QUASAR COMPONENT - Q-FIELD
  * Flat theme keeps Quasar underline/outline chrome; thinner than Quasar's 2px default.
  * Fantasy replaces these with micro-corner hairlines ($faMicroCornerField-*).
  */
 $qField-activeUnderline-height: 1.5px;
+/* Flat focus underline / outlined ring (Quasar .q-field__control color → currentColor). */
+$qField-flat-control-color: fa-v('primary-bright', $primary-bright);
+/* Solid stand-in for dark-field marginal tint (white@70% over dark) for glyph bases. */
+$qField-marginalIcon-color: color.mix($white, $dark, 70%);
 $qField-outlined-focusBorderWidth: 1.5px;
+$qField-warningIcon-color: fa-v('warning', $warning);

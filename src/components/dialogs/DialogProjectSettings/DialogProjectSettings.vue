@@ -91,7 +91,7 @@
           name="mdi-alert-circle"
           color="negative"
           size="20px"
-          class="dialogProjectSettings__saveErrorIcon"
+          class="dialogProjectSettings__saveErrorIcon fa-color-glyph"
           data-test-locator="dialogProjectSettings-saveErrorsIcon"
           :data-test-tooltip-text="saveValidationErrorsTooltip.flatText"
         >

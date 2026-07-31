@@ -168,8 +168,10 @@
 }
 
 .projectHierarchyTree__openIcon {
+  --fa-color-glyph-base: #{$projectHierarchyTree-openIcon-color};
+
   box-sizing: content-box;
-  color: $projectHierarchyTree-openIcon-color;
+  color: var(--fa-color-glyph-base);
   font-size: $projectHierarchyTree-openIcon-boxSize;
   height: $projectHierarchyTree-openIcon-boxSize;
   padding: $projectHierarchyTree-openIcon-padding;
@@ -177,6 +179,11 @@
   transform: rotate($projectHierarchyTree-openIcon-rotateClosed);
   transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
   width: $projectHierarchyTree-openIcon-boxSize;
+}
+
+body.fa-appTheme--fantasy .projectHierarchyTree__openIcon {
+  --fa-color-glyph-highlight-base: #{$projectHierarchyTree-openIcon-glyphHighlightBase-fantasy};
+  --fa-color-glyph-shade-base: #{$projectHierarchyTree-openIcon-glyphShadeBase-fantasy};
 }
 
 .projectHierarchyTree__nodeRow--world,

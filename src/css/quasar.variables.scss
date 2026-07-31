@@ -50,7 +50,10 @@
 @forward '../components/elements/FaColorPickerInput/styles/variables';
 @forward '../components/elements/FaCornerContentDot/styles/variables';
 @forward '../components/elements/FaHelpTooltipIcon/styles/variables';
+@forward '../components/elements/FaLabeledBooleanToggle/styles/variables';
 @forward '../components/elements/FaIconPickerInput/styles/variables';
+@forward '../components/elements/FaLocaleTranslationsInput/styles/variables';
+@forward '../components/elements/FaVerticalDraggableTabList/styles/variables';
 @forward '../components/elements/SocialContactSingleButton/styles/variables';
 @forward '../components/floatingWindows/WindowAppStyling/styles/variables';
 @forward '../components/foundation/FoundationColorPalette/styles/variables';
@@ -67,3 +70,4 @@
 @forward '../components/projectUI/ProjectHierarchyTreeSearch/styles/variables';
 @forward '../components/projectUI/ProjectOverview/styles/variables';
 @forward '../pages/SplashPage/styles/variables';
+@forward '../pages/DocumentWorkspacePage/styles/variables';

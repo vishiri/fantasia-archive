@@ -20,7 +20,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectAppControlBarTabContextMenu__icon"
+        class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
         name="mdi-content-copy"
       />
     </q-item-section>
@@ -47,7 +47,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectAppControlBarTabContextMenu__icon"
+        class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
         name="mdi-file-tree"
       />
     </q-item-section>

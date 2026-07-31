@@ -1,3 +1,5 @@
+@use './variables' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 
 .faIconPickerInput__pickerMenu.q-menu {
@@ -48,6 +50,9 @@
   .q-icon {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
+    --fa-color-glyph-base: #{$faIconPickerInput-menuIcon-color};
+
+    color: var(--fa-color-glyph-base);
     flex: 0 0 auto;
     font-size: $faQIconDisplay-iconFontSize;
     height: $faQIconDisplay-iconFontSize;
@@ -62,8 +67,15 @@
   background-color: transparent;
 
   .q-icon {
-    color: $faIconPickerInput-selected-iconColor;
+    --fa-color-glyph-base: #{$faIconPickerInput-selected-iconColor};
+
+    color: var(--fa-color-glyph-base);
   }
+}
+
+/* QBtn icon prop cannot take fa-color-glyph class; shade via mixin under fantasy. */
+body.fa-appTheme--fantasy .faIconPickerInput__iconCell.q-btn .q-icon {
+  @include colorGlyph.fa-color-glyph-shading;
 }
 
 .faIconPickerInput__statusMessage {

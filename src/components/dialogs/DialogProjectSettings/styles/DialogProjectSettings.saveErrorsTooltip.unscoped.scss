@@ -1,3 +1,11 @@
+@use './variables' as *;
+
+.dialogProjectSettings__saveErrorIcon {
+  --fa-color-glyph-base: #{$dialogProjectSettings-saveErrorIcon-color};
+
+  color: var(--fa-color-glyph-base);
+}
+
 .dialogProjectSettings__saveErrorTooltip.q-tooltip {
   max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
   text-align: left;

@@ -57,13 +57,8 @@ $splashControls-resumeMenu-rim-before-backgroundImage:
     color-mix(in srgb, fa-v('primary', $primary) 1.5%, transparent) 7.5%,
     transparent 10%
   );
-$splashControls-resumeMenu-rim-borderColor: color-mix(
-  in srgb,
-  fa-v('primary', $primary) 55%,
-  transparent
-);
 $splashControls-resumeMenu-rim-boxShadow:
-  0 0 0 1px $splashControls-resumeMenu-rim-borderColor,
+  0 0 0 1px color-mix(in srgb, fa-v('primary', $primary) 55%, transparent),
   #{$qCard-boxShadow};
 $splashControls-resumeMenu-separator-backgroundColor: fa-v('primary-bright', $primary-bright);
 $splashControls-resumeMenu-separatorAlt-backgroundColor: fa-v('text-menu-separator', $text-menu-separator);

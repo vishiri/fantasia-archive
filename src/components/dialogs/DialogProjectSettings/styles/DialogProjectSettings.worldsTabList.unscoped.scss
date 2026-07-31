@@ -1,53 +1,20 @@
 @use './variables' as *;
 @use '../../../../css/globals/faColorBead.mixin.scss' as colorBead;
 
+/* Dialog Project Settings overrides for FaVerticalDraggableTabList hosts. */
 .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList,
 .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
-  align-self: stretch;
-  flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
   /* Gutter + negative margin so right-edge core line can sit on the painted separator.
    * Y-scroll alone would force X clip and leave the highlight beside the border. */
   margin-right: -$dialogProjectSettings-worldsTabList-edgeGlowGutter;
-  max-height: 100%;
-  max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
-  min-height: 0;
-  min-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
-  overflow: hidden;
-  width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
 
   .faVerticalDraggableTabs__scroll {
-    box-sizing: border-box;
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden auto;
     padding-right: $dialogProjectSettings-worldsTabList-edgeGlowGutter;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .faVerticalDraggableTabs__divider,
-  .faVerticalDraggableTabs__addButtonRow,
-  .faVerticalDraggableTabs__filterRow {
-    flex: 0 0 auto;
   }
 
   .faVerticalDraggableTabs__filterRow {
-    box-sizing: border-box;
-    display: flex;
     padding-left: $dialogProjectSettings-verticalTabListFilterRow-paddingLeft;
     padding-right: $dialogProjectSettings-verticalTabListFilterRow-paddingRight;
-    width: 100%;
-  }
-
-  .dialogProjectSettingsWorldsTabList__filterEmpty,
-  .dialogProjectSettingsDocumentTemplatesTabList__filterEmpty {
-    padding:
-      $dialogProjectSettings-worldTemplateLayout-availableListEmpty-paddingBlock
-      $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
-    text-align: center;
   }
 }
 

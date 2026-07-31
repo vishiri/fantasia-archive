@@ -34,7 +34,10 @@
           class="projectAppControlBarTabContextMenu__item projectAppControlBarTabContextMenu__item--browseTab non-selectable"
           :class="{
             'projectAppControlBarTabContextMenu__item--browseTabActive': browseTab.documentId === activeDocumentTabName,
-            'projectAppControlBarTabContextMenu__item--browseTabCustomAppearance': resolveDocumentTabAppearanceChrome(browseTab) !== undefined,
+            'projectAppControlBarTabContextMenu__item--browseTabCustomAppearance':
+              resolveProjectAppControlBarTabHasUserCustomTextColor(browseTab),
+            'projectAppControlBarTabContextMenu__item--browseTabStatusMuted':
+              resolveProjectAppControlBarTabShowsStatusMuted(browseTab),
             'projectAppControlBarTabContextMenu__item--browseTabWithUnsavedAlert': browseTab.hasUnsavedChanges
           }"
           data-test-locator="projectAppControlBar-tabContextMenu-browseTab"
@@ -53,7 +56,7 @@
           />
           <q-item-section avatar>
             <q-icon
-              class="projectAppControlBarTabContextMenu__browseTabIcon"
+              class="projectAppControlBarTabContextMenu__browseTabIcon fa-color-glyph"
               :name="resolveDocumentTabDisplayIcon(browseTab)"
             />
           </q-item-section>
@@ -64,7 +67,7 @@
           </q-item-section>
           <q-icon
             v-if="browseTab.hasUnsavedChanges"
-            class="projectAppControlBarTabContextMenu__browseTabUnsavedIcon"
+            class="projectAppControlBarTabContextMenu__browseTabUnsavedIcon fa-color-glyph"
             name="mdi-feather"
           />
         </q-item>
@@ -82,6 +85,11 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import { contextMenuShouldShowSeparatorAltBeforeIndex } from 'app/src/components/globals/AppControlMenus/scripts/functions/contextMenuShouldShowSeparatorAltBeforeItem'
 
 import ProjectAppControlBarTabWorldIndicator from './ProjectAppControlBarTabWorldIndicator.vue'
+
+import {
+  resolveProjectAppControlBarTabHasUserCustomTextColor,
+  resolveProjectAppControlBarTabShowsStatusMuted
+} from './scripts/projectAppControlBar_manager'
 
 defineOptions({
   name: 'ProjectAppControlBarTabContextMenuBrowseSubmenu'

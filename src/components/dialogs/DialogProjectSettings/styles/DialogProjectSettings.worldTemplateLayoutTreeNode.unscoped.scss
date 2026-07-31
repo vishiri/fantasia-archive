@@ -1,4 +1,5 @@
 @use './variables' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode {
   box-sizing: border-box;
@@ -14,9 +15,14 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode--group {
-  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+    --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-groupIcon-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
   .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
-    color: fa-v('primary-bright', $primary-bright);
+    color: $dialogProjectSettings-worldTemplateLayout-treeNode-groupIcon-color;
   }
 }
 
@@ -47,10 +53,22 @@
 
   .dialogProjectSettingsWorldTemplateLayoutTreeNode__edit {
     font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-edit-fontSize !important;
+
+    .q-icon {
+      --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-editIcon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
   }
 
   .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
     font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-fontSize !important;
+
+    .q-icon {
+      --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-removeIcon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
   }
 }
 
@@ -60,6 +78,9 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarningHost {
+  --fa-color-glyph-base: #{$dialogProjectSettings-missingTranslationsWarning-icon-color};
+
+  color: var(--fa-color-glyph-base);
   flex: 0 0 auto;
   margin-right: $dialogProjectSettings-worldTemplateLayout-treeNode-missingTranslationsWarning-marginRight;
   pointer-events: auto;
@@ -121,7 +142,12 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
-  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon--nickname,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon--nickname {
+    --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-nicknameLabel-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
   .dialogProjectSettingsWorldTemplateLayoutTreeNode__label--nickname {
     color: $dialogProjectSettings-worldTemplateLayout-treeNode-nicknameLabel-color;
   }
@@ -134,4 +160,12 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__removeDisabledTooltip.q-tooltip {
   max-width: $dialogProjectSettings-worldTemplateLayout-treeNode-removeDisabledTooltip-maxWidth;
+}
+
+/* QBtn icon prop cannot take fa-color-glyph class; shade via mixin under fantasy. */
+body.fa-appTheme--fantasy {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__edit .q-icon,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove .q-icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
 }

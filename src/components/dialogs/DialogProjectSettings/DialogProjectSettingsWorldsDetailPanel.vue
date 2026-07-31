@@ -18,7 +18,7 @@
           dense
           :error="props.nameHasError"
           :error-message="props.nameHasError ? $t('dialogs.projectSettings.fields.worldName.errorRequired') : undefined"
-          :hide-bottom-space="!props.nameHasError"
+          :hide-bottom-space="true"
           :max-length="FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATION_MAX_LENGTH"
           test-locator="dialogProjectSettings-worlds-nameInput"
           @update:model-value="(value) => emitDisplayNameTranslations(value as I_faProjectWorldDisplayNameTranslations)"
@@ -195,12 +195,20 @@ function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutD
 <style lang="scss" src="./styles/DialogProjectSettings.panelTitle.unscoped.scss"></style>
 
 <style lang="scss" scoped>
+.dialogProjectSettings__worldsDetail {
+  /* World settings fields never reserve Quasar bottom message padding. */
+  :deep(.q-field--with-bottom) {
+    padding-bottom: 0;
+  }
+}
+
 .dialogProjectSettingsWorldsDetail__fieldsRow {
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
   gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
+  margin-bottom: $dialogProjectSettings-worldsDetailFieldsRow-marginBottom;
 }
 
 .dialogProjectSettingsWorldsDetail__nameField {
@@ -214,6 +222,7 @@ function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutD
 
 .dialogProjectSettingsWorldsDetail__deleteCol {
   flex: 0 0 auto;
+  margin-top: $dialogProjectSettings-worldsDetail-deleteCol-marginTop;
 }
 
 .dialogProjectSettingsWorldsDetail__paletteSection {

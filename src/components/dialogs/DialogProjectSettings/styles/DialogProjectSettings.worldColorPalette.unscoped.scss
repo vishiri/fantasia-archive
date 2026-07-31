@@ -1,3 +1,5 @@
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+
 .dialogProjectSettingsWorldColorPaletteSwatch + .dialogProjectSettingsWorldColorPaletteSwatch {
   margin-left: calc(-1 * $dialogProjectSettings-worldColorPalette-swatch-borderWidth);
 }
@@ -19,6 +21,17 @@
 
 .dialogProjectSettingsWorldColorPaletteSwatch__picker.q-color-picker {
   background-color: $dialogProjectSettings-worldColorPalette-picker-backgroundColor;
+}
+
+/* Palette "+" add: Quasar icon prop → .q-icon; pin base + fantasy glyph shade. */
+.dialogProjectSettingsWorldColorPalette__addButton .q-icon {
+  --fa-color-glyph-base: #{$dialogProjectSettings-worldColorPalette-addButton-icon-color};
+
+  color: var(--fa-color-glyph-base);
+}
+
+body.fa-appTheme--fantasy .dialogProjectSettingsWorldColorPalette__addButton .q-icon {
+  @include colorGlyph.fa-color-glyph-shading;
 }
 
 .dialogProjectSettingsWorldColorPalette__sortableFallback {

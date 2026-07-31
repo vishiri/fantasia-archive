@@ -8,7 +8,7 @@
   >
     <div
       v-if="isMenuPanelPresentation && props.error && props.errorMessage !== undefined && props.errorMessage.length > 0"
-      class="faLocaleTranslationsInput__menuPanelError text-negative text-caption q-mb-sm"
+      class="faLocaleTranslationsInput__menuPanelError fa-text-danger-emphasis text-caption q-mb-sm"
       :data-test-locator="`${props.testLocator}-menuPanelError`"
     >
       {{ props.errorMessage }}

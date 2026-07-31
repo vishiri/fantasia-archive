@@ -1,3 +1,5 @@
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+
 /* Teleported q-menu; stack above modal QDialog chrome. */
 
 .faColorPickerInput__picker.q-color-picker {
@@ -6,4 +8,15 @@
 
 .faColorPickerInput__pickerMenu.q-menu {
   z-index: $faColorPickerInput-colorPickerMenu-zIndex !important;
+}
+
+/* Palette "+" append: Quasar icon prop → .q-icon; pin base + fantasy glyph shade. */
+.faColorPickerInput__appendButton .q-icon {
+  --fa-color-glyph-base: #{$faColorPickerInput-appendButton-icon-color};
+
+  color: var(--fa-color-glyph-base);
+}
+
+body.fa-appTheme--fantasy .faColorPickerInput__appendButton .q-icon {
+  @include colorGlyph.fa-color-glyph-shading;
 }

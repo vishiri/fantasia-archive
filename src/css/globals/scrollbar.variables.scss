@@ -4,11 +4,9 @@
 /* Variables for 'scrollbar.scss'. Re-exported from 'quasar.variables.scss' barrel. */
 
 /* GLOBALS - SCROLLBAR — keep color.adjust steps in sync with fa-theme.scss :root */
-$globals-scrollbar-fantasy-size: 5px;
-$globals-scrollbar-fantasy-thumb-borderRadius: 999px;
 $globals-scrollbar-height: 5px;
-$globals-scrollbar-thumb-borderRadius: 5px;
-$globals-scrollbar-thumbBackground: fa-v('scrollbar-thumb', color.adjust($dark, $lightness: 40%));
-$globals-scrollbar-thumbHoverBackground: fa-v('scrollbar-thumb-hover', color.adjust($dark, $lightness: 60%));
-$globals-scrollbar-trackBackground: fa-v('scrollbar-track', $dark);
+$globals-scrollbar-thumb-borderRadius: 999px;
+$globals-scrollbar-thumbBackground: fa-v('scrollbar-thumb', color.adjust($dark, $lightness: 28%));
+$globals-scrollbar-thumbHoverBackground: fa-v('scrollbar-thumb-hover', color.adjust($dark, $lightness: 48%));
+$globals-scrollbar-trackBackground: fa-v('scrollbar-track', transparent);
 $globals-scrollbar-width: 5px;

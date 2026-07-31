@@ -51,7 +51,7 @@
       </VueDraggable>
       <div
         v-if="showFilterEmpty"
-        class="faVerticalDraggableTabList__filterEmpty fa-text-muted"
+        class="faVerticalDraggableTabs__filterEmpty fa-text-muted"
         :class="`${props.blockClassSuffix}__filterEmpty`"
         :data-test-locator="props.testLocatorFilterEmpty"
       >
@@ -253,4 +253,4 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style lang="scss" src="app/src/components/dialogs/DialogProjectSettings/styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>
+<style lang="scss" src="./styles/FaVerticalDraggableTabList.unscoped.scss"></style>

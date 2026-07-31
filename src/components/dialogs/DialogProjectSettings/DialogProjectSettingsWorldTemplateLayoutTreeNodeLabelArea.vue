@@ -4,7 +4,7 @@
     :data-test-locator="`${props.nodeTestLocator}-labelArea`"
   >
     <q-icon
-      class="dialogProjectSettingsWorldTemplateLayoutTreeNode__icon"
+      class="dialogProjectSettingsWorldTemplateLayoutTreeNode__icon fa-color-glyph"
       :class="{ 'dialogProjectSettingsWorldTemplateLayoutTreeNode__icon--nickname': props.node.usesNickname }"
       :name="props.displayIconName"
     />

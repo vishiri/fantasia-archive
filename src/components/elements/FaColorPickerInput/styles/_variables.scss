@@ -1,6 +1,7 @@
 @use '../../../../css/app.palette.scss' as *;
 
 /* COMPONENT - FA COLOR PICKER INPUT */
+$faColorPickerInput-appendButton-icon-color: fa-v('primary-bright', $primary-bright);
 $faColorPickerInput-appendButton-size: 32px;
 $faColorPickerInput-colorPicker-backgroundColor: fa-v('dark-lighter', $dark-lighter);
 $faColorPickerInput-row-gap: 8px;

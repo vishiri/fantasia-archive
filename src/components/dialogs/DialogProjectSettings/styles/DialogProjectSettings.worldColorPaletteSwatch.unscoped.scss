@@ -8,7 +8,7 @@
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch--beingDragged {
-  opacity: 0.45;
+  opacity: $dialogProjectSettings-worldColorPalette-swatch-beingDragged-opacity;
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__color {

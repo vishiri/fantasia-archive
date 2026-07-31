@@ -20,7 +20,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectAppControlBarTabContextMenu__icon"
+        class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
         name="mdi-close"
       />
     </q-item-section>
@@ -47,7 +47,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectAppControlBarTabContextMenu__icon"
+        class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
         name="mdi-close-box-outline"
       />
     </q-item-section>
@@ -74,7 +74,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectAppControlBarTabContextMenu__icon"
+        class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
         name="mdi-close-box-multiple-outline"
       />
     </q-item-section>

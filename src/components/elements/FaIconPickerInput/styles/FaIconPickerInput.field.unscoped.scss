@@ -1,3 +1,5 @@
+@use './variables' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 
 .faIconPickerInput__field {
@@ -6,16 +8,23 @@
   width: $faIconPickerInput-field-width;
 }
 
+/* Trigger: Quasar icon prop → .q-icon; pin base + fantasy glyph shade. */
 .faIconPickerInput__trigger.q-btn .q-icon {
   @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
+  --fa-color-glyph-base: #{$faIconPickerInput-triggerIcon-color};
   --fa-q-icon-display-glyph-font-size: #{$faIconPickerInput-triggerIcon-glyphFontSize};
   --fa-q-icon-display-mdi-font-size: #{$faIconPickerInput-triggerIcon-glyphFontSize};
 
+  color: var(--fa-color-glyph-base);
   flex: 0 0 auto;
   font-size: $faIconPickerInput-triggerIcon-boxSize;
   height: $faIconPickerInput-triggerIcon-boxSize;
   max-height: $faIconPickerInput-triggerIcon-boxSize;
   max-width: $faIconPickerInput-triggerIcon-boxSize;
   width: $faIconPickerInput-triggerIcon-boxSize;
+}
+
+body.fa-appTheme--fantasy .faIconPickerInput__trigger.q-btn .q-icon {
+  @include colorGlyph.fa-color-glyph-shading;
 }

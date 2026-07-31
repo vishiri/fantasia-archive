@@ -20,7 +20,7 @@
           <div class="dialogProjectSettingsWorldAvailableTemplatesList__itemBody column">
             <div class="dialogProjectSettingsWorldAvailableTemplatesList__titleRow row items-center no-wrap">
               <q-icon
-                class="dialogProjectSettingsWorldAvailableTemplatesList__icon"
+                class="dialogProjectSettingsWorldAvailableTemplatesList__icon fa-color-glyph"
                 :name="resolveDialogProjectSettingsDocumentTemplateDisplayIcon(
                   template.icon,
                   FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON
@@ -31,7 +31,7 @@
               </q-item-label>
               <q-icon
                 v-if="isTemplateMissingCurrentLanguageTranslations(template)"
-                class="dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning"
+                class="dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning fa-color-glyph"
                 color="warning"
                 data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"
                 :data-test-tooltip-text="resolveTemplateMissingTranslationsTooltip(template)"
@@ -215,10 +215,5 @@ function onItemContextMenu (event: MouseEvent): void {
   gap: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-gap;
   min-width: 0;
   width: 100%;
-}
-
-.dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning {
-  flex: 0 0 auto;
-  margin-left: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-marginLeft;
 }
 </style>

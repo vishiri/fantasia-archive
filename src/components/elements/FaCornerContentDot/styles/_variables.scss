@@ -2,7 +2,10 @@
 
 /* COMPONENT - FA CORNER CONTENT DOT */
 $faCornerContentDot-color: fa-v('primary', $primary);
+/* Fantasy glyph CSS-var fallback — palette OK on RHS of semantic token. */
+$faCornerContentDot-fantasy-glyphBaseFallback: $primary;
 /* Default inset (control-bar noteboard buttons). Menus override in AppControlSingleMenu. */
 $faCornerContentDot-offsetRight: 4px;
 $faCornerContentDot-offsetTop: 4px;
 $faCornerContentDot-size: 7px;
+$faCornerContentDot-zIndex: 2;

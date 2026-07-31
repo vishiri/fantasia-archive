@@ -1,6 +1,32 @@
+@use '../app.palette.scss' as *;
 @use 'faColorGlyph.mixin.scss' as colorGlyph;
 
-/* Fantasy theme: opt-in utility — prefer @include colorGlyph.fa-color-glyph-shading in feature SCSS. */
+/* Registered so transition can interpolate base color (QCheckbox ring hover, etc.). */
+@property --fa-color-glyph-base {
+  inherits: true;
+  initial-value: #{$white};
+  syntax: '<color>';
+}
+
+/*
+ * Fantasy icon glyph shading (CSS recipe):
+ * 1. Set --fa-color-glyph-base to the solid base color (token or resolved).
+ * 2. Optional: set --fa-color-glyph-highlight-base / --fa-color-glyph-shade-base
+ *    (e.g. via buildFaColorGlyphCssCustomProperties for highlight, or feature SCSS)
+ *    so dark hex bases use a milder white mix / caret uses stronger stops; defaults 58% / 62%.
+ * 3. Flat: color: var(--fa-color-glyph-base) (or equivalent solid color).
+ * 4. Fantasy: add class fa-color-glyph — utility below applies fa-color-glyph-shading
+ *    (host text for Material Icons; ::before for MDI / FA).
+ * Destructive menu rows (q-item.text-secondary): keep --fa-color-glyph-base on secondary
+ * through hover — do not switch to menu gold (see quasarComponentsAdjustments .q-menu).
+ * Disabled fantasy menu rows (q-item.disabled): pin --fa-color-glyph-base to
+ * $qMenu-item-disabled-color-fantasy so icons match muted labels (opacity is forced to 1).
+ * Solid fills (circles, badges, thumbs): @include fa-color-fill-shading instead.
+ * Outline borders (QCheckbox): @include fa-color-border-shading (mask ring on ::after;
+ * transparent interior — do not fill the box). SVG stroke/fill use paint servers
+ * #fa-color-glyph-grad-primary-bright / #fa-color-glyph-grad-checkbox-disabled
+ * (index.html + Storybook preview-body; stop mixes mirror variables above).
+ */
 body.fa-appTheme--fantasy .fa-color-glyph {
   @include colorGlyph.fa-color-glyph-shading;
 }

@@ -19,7 +19,7 @@
     />
     <q-icon
       v-if="displayIcon !== ''"
-      class="projectHierarchyTreeNode__icon"
+      class="projectHierarchyTreeNode__icon fa-color-glyph"
       :class="{
         'projectHierarchyTreeNode__icon--layoutKind': props.node.nodeKind !== 'world',
         'projectHierarchyTreeNode__icon--worldGlyph': props.node.nodeKind === 'world'
@@ -67,6 +67,7 @@ import ProjectHierarchyTreePlacementCount from './ProjectHierarchyTreePlacementC
 import ProjectHierarchyTreeOrderNumberBadge from './ProjectHierarchyTreeOrderNumberBadge.vue'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
+  buildFaColorGlyphCssCustomProperties,
   clearProjectHierarchyTreeTreeNodeKindClass,
   resolveProjectHierarchyTreeDocumentAppearanceChrome,
   resolveProjectHierarchyTreePlacementDisplayIcon,
@@ -207,11 +208,17 @@ const nodeLabelTextStyle = computed(() => {
 
 const nodeIconStyle = computed(() => {
   if (props.node.nodeKind === 'world') {
-    return {
-      '--fa-color-glyph-base': resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
-    }
+    return buildFaColorGlyphCssCustomProperties(
+      resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
+    )
   }
-  return nodeLabelTextStyle.value
+
+  const textColor = documentAppearanceChrome.value?.color
+  if (textColor === undefined) {
+    return undefined
+  }
+
+  return buildFaColorGlyphCssCustomProperties(textColor)
 })
 </script>
 

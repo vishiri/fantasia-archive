@@ -94,6 +94,18 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
       filter: '.projectAppControlBarTabs__tabClose',
       preventOnFilter: true
     },
+    resolveProjectAppControlBarTabHasUserCustomTextColor: (
+      tab: Pick<I_faOpenedDocumentTab, 'documentTextColorDraft'>
+    ) => {
+      return tab.documentTextColorDraft.trim().length > 0
+    },
+    resolveProjectAppControlBarTabShowsStatusMuted: (
+      tab: Pick<I_faOpenedDocumentTab, 'documentTextColorDraft'> & {
+        isMinorDraft?: boolean | undefined
+      }
+    ) => {
+      return tab.isMinorDraft === true && tab.documentTextColorDraft.trim().length === 0
+    },
     startProjectAppControlBarTabsDragEdgeScroll,
     stopProjectAppControlBarTabsDragEdgeScroll,
     useProjectAppControlBarTabsInlineEndBlend: (input: {
@@ -444,6 +456,23 @@ test('Test that ProjectAppControlBarOpenedTabs applies appearance and world-indi
   expect(tab?.className).toContain('projectAppControlBarTabs__tab--customDocumentBackground')
   expect(tab?.className).toContain('projectAppControlBarTabs__tab--withUnsavedAlert')
   expect(tab?.className).toContain('projectAppControlBarTabs__tab--withWorldIndicator')
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectAppControlBarOpenedTabs marks minor-only tabs as statusMuted without customAppearance', async () => {
+  const minorTab: I_faOpenedDocumentTab = {
+    ...sampleTab,
+    isMinorDraft: true
+  }
+  const wrapper = await mountOpenedTabs({
+    tabs: [minorTab]
+  })
+  await flushPromises()
+
+  const tab = document.querySelector('[data-test-locator="projectAppControlBar-tab-doc-1"]')
+  expect(tab?.className).toContain('projectAppControlBarTabs__tab--statusMuted')
+  expect(tab?.className).not.toContain('projectAppControlBarTabs__tab--customAppearance')
 
   wrapper.unmount()
 })

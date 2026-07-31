@@ -1,0 +1,14 @@
+@use './variables' as *;
+
+/* Field title / relationship glyphs (fa-color-glyph shades under fantasy). */
+.documentWorkspacePage__fieldTitleIcon {
+  --fa-color-glyph-base: #{$documentWorkspacePage-fieldTitleIcon-color};
+
+  color: var(--fa-color-glyph-base);
+}
+
+.documentWorkspacePageBelongsUnderField__oneWayIcon {
+  --fa-color-glyph-base: #{$documentWorkspacePage-oneWayRelationshipIcon-color};
+
+  color: var(--fa-color-glyph-base);
+}

@@ -117,6 +117,18 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
       filter: '.projectAppControlBarTabs__tabClose',
       preventOnFilter: true
     },
+    resolveProjectAppControlBarTabHasUserCustomTextColor: (
+      tab: Pick<I_faOpenedDocumentTab, 'documentTextColorDraft'>
+    ) => {
+      return tab.documentTextColorDraft.trim().length > 0
+    },
+    resolveProjectAppControlBarTabShowsStatusMuted: (
+      tab: Pick<I_faOpenedDocumentTab, 'documentTextColorDraft'> & {
+        isMinorDraft?: boolean | undefined
+      }
+    ) => {
+      return tab.isMinorDraft === true && tab.documentTextColorDraft.trim().length === 0
+    },
     useProjectAppControlBarOpenedTabsSortable: (input: {
       getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
       onTabReorder: (fromIndex: number, toIndex: number) => void

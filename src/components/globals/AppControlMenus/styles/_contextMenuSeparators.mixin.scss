@@ -9,5 +9,5 @@
 @mixin fa-context-menu-separator-alt {
   background-color: appControlMenus.$appControlMenus-separatorAltColor;
   height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
-  opacity: 0.2;
+  opacity: appControlSingleMenu.$appControlSingleMenu-separatorAlt-opacity;
 }

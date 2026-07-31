@@ -13,6 +13,11 @@ $dark-middle: #183e4d; /* Between $dark and $dark-lighter; app header + window c
 $dark-page: #303742;
 /* Fantasy dialog card shells (darker than $dark). */
 $fantasy-dark: #152229;
+/* $fantasy-dark +10% lightness, then −25% — fantasy submenu panels. */
+$fantasy-dark-light: color.scale(
+  color.scale($fantasy-dark, $lightness: 10%),
+  $lightness: -25%
+);
 /* $dark-lighter darkened by same HSL lightness drop as $dark → $fantasy-dark (≈ -5.294%). */
 $fantasy-medium: #133341;
 

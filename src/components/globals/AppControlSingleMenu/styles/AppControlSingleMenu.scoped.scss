@@ -27,8 +27,8 @@
       color: $appControlSingleMenu-item-muted-color;
     }
 
-    &:hover:not([aria-disabled="true"]),
-    &:focus:not([aria-disabled="true"]) {
+    &:hover:not([aria-disabled='true'], .text-secondary),
+    &:focus:not([aria-disabled='true'], .text-secondary) {
       color: $appControlMenus-singleHover;
     }
   }
@@ -41,12 +41,12 @@
   &__separatorAlt {
     background-color: $appControlMenus-separatorAltColor;
     height: $appControlSingleMenu-separator-height !important;
-    opacity: 0.2;
+    opacity: $appControlSingleMenu-separatorAlt-opacity;
   }
 
   &__keybindText {
     font-size: $appControlSingleMenu-keybindText-fontSize;
-    font-weight: 600;
+    font-weight: $appControlSingleMenu-keybindText-fontWeight;
     text-shadow: none;
   }
 

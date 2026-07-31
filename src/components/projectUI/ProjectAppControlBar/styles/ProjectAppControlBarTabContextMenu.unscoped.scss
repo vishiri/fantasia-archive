@@ -1,5 +1,4 @@
 @use './variables' as *;
-@use '../../../../css/app.palette.scss' as *;
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
 @use '../../../globals/AppControlMenus/styles/contextMenuSeparators.mixin' as contextMenuSeparators;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
@@ -39,25 +38,42 @@
     transition: $qMenu-item-hover-colorTransition;
 
     &.projectAppControlBarTabContextMenu__item--browseActivator {
-      .projectAppControlBarTabContextMenu__primaryLabel,
-      .projectAppControlBarTabContextMenu__icon {
+      .projectAppControlBarTabContextMenu__primaryLabel {
         color: $projectAppControlBar-tabContextMenu-browseActivator-color;
+        transition: $qMenu-item-hover-colorTransition;
+      }
+
+      .projectAppControlBarTabContextMenu__icon {
+        --fa-color-glyph-base: #{$projectAppControlBar-tabContextMenu-browseActivator-color};
+
+        color: var(--fa-color-glyph-base);
         transition: $qMenu-item-hover-colorTransition;
       }
 
       &:hover:not([aria-disabled='true']),
       &:focus:not([aria-disabled='true']) {
-        .projectAppControlBarTabContextMenu__primaryLabel,
-        .projectAppControlBarTabContextMenu__icon {
+        .projectAppControlBarTabContextMenu__primaryLabel {
           color: appControlMenus.$appControlMenus-singleHover;
+        }
+
+        .projectAppControlBarTabContextMenu__icon {
+          --fa-color-glyph-base: #{appControlMenus.$appControlMenus-singleHover};
+
+          color: var(--fa-color-glyph-base);
         }
       }
     }
 
-    &:not(.projectAppControlBarTabContextMenu__item--browseTab) {
+    &:not(.projectAppControlBarTabContextMenu__item--browseTab, .text-secondary) {
       &:hover:not([aria-disabled='true']),
       &:focus:not([aria-disabled='true']) {
         color: appControlMenus.$appControlMenus-singleHover;
+
+        .projectAppControlBarTabContextMenu__icon {
+          --fa-color-glyph-base: #{appControlMenus.$appControlMenus-singleHover};
+
+          color: var(--fa-color-glyph-base);
+        }
       }
     }
   }
@@ -68,11 +84,33 @@
   }
 
   .projectAppControlBarTabContextMenu__icon.q-icon {
+    --fa-color-glyph-base: #{appControlMenus.$appControlMenus-color};
+
+    color: var(--fa-color-glyph-base);
     font-size: $iconSize;
   }
 
+  .projectAppControlBarTabContextMenu__item.text-secondary {
+    .projectAppControlBarTabContextMenu__icon {
+      --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      .projectAppControlBarTabContextMenu__icon {
+        --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+        color: var(--fa-color-glyph-base);
+      }
+    }
+  }
+
   .projectAppControlBarTabContextMenu__browseTabUnsavedIcon.q-icon {
-    color: $projectAppControlBar-unsavedTabIconColor;
+    --fa-color-glyph-base: #{$projectAppControlBar-unsavedTabIconColor};
+
+    color: var(--fa-color-glyph-base);
     flex: 0 0 auto;
     font-size: $projectAppControlBar-tabAlertIcon-fontSize;
     height: $projectAppControlBar-tabAlertIcon-fontSize;
@@ -88,10 +126,12 @@
   .projectAppControlBarTabContextMenu__browseTabIcon.q-icon {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
+    --fa-color-glyph-base: #{appControlMenus.$appControlMenus-color};
     --fa-q-icon-display-glyph-font-size: #{$projectAppControlBar-tabContextMenu-templateIcon-glyphFontSize};
     --fa-q-icon-display-mdi-font-size: #{$projectAppControlBar-tabContextMenu-templateIcon-glyphFontSize};
 
     align-items: center;
+    color: var(--fa-color-glyph-base);
     display: inline-flex;
     flex: 0 0 auto;
     font-size: $projectAppControlBar-tabContextMenu-browseTabIcon-boxSize !important;
@@ -157,16 +197,38 @@
   }
 
   .projectAppControlBarTabContextMenu__item--browseTabActive:not(.projectAppControlBarTabContextMenu__item--browseTabCustomAppearance) {
-    .projectAppControlBarTabContextMenu__primaryLabel,
-    .projectAppControlBarTabContextMenu__browseTabIcon {
+    .projectAppControlBarTabContextMenu__primaryLabel {
       color: $projectAppControlBar-tabContextMenu-browseTabActive-color;
+    }
+
+    .projectAppControlBarTabContextMenu__browseTabIcon {
+      --fa-color-glyph-base: #{$projectAppControlBar-tabContextMenu-browseTabActive-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+  }
+
+  .projectAppControlBarTabContextMenu__item--browseTabStatusMuted:not(.projectAppControlBarTabContextMenu__item--browseTabActive) {
+    .projectAppControlBarTabContextMenu__primaryLabel {
+      color: $projectAppControlBar-tabStatusMutedColor;
+    }
+
+    .projectAppControlBarTabContextMenu__browseTabIcon {
+      --fa-color-glyph-base: #{$projectAppControlBar-tabStatusMutedColor};
+
+      color: var(--fa-color-glyph-base);
     }
   }
 
   .projectAppControlBarTabContextMenu__item--browseTabCustomAppearance {
-    .projectAppControlBarTabContextMenu__primaryLabel,
-    .projectAppControlBarTabContextMenu__browseTabIcon {
+    .projectAppControlBarTabContextMenu__primaryLabel {
       color: var(--projectAppControlBarTab-textColor);
+    }
+
+    .projectAppControlBarTabContextMenu__browseTabIcon {
+      --fa-color-glyph-base: var(--projectAppControlBarTab-textColor);
+
+      color: var(--fa-color-glyph-base);
     }
   }
 
@@ -191,13 +253,21 @@ body.fa-appTheme--fantasy .projectAppControlBarTabContextMenu__browseTabWorldInd
   @include colorGlyph.fa-color-glyph-shading;
 }
 
+body.fa-appTheme--fantasy {
+  .projectAppControlBarTabContextMenu__icon.q-icon,
+  .projectAppControlBarTabContextMenu__browseTabIcon.q-icon,
+  .projectAppControlBarTabContextMenu__browseTabUnsavedIcon.q-icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
+}
+
 .projectAppControlBarTabContextMenu__primaryLabel {
   white-space: nowrap;
 }
 
 .projectAppControlBarTabContextMenu__keybindText {
   font-size: appControlSingleMenu.$appControlSingleMenu-keybindText-fontSize;
-  font-weight: 600;
+  font-weight: $projectAppControlBar-tabContextMenu-keybindText-fontWeight;
   margin-top: $projectAppControlBar-tabContextMenu-keybindText-marginTopPx;
   text-shadow: none;
 }

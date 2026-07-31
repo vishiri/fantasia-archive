@@ -1,4 +1,6 @@
 @use './variables' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 @use '../../../../css/globals/faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
 
 /*
@@ -28,4 +30,33 @@ body.desktop.fa-appTheme--fantasy .dialogProjectSettingsWorldAvailableTemplatesL
   &::before {
     opacity: 0 !important;
   }
+}
+
+.dialogProjectSettingsWorldAvailableTemplatesList__icon {
+  @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+  --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-templateIcon-color};
+
+  align-items: center;
+  color: var(--fa-color-glyph-base);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: $faQIconDisplay-iconFontSize;
+  height: $faQIconDisplay-iconFontSize;
+  justify-content: center;
+  margin-right: $faQIconDisplay-iconMarginRight;
+  overflow: visible;
+  width: $faQIconDisplay-iconFontSize;
+}
+
+body.fa-appTheme--fantasy .dialogProjectSettingsWorldAvailableTemplatesList__icon {
+  @include colorGlyph.fa-color-glyph-shading;
+}
+
+.dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning {
+  --fa-color-glyph-base: #{$dialogProjectSettings-missingTranslationsWarning-icon-color};
+
+  color: var(--fa-color-glyph-base);
+  flex: 0 0 auto;
+  margin-left: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-marginLeft;
 }

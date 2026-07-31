@@ -1,7 +1,8 @@
+@use './variables' as *;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 
 .dialogProjectSettingsDocumentTemplatesTabItem__tabIcon,
-.dialogProjectSettingsWorldAvailableTemplatesList__icon,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
   @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
@@ -13,4 +14,18 @@
   justify-content: center;
   margin-right: $faQIconDisplay-iconMarginRight;
   width: $faQIconDisplay-iconFontSize;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+  --fa-color-glyph-base: #{$dialogProjectSettings-worldTemplateLayout-treeNode-templateIcon-color};
+
+  color: var(--fa-color-glyph-base);
+  overflow: visible;
+}
+
+body.fa-appTheme--fantasy {
+  .dialogProjectSettingsDocumentTemplatesTabItem__tabIcon,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
 }

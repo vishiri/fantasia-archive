@@ -1,8 +1,10 @@
 @use './variables' as *;
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
 @use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+@use '../../../../css/globals/faOutlineButtonGlow.variables.scss' as outlineBtnGlow;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as *;
 @import '@quasar/extras/animate/fadeIn.css';
 @import '@quasar/extras/animate/fadeOut.css';
 
@@ -107,12 +109,54 @@
   display: flex;
 }
 
+/*
+ * Fixed-strip outline icons (Quasar icon prop → .q-icon). Pin --fa-color-glyph-base by
+ * Quasar text-* class so save dirty/clean swaps (teal-14 ↔ primary-bright) track like
+ * faOutlineButtonGlow Chromium pins — never rely on currentColor after transparent fill.
+ */
+.projectAppControlBarFixedStripLeft .q-btn--outline,
+.projectAppControlBar__right .q-btn--outline,
+.projectAppControlBarDeleteDocumentAction .q-btn--outline {
+  .q-icon {
+    --fa-color-glyph-base: #{outlineBtnGlow.$faOutlineButtonGlow-color-primaryBright};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  &.text-primary-bright .q-icon {
+    --fa-color-glyph-base: #{outlineBtnGlow.$faOutlineButtonGlow-color-primaryBright};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  &.text-teal-14 .q-icon {
+    --fa-color-glyph-base: #{outlineBtnGlow.$faOutlineButtonGlow-color-teal14};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  &.text-secondary .q-icon {
+    --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+}
+
+/* QBtn icon prop cannot take fa-color-glyph class; shade via mixin under fantasy. */
+body.fa-appTheme--fantasy {
+  .projectAppControlBarFixedStripLeft .q-btn--outline .q-icon,
+  .projectAppControlBar__right .q-btn--outline .q-icon,
+  .projectAppControlBarDeleteDocumentAction .q-btn--outline .q-icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
+}
+
 .projectAppControlBar__actionSeparator {
   background-color: $projectAppControlBar-actionSeparatorColor;
   margin-bottom: $projectAppControlBar-actionSeparator-marginBlockPx;
   margin-left: $projectAppControlBar-stripButtonSpacingPx;
   margin-top: $projectAppControlBar-actionSeparator-marginBlockPx;
-  opacity: 0.5;
+  opacity: $projectAppControlBar-actionSeparator-opacity;
 }
 
 .projectAppControlBar__buttonTooltip.q-tooltip {
@@ -168,8 +212,8 @@
   background-color: mainLayout.$mainLayout-appHeader-backgroundColor;
   content: '';
   height: 100%;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000);
-  mask-image: linear-gradient(to right, transparent, #000);
+  -webkit-mask-image: linear-gradient(to right, transparent, $projectAppControlBar-tabsRegion-endBlendMaskOpaqueStopColor);
+  mask-image: linear-gradient(to right, transparent, $projectAppControlBar-tabsRegion-endBlendMaskOpaqueStopColor);
   pointer-events: none;
   position: absolute;
   right: 0;
@@ -205,7 +249,17 @@
 }
 
 .projectAppControlBarTabs__tabClose {
-  color: $projectAppControlBar-tabClose-color;
+  --fa-color-glyph-base: #{$projectAppControlBar-tabClose-color};
+
+  color: var(--fa-color-glyph-base);
+
+  .q-icon {
+    color: var(--fa-color-glyph-base);
+  }
+}
+
+body.fa-appTheme--fantasy .projectAppControlBarTabs__tabClose .q-icon {
+  @include colorGlyph.fa-color-glyph-shading;
 }
 
 .projectAppControlBarTabs__tab.q-tab {
@@ -292,9 +346,29 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     .projectAppControlBarTabs__deadMarker,
     .projectAppControlBarTabs__finishedMarker,
     .projectAppControlBarTabs__tabLabelText,
-    .q-tab__icon,
     .q-tab__label {
       color: $projectAppControlBar-tabActiveContentColor;
+    }
+
+    .q-tab__icon {
+      --fa-color-glyph-base: #{$projectAppControlBar-tabActiveContentColor};
+
+      color: var(--fa-color-glyph-base);
+    }
+  }
+
+  .projectAppControlBarTabs__tab--statusMuted.q-tab:not(.q-tab--active) {
+    .projectAppControlBarTabs__deadMarker,
+    .projectAppControlBarTabs__finishedMarker,
+    .projectAppControlBarTabs__tabLabelText,
+    .q-tab__label {
+      color: $projectAppControlBar-tabStatusMutedColor;
+    }
+
+    .q-tab__icon {
+      --fa-color-glyph-base: #{$projectAppControlBar-tabStatusMutedColor};
+
+      color: var(--fa-color-glyph-base);
     }
   }
 
@@ -335,12 +409,13 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
     /* Same glyph sizing as ProjectHierarchyTreeNode__icon--layoutKind. */
+    --fa-color-glyph-base: #{$projectAppControlBar-tabContent-color};
     --fa-q-icon-display-glyph-font-size: #{$projectAppControlBar-tabIcon-boxSize};
     --fa-q-icon-display-mdi-fit-scale: 1;
     --fa-q-icon-display-mdi-font-size: #{$projectAppControlBar-tabIcon-boxSize};
 
     align-items: center;
-    color: $projectAppControlBar-tabContent-color;
+    color: var(--fa-color-glyph-base);
     display: inline-flex;
     flex: 0 0 auto;
     font-size: $projectAppControlBar-tabIcon-boxSize;
@@ -366,6 +441,10 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     }
   }
 
+  body.fa-appTheme--fantasy & .q-tab .q-tab__icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
+
   .q-tab__label {
     color: $projectAppControlBar-tabContent-color;
     flex: 1 1 auto;
@@ -385,9 +464,14 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     .projectAppControlBarTabs__deadMarker,
     .projectAppControlBarTabs__finishedMarker,
     .projectAppControlBarTabs__tabLabelText,
-    .q-tab__icon,
     .q-tab__label {
       color: var(--projectAppControlBarTab-textColor);
+    }
+
+    .q-tab__icon {
+      --fa-color-glyph-base: var(--projectAppControlBarTab-textColor);
+
+      color: var(--fa-color-glyph-base);
     }
   }
 
@@ -424,7 +508,9 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
   }
 
   .q-tab__alert-icon {
-    color: $projectAppControlBar-unsavedTabIconColor;
+    --fa-color-glyph-base: #{$projectAppControlBar-unsavedTabIconColor};
+
+    color: var(--fa-color-glyph-base);
     font-size: $projectAppControlBar-tabAlertIcon-fontSize !important;
     height: $projectAppControlBar-tabAlertIcon-fontSize;
     line-height: $projectAppControlBar-tabAlertIcon-fontSize;
@@ -434,6 +520,10 @@ body.fa-appTheme--fantasy .projectAppControlBarTabs__tabWorldIndicator {
     top: $projectAppControlBar-tabAlertIcon-positionTop;
     width: $projectAppControlBar-tabAlertIcon-fontSize;
     z-index: 2;
+  }
+
+  body.fa-appTheme--fantasy & .q-tab__alert-icon {
+    @include colorGlyph.fa-color-glyph-shading;
   }
 
   .projectAppControlBarTabs__tab.q-focusable:focus > .q-focus-helper,

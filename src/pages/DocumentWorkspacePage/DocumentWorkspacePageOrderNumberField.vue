@@ -13,7 +13,7 @@
       <q-icon
         name="mdi-file-tree"
         size="16px"
-        class="documentWorkspacePageOrderNumberField__titleIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
+        class="documentWorkspacePageOrderNumberField__titleIcon documentWorkspacePage__fieldTitleIcon documentWorkspacePage__fieldHelpIcon fa-color-glyph q-ml-md"
         data-test-locator="documentWorkspacePage-orderNumberTitleIcon"
       />
       <FaHelpTooltipIcon

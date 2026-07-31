@@ -18,6 +18,7 @@
   --fa-color-dialog-rim-cyan-bright: #{$dialog-rim-cyan-bright};
   --fa-color-dialog-rim-cyan-deep: #{$dialog-rim-cyan-deep};
   --fa-color-fantasy-dark: #{$fantasy-dark};
+  --fa-color-fantasy-dark-light: #{$fantasy-dark-light};
   --fa-color-fantasy-medium: #{$fantasy-medium};
   --fa-color-gold-muted-border: #{$gold-muted-border-raw};
   --fa-color-grey: #{$grey};
@@ -34,9 +35,9 @@
   --fa-color-positive: #{$positive};
   --fa-color-primary: #{$primary};
   --fa-color-primary-bright: #{$primary-bright};
-  --fa-color-scrollbar-thumb: #{color.adjust($dark, $lightness: 40%)};
-  --fa-color-scrollbar-thumb-hover: #{color.adjust($dark, $lightness: 60%)};
-  --fa-color-scrollbar-track: #{$dark};
+  --fa-color-scrollbar-thumb: #{color.adjust($dark, $lightness: 28%)};
+  --fa-color-scrollbar-thumb-hover: #{color.adjust($dark, $lightness: 48%)};
+  --fa-color-scrollbar-track: transparent;
   --fa-color-secondary: #{$secondary};
   --fa-color-select-background-dark: #{$select-background-dark};
   --fa-color-select-background-light: #{$select-background-light};
@@ -59,11 +60,4 @@
   --fa-color-tooltip-text: #{$tooltip-text};
   --fa-color-warning: #{$warning};
   --fa-color-white: #{$white};
-}
-
-/* Fantasy scrollbars: flat cyan family, slightly darker; track stays quiet. */
-body.fa-appTheme--fantasy {
-  --fa-color-scrollbar-thumb: #{color.adjust($dark, $lightness: 28%)};
-  --fa-color-scrollbar-thumb-hover: #{color.adjust($dark, $lightness: 48%)};
-  --fa-color-scrollbar-track: transparent;
 }

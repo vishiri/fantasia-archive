@@ -244,3 +244,5 @@ const {
   display: block;
 }
 </style>
+
+<style lang="scss" src="./styles/DocumentWorkspacePage.fieldTitleIcons.unscoped.scss"></style>

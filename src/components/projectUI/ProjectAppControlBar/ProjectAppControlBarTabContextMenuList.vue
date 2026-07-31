@@ -19,7 +19,7 @@
       </q-item-section>
       <q-item-section avatar>
         <q-icon
-          class="projectAppControlBarTabContextMenu__icon"
+          class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
           name="keyboard_arrow_right"
         />
       </q-item-section>
@@ -83,7 +83,7 @@
       </q-item-section>
       <q-item-section avatar>
         <q-icon
-          class="projectAppControlBarTabContextMenu__icon"
+          class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
           name="mdi-chevron-left"
         />
       </q-item-section>
@@ -116,7 +116,7 @@
       </q-item-section>
       <q-item-section avatar>
         <q-icon
-          class="projectAppControlBarTabContextMenu__icon"
+          class="projectAppControlBarTabContextMenu__icon fa-color-glyph"
           name="mdi-chevron-right"
         />
       </q-item-section>

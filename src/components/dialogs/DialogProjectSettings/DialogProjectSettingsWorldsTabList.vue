@@ -116,3 +116,5 @@ function isWorldTabValidationError (world: I_dialogProjectSettingsWorldDraft): b
   return isDialogProjectSettingsWorldTabValidationError(world, props.documentTemplates)
 }
 </script>
+
+<style lang="scss" src="./styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

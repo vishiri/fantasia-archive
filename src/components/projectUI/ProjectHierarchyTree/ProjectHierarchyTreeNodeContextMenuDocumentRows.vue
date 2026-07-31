@@ -14,7 +14,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectHierarchyTreeNodeContextMenu__icon"
+        class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
         name="mdi-book-open-page-variant-outline"
       />
     </q-item-section>
@@ -41,7 +41,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectHierarchyTreeNodeContextMenu__icon"
+        class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
         name="mdi-pencil"
       />
     </q-item-section>
@@ -68,7 +68,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectHierarchyTreeNodeContextMenu__icon"
+        class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
         name="mdi-content-copy"
       />
     </q-item-section>
@@ -95,7 +95,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectHierarchyTreeNodeContextMenu__icon"
+        class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
         name="mdi-file-tree"
       />
     </q-item-section>

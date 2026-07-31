@@ -135,9 +135,9 @@ body.fa-appTheme--flat .q-btn--rectangle {
 
   &__inner {
     &::before {
-      background-color: $qCheckbox-inner-before-backgroundColor !important;
-      opacity: $qCheckbox-inner-before-opacity !important;
-      transition: $qCheckbox-inner-before-backgroundColorTransition;
+      /* Kill Quasar Material hover/focus halo circle behind the box. */
+      content: none !important;
+      display: none !important;
     }
 
     &--truthy,
@@ -155,6 +155,95 @@ body.fa-appTheme--flat .q-btn--rectangle {
   &.disabled {
     .q-checkbox__bg {
       border-color: $qCheckbox-disabled-borderColor;
+    }
+  }
+
+  /* Active border tint on hover only — not focus / focus-within (click would stick).
+   * Same primary-bright as checked border / checkmark. */
+  &:not(.disabled):hover {
+    .q-checkbox__inner:not(.q-checkbox__inner--truthy, .q-checkbox__inner--indeterminate) .q-checkbox__bg {
+      border-color: $qCheckbox-truthy-borderColor;
+    }
+  }
+}
+
+/*
+ * Fantasy: keep Fantasia outline checkbox shape (transparent fill + stroke check).
+ * Gradient only on border ring (::after mask) and SVG check/indet paint servers.
+ * Slightly larger hit box; scale SVG check so it clears the ring (Quasar .fit is 100% — inset alone does not shrink).
+ */
+body.fa-appTheme--fantasy .q-checkbox {
+  .q-checkbox__inner {
+    font-size: $qCheckbox-fantasy-inner-fontSize;
+  }
+
+  .q-checkbox__bg {
+    #{glyphVars.$faColorGlyph-baseVar}: #{$qCheckbox-fantasy-idleBorder-base};
+
+    transition: $qCheckbox-fantasy-borderBase-transition;
+
+    @include colorGlyph.fa-color-border-shading($qCheckbox-truthy-borderWidth);
+  }
+
+  /* Gold ring on hover only — not focus / focus-within (click would stick). */
+  &:not(.disabled):hover .q-checkbox__bg {
+    #{glyphVars.$faColorGlyph-baseVar}: #{$qCheckbox-fantasy-hoverBorder-base};
+  }
+
+  .q-checkbox__svg {
+    transform: scale(#{$qCheckbox-fantasy-svg-scale});
+    transform-origin: center center;
+  }
+
+  .q-checkbox__inner--truthy,
+  .q-checkbox__inner--indeterminate {
+    .q-checkbox__bg {
+      #{glyphVars.$faColorGlyph-baseVar}: #{$qCheckbox-fantasy-checkedBorder-base};
+
+      @include colorGlyph.fa-color-border-shading($qCheckbox-truthy-borderWidth);
+    }
+
+    .q-checkbox__svg {
+      color: transparent !important;
+      filter: drop-shadow(#{glyphVars.$faColorGlyph-dropShadow});
+      transform: scale(#{$qCheckbox-fantasy-svg-scale});
+      transform-origin: center center;
+    }
+
+    .q-checkbox__truthy {
+      stroke: $qCheckbox-fantasy-checkedPaintServer !important;
+    }
+
+    .q-checkbox__indet {
+      fill: $qCheckbox-fantasy-checkedPaintServer !important;
+    }
+  }
+
+  &.disabled {
+    opacity: 1 !important;
+
+    .q-checkbox__bg {
+      #{glyphVars.$faColorGlyph-baseVar}: #{$qCheckbox-fantasy-disabledBorder-base};
+
+      @include colorGlyph.fa-color-border-shading($qCheckbox-truthy-borderWidth);
+    }
+
+    .q-checkbox__inner--truthy,
+    .q-checkbox__inner--indeterminate {
+      .q-checkbox__svg {
+        color: transparent !important;
+        filter: drop-shadow(#{glyphVars.$faColorGlyph-dropShadow});
+        transform: scale(#{$qCheckbox-fantasy-svg-scale});
+        transform-origin: center center;
+      }
+
+      .q-checkbox__truthy {
+        stroke: $qCheckbox-fantasy-disabledPaintServer !important;
+      }
+
+      .q-checkbox__indet {
+        fill: $qCheckbox-fantasy-disabledPaintServer !important;
+      }
     }
   }
 }
@@ -225,6 +314,10 @@ body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card.dialogKeybindSe
 }
 
 /* Flat Quasar focus chrome: thin hairline (fantasy uses micro-corner fields instead). */
+body.fa-appTheme--flat .q-field__control {
+  color: $qField-flat-control-color;
+}
+
 .q-field--standard .q-field__control::after,
 .q-field--filled .q-field__control::after {
   height: $qField-activeUnderline-height;
@@ -238,6 +331,59 @@ body.fa-appTheme--fantasy .q-dialog > .q-dialog__inner > .q-card.dialogKeybindSe
 .q-field--dark .q-field__marginal,
 .q-field--dark:not(.q-field--highlighted) .q-field__label {
   color: color-mix(in srgb, var(--fa-color-white) 70%, transparent);
+}
+
+/* Error copy uses danger-emphasis (not muted bottom/label mix, not Quasar text-negative alone). */
+.q-field--error .q-field__messages,
+.q-field--dark.q-field--error .q-field__bottom,
+.q-field--dark.q-field--error .q-field__messages {
+  color: var(--fa-color-text-danger-emphasis) !important;
+}
+
+/*
+ * Fantasy: glyph shading on dark-field prepend/append icons (search, colorize, etc.).
+ * Pin --fa-color-glyph-base by Quasar text-* so secondary/primary-bright/warning buttons
+ * keep their colors (same idea as outline save-button glow pins).
+ */
+body.fa-appTheme--fantasy {
+  .q-field--dark .q-field__prepend > .q-icon,
+  .q-field--dark .q-field__append > .q-icon,
+  .q-field--dark .q-field__marginal > .q-icon,
+  .q-field--dark .q-field__after > .q-icon {
+    --fa-color-glyph-base: #{$qField-marginalIcon-color};
+
+    @include colorGlyph.fa-color-glyph-shading;
+  }
+
+  .q-field__prepend .q-btn .q-icon,
+  .q-field__append .q-btn .q-icon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
+
+  .q-field__prepend .q-btn.text-primary-bright .q-icon,
+  .q-field__append .q-btn.text-primary-bright .q-icon {
+    --fa-color-glyph-base: #{$faOutlineButtonGlow-color-primaryBright};
+  }
+
+  .q-field__prepend .q-btn.text-secondary .q-icon,
+  .q-field__append .q-btn.text-secondary .q-icon,
+  .q-field__prepend > .q-icon.text-secondary,
+  .q-field__append > .q-icon.text-secondary {
+    --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+  }
+
+  .q-field__prepend .q-btn.text-warning .q-icon,
+  .q-field__append .q-btn.text-warning .q-icon,
+  .q-field__prepend > .q-icon.text-warning,
+  .q-field__append > .q-icon.text-warning,
+  .q-field__after > .q-icon.text-warning {
+    --fa-color-glyph-base: #{$qField-warningIcon-color};
+  }
+
+  .q-field__prepend .q-btn:not(.text-primary-bright, .text-secondary, .text-warning) .q-icon,
+  .q-field__append .q-btn:not(.text-primary-bright, .text-secondary, .text-warning) .q-icon {
+    --fa-color-glyph-base: #{$qField-marginalIcon-color};
+  }
 }
 
 /*
@@ -527,6 +673,31 @@ body.fa-appTheme--fantasy .q-markdown hr {
         font-weight: $qMenu-negativeMenuItemLabel-fontWeight;
         text-shadow: $qMenu-negativeMenuItemLabel-textShadow;
       }
+
+      /*
+       * Keep destructive icons on secondary through hover/focus. Feature menus set
+       * --fa-color-glyph-base to menu gold on hover; that must not win for text-secondary rows.
+       */
+      .q-icon,
+      .fa-color-glyph,
+      [class*='__icon'],
+      [class*='__contextMenuIcon'] {
+        --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+        color: var(--fa-color-glyph-base, #{$qMenu-destructiveItem-icon-color});
+      }
+
+      &:hover:not([aria-disabled='true']),
+      &:focus:not([aria-disabled='true']) {
+        .q-icon,
+        .fa-color-glyph,
+        [class*='__icon'],
+        [class*='__contextMenuIcon'] {
+          --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+          color: var(--fa-color-glyph-base, #{$qMenu-destructiveItem-icon-color});
+        }
+      }
     }
   }
 
@@ -552,14 +723,62 @@ body.fa-appTheme--fantasy .q-menu {
     font-weight: $qMenu-item-fontWeight-fantasy;
 
     &.disabled,
-    &[disabled] {
+    &[disabled],
+    &[aria-disabled='true'] {
       color: $qMenu-item-disabled-color-fantasy;
       opacity: 1 !important;
+
+      /*
+       * Glyph bases pin solid menu colors; without this, disabled icons stay full white/gold
+       * while labels use the fantasy disabled mix (opacity is forced to 1 above).
+       */
+      .q-icon,
+      .fa-color-glyph,
+      [class*='__icon'],
+      [class*='__contextMenuIcon'] {
+        --fa-color-glyph-base: #{$qMenu-item-disabled-color-fantasy};
+
+        color: var(--fa-color-glyph-base, #{$qMenu-item-disabled-color-fantasy});
+      }
 
       .fa-text-keybind-hint {
         color: $qMenu-item-disabled-keybind-color-fantasy !important;
       }
     }
+  }
+}
+
+/* Fantasy: darkened flat root menus; submenus = $fantasy-dark-light
+ * (not splash slate / language parchment).
+ * Root: $dark-lighter → $fantasy-medium; submenu: $fantasy-dark-light. */
+body.fa-appTheme--fantasy .q-menu:not(.splashControls__resumeMenu, .globalLanguageSelector__menu) {
+  background-color: $qMenu-backgroundColor-fantasy !important;
+}
+
+body.fa-appTheme--fantasy {
+  .appControlSingleMenu__subMenu.q-menu,
+  .projectAppControlBarTabContextMenu__browseSubmenu.q-menu,
+  .projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
+    background-color: $qMenu-subMenu-backgroundColor-fantasy !important;
+  }
+}
+
+/* Fantasy: opaque inner list/panels that still painted flat $dark / $dark-lighter. */
+body.fa-appTheme--fantasy {
+  .appControlSingleMenu__menu .appControlSingleMenu__list,
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuList,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody,
+  .faIconPickerInput__menuPanel,
+  .faLocaleTranslationsInput__menuBody,
+  .projectAppControlBarTabContextMenu.q-menu .projectAppControlBarTabContextMenu__list,
+  .projectHierarchyTreeNodeContextMenu.q-menu .projectHierarchyTreeNodeContextMenu__list {
+    background-color: $qMenu-backgroundColor-fantasy;
+  }
+
+  .appControlSingleMenu__subMenu .appControlSingleMenu__list,
+  .projectAppControlBarTabContextMenu__browseSubmenu .projectAppControlBarTabContextMenu__list,
+  .projectHierarchyTreeNodeContextMenu__sortBySubmenu .projectHierarchyTreeNodeContextMenu__list {
+    background-color: $qMenu-subMenu-backgroundColor-fantasy;
   }
 }
 

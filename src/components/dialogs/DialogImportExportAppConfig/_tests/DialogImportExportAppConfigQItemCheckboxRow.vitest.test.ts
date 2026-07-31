@@ -50,6 +50,9 @@ test('Test that DialogImportExportAppConfigQItemCheckboxRow toggles model on che
   })
 
   await flushPromises()
+
+  expect(w.findAll('[data-test-locator="dialogImportExportAppConfig-check-export-settings"]')).toHaveLength(1)
+
   await w.get('[data-test-locator="dialogImportExportAppConfig-check-export-settings"]').trigger('click')
 
   expect(w.props('modelValue')).toBe(true)

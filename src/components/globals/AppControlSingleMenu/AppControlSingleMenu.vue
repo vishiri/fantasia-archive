@@ -85,7 +85,7 @@
             </q-item-section>
             <q-item-section avatar>
               <q-icon
-                class="appControlSingleMenu__icon"
+                class="appControlSingleMenu__icon fa-color-glyph"
                 :name="menuItem.icon"
                 data-test-locator="AppControlSingleMenu-menuItem-icon"
               />
@@ -166,7 +166,7 @@
                       avatar
                     >
                       <q-icon
-                        class="appControlSingleMenu__icon"
+                        class="appControlSingleMenu__icon fa-color-glyph"
                         data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-icon"
                         :name="submenuItem.icon"
                       />

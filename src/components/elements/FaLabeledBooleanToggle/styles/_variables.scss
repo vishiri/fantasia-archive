@@ -1,0 +1,4 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FA LABELED BOOLEAN TOGGLE */
+$faLabeledBooleanToggle-leadingIcon-color: fa-v('accent', $accent);

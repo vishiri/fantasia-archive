@@ -52,6 +52,9 @@ test('Test that ProjectHierarchyTreeOpenIcon defers open class when pending expa
   expect(wrapper.get('[data-test-locator="projectHierarchyTree-openIcon"]').classes()).toContain(
     'projectHierarchyTree__openIcon--open'
   )
+  expect(wrapper.get('[data-test-locator="projectHierarchyTree-openIcon"]').classes()).toContain(
+    'fa-color-glyph'
+  )
   wrapper.unmount()
   vi.restoreAllMocks()
 })

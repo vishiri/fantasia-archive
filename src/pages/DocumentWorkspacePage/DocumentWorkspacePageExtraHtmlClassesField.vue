@@ -13,7 +13,7 @@
       <q-icon
         name="mdi-language-css3"
         size="16px"
-        class="documentWorkspacePageExtraHtmlClassesField__titleIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
+        class="documentWorkspacePageExtraHtmlClassesField__titleIcon documentWorkspacePage__fieldTitleIcon documentWorkspacePage__fieldHelpIcon fa-color-glyph q-ml-md"
         data-test-locator="documentWorkspacePage-extraHtmlClassesTitleIcon"
       />
       <FaHelpTooltipIcon

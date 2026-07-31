@@ -12,6 +12,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { buildFaColorGlyphCssCustomProperties } from './scripts/projectAppControlBar_manager'
+
 defineOptions({
   name: 'ProjectAppControlBarTabWorldIndicator'
 })
@@ -23,7 +25,7 @@ const props = defineProps<{
   visible: boolean
 }>()
 
-const indicatorStyle = computed(() => ({
-  '--fa-color-glyph-base': props.color ?? ''
-}))
+const indicatorStyle = computed(() => {
+  return buildFaColorGlyphCssCustomProperties(props.color ?? '')
+})
 </script>

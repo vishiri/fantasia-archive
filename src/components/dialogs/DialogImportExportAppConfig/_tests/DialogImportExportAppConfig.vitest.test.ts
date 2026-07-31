@@ -254,11 +254,8 @@ test('Test that DialogImportExportAppConfig export step checkboxes emit model up
 
   for (const loc of locators) {
     const cells = w.findAll(`[data-test-locator="${loc}"]`)
-    expect(cells[0]!?.exists()).toBe(true)
+    expect(cells).toHaveLength(1)
     await cells[0]!.trigger('click')
-    await flushPromises()
-    expect(cells[1]!?.exists()).toBe(true)
-    await cells[1]!.trigger('click')
     await flushPromises()
   }
 
@@ -335,11 +332,8 @@ test('Test that DialogImportExportAppConfig import selected success closes the d
 
   for (const loc of importLocators) {
     const cells = w.findAll(`[data-test-locator="${loc}"]`)
-    expect(cells[0]!?.exists()).toBe(true)
+    expect(cells).toHaveLength(1)
     await cells[0]!.trigger('click')
-    await flushPromises()
-    expect(cells[1]!?.exists()).toBe(true)
-    await cells[1]!.trigger('click')
     await flushPromises()
   }
 

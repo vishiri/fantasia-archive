@@ -1,5 +1,46 @@
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as *;
+
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenu.q-menu {
   z-index: $dialogProjectSettings-worldColorPalette-contextMenu-zIndex !important;
+
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem.q-item {
+    align-items: center;
+  }
+
+  /* Beat Quasar .q-item__section--side > .q-icon { font-size: 24px }. */
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem.q-item .q-item__section--avatar {
+    color: inherit;
+    min-width: unset;
+  }
+
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon.q-icon {
+    --fa-color-glyph-base: #{$dialogProjectSettings-worldColorPalette-contextMenu-icon-color};
+
+    color: var(--fa-color-glyph-base);
+    font-size: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+    height: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+    line-height: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+    transition: $qMenu-item-hover-colorTransition;
+    width: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+  }
+
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem.text-secondary {
+    .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon.q-icon {
+      --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon.q-icon {
+        --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+        color: var(--fa-color-glyph-base);
+      }
+    }
+  }
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuList {
@@ -10,9 +51,17 @@
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem {
   transition: $qMenu-item-hover-colorTransition;
 
-  &:hover:not([aria-disabled='true']),
-  &:focus:not([aria-disabled='true']) {
-    color: $dialogProjectSettings-worldColorPalette-contextMenu-hoverColor;
+  &:not(.text-secondary) {
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      color: $dialogProjectSettings-worldColorPalette-contextMenu-hoverColor;
+
+      .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon {
+        --fa-color-glyph-base: #{$dialogProjectSettings-worldColorPalette-contextMenu-hoverColor};
+
+        color: var(--fa-color-glyph-base);
+      }
+    }
   }
 }
 
@@ -28,12 +77,13 @@
   white-space: nowrap;
 }
 
-.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon {
-  font-size: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
-  transition: $qMenu-item-hover-colorTransition;
-}
-
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuSeparator {
   background-color: $dialogProjectSettings-worldColorPalette-contextMenu-separatorColor;
   height: $dialogProjectSettings-worldColorPalette-contextMenu-separator-height !important;
+}
+
+body.fa-appTheme--fantasy {
+  .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon {
+    @include colorGlyph.fa-color-glyph-shading;
+  }
 }

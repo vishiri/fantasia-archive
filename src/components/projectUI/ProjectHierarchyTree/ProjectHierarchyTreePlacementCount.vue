@@ -67,10 +67,9 @@ const categoryCountLabel = computed(() => {
 
 <style lang="scss">
 @use './styles/variables' as *;
-@use '../../../css/app.palette.scss' as *;
 
 .projectHierarchyTreePlacementCount {
-  color: fa-v('grey', $grey);
+  color: $projectHierarchyTree-placementCount-color;
   margin-left: $projectHierarchyTree-placementCount-marginLeft;
 }
 
@@ -79,6 +78,6 @@ const categoryCountLabel = computed(() => {
 }
 
 .projectHierarchyTreePlacementCount__tooltipValue {
-  color: fa-v('black', $black);
+  color: $projectHierarchyTree-placementCount-tooltipValue-color;
 }
 </style>

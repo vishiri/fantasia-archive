@@ -1,26 +1,16 @@
 <template>
   <q-item
     tag="label"
-    class="importExportAppConfigQItemCheckboxRow flex justify-center"
+    class="importExportAppConfigQItemCheckboxRow flex justify-center items-center"
     :class="{
       'importExportAppConfigQItemCheckboxRow--isDisabled': isDisabled
     }"
     :aria-disabled="isDisabled || undefined"
   >
-    <q-item-section avatar>
-      <q-checkbox
-        v-model="model"
-        :color="checkboxColor"
-        :data-test-locator="dataTestLocator"
-        :disable="isDisabled"
-      />
-    </q-item-section>
-    <q-item-section
-      avatar
-      class="importExportAppConfig__checkboxLabel"
-    >
+    <!-- Label column -->
+    <q-item-section class="importExportAppConfigQItemCheckboxRow__label">
       <q-item-label
-        class="importExportAppConfig__label"
+        class="importExportAppConfigQItemCheckboxRow__labelText"
         :class="{
           'fa-text-checkbox-idle': !model && !isDisabled,
           'fa-text-checkbox-disabled': !model && isDisabled
@@ -30,7 +20,8 @@
       </q-item-label>
     </q-item-section>
 
-    <q-item-section avatar>
+    <!-- Checkbox column (right) -->
+    <q-item-section class="importExportAppConfigQItemCheckboxRow__checkbox">
       <q-checkbox
         v-model="model"
         :color="checkboxColor"
@@ -64,18 +55,32 @@ const isDisabled = computed(() => props.disabled === true)
     cursor: not-allowed;
     pointer-events: none;
   }
-}
 
-.q-item__section--side {
-  min-width: 0;
-  padding-right: 0;
-}
+  &__label {
+    align-items: flex-start;
+    flex: 0 0 $dialogImportExportAppConfig-checkboxRow-labelWidth;
+    justify-content: center;
+    max-width: $dialogImportExportAppConfig-checkboxRow-labelWidth;
+    min-width: $dialogImportExportAppConfig-checkboxRow-labelWidth;
+    padding: 0;
+    text-align: left;
+  }
 
-.q-checkbox {
-  margin: 0 $dialogImportExportAppConfig-checkbox-marginInline;
-}
+  &__labelText {
+    text-align: left;
+    transition: color 0.3s cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+    width: 100%;
+  }
 
-.importExportAppConfig__label {
-  transition: color 0.3s cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+  &__checkbox {
+    align-items: flex-start;
+    flex: 0 0 $dialogImportExportAppConfig-checkboxRow-checkboxWidth;
+    justify-content: center;
+    max-width: $dialogImportExportAppConfig-checkboxRow-checkboxWidth;
+    min-width: $dialogImportExportAppConfig-checkboxRow-checkboxWidth;
+    padding: 0;
+  }
 }
 </style>
+
+<style lang="scss" src="./styles/DialogImportExportAppConfigQItemCheckboxRow.unscoped.scss"></style>

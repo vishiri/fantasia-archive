@@ -32,7 +32,8 @@
   max-height: $faLocaleTranslationsInput-menu-maxHeight;
   min-height: 0;
   overflow: hidden;
-  padding: $faLocaleTranslationsInput-menu-body-padding-y $faLocaleTranslationsInput-menu-body-padding-x;
+  /* Left inset only — scrollbar docks to the menu’s right edge (all themes). */
+  padding: 0 0 0 $faLocaleTranslationsInput-menu-body-padding-x;
   width: 100%;
 }
 
@@ -105,16 +106,13 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden auto;
+  /* Gap before thumb so locale fields do not sit flush under the scrollbar. */
+  padding-inline-end: $faLocaleTranslationsInput-scroll-scrollbarGap;
 }
 
-/* Fantasy: darker panel; left-only 12px body padding; gap before thumb on scroll. */
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody {
+/* Fantasy field dropdown: darker panel only (edge padding is shared). */
+body.fa-appTheme--fantasy .faLocaleTranslationsInput__menu.q-menu .faLocaleTranslationsInput__menuBody {
   background-color: $faLocaleTranslationsInput-menu-backgroundColor-fantasy;
-  padding: 0 0 0 $faLocaleTranslationsInput-menu-body-padding-x;
-}
-
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__scroll {
-  padding-inline-end: $faLocaleTranslationsInput-scroll-scrollbarGap-fantasy;
 }
 
 .faLocaleTranslationsInput__menuBody--pinnedAside .faLocaleTranslationsInput__scroll {
@@ -129,20 +127,17 @@ body.fa-appTheme--fantasy .faLocaleTranslationsInput__scroll {
   display: flex;
   flex-direction: column;
   gap: $faLocaleTranslationsInput-menuRow-gap;
+  padding-bottom: $faLocaleTranslationsInput-rows-padding-y;
 }
 
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__rows {
-  padding-bottom: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+/* No column headers above: breathe under shell’s zero top padding. */
+.faLocaleTranslationsInput__menuBody:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__rows {
+  padding-top: $faLocaleTranslationsInput-rows-padding-y;
 }
 
-/* No column headers above: breathe under fantasy body zero top padding. */
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__rows {
-  padding-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
-}
-
-/* Align pinned aside with first locale row when rows gain fantasy top padding. */
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody--pinnedAside:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__pinnedAsideInput {
-  margin-top: $faLocaleTranslationsInput-rows-padding-y-fantasy;
+/* Align pinned aside with first locale row when rows gain top padding. */
+.faLocaleTranslationsInput__menuBody--pinnedAside:not(.faLocaleTranslationsInput__menuBody--singularPlural) .faLocaleTranslationsInput__pinnedAsideInput {
+  margin-top: $faLocaleTranslationsInput-rows-padding-y;
 }
 
 .faLocaleTranslationsInput__row {
@@ -159,20 +154,15 @@ body.fa-appTheme--fantasy .faLocaleTranslationsInput__menuBody--pinnedAside:not(
 .faLocaleTranslationsInput__columnHeaders {
   flex-shrink: 0;
   gap: $faLocaleTranslationsInput-columnHeaders-gap;
-  margin-bottom: $faLocaleTranslationsInput-columnHeaders-marginBottom;
-  padding: 0 $faLocaleTranslationsInput-columnHeaders-paddingX;
-}
-
-body.fa-appTheme--fantasy .faLocaleTranslationsInput__columnHeaders {
   margin-bottom: 0;
-  padding: $faLocaleTranslationsInput-rows-padding-y-fantasy 0;
+  padding: $faLocaleTranslationsInput-rows-padding-y 0;
 }
 
 .faLocaleTranslationsInput__formHeader {
-  color: rgba(255, 255, 255, 0.7);
+  color: $faLocaleTranslationsInput-formHeader-color;
   font-size: $faLocaleTranslationsInput-formHeader-fontSize;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: $faLocaleTranslationsInput-formHeader-fontWeight;
+  letter-spacing: $faLocaleTranslationsInput-formHeader-letterSpacing;
   text-transform: uppercase;
 }
 

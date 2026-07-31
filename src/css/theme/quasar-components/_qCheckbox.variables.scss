@@ -2,16 +2,25 @@
 
 /* QUASAR COMPONENT - Q-CHECKBOX (see node_modules/quasar/src/components/checkbox/QCheckbox.sass for upstream timing) */
 $qCheckbox-bg-borderColor: fa-v('white', $white);
-$qCheckbox-bg-transition: background 0s cubic-bezier(0, 0, 0.2, 1) 0ms;
+$qCheckbox-bg-transition:
+  background 0s cubic-bezier(0, 0, 0.2, 1) 0ms,
+  border-color 0.28s ease-out;
 
-$qCheckbox-inner-before-backgroundColor: fa-v('primary-bright', $primary-bright);
-$qCheckbox-inner-before-opacity: 0.12;
-$qCheckbox-inner-before-backgroundColorTransition: background-color 0.22s cubic-bezier(0, 0, 0.2, 1) 0ms;
+$qCheckbox-fantasy-borderBase-transition: --fa-color-glyph-base 0.28s ease-out;
+$qCheckbox-fantasy-checkedBorder-base: fa-v('primary-bright', $primary-bright);
+$qCheckbox-fantasy-checkedPaintServer: url('#fa-color-glyph-grad-primary-bright');
+$qCheckbox-fantasy-disabledBorder-base: fa-v('grey', $grey);
+$qCheckbox-fantasy-disabledPaintServer: url('#fa-color-glyph-grad-checkbox-disabled');
+$qCheckbox-fantasy-hoverBorder-base: fa-v('primary-bright', $primary-bright);
+$qCheckbox-fantasy-idleBorder-base: fa-v('white', $white);
+/* Quasar default $checkbox-inner-font-size is 40px; scale SVG so check clears the ring. */
+$qCheckbox-fantasy-inner-fontSize: 46px;
+$qCheckbox-fantasy-svg-scale: 0.68;
 
 $qCheckbox-svg-color: fa-v('primary-bright', $primary-bright);
 
 $qCheckbox-truthy-borderWidth: 2px;
-$qCheckbox-truthy-borderColor: fa-v('primary', $primary);
+$qCheckbox-truthy-borderColor: fa-v('primary-bright', $primary-bright);
 
 $qCheckbox-path-strokeDashoffsetTransition: stroke-dashoffset 0.18s cubic-bezier(0.4, 0, 0.6, 1) 0ms;
 

@@ -2,7 +2,14 @@
 @use 'sass:color';
 
 /* QUASAR COMPONENT - Q-MENU */
+/*
+ * Fantasy panel shells: same HSL lightness drop as flat $dark → $fantasy-dark for root menus.
+ * Root (flat $dark-lighter) → $fantasy-medium; submenus → $fantasy-dark-light (~25% darker than prior +10% lift).
+ */
+$qMenu-backgroundColor-fantasy: fa-v('fantasy-medium', $fantasy-medium);
 $qMenu-borderRadius: 4px;
+/* Destructive rows (text-secondary): icon glyph base stays secondary on hover — not menu gold. */
+$qMenu-destructiveItem-icon-color: fa-v('secondary', $secondary);
 $qMenu-item-hover-backgroundTransition: background-color 0.3s ease;
 $qMenu-item-hover-colorTransition: color 0.3s ease;
 /* Opacity wash + background (browse/sortBy/splash override currentcolor → tint). */
@@ -16,4 +23,5 @@ $qMenu-item-disabled-color-fantasy: color.mix($accent, $dark-lighter, 35%);
 $qMenu-item-disabled-keybind-color-fantasy: color.mix($text-keybind-hint, $dark-lighter, 35%);
 $qMenu-negativeMenuItemLabel-fontWeight: 500;
 $qMenu-negativeMenuItemLabel-textShadow: 0 0 3px fa-v('black', $black);
+$qMenu-subMenu-backgroundColor-fantasy: fa-v('fantasy-dark-light', $fantasy-dark-light);
 $qMenu-subMenu-zIndex: 5999;

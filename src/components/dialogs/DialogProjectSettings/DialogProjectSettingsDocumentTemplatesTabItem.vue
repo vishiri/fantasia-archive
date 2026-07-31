@@ -17,7 +17,7 @@
     <div class="dialogProjectSettingsDocumentTemplatesTabItem__labelRow">
       <div class="dialogProjectSettingsDocumentTemplatesTabItem__titleRow">
         <q-icon
-          class="dialogProjectSettingsDocumentTemplatesTabItem__tabIcon"
+          class="dialogProjectSettingsDocumentTemplatesTabItem__tabIcon fa-color-glyph"
           :data-test-icon-name="tabIconName"
           data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"
           :name="tabIconName"
@@ -36,7 +36,7 @@
         </div>
         <q-icon
           v-if="showMissingTranslationsWarning"
-          class="dialogProjectSettingsDocumentTemplatesTabItem__missingTranslationsWarning"
+          class="dialogProjectSettingsDocumentTemplatesTabItem__missingTranslationsWarning fa-color-glyph"
           color="warning"
           data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"
           :data-test-tooltip-text="missingTranslationsWarningTooltip"

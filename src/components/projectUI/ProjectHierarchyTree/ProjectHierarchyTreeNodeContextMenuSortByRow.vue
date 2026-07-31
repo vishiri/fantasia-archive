@@ -14,7 +14,7 @@
     </q-item-section>
     <q-item-section avatar>
       <q-icon
-        class="projectHierarchyTreeNodeContextMenu__icon"
+        class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
         name="keyboard_arrow_right"
       />
     </q-item-section>

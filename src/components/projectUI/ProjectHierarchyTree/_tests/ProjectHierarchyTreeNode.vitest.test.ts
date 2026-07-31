@@ -48,6 +48,7 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
   expect(wrapper.find('[data-test-node-kind="world"]').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode--world').exists()).toBe(true)
   expect(worldIcon.exists()).toBe(true)
+  expect(worldIcon.classes()).toContain('fa-color-glyph')
   expect(wrapper.find('.q-focus-helper').exists()).toBe(true)
   expect((wrapper.element as HTMLElement).style.color).toBe('')
   expectCssColorValue(
@@ -57,6 +58,9 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
   expect(
     (worldIcon.element as HTMLElement).style.getPropertyValue('--fa-color-glyph-base').trim()
   ).toBe('#112233')
+  expect(
+    (worldIcon.element as HTMLElement).style.getPropertyValue('--fa-color-glyph-highlight-base').trim()
+  ).toBe('80%')
   expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(false)
 })
@@ -514,8 +518,9 @@ test('Test that ProjectHierarchyTreeNode applies document appearance chrome colo
     global: {
       stubs: {
         QIcon: {
+          inheritAttrs: false,
           props: ['name'],
-          template: '<i class="q-icon" :name="name" />'
+          template: '<i class="q-icon" :class="$attrs.class" :style="$attrs.style" :name="name" />'
         }
       }
     },
@@ -542,10 +547,15 @@ test('Test that ProjectHierarchyTreeNode applies document appearance chrome colo
     (wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color,
     '#aabbcc'
   )
-  expectCssColorValue(
-    (wrapper.find('.projectHierarchyTreeNode__icon').element as HTMLElement).style.color,
-    '#aabbcc'
-  )
+  const documentIcon = wrapper.find('.projectHierarchyTreeNode__icon')
+  expect(documentIcon.classes()).toContain('fa-color-glyph')
+  expect(
+    (documentIcon.element as HTMLElement).style.getPropertyValue('--fa-color-glyph-base').trim()
+  ).toBe('#aabbcc')
+  expect(
+    (documentIcon.element as HTMLElement).style.getPropertyValue('--fa-color-glyph-highlight-base').trim()
+  ).toBe('58%')
+  expect((documentIcon.element as HTMLElement).style.color).toBe('')
 })
 
 test('Test that ProjectHierarchyTreeNode resyncs kind class when node kind changes', async () => {

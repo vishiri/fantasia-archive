@@ -101,3 +101,19 @@ test('Test that ProjectAppControlBarTabContextMenuList applies browse tab appear
 
   wrapper.unmount()
 })
+
+test('Test that ProjectAppControlBarTabContextMenuList marks minor-only browse tabs as statusMuted', () => {
+  const minorTab = {
+    ...projectAppControlBarTabContextMenuSampleTab,
+    isMinorDraft: true
+  }
+  const wrapper = mountProjectAppControlBarTabContextMenuList({
+    openedDocumentTabs: [minorTab]
+  })
+
+  const browseTab = wrapper.get('[data-test-locator="projectAppControlBar-tabContextMenu-browseTab"]')
+  expect(browseTab.classes()).toContain('projectAppControlBarTabContextMenu__item--browseTabStatusMuted')
+  expect(browseTab.classes()).not.toContain('projectAppControlBarTabContextMenu__item--browseTabCustomAppearance')
+
+  wrapper.unmount()
+})

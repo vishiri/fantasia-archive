@@ -3,9 +3,10 @@
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
 
 /* COMPONENT - PROJECT APP CONTROL BAR */
-$projectAppControlBar-actionSeparatorColor: fa-v('accent', $accent);
 $projectAppControlBar-actionSeparator-marginBlockPx: 6px;
 $projectAppControlBar-actionSeparator-marginInlineEndPx: 9px;
+$projectAppControlBar-actionSeparator-opacity: 0.5;
+$projectAppControlBar-actionSeparatorColor: fa-v('accent', $accent);
 $projectAppControlBar-backgroundColor: fa-v('dark', $dark);
 $projectAppControlBar-blockerHeightPx: 7.5px;
 $projectAppControlBar-bottomRuleColor: rgba($accent, 0.2);
@@ -37,6 +38,7 @@ $projectAppControlBar-tabBottomBorderWidthPx: 1px;
 $projectAppControlBar-tabDefaultBackgroundColor: rgba(255, 255, 255, 0.05);
 $projectAppControlBar-tabActiveBackgroundColor: fa-v('dark', $dark);
 $projectAppControlBar-tabActiveContentColor: fa-v('primary-bright', $primary-bright);
+$projectAppControlBar-tabStatusMutedColor: fa-v('text-muted', $text-muted);
 $projectAppControlBar-tabLabel-fontSize: 13px;
 $projectAppControlBar-tabLabel-fontWeight: 400;
 $projectAppControlBar-tabPadding-inlinePx: 10px;
@@ -50,6 +52,7 @@ $projectAppControlBar-tabWorldIndicator-iconMarginInlineStartPx: 4px;
 $projectAppControlBar-tabWorldIndicator-offsetLeft: -8px;
 $projectAppControlBar-tabWorldIndicator-offsetTop: 4px;
 /* Right-edge fade into header chrome when scroll arrows hidden (mid of 5-10px). */
+$projectAppControlBar-tabsRegion-endBlendMaskOpaqueStopColor: $black;
 $projectAppControlBar-tabsRegion-endBlendWidthPx: 8px;
 $projectAppControlBar-tabsRegion-endBlendZIndex: 3;
 $projectAppControlBar-tabsRegion-marginInlineEndWhenScrollButtonsHiddenPx: 5px;
@@ -62,6 +65,7 @@ $projectAppControlBar-tabContextMenu-browseSubmenu-bgColor: fa-v('dark', $dark);
 $projectAppControlBar-tabContextMenu-browseTab-paddingInlineStartBasePx: 16px;
 $projectAppControlBar-tabContextMenu-browseTab-extraPaddingInlineStartPx: 4px;
 $projectAppControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx: 5px;
+$projectAppControlBar-tabContextMenu-keybindText-fontWeight: 600;
 $projectAppControlBar-tabContextMenu-keybindText-marginTopPx: 2px;
 $projectAppControlBar-tabContextMenu-browseTabActive-color: fa-v('primary-bright', $primary-bright);
 $projectAppControlBar-tabContextMenu-browseTabWorldIndicator-fontSize: $projectAppControlBar-tabWorldIndicator-fontSize;

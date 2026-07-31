@@ -69,7 +69,7 @@
           </q-item-section>
           <q-item-section avatar>
             <q-icon
-              class="projectHierarchyTreeNodeContextMenu__icon"
+              class="projectHierarchyTreeNodeContextMenu__icon fa-color-glyph"
               :name="addNewRowIcon ?? undefined"
             />
           </q-item-section>

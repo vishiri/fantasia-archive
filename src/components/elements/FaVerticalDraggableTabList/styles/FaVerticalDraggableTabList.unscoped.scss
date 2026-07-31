@@ -1,0 +1,44 @@
+/* Shared vertical tab column host layout (FaVerticalDraggableTabList).
+ * Dialog Project Settings adds edge-glow / width overrides in
+ * DialogProjectSettings.worldsTabList.unscoped.scss. */
+.faVerticalDraggableTabs {
+  align-self: stretch;
+  flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$faVerticalDraggableTabs-column-default-width});
+  max-height: 100%;
+  max-width: var(--fa-vertical-draggable-tabs-column-width, #{$faVerticalDraggableTabs-column-default-width});
+  min-height: 0;
+  min-width: var(--fa-vertical-draggable-tabs-column-width, #{$faVerticalDraggableTabs-column-default-width});
+  overflow: hidden;
+  width: var(--fa-vertical-draggable-tabs-column-width, #{$faVerticalDraggableTabs-column-default-width});
+
+  .faVerticalDraggableTabs__scroll {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .faVerticalDraggableTabs__divider,
+  .faVerticalDraggableTabs__addButtonRow,
+  .faVerticalDraggableTabs__filterRow {
+    flex: 0 0 auto;
+  }
+
+  .faVerticalDraggableTabs__filterRow {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+  }
+}
+
+.faVerticalDraggableTabs__filterEmpty {
+  padding:
+    $faVerticalDraggableTabList-filterEmpty-paddingBlock
+    $faVerticalDraggableTabList-filterEmpty-paddingInline;
+  text-align: center;
+}

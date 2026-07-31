@@ -44,7 +44,8 @@ test('Test that ProjectAppControlBarTabWorldIndicator renders colored globe when
   expect(icon.exists()).toBe(true)
   expect(icon.props('name')).toBe('mdi-earth')
   expect(icon.props('style')).toEqual({
-    '--fa-color-glyph-base': '#ff00ff'
+    '--fa-color-glyph-base': '#ff00ff',
+    '--fa-color-glyph-highlight-base': '58%'
   })
   expect(wrapper.find('[data-test-locator="projectAppControlBar-tabWorldIndicator-doc-1"]').exists()).toBe(true)
 

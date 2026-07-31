@@ -1,6 +1,11 @@
 <template>
   <div class="dialogProjectSettings__documentTemplatesDetail">
-    <div class="dialogProjectSettingsDocumentTemplatesDetail__fieldsRow">
+    <div
+      class="dialogProjectSettingsDocumentTemplatesDetail__fieldsRow"
+      :class="{
+        'dialogProjectSettingsDocumentTemplatesDetail__fieldsRow--nameError': props.nameHasError
+      }"
+    >
       <div class="dialogProjectSettingsDocumentTemplatesDetail__nameField dialogProjectSettings__field">
         <div class="dialogProjectSettings__panelTitle">
           <span
@@ -22,7 +27,7 @@
           dense
           :error="props.nameHasError"
           :error-message="props.nameHasError ? $t('dialogs.projectSettings.fields.documentTemplateName.errorRequired') : undefined"
-          :hide-bottom-space="!props.nameHasError"
+          :hide-bottom-space="true"
           :max-length="FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH"
           test-locator="dialogProjectSettings-documentTemplates-nameInput"
           @update:model-value="(value) => emitTitleTranslations(value as I_faLocaleSingularPluralTranslations)"
@@ -137,10 +142,15 @@ function emitIcon (value: string | number | null): void {
 
 <style lang="scss" scoped>
 .dialogProjectSettingsDocumentTemplatesDetail__fieldsRow {
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
   flex-wrap: nowrap;
   gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
+  position: relative;
+
+  &--nameError {
+    margin-bottom: $dialogProjectSettings-detailFields-errorMessage-reserve;
+  }
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__nameField {
@@ -161,9 +171,14 @@ function emitIcon (value: string | number | null): void {
 
 .dialogProjectSettingsDocumentTemplatesDetail__iconField {
   flex: 0 0 auto;
+
+  :deep(.faIconPickerInput__trigger) {
+    margin-top: $dialogProjectSettings-documentTemplatesDetail-iconTrigger-marginTop;
+  }
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__deleteCol {
   flex: 0 0 auto;
+  margin-top: $dialogProjectSettings-documentTemplatesDetail-deleteCol-marginTop;
 }
 </style>

@@ -116,3 +116,5 @@ function isTemplateTabValidationError (
   return isDialogProjectSettingsDocumentTemplateTabValidationError(template)
 }
 </script>
+
+<style lang="scss" src="./styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

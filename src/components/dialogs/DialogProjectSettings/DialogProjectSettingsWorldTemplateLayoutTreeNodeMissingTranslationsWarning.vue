@@ -1,6 +1,6 @@
 <template>
   <q-icon
-    class="dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarningHost dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarning"
+    class="dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarningHost dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarning fa-color-glyph"
     color="warning"
     :data-test-locator="props.testLocator"
     :data-test-tooltip-text="props.tooltipText"

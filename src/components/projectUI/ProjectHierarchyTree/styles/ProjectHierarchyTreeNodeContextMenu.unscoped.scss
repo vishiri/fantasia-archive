@@ -1,5 +1,4 @@
 @use './variables' as *;
-@use '../../../../css/app.palette.scss' as *;
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
 @use '../../../globals/AppControlMenus/styles/contextMenuSeparators.mixin' as contextMenuSeparators;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
@@ -40,6 +39,9 @@
   }
 
   .projectHierarchyTreeNodeContextMenu__icon.q-icon {
+    --fa-color-glyph-base: #{appControlMenus.$appControlMenus-color};
+
+    color: var(--fa-color-glyph-base);
     font-size: paletteGlobals.$iconSize;
   }
 }
@@ -48,24 +50,60 @@
   .projectHierarchyTreeNodeContextMenu__item.q-item {
     transition: $qMenu-item-hover-colorTransition;
 
+    &:not(.text-secondary) {
+      &:hover:not([aria-disabled='true']),
+      &:focus:not([aria-disabled='true']) {
+        color: appControlMenus.$appControlMenus-singleHover;
+
+        .projectHierarchyTreeNodeContextMenu__icon {
+          --fa-color-glyph-base: #{appControlMenus.$appControlMenus-singleHover};
+
+          color: var(--fa-color-glyph-base);
+        }
+      }
+    }
+  }
+
+  .projectHierarchyTreeNodeContextMenu__item.text-secondary {
+    .projectHierarchyTreeNodeContextMenu__icon {
+      --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+
     &:hover:not([aria-disabled='true']),
     &:focus:not([aria-disabled='true']) {
-      color: appControlMenus.$appControlMenus-singleHover;
+      .projectHierarchyTreeNodeContextMenu__icon {
+        --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+        color: var(--fa-color-glyph-base);
+      }
     }
   }
 
   .projectHierarchyTreeNodeContextMenu__item--sortByActivator.q-item {
-    .projectHierarchyTreeNodeContextMenu__primaryLabel,
-    .projectHierarchyTreeNodeContextMenu__icon {
+    .projectHierarchyTreeNodeContextMenu__primaryLabel {
       color: $projectHierarchyTree-nodeContextMenu-sortByActivator-color;
+      transition: $qMenu-item-hover-colorTransition;
+    }
+
+    .projectHierarchyTreeNodeContextMenu__icon {
+      --fa-color-glyph-base: #{$projectHierarchyTree-nodeContextMenu-sortByActivator-color};
+
+      color: var(--fa-color-glyph-base);
       transition: $qMenu-item-hover-colorTransition;
     }
 
     &:hover:not([aria-disabled='true']),
     &:focus:not([aria-disabled='true']) {
-      .projectHierarchyTreeNodeContextMenu__primaryLabel,
-      .projectHierarchyTreeNodeContextMenu__icon {
+      .projectHierarchyTreeNodeContextMenu__primaryLabel {
         color: appControlMenus.$appControlMenus-singleHover;
+      }
+
+      .projectHierarchyTreeNodeContextMenu__icon {
+        --fa-color-glyph-base: #{appControlMenus.$appControlMenus-singleHover};
+
+        color: var(--fa-color-glyph-base);
       }
     }
   }
@@ -93,7 +131,7 @@
     color: $projectHierarchyTree-nodeContextMenu-sortByDetail-color;
     display: block;
     font-size: $projectHierarchyTree-nodeContextMenu-sortByDetail-fontSize;
-    font-weight: 600;
+    font-weight: $projectHierarchyTree-nodeContextMenu-sortByDetail-fontWeight;
     line-height: 1.2;
     white-space: nowrap;
   }

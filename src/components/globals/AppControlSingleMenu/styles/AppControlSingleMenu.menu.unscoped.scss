@@ -1,4 +1,6 @@
 @use './variables' as *;
+@use '../../AppControlMenus/styles/variables' as appControlMenus;
+@use '../../../../css/theme/quasar-components/qMenu.variables' as *;
 
 /* Teleported App Control menus.
  * Must use class= on q-menu — content-class is not a QMenu prop
@@ -30,5 +32,61 @@ body.fa-appTheme--fantasy .appControlSingleMenu__subMenu.q-menu {
   .faCornerContentDot {
     right: $appControlSingleMenu-contentDot-offsetRight;
     top: $appControlSingleMenu-contentDot-offsetTop;
+  }
+}
+
+/* Fantasy glyph bases for root + submenu icons (fa-color-glyph utility shades under fantasy). */
+.appControlSingleMenu__menu.q-menu,
+.appControlSingleMenu__subMenu.q-menu {
+  .appControlSingleMenu__icon.q-icon {
+    --fa-color-glyph-base: #{appControlMenus.$appControlMenus-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  .appControlSingleMenu__item:not(.text-secondary) {
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      .appControlSingleMenu__icon {
+        --fa-color-glyph-base: #{appControlMenus.$appControlMenus-singleHover};
+
+        color: var(--fa-color-glyph-base);
+      }
+    }
+  }
+
+  .appControlSingleMenu__item.text-secondary {
+    .appControlSingleMenu__icon {
+      --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      .appControlSingleMenu__icon {
+        --fa-color-glyph-base: #{$qMenu-destructiveItem-icon-color};
+
+        color: var(--fa-color-glyph-base);
+      }
+    }
+  }
+
+  .appControlSingleMenu__item--muted:not(.disabled, [disabled], [aria-disabled='true']) {
+    .appControlSingleMenu__icon {
+      --fa-color-glyph-base: #{$appControlSingleMenu-item-muted-color};
+
+      color: var(--fa-color-glyph-base);
+    }
+  }
+
+  .appControlSingleMenu__item.disabled,
+  .appControlSingleMenu__item[disabled],
+  .appControlSingleMenu__item[aria-disabled='true'] {
+    .appControlSingleMenu__icon {
+      --fa-color-glyph-base: #{$qMenu-item-disabled-color-fantasy};
+
+      color: var(--fa-color-glyph-base);
+    }
   }
 }

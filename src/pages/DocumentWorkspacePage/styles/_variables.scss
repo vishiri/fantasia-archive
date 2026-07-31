@@ -1,0 +1,7 @@
+@use '../../../css/app.palette.scss' as *;
+
+/* PAGE - DOCUMENT WORKSPACE PAGE
+ * fieldTitleIcon: css3 / file-tree glyphs beside field labels (near-white accent).
+ * oneWayRelationshipIcon: Quasar Material amber-14 (mdi-arrow-right-bold). */
+$documentWorkspacePage-fieldTitleIcon-color: fa-v('accent', $accent);
+$documentWorkspacePage-oneWayRelationshipIcon-color: #ffab00;

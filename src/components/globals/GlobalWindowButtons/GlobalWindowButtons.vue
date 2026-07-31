@@ -16,6 +16,7 @@
       @click="minimizeWindow()"
     >
       <q-icon
+        class="globalWindowButtons__icon fa-color-glyph"
         size="16px"
         name="mdi-window-minimize"
       />
@@ -33,6 +34,7 @@
       @click="resizeWindowThenRefreshMaximized()"
     >
       <q-icon
+        class="globalWindowButtons__icon fa-color-glyph"
         size="16px"
         :name="(isMaximized)
           ? 'mdi-window-restore'
@@ -52,6 +54,7 @@
       @click="tryCloseWindow()"
     >
       <q-icon
+        class="globalWindowButtons__icon fa-color-glyph"
         size="16px"
         name="mdi-window-close"
       />
@@ -94,10 +97,22 @@ const {
     z-index: $globalWindowButtons-dialogOverlay-zIndex;
   }
 
+  &__icon {
+    --fa-color-glyph-base: #{$globalWindowButtons-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
   &__button {
     &:hover,
     &:focus {
       color: $globalWindowButtons-hoverColor;
+
+      .globalWindowButtons__icon {
+        --fa-color-glyph-base: #{$globalWindowButtons-hoverColor};
+
+        color: var(--fa-color-glyph-base);
+      }
     }
   }
 
@@ -105,6 +120,12 @@ const {
     &:hover,
     &:focus {
       color: $globalWindowButtons-close-hoverColor;
+
+      .globalWindowButtons__icon {
+        --fa-color-glyph-base: #{$globalWindowButtons-close-hoverColor};
+
+        color: var(--fa-color-glyph-base);
+      }
     }
   }
 }

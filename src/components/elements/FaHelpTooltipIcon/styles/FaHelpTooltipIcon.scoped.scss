@@ -24,6 +24,7 @@
     flex-shrink: 0;
     height: $faHelpTooltipIcon-diamond-size;
     justify-content: center;
+    position: relative;
     transform: rotate(45deg);
     width: $faHelpTooltipIcon-diamond-size;
   }
@@ -33,8 +34,11 @@
     font-size: $faHelpTooltipIcon-glyph-font-size !important;
     height: auto !important;
     line-height: 1;
+    /* Above diamond ::after ring (fa-color-border-shading) so ? stays visible. */
+    position: relative;
     transform: rotate(-45deg);
     width: auto !important;
+    z-index: 1;
 
     &::before {
       font-size: inherit;

@@ -29,7 +29,7 @@
       </div>
       <q-icon
         v-if="showMissingTranslationsWarning"
-        class="dialogProjectSettingsWorldsTabItem__missingTranslationsWarning"
+        class="dialogProjectSettingsWorldsTabItem__missingTranslationsWarning fa-color-glyph"
         color="warning"
         data-test-locator="dialogProjectSettings-worlds-tabMissingTranslationsWarning"
         :data-test-tooltip-text="$t('dialogs.projectSettings.panels.worlds.missingTranslationsTabTooltip')"

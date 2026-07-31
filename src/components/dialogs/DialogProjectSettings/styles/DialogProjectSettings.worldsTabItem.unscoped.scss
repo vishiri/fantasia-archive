@@ -15,6 +15,9 @@
 }
 
 .dialogProjectSettingsWorldsTabItem__missingTranslationsWarning {
+  --fa-color-glyph-base: #{$dialogProjectSettings-missingTranslationsWarning-icon-color};
+
+  color: var(--fa-color-glyph-base);
   flex: 0 0 auto;
   margin-left: $dialogProjectSettings-worldsTabMissingTranslationsWarning-marginLeft;
   pointer-events: auto;

@@ -12,6 +12,7 @@
         :dense="props.dense"
         :data-test-locator="props.testLocator"
         filled
+        hide-bottom-space
         outlined
         :readonly="props.readOnly"
         @click="openPickerMenu"

@@ -7,7 +7,7 @@
       <div class="faLabeledBooleanToggle__title">
         <q-icon
           v-if="icon !== undefined && icon.length > 0"
-          class="faLabeledBooleanToggle__leadingIcon q-mr-sm"
+          class="faLabeledBooleanToggle__leadingIcon fa-color-glyph q-mr-sm"
           :name="icon"
           size="20px"
         />
@@ -74,3 +74,5 @@ function onToggle (value: boolean): void {
   align-self: flex-start;
 }
 </style>
+
+<style lang="scss" src="./styles/FaLabeledBooleanToggle.unscoped.scss"></style>

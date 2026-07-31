@@ -1,0 +1,8 @@
+@use './variables' as *;
+
+/* Leading title icon: solid flat; fantasy glyph shade via .fa-color-glyph. */
+.faLabeledBooleanToggle__leadingIcon {
+  --fa-color-glyph-base: #{$faLabeledBooleanToggle-leadingIcon-color};
+
+  color: var(--fa-color-glyph-base);
+}

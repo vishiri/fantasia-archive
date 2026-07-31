@@ -1,5 +1,4 @@
 @use './variables' as *;
-@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 
 .projectHierarchyTreeNode {
@@ -22,7 +21,12 @@
 .projectHierarchyTreeNode--documentTemplate {
   color: $projectHierarchyTree-documentRow-color;
 
-  .projectHierarchyTreeNode__icon,
+  .projectHierarchyTreeNode__icon {
+    --fa-color-glyph-base: #{$projectHierarchyTree-documentRow-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
   .projectHierarchyTreeNode__label {
     color: $projectHierarchyTree-documentRow-color;
   }
@@ -31,7 +35,12 @@
 .projectHierarchyTreeNode--addNewDocument {
   color: $projectHierarchyTree-addNewDocumentRow-color;
 
-  .projectHierarchyTreeNode__icon,
+  .projectHierarchyTreeNode__icon {
+    --fa-color-glyph-base: #{$projectHierarchyTree-addNewDocumentRow-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
   .projectHierarchyTreeNode__label {
     color: $projectHierarchyTree-addNewDocumentRow-color;
   }
@@ -39,7 +48,13 @@
 
 .projectHierarchyTreeNode--group {
   color: $projectHierarchyTree-groupRow-color;
-  font-weight: 700;
+  font-weight: $projectHierarchyTree-groupRow-fontWeight;
+
+  .projectHierarchyTreeNode__icon {
+    --fa-color-glyph-base: #{$projectHierarchyTree-groupRow-color};
+
+    color: var(--fa-color-glyph-base);
+  }
 
   .projectHierarchyTreeNode__label {
     color: $projectHierarchyTree-groupRow-color;
@@ -53,10 +68,6 @@
 .projectHierarchyTreeNode__icon--worldGlyph {
   color: var(--fa-color-glyph-base);
   flex-shrink: 0;
-}
-
-body.fa-appTheme--fantasy .projectHierarchyTreeNode__icon--worldGlyph {
-  @include colorGlyph.fa-color-glyph-shading;
 }
 
 .projectHierarchyTreeNode__icon {

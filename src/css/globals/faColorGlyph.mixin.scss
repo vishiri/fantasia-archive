@@ -1,32 +1,80 @@
 @use 'faColorGlyph.variables.scss' as *;
 
+@mixin fa-color-glyph-text-clip-fill {
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-highlightBaseVar}, #{$faColorGlyph-gradient-highlightBase}),
+        var(--fa-color-white)
+      ),
+      var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-midStop,
+      color-mix(
+        in srgb,
+        var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-shadeBaseVar}, #{$faColorGlyph-gradient-shadeBase}),
+        var(--fa-color-black)
+      )
+    );
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 // Soft top-light / bottom-shade gradient painted into a font icon glyph.
-// Set #{$faColorGlyph-baseVar} on the element (world color). No circular fill.
-// Targets ::before (MDI / similar) — box-shadow inset cannot shade a glyph.
+// Set #{$faColorGlyph-baseVar} on the element. No circular fill.
+// Optional #{$faColorGlyph-highlightBaseVar} / #{$faColorGlyph-shadeBaseVar} override mix shares.
+// Host clip = Material Icons / ligatures (text on element). ::before = MDI / FA webfonts.
 @mixin fa-color-glyph-shading {
   color: var(#{$faColorGlyph-baseVar});
   filter: drop-shadow(#{$faColorGlyph-dropShadow});
 
+  @include fa-color-glyph-text-clip-fill;
+
   &::before {
-    -webkit-background-clip: text;
-    background-clip: text;
+    @include fa-color-glyph-text-clip-fill;
+  }
+}
+
+// Gradient ring border (transparent interior). Set #{$faColorGlyph-baseVar} on the host.
+// Uses ::after + mask so Quasar QCheckbox keeps its outline shape (not a filled gold tile).
+@mixin fa-color-border-shading($border-width: 2px) {
+  background: transparent !important;
+  background-image: none !important;
+  border: $border-width solid transparent !important;
+
+  &::after {
     background-image:
       linear-gradient(
         180deg,
         color-mix(
           in srgb,
-          var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-highlightBase,
+          var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-highlightBaseVar}, #{$faColorGlyph-gradient-highlightBase}),
           var(--fa-color-white)
         ),
         var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-midStop,
         color-mix(
           in srgb,
-          var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-shadeBase,
+          var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-shadeBaseVar}, #{$faColorGlyph-gradient-shadeBase}),
           var(--fa-color-black)
         )
       );
-    color: transparent;
-    -webkit-text-fill-color: transparent;
+    border-radius: inherit;
+    box-sizing: border-box;
+    content: '';
+    inset: 0;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: $border-width;
+    pointer-events: none;
+    position: absolute;
   }
 }
 
@@ -40,13 +88,13 @@
       $angle,
       color-mix(
         in srgb,
-        var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-highlightBase,
+        var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-highlightBaseVar}, #{$faColorGlyph-gradient-highlightBase}),
         var(--fa-color-white)
       ),
       var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-midStop,
       color-mix(
         in srgb,
-        var(#{$faColorGlyph-baseVar}) $faColorGlyph-gradient-shadeBase,
+        var(#{$faColorGlyph-baseVar}) var(#{$faColorGlyph-shadeBaseVar}, #{$faColorGlyph-gradient-shadeBase}),
         var(--fa-color-black)
       )
     );
