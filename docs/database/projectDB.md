@@ -8,7 +8,7 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 
 ## Schema version (`PRAGMA user_version`)
 
-Flattened to a single bootstrap revision during pre-release dev. No upgrade ladder ships.
+Fresh files bootstrap to **v5**. Live upgrade ladder **v1→v5** ships. Pre-release flatten (squash to single bootstrap) separate — [fantasia-flatten-database-schemas](../../.cursor/skills/fantasia-flatten-database-schemas/SKILL.md).
 
 | Version | Contents |
 |---------|----------|
@@ -186,15 +186,15 @@ Singleton workspace tab snapshot (one row, **`id = 1`**).
 
 **Link helpers (FK assignment):** **`setFaProjectDocumentWorld`**, **`setFaProjectDocumentTemplate`** in **`faProjectDocumentsPersistWiring.ts`**.
 
-## Planned extensions (after version 4)
+## Planned extensions (after version 5)
 
-Template custom fields (defs, typed values, orphan retention) in [templateCustomFields.md](templateCustomFields.md); future migration; table detail lands here when shipped.
+Template custom fields (defs, typed values, orphan retention) in [templateCustomFields.md](templateCustomFields.md); future migration (**v6+**); table detail lands here when shipped.
 
 ## Main-process module map
 
 ```
 src-electron/mainScripts/projectManagement/
-  faProjectDbMigrateWiring.ts          # flattened single-version migrations, metadata read helpers
+  faProjectDbMigrateWiring.ts          # migrations v1→v5 + bootstrap, metadata read helpers
   faProjectDatabaseEnsureConnectedWiring.ts  # runWithFaProjectDatabase* (required entry)
   faProjectDataKvWiring.ts
   faProjectSettingsPersistWiring.ts

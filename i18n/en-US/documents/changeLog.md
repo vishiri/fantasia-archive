@@ -48,6 +48,14 @@
 - **App Settings**: **Prevent filled app noteboard from showing** and **Prevent filled project noteboard from showing** (defaults off). When off, a filled **App Noteboard** opens at app load and a filled **Project Noteboard** opens when a project loads; when on, that auto-open is skipped. Empty noteboards never open on their own. Manual toggle and keybinds still work. Older **Prevent filled noteboard** saves migrate to the app setting.
 
 ### Bugfixes & Optimizations
+- **Checkboxes**: Fantasy checkboxes keep a transparent outline box with a gold gradient ring and checkmark (no Material hover halo). Hover tints the ring; disabled uses a muted grey ring. Flat theme keeps a simpler outlined box with primary-bright hover border.
+- **Color glyphs**: Fantasy theme applies angled metal/gold shading to more chrome icons — top menus, window controls, app control bar strip and tab icons, hierarchy tree icons, **Project Settings** tab/template/palette/menu icons, color-picker **+**, help diamond ring (question mark stays solid), and document-workspace field title icons (**Belongs under**, **Custom order**, **Extra HTML classes**).
+- **Document colors**: Very dark custom document text colors use a milder fantasy glyph highlight so the hue stays readable on tabs and tree icons.
+- **Document tabs**: Inactive tabs marked **Is a minor document** with no custom text color use muted grey label/icon chrome; the active tab still uses the normal bright accent unless a custom text color is set.
+- **Forms**: Flat-theme focused fields use a primary-bright underline or outline ring. Dark field prepend/append icons pick up fantasy glyph shading and keep warning/destructive colors when those Quasar text colors apply.
+- **Scrollbars**: Shared thin pill thumbs with a darker thumb and transparent track (flat and fantasy).
+- **Import / Export App Configuration**: Checkbox rows put the label on the left and the checkbox on the right with fixed column widths.
+- **Project Settings**: Document-template name/icon row keeps a reserved error-message band so the icon picker stays aligned when the name field shows an error; fantasy glyph shading on related icons and palette context-menu rows.
 - **Toggles**: Settings and form toggles use a fixed-size moon-pill track (**135×28**) with a sliding disc (no thumb border). Fantasy theme shades off discs in moon silver and on discs in gold with the same angled fill lighting as hierarchy world glyphs, plus a soft gold glow when on; flat theme keeps rim-only chrome without off-state glow.
 - **App Settings**: Toggle controls use the same **12px** / **10px** padding as select fields so they line up under their titles; category tabs keep a **330px** minimum width.
 - **Language selector**: Fantasy-theme hover glow on the spellcheck refresh control matches the red spinner icon (same edge-bloom treatment as other flat fantasy buttons).
