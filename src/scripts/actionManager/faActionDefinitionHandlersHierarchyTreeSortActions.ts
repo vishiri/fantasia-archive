@@ -5,6 +5,11 @@ import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeDocumentSortBucket } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
+  hasFaProjectHierarchySortBridge,
+  listFaProjectPlacementDocumentChildrenForRenderer,
+  reindexFaProjectDocumentSiblingsForRenderer
+} from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
+import {
   resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId,
   runProjectHierarchyTreeDocumentSort
 } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentSortRun'
@@ -65,20 +70,18 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
     if (root === null) {
       return
     }
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.listPlacementDocumentChildren !== 'function' ||
-      typeof api?.reindexDocumentSiblingsInHierarchy !== 'function'
-    ) {
+    if (!hasFaProjectHierarchySortBridge()) {
       throw new Error('Project hierarchy sort bridge is unavailable')
     }
     const sortResult = await ResultAsync.fromPromise(
       runProjectHierarchyTreeDocumentSort({
         direction: payload.direction,
         key: payload.key,
-        listPlacementDocumentChildren: (listInput) => api.listPlacementDocumentChildren(listInput),
+        listPlacementDocumentChildren: (listInput) => {
+          return listFaProjectPlacementDocumentChildrenForRenderer(listInput)
+        },
         reindexDocumentSiblingsInHierarchy: (reindexInput) => {
-          return api.reindexDocumentSiblingsInHierarchy(reindexInput)
+          return reindexFaProjectDocumentSiblingsForRenderer(reindexInput)
         },
         root,
         scope: payload.scope

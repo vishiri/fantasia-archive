@@ -1,6 +1,7 @@
 import type { Ref, watch as WatchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import { listFaProjectPlacementDocumentChildrenForRenderer } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 
 import { runProjectHierarchyTreeDeferredLazyLoadBatch } from './projectHierarchyTreeDeferredLazyLoadBatchWiring'
 import { createProjectHierarchyTreeLazyLoadWiring } from './projectHierarchyTreeLazyLoadWiring'
@@ -10,16 +11,6 @@ type T_hierarchyStore = {
   flushUiStatePersist: () => void
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   queuePersistScrollTopPx: (scrollTopPx: number) => void
-}
-
-async function listProjectHierarchyTreePlacementDocumentChildren (
-  input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
-) {
-  const api = window.faContentBridgeAPIs?.projectContent
-  if (typeof api?.listPlacementDocumentChildren !== 'function') {
-    return { items: [] }
-  }
-  return await api.listPlacementDocumentChildren(input)
 }
 
 export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
@@ -53,7 +44,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
     deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: deps.getPreferredLanguageCode,
-    listPlacementDocumentChildren: listProjectHierarchyTreePlacementDocumentChildren,
+    listPlacementDocumentChildren: listFaProjectPlacementDocumentChildrenForRenderer,
     nextTick: deps.nextTick,
     onAfterTreeRevisionPublished: () => {
       if (deps.deferLazyLoadTreeRevisionPublish.value) {

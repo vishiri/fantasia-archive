@@ -37,6 +37,11 @@ export const S_FaProjectWorkspaceWorlds = defineStore('S_FaProjectWorkspaceWorld
     worldListItems.value = []
   }
 
+  function replaceSessionForComponentTesting (worlds: I_faProjectWorld[]): void {
+    worldsRaw.value = [...worlds]
+    applyMappedList()
+  }
+
   async function refreshWorkspaceWorlds (): Promise<void> {
     if (!S_FaActiveProject().hasActiveProject) {
       clearWorkspaceWorlds()
@@ -75,6 +80,7 @@ export const S_FaProjectWorkspaceWorlds = defineStore('S_FaProjectWorkspaceWorld
 
   return {
     refreshWorkspaceWorlds,
+    replaceSessionForComponentTesting,
     worldListItems: readonly(worldListItems)
   }
 })

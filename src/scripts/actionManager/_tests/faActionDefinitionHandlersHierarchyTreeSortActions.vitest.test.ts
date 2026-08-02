@@ -1,9 +1,11 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
 import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from '../faActionDefinitionHandlersHierarchyTreeSortActions'
+import { setFaComponentTestingProjectContentOverrides } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  setFaComponentTestingProjectContentOverrides(null)
 })
 
 function stubProjectContentApi (api: {

@@ -348,6 +348,7 @@ test('Test that ProjectHierarchyTreeNode renders placement counts from display p
       placementCountDisplay: {
         categoryCount: 3,
         display: {
+          doubleDashDivider: false,
           segments: [
             {
               kind: 'document',

@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import { setFaComponentTestingProjectContentOverrides } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 import { runProjectHierarchyTreeSearchQuery } from '../projectHierarchyTreeSearchQueryWiring'
 
 const searchProjectHierarchyMock = vi.fn(async () => ({
@@ -18,6 +19,7 @@ const searchProjectHierarchyMock = vi.fn(async () => ({
 
 beforeEach(() => {
   searchProjectHierarchyMock.mockClear()
+  setFaComponentTestingProjectContentOverrides(null)
   window.faContentBridgeAPIs = {
     projectContent: {
       searchProjectHierarchy: searchProjectHierarchyMock
@@ -72,4 +74,30 @@ test('Test that runProjectHierarchyTreeSearchQuery clears search when bridge is 
   }
   await runProjectHierarchyTreeSearchQuery('hero', hierarchyStore as never)
   expect(hierarchyStore.clearSearch).toHaveBeenCalled()
+})
+
+test('Test that runProjectHierarchyTreeSearchQuery uses searchHitsByQuery overrides', async () => {
+  window.faContentBridgeAPIs = {
+    projectContent: {}
+  } as never
+  setFaComponentTestingProjectContentOverrides({
+    searchHitsByQuery: {
+      hero: [{
+        ancestorDocumentIds: [],
+        displayName: 'Hero',
+        documentId: 'doc-1',
+        placementId: 'placement-1',
+        worldId: 'world-1'
+      }]
+    }
+  })
+  const hierarchyStore = {
+    clearSearch: vi.fn(),
+    requestRevealSearchHit: vi.fn(),
+    setSearchHits: vi.fn()
+  }
+  await runProjectHierarchyTreeSearchQuery('hero', hierarchyStore as never)
+  expect(hierarchyStore.setSearchHits).toHaveBeenCalled()
+  expect(hierarchyStore.requestRevealSearchHit).toHaveBeenCalled()
+  setFaComponentTestingProjectContentOverrides(null)
 })

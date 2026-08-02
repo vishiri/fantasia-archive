@@ -151,3 +151,42 @@ test('Test that language changes do not remap when the workspace world list is e
 
   expect(store.worldListItems).toEqual([])
 })
+
+test('Test that replaceSessionForComponentTesting maps seeded worlds in list order', async () => {
+  const { S_FaProjectWorkspaceWorlds } = await import('../S_FaProjectWorkspaceWorlds')
+  const store = S_FaProjectWorkspaceWorlds()
+
+  store.replaceSessionForComponentTesting([
+    {
+      color: '#000000',
+      colorPallete: '',
+      createdAtMs: 1,
+      displayName: 'Alpha',
+      displayNameTranslations: { 'en-US': 'Alpha World' },
+      id: 'world-a',
+      sortOrder: 0,
+      updatedAtMs: 1
+    },
+    {
+      color: '#111111',
+      colorPallete: '',
+      createdAtMs: 2,
+      displayName: 'Beta',
+      displayNameTranslations: { 'en-US': 'Beta World' },
+      id: 'world-b',
+      sortOrder: 1,
+      updatedAtMs: 2
+    }
+  ])
+
+  expect(store.worldListItems).toEqual([
+    {
+      displayName: 'Alpha World',
+      id: 'world-a'
+    },
+    {
+      displayName: 'Beta World',
+      id: 'world-b'
+    }
+  ])
+})

@@ -245,6 +245,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
           return {
             categoryCount,
             display: {
+              doubleDashDivider: false,
               segments: [
                 {
                   kind: 'document',

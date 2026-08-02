@@ -26,6 +26,14 @@ declare global{
     __faComponentTestingPatchStores?: (seed: I_faComponentTestingStoreSeed) => void
 
     /**
+     * Component-testing harness: hierarchy search override invoke probe (TEST_ENV components).
+     */
+    __faComponentTestingHierarchySearchProbe?: {
+      callCount: number
+      lastQuery: string
+    }
+
+    /**
      * E2E-only: Pinia active project snapshot for Playwright page.evaluate (installed when TEST_ENV is 'e2e').
      */
     __faE2eGetActiveProjectSnapshot?: () => I_faActiveProject | null

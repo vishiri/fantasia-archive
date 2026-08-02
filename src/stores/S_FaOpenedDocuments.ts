@@ -21,6 +21,19 @@ import {
   navigateToWorkspaceHomeRoute
 } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import {
+  createFaProjectDocumentForRenderer,
+  deleteFaProjectDocumentForRenderer,
+  getFaProjectDocumentByIdForRenderer,
+  getFaProjectDocumentTemplateByIdForRenderer,
+  getFaProjectWorldByIdForRenderer,
+  hasFaProjectContentEntityReaders,
+  hasFaProjectDocumentByIdReader,
+  hasFaProjectDocumentCreateWriter,
+  hasFaProjectDocumentUpdateWriter,
+  listFaProjectPlacementDocumentChildrenForRenderer,
+  updateFaProjectDocumentForRenderer
+} from 'app/src/scripts/componentTesting/componentTesting_manager'
+import {
   applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
   applyFaOpenedDocumentIsCategoryDraft,
@@ -267,12 +280,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     documentId: string,
     treeMeta: I_faOpenedDocumentTreeOpenMeta
   ): Promise<I_faOpenedDocumentTab | null> {
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (typeof api?.getDocumentById !== 'function') {
+    if (!hasFaProjectDocumentByIdReader()) {
       return null
     }
     const documentResult = await ResultAsync.fromPromise(
-      api.getDocumentById(documentId),
+      getFaProjectDocumentByIdForRenderer(documentId),
       (error): unknown => error
     )
     if (documentResult.isErr()) {
@@ -334,12 +346,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function createTemporaryDocument (
     input: I_faTemporaryOpenedDocumentCreateInput
   ): Promise<string> {
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.getDocumentTemplateById !== 'function' ||
-      typeof api?.getWorldById !== 'function' ||
-      typeof api?.getDocumentById !== 'function'
-    ) {
+    if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
 
@@ -351,11 +358,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       const parentIsOpenTemporary = parentTab !== undefined &&
         resolveOpenedDocumentTabIsTemporary(parentTab.persistenceState)
       if (!parentIsOpenTemporary) {
-        await api.getDocumentById(parentDocumentId)
+        await getFaProjectDocumentByIdForRenderer(parentDocumentId)
       }
     }
-    await api.getWorldById(input.worldId)
-    const template = await api.getDocumentTemplateById(input.templateId)
+    await getFaProjectWorldByIdForRenderer(input.worldId)
+    const template = await getFaProjectDocumentTemplateByIdForRenderer(input.templateId)
     const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
     const tabLabel = resolveFaProjectDocumentTemplateDisplayTitleFromFields(
       template.titlePluralTranslations,
@@ -390,17 +397,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function createTemporaryDocumentUnderParentDocument (
     sourceDocumentId: string
   ): Promise<string | null> {
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.getDocumentById !== 'function' ||
-      typeof api?.getDocumentTemplateById !== 'function' ||
-      typeof api?.getWorldById !== 'function'
-    ) {
+    if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
 
     const sourceDocumentResult = await ResultAsync.fromPromise(
-      api.getDocumentById(sourceDocumentId),
+      getFaProjectDocumentByIdForRenderer(sourceDocumentId),
       (error): unknown => error
     )
     if (sourceDocumentResult.isErr()) {
@@ -414,11 +416,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
 
     const temporaryParentResolveDocumentIds = await buildTemporaryDocumentParentResolveDocumentIds({
-      getDocumentById: api.getDocumentById,
+      getDocumentById: getFaProjectDocumentByIdForRenderer,
       startDocumentId: sourceDocumentId
     })
-    await api.getWorldById(sourceDocument.worldId)
-    const template = await api.getDocumentTemplateById(templateId)
+    await getFaProjectWorldByIdForRenderer(sourceDocument.worldId)
+    const template = await getFaProjectDocumentTemplateByIdForRenderer(templateId)
     const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
     const displayName = resolveProjectHierarchyTreeNewDocumentDisplayName({
       preferredLanguageCode,
@@ -439,17 +441,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function createTemporaryDocumentCopyFromSource (
     sourceDocumentId: string
   ): Promise<string | null> {
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.getDocumentById !== 'function' ||
-      typeof api?.getDocumentTemplateById !== 'function' ||
-      typeof api?.getWorldById !== 'function'
-    ) {
+    if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
 
     const sourceDocumentResult = await ResultAsync.fromPromise(
-      api.getDocumentById(sourceDocumentId),
+      getFaProjectDocumentByIdForRenderer(sourceDocumentId),
       (error): unknown => error
     )
     if (sourceDocumentResult.isErr()) {
@@ -462,8 +459,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return null
     }
 
-    await api.getWorldById(sourceDocument.worldId)
-    const template = await api.getDocumentTemplateById(templateId)
+    await getFaProjectWorldByIdForRenderer(sourceDocument.worldId)
+    const template = await getFaProjectDocumentTemplateByIdForRenderer(templateId)
     const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
     const tabLabel = resolveFaProjectDocumentTemplateDisplayTitleFromFields(
       template.titlePluralTranslations,
@@ -484,7 +481,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const temporaryParentResolveDocumentIds = parentDocumentId === null
       ? undefined
       : await buildTemporaryDocumentParentResolveDocumentIds({
-        getDocumentById: api.getDocumentById,
+        getDocumentById: getFaProjectDocumentByIdForRenderer,
         startDocumentId: parentDocumentId
       })
     const newTab = createTemporaryOpenedDocumentTabCopySeed({
@@ -527,18 +524,13 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return null
     }
 
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.getDocumentById !== 'function' ||
-      typeof api?.getDocumentTemplateById !== 'function' ||
-      typeof api?.getWorldById !== 'function'
-    ) {
+    if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
 
     const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
       ResultAsync,
-      getDocumentById: api.getDocumentById,
+      getDocumentById: getFaProjectDocumentByIdForRenderer,
       sourceTab
     })
     if (actionContext === null) {
@@ -546,8 +538,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
 
     const { parentDocumentId, templateId, worldId } = actionContext
-    await api.getWorldById(worldId)
-    await api.getDocumentTemplateById(templateId)
+    await getFaProjectWorldByIdForRenderer(worldId)
+    await getFaProjectDocumentTemplateByIdForRenderer(templateId)
 
     const displayName = resolveCopyOfDocumentDisplayName({
       formatCopyOfPrefix: (params) => {
@@ -562,7 +554,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const temporaryParentResolveDocumentIds = parentDocumentId === null
       ? undefined
       : await buildTemporaryDocumentParentResolveDocumentIds({
-        getDocumentById: api.getDocumentById,
+        getDocumentById: getFaProjectDocumentByIdForRenderer,
         startDocumentId: parentDocumentId
       })
     const newTab = createTemporaryOpenedDocumentTabCopySeed({
@@ -609,18 +601,13 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return null
     }
 
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (
-      typeof api?.getDocumentById !== 'function' ||
-      typeof api?.getDocumentTemplateById !== 'function' ||
-      typeof api?.getWorldById !== 'function'
-    ) {
+    if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
 
     const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
       ResultAsync,
-      getDocumentById: api.getDocumentById,
+      getDocumentById: getFaProjectDocumentByIdForRenderer,
       sourceTab
     })
     if (actionContext === null) {
@@ -628,8 +615,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
 
     const { templateId, worldId } = actionContext
-    await api.getWorldById(worldId)
-    const template = await api.getDocumentTemplateById(templateId)
+    await getFaProjectWorldByIdForRenderer(worldId)
+    const template = await getFaProjectDocumentTemplateByIdForRenderer(templateId)
     const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
     const displayName = resolveProjectHierarchyTreeNewDocumentDisplayName({
       preferredLanguageCode,
@@ -638,7 +625,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     })
     const temporaryParentResolveDocumentIds =
       await buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab({
-        getDocumentById: api.getDocumentById,
+        getDocumentById: getFaProjectDocumentByIdForRenderer,
         sourceTab
       })
 
@@ -911,7 +898,6 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (current === undefined) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
     }
-    const api = window.faContentBridgeAPIs?.projectContent
     if (!input.keepEditMode && typeof document !== 'undefined') {
       const activeElement = document.activeElement
       if (activeElement instanceof HTMLElement) {
@@ -921,8 +907,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
 
     if (resolveOpenedDocumentTabIsTemporary(current.persistenceState)) {
       if (
-        typeof api?.createDocument !== 'function' ||
-        typeof api?.getDocumentTemplateById !== 'function'
+        !hasFaProjectDocumentCreateWriter() ||
+        !hasFaProjectContentEntityReaders()
       ) {
         throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
       }
@@ -931,7 +917,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       if (worldId === undefined || templateId === undefined) {
         throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
       }
-      const template = await api.getDocumentTemplateById(templateId)
+      const template = await getFaProjectDocumentTemplateByIdForRenderer(templateId)
       const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
       const templateSingularTitle = resolveFaLocaleStringTranslation(
         template.titleSingularTranslations,
@@ -950,7 +936,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       const availableDocumentIds = new Set<string>()
       for (const chainDocumentId of parentResolveChain) {
         const chainDocumentResult = await ResultAsync.fromPromise(
-          api.getDocumentById(chainDocumentId),
+          getFaProjectDocumentByIdForRenderer(chainDocumentId),
           (error): unknown => error
         )
         if (chainDocumentResult.isOk()) {
@@ -963,7 +949,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       let resolvedParentDocumentId = draftParentDocumentId
       if (draftParentDocumentId !== null) {
         const parentDocumentResult = await ResultAsync.fromPromise(
-          api.getDocumentById(draftParentDocumentId),
+          getFaProjectDocumentByIdForRenderer(draftParentDocumentId),
           (error): unknown => error
         )
         if (parentDocumentResult.isErr()) {
@@ -975,7 +961,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       }
       const temporarySaveResult = await ResultAsync.fromPromise(
         (async () => {
-          const savedDocument = await api.createDocument({
+          const savedDocument = await createFaProjectDocumentForRenderer({
             displayName,
             documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
               current.documentBackgroundColorDraft
@@ -1062,7 +1048,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return
     }
 
-    if (typeof api?.updateDocument !== 'function' || typeof api?.getDocumentById !== 'function') {
+    if (
+      !hasFaProjectDocumentUpdateWriter() ||
+      !hasFaProjectDocumentByIdReader()
+    ) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
     }
     const trimmedDraft = current.displayNameDraft.trim()
@@ -1080,13 +1069,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
           worldId: string
         } | null = null
         if (parentChanged) {
-          if (
-            typeof api.moveDocumentInHierarchy !== 'function' ||
-            typeof api.listPlacementDocumentChildren !== 'function'
-          ) {
+          const api = window.faContentBridgeAPIs?.projectContent
+          if (typeof api?.moveDocumentInHierarchy !== 'function') {
             throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
           }
-          const existingDocument = await api.getDocumentById(documentId)
+          const existingDocument = await getFaProjectDocumentByIdForRenderer(documentId)
           const placementId = existingDocument.placementId
           if (placementId === null) {
             throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
@@ -1094,7 +1081,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
           const targetParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
             current.parentDocumentIdDraft
           )
-          const siblingsResult = await api.listPlacementDocumentChildren({
+          const siblingsResult = await listFaProjectPlacementDocumentChildrenForRenderer({
             placementId,
             parentDocumentId: targetParentDocumentId
           })
@@ -1114,7 +1101,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
             worldId: existingDocument.worldId
           }
         }
-        const savedDocument = await api.updateDocument(documentId, {
+        const savedDocument = await updateFaProjectDocumentForRenderer(documentId, {
           displayName: trimmedDraft,
           documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
             current.documentBackgroundColorDraft
@@ -1347,7 +1334,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       openTab === null ||
       !resolveOpenedDocumentTabIsTemporary(openTab.persistenceState)
     if (shouldDeletePersistedDocumentRow) {
-      await window.faContentBridgeAPIs.projectContent.deleteDocument(documentId)
+      await deleteFaProjectDocumentForRenderer(documentId)
     }
     removeProjectHierarchyTreeDocumentNodesByDocumentIds(
       hierarchyStore.treeData,

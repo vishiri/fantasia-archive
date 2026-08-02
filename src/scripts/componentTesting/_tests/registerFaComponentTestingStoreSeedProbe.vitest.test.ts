@@ -3,7 +3,9 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { registerFaComponentTestingStoreSeedProbe } from '../registerFaComponentTestingStoreSeedProbe_manager'
@@ -129,4 +131,29 @@ test('Test that registerFaComponentTestingStoreSeedProbe patches opened document
   expect(openedDocuments.tabs).toHaveLength(1)
   expect(openedDocuments.activeDocumentId).toBe('doc-1')
   expect(openedDocuments.hydrationComplete).toBe(true)
+})
+
+/**
+ * registerFaComponentTestingStoreSeedProbe
+ * Patches noteboard text, app theme body classes, and hideTabCloseButton.
+ */
+test('Test that registerFaComponentTestingStoreSeedProbe patches noteboards theme and tab close setting', () => {
+  registerFaComponentTestingStoreSeedProbe()
+
+  window.__faComponentTestingPatchStores?.({
+    activeProject: {
+      filePath: 'C:\\Playwright\\dots.faproject',
+      id: 'dots-id',
+      name: 'Dots Project'
+    },
+    appNoteboardText: 'app notes',
+    appTheme: 'lightThemeFlat',
+    hideTabCloseButton: true,
+    projectNoteboardText: 'project notes'
+  })
+
+  expect(S_FaAppNoteboard().text).toBe('app notes')
+  expect(S_FaProjectNoteboard().text).toBe('project notes')
+  expect(S_FaUserSettings().settings?.hideTabCloseButton).toBe(true)
+  expect(S_FaUserSettings().settings?.appTheme).toBe('lightThemeFlat')
 })

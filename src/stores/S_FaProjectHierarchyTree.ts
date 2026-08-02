@@ -237,9 +237,28 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
   const resetOnProjectCloseOut = resetOnProjectClose
   const searchHitsOut = searchHits
   const setSearchHitsOut = setSearchHits
+  /**
+   * Component-testing only: replace hierarchy session without bridge hydrate.
+   */
+  function replaceSessionForComponentTesting (input: {
+    treeData?: I_faProjectHierarchyTreeHeTreeNode[] | undefined
+    uiState?: I_faProjectHierarchyTreeUiState | undefined
+    worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
+  }): void {
+    worlds.value = input.worlds
+    if (input.treeData !== undefined) {
+      treeData.value = input.treeData
+    }
+    if (input.uiState !== undefined) {
+      applyUiState(input.uiState)
+    }
+    layoutRefreshGeneration.value += 1
+  }
+
   const treeDataOut = treeData
   const uiStateOut = uiState
   const worldsOut = worlds
+  const replaceSessionForComponentTestingOut = replaceSessionForComponentTesting
 
   return {
     clearPendingDocumentRefreshIds: clearPendingDocumentRefreshIdsOut,
@@ -258,6 +277,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     refreshHierarchyTreeNodes: refreshHierarchyTreeNodesOut,
     refreshLayout: refreshLayoutOut,
     refreshUiState: refreshUiStateOut,
+    replaceSessionForComponentTesting: replaceSessionForComponentTestingOut,
     requestRevealSearchHit: requestRevealSearchHitOut,
     resetOnProjectClose: resetOnProjectCloseOut,
     searchHits: readonly(searchHitsOut),
