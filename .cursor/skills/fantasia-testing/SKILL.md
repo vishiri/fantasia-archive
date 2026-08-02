@@ -85,16 +85,18 @@ See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI
 
 - **Renderer readiness**: **`waitForFaRendererContentBridgeApis`** — not bare **`page.evaluate`** for bridge globals. E2E on **`#/`**: **`waitForFaE2eRendererDomReady`**.
 - **Structure/locators/layout**: [playwright-tests.mdc](../../rules/playwright-tests.mdc)
-- **Command**: `yarn test:components` — own terminal
-- **Location**: `src/components/**/_tests/*.playwright.test.ts`
+- **Command**: `yarn test:components` — own terminal (**`src/components`**, **`src/layouts`**, **`src/pages`**)
+- **Location**: `src/components|layouts|pages/**/_tests/*.playwright.test.ts`
 - **Single**: `yarn test:components:single --component=<bucket>/<ComponentName>`
 - **Picker**: `yarn test:components:list`
+- **Harness seed**: **`I_faComponentTestingStoreSeed`** / **`projectContentOverrides`** — see AGENTS **Component-testing seed**
 
 ### E2E tests
 
 - **Structure**: same serial pattern; **`TEST_ENV: 'e2e'`**
 - **Project management**: [`checkProjectManagementFlow.playwright.spec.ts`](../../../e2e-tests/checkProjectManagementFlow.playwright.spec.ts); path staging via **`playwrightE2eProjectPaths.ts`**
 - **Workspace sidebar**: [`checkWorkspaceSidebar.playwright.spec.ts`](../../../e2e-tests/checkWorkspaceSidebar.playwright.spec.ts); drag + **`sidebar_width`** cold restart via **`faPlaywrightE2eWorkspaceSidebar.ts`**
+- **Workspace docs/tree**: **`e2e-tests/checkWorkspace*.playwright.spec.ts`**; helpers **`e2eWorkspaceHierarchyTree*`**
 - **Command**: `yarn test:e2e` — own terminal
 - **Single**: `yarn test:e2e:single --spec=<stem>` (no suffix) or **`yarn test:e2e:single:ci --spec=<full file>`**
 - **Picker**: `yarn test:e2e:list`

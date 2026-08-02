@@ -158,6 +158,8 @@ yarn test:e2e:single:ci --spec=checkDevToolsFunctionality.playwright.spec.ts
 yarn test:e2e:list
 ```
 
+**`yarn test:components`**: **`src/components`**, **`src/layouts`**, **`src/pages`** (`*.playwright.test.ts`). Workspace E2E: **`e2e-tests/checkWorkspace*.playwright.spec.ts`** + **`helpers/playwrightHelpers_e2e/e2eWorkspaceHierarchyTree*`**.
+
 **Locators:** **`data-test-locator`** + **`selectorList`** — [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc). **Keyboard:** **`faPlaywrightKeyboardChords`** for cross-OS chords.
 
 **Report/videos:** **`test-results/playwright-report/index.html`**. **`FA_PLAYWRIGHT_NO_VIDEO=1`** to skip recording.
