@@ -37,33 +37,32 @@ const selectorList = {
   splashNew: 'splashPage-btn-new'
 } as const
 
-const OPENED_DOCUMENTS_E2E_FAPROJECT = 'e2e-opened-documents.faproject'
+const CLOSE_LAST_TAB_E2E_FAPROJECT = 'e2e-close-last-tab-empty.faproject'
+const CLOSE_LAST_TAB_E2E_PROJECT_NAME = 'E2E close last tab empty project'
+const CLOSE_LAST_TAB_E2E_LABEL = 'E2E Last Tab Only'
+const OPENED_DOCUMENTS_PERSIST_SETTLE_MS = 750
 
-const OPENED_DOCUMENTS_E2E_DISPLAY_NAME = 'E2E opened documents project'
-
-const OPENED_DOCUMENTS_E2E_TAB_LABEL = 'E2E Tab Document'
-
-let e2eOpenedDocumentsPersistedDocumentId = ''
+let e2eCloseLastTabDocumentId = ''
 
 async function createE2eProjectOnWorkspaceRoute (
   page: Page,
   electronApplication: ElectronApplication
 ): Promise<void> {
   await navigateFaPlaywrightE2eToSplashRoute(page)
-  await e2eSetNextProjectCreatePath(electronApplication, OPENED_DOCUMENTS_E2E_FAPROJECT)
+  await e2eSetNextProjectCreatePath(electronApplication, CLOSE_LAST_TAB_E2E_FAPROJECT)
   await page.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
   await expect(page.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
-  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(CLOSE_LAST_TAB_E2E_PROJECT_NAME)
   await page.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
-  await e2eExpectFaActiveProjectStoreName(page, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await e2eExpectFaActiveProjectStoreName(page, CLOSE_LAST_TAB_E2E_PROJECT_NAME)
   await expectFaPlaywrightE2eHashRoute(page, '/home')
   await expectFaPlaywrightE2eWorkspaceShell(page)
 }
 
-async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
+async function seedSinglePersistedOpenedDocumentTab (
   page: Page
 ): Promise<string> {
-  const documentId = await page.evaluate(async (tabLabel) => {
+  return page.evaluate(async (tabLabel) => {
     const content = window.faContentBridgeAPIs?.projectContent
     const management = window.faContentBridgeAPIs?.projectManagement
     if (content === undefined || management === undefined) {
@@ -81,46 +80,78 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
     const saved = await management.saveOpenedDocumentsSnapshot({
       activeDocumentId: document.id,
       schemaVersion: 1,
-      tabs: [
-        {
-          displayNameDraft: tabLabel,
-          documentId: document.id,
-          persistenceState: 'persisted',
-          hasUnsavedChanges: false,
-          editState: true,
-          savedDisplayName: tabLabel,
-          documentTextColorDraft: '',
-          savedDocumentTextColor: '',
-          documentBackgroundColorDraft: '',
-          savedDocumentBackgroundColor: '',
-          isCategoryDraft: false,
-          savedIsCategory: false,
-          isFinishedDraft: false,
-          isMinorDraft: false,
-          isDeadDraft: false,
-          savedIsFinished: false,
-          savedIsMinor: false,
-          savedIsDead: false,
-          parentDocumentIdDraft: '',
-          savedParentDocumentId: '',
-          treeOrderNumberDraft: '',
-          savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
-          extraClassesDraft: '',
-          savedExtraClasses: '',
-          tabLabel,
-          templateIcon: 'mdi-file-document'
-        }
-      ]
+      tabs: [{
+        displayNameDraft: tabLabel,
+        documentId: document.id,
+        persistenceState: 'persisted',
+        hasUnsavedChanges: false,
+        editState: false,
+        savedDisplayName: tabLabel,
+        documentTextColorDraft: '',
+        savedDocumentTextColor: '',
+        documentBackgroundColorDraft: '',
+        savedDocumentBackgroundColor: '',
+        isCategoryDraft: false,
+        savedIsCategory: false,
+        isFinishedDraft: false,
+        isMinorDraft: false,
+        isDeadDraft: false,
+        savedIsFinished: false,
+        savedIsMinor: false,
+        savedIsDead: false,
+        parentDocumentIdDraft: '',
+        savedParentDocumentId: '',
+        treeOrderNumberDraft: '',
+        savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+        extraClassesDraft: '',
+        savedExtraClasses: '',
+        tabLabel,
+        templateIcon: 'mdi-file-document'
+      }]
     })
     if (!saved) {
       throw new Error('saveOpenedDocumentsSnapshot returned false')
     }
     return document.id
-  }, OPENED_DOCUMENTS_E2E_TAB_LABEL)
-  return documentId
+  }, CLOSE_LAST_TAB_E2E_LABEL)
 }
 
-test.describe.serial('Opened documents E2E — persist snapshot and restore on reopen', () => {
+async function hydrateOpenedDocumentsAndRoute (
+  page: Page,
+  documentId: string
+): Promise<void> {
+  await page.evaluate(async (nextDocumentId) => {
+    const root = document.querySelector('#q-app') as HTMLElement & {
+      __vue_app__?: {
+        config: {
+          globalProperties: {
+            $pinia?: {
+              _s?: Map<string, {
+                hydrateFromProjectDatabase?: () => Promise<void>
+              }>
+            }
+            $router: {
+              replace: (location: { path: string }) => Promise<void>
+            }
+          }
+        }
+      }
+    }
+    const globalProperties = root?.__vue_app__?.config.globalProperties
+    const router = globalProperties?.$router
+    const openedDocumentsStore = globalProperties?.$pinia?._s?.get('S_FaOpenedDocuments')
+    if (router === undefined) {
+      throw new Error('Vue router missing in E2E app')
+    }
+    if (typeof openedDocumentsStore?.hydrateFromProjectDatabase !== 'function') {
+      throw new Error('S_FaOpenedDocuments.hydrateFromProjectDatabase missing in E2E app')
+    }
+    await openedDocumentsStore.hydrateFromProjectDatabase()
+    await router.replace({ path: `/home/document/${nextDocumentId}` })
+  }, documentId)
+}
+
+test.describe.serial('Opened documents E2E — close last tab leaves empty strip', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -133,7 +164,7 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     suiteTestInfo = testInfo
     const launched = await launchFaPlaywrightE2eAppWindow({
       afterIsolationResetBeforeLaunch (): void {
-        tryUnlinkE2eFaprojectFixture(OPENED_DOCUMENTS_E2E_FAPROJECT)
+        tryUnlinkE2eFaprojectFixture(CLOSE_LAST_TAB_E2E_FAPROJECT)
       },
       buildLaunchEnv (): Record<string, string> {
         return {
@@ -156,19 +187,30 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     })
   })
 
-  /**
-   * Creates a project, seeds opened_documents in SQLite, and records the document id for cold restart.
-   */
-  test('Seed opened documents snapshot in the active project database', async () => {
+  test('Close the only clean tab and return to project dashboard', async () => {
     await createE2eProjectOnWorkspaceRoute(appWindow, electronApp)
-    e2eOpenedDocumentsPersistedDocumentId = await seedOpenedDocumentsSnapshotForFirstWorldDocument(
-      appWindow
+    e2eCloseLastTabDocumentId = await seedSinglePersistedOpenedDocumentTab(appWindow)
+    expect(e2eCloseLastTabDocumentId.length).toBeGreaterThan(0)
+
+    await hydrateOpenedDocumentsAndRoute(appWindow, e2eCloseLastTabDocumentId)
+    const tab = appWindow.locator(
+      `[data-test-locator="projectAppControlBar-tab-${e2eCloseLastTabDocumentId}"]`
     )
-    expect(e2eOpenedDocumentsPersistedDocumentId.length).toBeGreaterThan(0)
+    await expect(tab).toBeVisible({ timeout: 15_000 })
+
+    await appWindow.locator(
+      `[data-test-locator="projectAppControlBar-tabClose-${e2eCloseLastTabDocumentId}"]`
+    ).click()
+    await expect(tab).toHaveCount(0, { timeout: 15_000 })
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expect(
+      appWindow.locator('[data-test-locator^="projectAppControlBar-tab-"]')
+    ).toHaveCount(0)
+    await appWindow.waitForTimeout(OPENED_DOCUMENTS_PERSIST_SETTLE_MS)
   })
 })
 
-test.describe.serial('Opened documents E2E — cold restart restores workspace tabs', () => {
+test.describe.serial('Opened documents E2E — cold restart keeps empty tab strip', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -202,29 +244,25 @@ test.describe.serial('Opened documents E2E — cold restart restores workspace t
     })
   })
 
-  /**
-   * Reopens the persisted project and hydrates document tabs from opened_documents.
-   */
-  test('Restore opened document tabs after cold restart', async () => {
+  test('Cold restart restores workspace with no opened document tabs', async () => {
+    expect(e2eCloseLastTabDocumentId.length).toBeGreaterThan(0)
+
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await clickFaPlaywrightE2eSplashResumePrimarySegment(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+    await e2eExpectFaActiveProjectStoreName(appWindow, CLOSE_LAST_TAB_E2E_PROJECT_NAME)
     await expectFaPlaywrightE2eWorkspaceShell(appWindow)
 
-    const tabLocator = `[data-test-locator="projectAppControlBar-tab-${e2eOpenedDocumentsPersistedDocumentId}"]`
-    await expect(appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)).toBeVisible()
-    await expect(appWindow.locator(tabLocator)).toBeVisible()
-    await expect(appWindow.getByText(OPENED_DOCUMENTS_E2E_TAB_LABEL, { exact: true })).toHaveCount(1)
-    await expectFaPlaywrightE2eHashRoute(
-      appWindow,
-      `/home/document/${e2eOpenedDocumentsPersistedDocumentId}`
-    )
-    // Seeded editState true → document page opens in edit mode after cold hydrate.
     await expect(
-      appWindow.locator('[data-test-locator="documentWorkspacePage-nameInput"]')
-    ).toBeVisible({ timeout: 15_000 })
+      appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)
+    ).toBeVisible()
     await expect(
-      appWindow.locator('[data-test-locator="documentWorkspacePage-previewTitle"]')
+      appWindow.locator(
+        `[data-test-locator="projectAppControlBar-tab-${e2eCloseLastTabDocumentId}"]`
+      )
     ).toHaveCount(0)
+    await expect(
+      appWindow.locator('[data-test-locator^="projectAppControlBar-tab-"]')
+    ).toHaveCount(0)
+    await expect(appWindow.getByText(CLOSE_LAST_TAB_E2E_LABEL, { exact: true })).toHaveCount(0)
   })
 })

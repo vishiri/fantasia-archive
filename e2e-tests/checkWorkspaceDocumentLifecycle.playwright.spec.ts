@@ -20,47 +20,45 @@ import {
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 
-/**
- * Extra env settings to trigger E2E via Playwright (isolated userData).
- */
 const extraEnvSettings = {
   TEST_ENV: 'e2e' as const
 }
 
-/**
- * Object of string data selectors for the e2e
- */
 const selectorList = {
   createBtn: 'dialogNewProject-button-create',
+  documentNameInput: 'documentWorkspacePage-nameInput',
   nameInput: 'dialogNewProject-input-name',
   projectAppControlBar: 'projectAppControlBar',
+  saveDocumentButton: 'projectAppControlBar-saveDocumentButton',
   splashNew: 'splashPage-btn-new'
 } as const
 
-const OPENED_DOCUMENTS_E2E_FAPROJECT = 'e2e-opened-documents.faproject'
+const DOCUMENT_LIFECYCLE_E2E_FAPROJECT = 'e2e-document-lifecycle.faproject'
 
-const OPENED_DOCUMENTS_E2E_DISPLAY_NAME = 'E2E opened documents project'
+const DOCUMENT_LIFECYCLE_E2E_DISPLAY_NAME = 'E2E document lifecycle project'
 
-const OPENED_DOCUMENTS_E2E_TAB_LABEL = 'E2E Tab Document'
+const DOCUMENT_LIFECYCLE_E2E_INITIAL_NAME = 'E2E Lifecycle Doc'
 
-let e2eOpenedDocumentsPersistedDocumentId = ''
+const DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME = 'E2E Lifecycle Renamed'
+
+let e2eLifecyclePersistedDocumentId = ''
 
 async function createE2eProjectOnWorkspaceRoute (
   page: Page,
   electronApplication: ElectronApplication
 ): Promise<void> {
   await navigateFaPlaywrightE2eToSplashRoute(page)
-  await e2eSetNextProjectCreatePath(electronApplication, OPENED_DOCUMENTS_E2E_FAPROJECT)
+  await e2eSetNextProjectCreatePath(electronApplication, DOCUMENT_LIFECYCLE_E2E_FAPROJECT)
   await page.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
   await expect(page.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
-  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(DOCUMENT_LIFECYCLE_E2E_DISPLAY_NAME)
   await page.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
-  await e2eExpectFaActiveProjectStoreName(page, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await e2eExpectFaActiveProjectStoreName(page, DOCUMENT_LIFECYCLE_E2E_DISPLAY_NAME)
   await expectFaPlaywrightE2eHashRoute(page, '/home')
   await expectFaPlaywrightE2eWorkspaceShell(page)
 }
 
-async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
+async function seedEditableDocumentTab (
   page: Page
 ): Promise<string> {
   const documentId = await page.evaluate(async (tabLabel) => {
@@ -116,11 +114,11 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
       throw new Error('saveOpenedDocumentsSnapshot returned false')
     }
     return document.id
-  }, OPENED_DOCUMENTS_E2E_TAB_LABEL)
+  }, DOCUMENT_LIFECYCLE_E2E_INITIAL_NAME)
   return documentId
 }
 
-test.describe.serial('Opened documents E2E — persist snapshot and restore on reopen', () => {
+test.describe.serial('Document lifecycle E2E — UI rename and save', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -133,7 +131,7 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     suiteTestInfo = testInfo
     const launched = await launchFaPlaywrightE2eAppWindow({
       afterIsolationResetBeforeLaunch (): void {
-        tryUnlinkE2eFaprojectFixture(OPENED_DOCUMENTS_E2E_FAPROJECT)
+        tryUnlinkE2eFaprojectFixture(DOCUMENT_LIFECYCLE_E2E_FAPROJECT)
       },
       buildLaunchEnv (): Record<string, string> {
         return {
@@ -156,19 +154,58 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     })
   })
 
-  /**
-   * Creates a project, seeds opened_documents in SQLite, and records the document id for cold restart.
-   */
-  test('Seed opened documents snapshot in the active project database', async () => {
+  test('Rename document in edit mode and save from the control bar', async () => {
     await createE2eProjectOnWorkspaceRoute(appWindow, electronApp)
-    e2eOpenedDocumentsPersistedDocumentId = await seedOpenedDocumentsSnapshotForFirstWorldDocument(
-      appWindow
-    )
-    expect(e2eOpenedDocumentsPersistedDocumentId.length).toBeGreaterThan(0)
+    e2eLifecyclePersistedDocumentId = await seedEditableDocumentTab(appWindow)
+    expect(e2eLifecyclePersistedDocumentId.length).toBeGreaterThan(0)
+
+    await appWindow.evaluate(async (documentId) => {
+      const root = document.querySelector('#q-app') as HTMLElement & {
+        __vue_app__?: {
+          config: {
+            globalProperties: {
+              $pinia?: {
+                _s?: Map<string, {
+                  hydrateFromProjectDatabase?: () => Promise<void>
+                }>
+              }
+              $router: {
+                replace: (location: { path: string }) => Promise<void>
+              }
+            }
+          }
+        }
+      }
+      const globalProperties = root?.__vue_app__?.config.globalProperties
+      const router = globalProperties?.$router
+      const openedDocumentsStore = globalProperties?.$pinia?._s?.get('S_FaOpenedDocuments')
+      if (router === undefined) {
+        throw new Error('Vue router missing in E2E app')
+      }
+      if (typeof openedDocumentsStore?.hydrateFromProjectDatabase !== 'function') {
+        throw new Error('S_FaOpenedDocuments.hydrateFromProjectDatabase missing in E2E app')
+      }
+      await openedDocumentsStore.hydrateFromProjectDatabase()
+      await router.replace({ path: `/home/document/${documentId}` })
+    }, e2eLifecyclePersistedDocumentId)
+
+    const nameInput = appWindow.locator(`[data-test-locator="${selectorList.documentNameInput}"]`)
+    await expect(nameInput).toBeVisible({ timeout: 15_000 })
+    await nameInput.fill(DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME)
+    await appWindow.locator(`[data-test-locator="${selectorList.saveDocumentButton}"]`).click()
+    await expect(
+      appWindow.locator(
+        `[data-test-locator="projectAppControlBar-tab-${e2eLifecyclePersistedDocumentId}"]`
+      )
+    ).toContainText(DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME, { timeout: 15_000 })
+    await expect(nameInput).toHaveCount(0)
+    await expect(
+      appWindow.locator('[data-test-locator="documentWorkspacePage-previewTitle"]')
+    ).toHaveText(DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME)
   })
 })
 
-test.describe.serial('Opened documents E2E — cold restart restores workspace tabs', () => {
+test.describe.serial('Document lifecycle E2E — cold restart keeps renamed display name', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -202,29 +239,26 @@ test.describe.serial('Opened documents E2E — cold restart restores workspace t
     })
   })
 
-  /**
-   * Reopens the persisted project and hydrates document tabs from opened_documents.
-   */
-  test('Restore opened document tabs after cold restart', async () => {
+  test('Restore renamed document label after cold restart', async () => {
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await clickFaPlaywrightE2eSplashResumePrimarySegment(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+    await e2eExpectFaActiveProjectStoreName(appWindow, DOCUMENT_LIFECYCLE_E2E_DISPLAY_NAME)
     await expectFaPlaywrightE2eWorkspaceShell(appWindow)
 
-    const tabLocator = `[data-test-locator="projectAppControlBar-tab-${e2eOpenedDocumentsPersistedDocumentId}"]`
-    await expect(appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)).toBeVisible()
-    await expect(appWindow.locator(tabLocator)).toBeVisible()
-    await expect(appWindow.getByText(OPENED_DOCUMENTS_E2E_TAB_LABEL, { exact: true })).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(
+        `[data-test-locator="projectAppControlBar-tab-${e2eLifecyclePersistedDocumentId}"]`
+      )
+    ).toContainText(DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME)
     await expectFaPlaywrightE2eHashRoute(
       appWindow,
-      `/home/document/${e2eOpenedDocumentsPersistedDocumentId}`
+      `/home/document/${e2eLifecyclePersistedDocumentId}`
     )
-    // Seeded editState true → document page opens in edit mode after cold hydrate.
-    await expect(
-      appWindow.locator('[data-test-locator="documentWorkspacePage-nameInput"]')
-    ).toBeVisible({ timeout: 15_000 })
     await expect(
       appWindow.locator('[data-test-locator="documentWorkspacePage-previewTitle"]')
-    ).toHaveCount(0)
+    ).toHaveText(DOCUMENT_LIFECYCLE_E2E_RENAMED_NAME, { timeout: 15_000 })
   })
 })

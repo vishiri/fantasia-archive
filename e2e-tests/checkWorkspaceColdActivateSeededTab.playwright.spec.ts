@@ -37,25 +37,23 @@ const selectorList = {
   splashNew: 'splashPage-btn-new'
 } as const
 
-const OPENED_DOCUMENTS_E2E_FAPROJECT = 'e2e-opened-documents.faproject'
+const COLD_ACTIVATE_E2E_FAPROJECT = 'e2e-cold-activate-seeded-tab.faproject'
+const COLD_ACTIVATE_E2E_PROJECT_NAME = 'E2E cold activate seeded tab project'
+const COLD_ACTIVATE_E2E_TAB_LABEL = 'E2E Cold Activate Tab'
 
-const OPENED_DOCUMENTS_E2E_DISPLAY_NAME = 'E2E opened documents project'
-
-const OPENED_DOCUMENTS_E2E_TAB_LABEL = 'E2E Tab Document'
-
-let e2eOpenedDocumentsPersistedDocumentId = ''
+let e2eColdActivateDocumentId = ''
 
 async function createE2eProjectOnWorkspaceRoute (
   page: Page,
   electronApplication: ElectronApplication
 ): Promise<void> {
   await navigateFaPlaywrightE2eToSplashRoute(page)
-  await e2eSetNextProjectCreatePath(electronApplication, OPENED_DOCUMENTS_E2E_FAPROJECT)
+  await e2eSetNextProjectCreatePath(electronApplication, COLD_ACTIVATE_E2E_FAPROJECT)
   await page.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
   await expect(page.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
-  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(COLD_ACTIVATE_E2E_PROJECT_NAME)
   await page.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
-  await e2eExpectFaActiveProjectStoreName(page, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+  await e2eExpectFaActiveProjectStoreName(page, COLD_ACTIVATE_E2E_PROJECT_NAME)
   await expectFaPlaywrightE2eHashRoute(page, '/home')
   await expectFaPlaywrightE2eWorkspaceShell(page)
 }
@@ -63,7 +61,7 @@ async function createE2eProjectOnWorkspaceRoute (
 async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
   page: Page
 ): Promise<string> {
-  const documentId = await page.evaluate(async (tabLabel) => {
+  return page.evaluate(async (tabLabel) => {
     const content = window.faContentBridgeAPIs?.projectContent
     const management = window.faContentBridgeAPIs?.projectManagement
     if (content === undefined || management === undefined) {
@@ -81,46 +79,43 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
     const saved = await management.saveOpenedDocumentsSnapshot({
       activeDocumentId: document.id,
       schemaVersion: 1,
-      tabs: [
-        {
-          displayNameDraft: tabLabel,
-          documentId: document.id,
-          persistenceState: 'persisted',
-          hasUnsavedChanges: false,
-          editState: true,
-          savedDisplayName: tabLabel,
-          documentTextColorDraft: '',
-          savedDocumentTextColor: '',
-          documentBackgroundColorDraft: '',
-          savedDocumentBackgroundColor: '',
-          isCategoryDraft: false,
-          savedIsCategory: false,
-          isFinishedDraft: false,
-          isMinorDraft: false,
-          isDeadDraft: false,
-          savedIsFinished: false,
-          savedIsMinor: false,
-          savedIsDead: false,
-          parentDocumentIdDraft: '',
-          savedParentDocumentId: '',
-          treeOrderNumberDraft: '',
-          savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
-          extraClassesDraft: '',
-          savedExtraClasses: '',
-          tabLabel,
-          templateIcon: 'mdi-file-document'
-        }
-      ]
+      tabs: [{
+        displayNameDraft: tabLabel,
+        documentId: document.id,
+        persistenceState: 'persisted',
+        hasUnsavedChanges: false,
+        editState: false,
+        savedDisplayName: tabLabel,
+        documentTextColorDraft: '',
+        savedDocumentTextColor: '',
+        documentBackgroundColorDraft: '',
+        savedDocumentBackgroundColor: '',
+        isCategoryDraft: false,
+        savedIsCategory: false,
+        isFinishedDraft: false,
+        isMinorDraft: false,
+        isDeadDraft: false,
+        savedIsFinished: false,
+        savedIsMinor: false,
+        savedIsDead: false,
+        parentDocumentIdDraft: '',
+        savedParentDocumentId: '',
+        treeOrderNumberDraft: '',
+        savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+        extraClassesDraft: '',
+        savedExtraClasses: '',
+        tabLabel,
+        templateIcon: 'mdi-file-document'
+      }]
     })
     if (!saved) {
       throw new Error('saveOpenedDocumentsSnapshot returned false')
     }
     return document.id
-  }, OPENED_DOCUMENTS_E2E_TAB_LABEL)
-  return documentId
+  }, COLD_ACTIVATE_E2E_TAB_LABEL)
 }
 
-test.describe.serial('Opened documents E2E — persist snapshot and restore on reopen', () => {
+test.describe.serial('Opened documents E2E — seed active tab without hydrating session', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -133,7 +128,7 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     suiteTestInfo = testInfo
     const launched = await launchFaPlaywrightE2eAppWindow({
       afterIsolationResetBeforeLaunch (): void {
-        tryUnlinkE2eFaprojectFixture(OPENED_DOCUMENTS_E2E_FAPROJECT)
+        tryUnlinkE2eFaprojectFixture(COLD_ACTIVATE_E2E_FAPROJECT)
       },
       buildLaunchEnv (): Record<string, string> {
         return {
@@ -156,19 +151,18 @@ test.describe.serial('Opened documents E2E — persist snapshot and restore on r
     })
   })
 
-  /**
-   * Creates a project, seeds opened_documents in SQLite, and records the document id for cold restart.
-   */
-  test('Seed opened documents snapshot in the active project database', async () => {
+  test('Seed opened_documents snapshot with activeDocumentId only in SQLite', async () => {
     await createE2eProjectOnWorkspaceRoute(appWindow, electronApp)
-    e2eOpenedDocumentsPersistedDocumentId = await seedOpenedDocumentsSnapshotForFirstWorldDocument(
-      appWindow
-    )
-    expect(e2eOpenedDocumentsPersistedDocumentId.length).toBeGreaterThan(0)
+    e2eColdActivateDocumentId = await seedOpenedDocumentsSnapshotForFirstWorldDocument(appWindow)
+    expect(e2eColdActivateDocumentId.length).toBeGreaterThan(0)
+    await expect(
+      appWindow.locator('[data-test-locator^="projectAppControlBar-tab-"]')
+    ).toHaveCount(0)
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
   })
 })
 
-test.describe.serial('Opened documents E2E — cold restart restores workspace tabs', () => {
+test.describe.serial('Opened documents E2E — cold resume auto-activates seeded tab', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -202,29 +196,29 @@ test.describe.serial('Opened documents E2E — cold restart restores workspace t
     })
   })
 
-  /**
-   * Reopens the persisted project and hydrates document tabs from opened_documents.
-   */
-  test('Restore opened document tabs after cold restart', async () => {
+  test('Cold restart hydrates seeded tab and routes to the active document', async () => {
+    expect(e2eColdActivateDocumentId.length).toBeGreaterThan(0)
+
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await clickFaPlaywrightE2eSplashResumePrimarySegment(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
+    await e2eExpectFaActiveProjectStoreName(appWindow, COLD_ACTIVATE_E2E_PROJECT_NAME)
     await expectFaPlaywrightE2eWorkspaceShell(appWindow)
 
-    const tabLocator = `[data-test-locator="projectAppControlBar-tab-${e2eOpenedDocumentsPersistedDocumentId}"]`
-    await expect(appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)).toBeVisible()
-    await expect(appWindow.locator(tabLocator)).toBeVisible()
-    await expect(appWindow.getByText(OPENED_DOCUMENTS_E2E_TAB_LABEL, { exact: true })).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(
+        `[data-test-locator="projectAppControlBar-tab-${e2eColdActivateDocumentId}"]`
+      )
+    ).toBeVisible({ timeout: 15_000 })
+    await expect(appWindow.getByText(COLD_ACTIVATE_E2E_TAB_LABEL, { exact: true })).toHaveCount(1)
     await expectFaPlaywrightE2eHashRoute(
       appWindow,
-      `/home/document/${e2eOpenedDocumentsPersistedDocumentId}`
+      `/home/document/${e2eColdActivateDocumentId}`
     )
-    // Seeded editState true → document page opens in edit mode after cold hydrate.
-    await expect(
-      appWindow.locator('[data-test-locator="documentWorkspacePage-nameInput"]')
-    ).toBeVisible({ timeout: 15_000 })
     await expect(
       appWindow.locator('[data-test-locator="documentWorkspacePage-previewTitle"]')
-    ).toHaveCount(0)
+    ).toBeVisible({ timeout: 15_000 })
   })
 })

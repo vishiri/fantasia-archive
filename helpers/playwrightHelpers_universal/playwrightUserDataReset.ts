@@ -62,8 +62,8 @@ export function getFaPlaywrightIsolatedUserDataDir (): string {
   })
 }
 
-const RESET_FA_USER_DATA_MAX_ATTEMPTS = 15
-const RESET_FA_USER_DATA_BASE_DELAY_MS = 80
+const RESET_FA_USER_DATA_MAX_ATTEMPTS = 30
+const RESET_FA_USER_DATA_BASE_DELAY_MS = 120
 
 /**
  * Windows can hold a short lock on Chromium under 'Cache' after Electron exits; a single
