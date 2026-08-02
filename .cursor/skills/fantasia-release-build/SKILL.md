@@ -23,8 +23,9 @@ description: >-
 
 1. **Full** **`yarn testbatch:verify`** one terminal (not dev scoped gate alone)
 2. **`yarn quasar:build:electron`** separate terminal; smoke packaged app
-3. Playwright after same build — [fantasia-testing](../fantasia-testing/SKILL.md)
-4. Full chain: **`yarn testbatch:ensure:nochange`** or separate Storybook scripts
+3. **Packaged DevTools** — **Help → Toggle developer tools** (or default F12 chord) opens DevTools on the installed build. Product law; do not ship if blocked. [fantasia-electron-main](../fantasia-electron-main/SKILL.md) **Packaged DevTools**
+4. Playwright after same build — [fantasia-testing](../fantasia-testing/SKILL.md)
+5. Full chain: **`yarn testbatch:ensure:nochange`** or separate Storybook scripts
 
 ## CI release build (`.github/workflows/build.yml`)
 

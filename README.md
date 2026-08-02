@@ -73,6 +73,8 @@ Production build:
 yarn quasar:build:electron
 ```
 
+After packaging, **Help → Toggle developer tools** (or default F12 chord) must open DevTools — intentional product behavior in installed builds ([fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) **Packaged DevTools**).
+
 Quiet build (log → **`test-results/quasar-build-electron-last.log`** on failure):
 
 ```

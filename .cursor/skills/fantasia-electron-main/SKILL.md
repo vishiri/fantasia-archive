@@ -48,10 +48,20 @@ description: >-
 - **`registerFaWindowControlIpc`**, **`registerFaAppDetailsIpc`** — **`BrowserWindow.fromWebContents(event.sender)`**
 - **Preload path**: **`path.resolve(currentDir, …)`** from bundled main chunk — no extra **`..`** assuming subfolder of **`mainScripts/`**
 
+## Packaged DevTools (intentional — do not regress)
+
+**Product law:** installed / **`app.isPackaged`** builds **must** open Chrome DevTools via **Help → Toggle developer tools**, default keybind (**F12** / primary chord), and **`faDevToolsControl`** IPC — same as unpackaged.
+
+- **Registrar**: **`registerFaDevToolsIpc`** (**`FA_DEVTOOLS_IPC`**) → **`openDevTools` / `closeDevTools` / status**. Bridge: **`faDevToolsControlAPI`** → renderer **`toggleDevTools`**.
+- **Forbidden**: gating DevTools on **`app.isPackaged`**, **`webPreferences.devTools: false`**, or “security hardening” that no-ops packaged toggle/open/close/status. That regression has shipped more than once; treat as bug, not hardening.
+- **Allowed**: keep sandbox / contextIsolation / sender checks elsewhere; DevTools itself stays available after install.
+- **Vitest**: **`registerFaDevToolsIpc.vitest.test.ts`** must assert packaged path can open — never re-add “packaged no-op” specs as desired behavior.
+- **Smoke**: after Electron packaging, verify menu/keybind still opens DevTools ([fantasia-release-build](../fantasia-release-build/SKILL.md)).
+
 ## Security hardening (main)
 
 - **`app://`** — **`registerFaAppProtocolWiring`**: host allowlist + **`path.relative`** guard against traversal outside app root.
-- **IPC sender** — invoke handlers validate **`event.sender.id`** matches registered main window (failsafe path reply, OS-open, packaged DevTools no-op).
+- **IPC sender** — invoke handlers validate **`event.sender.id`** matches registered main window (failsafe path reply, OS-open). **Do not** pair sender checks with packaged DevTools disable — see **Packaged DevTools** above.
 - **Navigation** — **`will-navigate`** + **`setWindowOpenHandler`** allowlist on main **`BrowserWindow`** (**`mainWindowCreationWiring.ts`**).
 - **`openExternal`** — **`faExternalUrlPredicate`**: block RFC1918 + link-local targets.
 - **Project paths** — **`createResolveHardenedFaProjectFilePath`** (**`functions/`**) + **`faProjectFilePathHardeningWiring.ts`** before open/reconnect; packaged builds omit dev **`ELECTRON_MAIN_FILEPATH`** leak.

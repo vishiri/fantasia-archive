@@ -89,7 +89,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | --- | --- |
 | Neverthrow | [neverthrow.mdc](.cursor/rules/neverthrow.mdc), [fantasia-neverthrow](.cursor/skills/fantasia-neverthrow/SKILL.md) |
 | YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) — orthogonal to [caveman-default.mdc](.cursor/rules/caveman-default.mdc) |
-| Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) — security hardening: **`app://`**, IPC sender, navigation allowlist, path hardening |
+| Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) — **`app://`**, IPC sender, navigation allowlist, path hardening; **packaged DevTools required** (not a security disable target) |
 | Domain script barrels | **`faDragDrop_manager`**, **`dom_manager`**, **`faColorContrast_manager`**, **`documentAppearance_manager`**, **`faColorPicker_manager`**, **`openedDocuments_manager`** — [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc), [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc) |
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
@@ -103,7 +103,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Hide dead strike-through | **`hideDeadCrossThrough`** → **`applyFaHideDeadCrossThroughToDocument`** → **`body.fa-userSetting--hideDeadCrossThrough`**; CSS **`src/css/globals/faUserSettingsAccessibility.scss`** (dead tree + tab labels only); App Settings live preview |
 | Placement count badges | Hierarchy + Project Settings layout: **`disableDocumentCounts`**, **`disableCategoryCount`**, **`invertCategoryPosition`**, **`doubleDashDocCount`** via **`projectHierarchyTreePlacementCount*`** |
 | Component-testing seed | **`I_faComponentTestingStoreSeed`** + **`faComponentTestingStoreSeedPatchWiring`**; optional **`projectContentOverrides`** (entity maps / placement children / search) — Playwright **`TEST_ENV=components`** |
-| Workspace E2E | **`e2e-tests/checkWorkspace*.playwright.spec.ts`**; helpers **`e2eWorkspaceHierarchyTree*`** under **`helpers/playwrightHelpers_e2e/`**; sidebar splitter still **`checkWorkspaceSidebar`** |
+| Packaged DevTools | **Help / keybind Toggle developer tools** must work when **`app.isPackaged`** — [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) **Packaged DevTools**; never no-op **`registerFaDevToolsIpc`** for packaging |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md), [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers](.cursor/skills/fantasia-context-menu-dividers/SKILL.md) |
@@ -132,7 +132,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 
 | Profile | Focus |
 | --- | --- |
-| Electron / preload | `src-electron/`, IPC, [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md) |
+| Electron / preload | `src-electron/`, IPC, [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md); packaged **Toggle developer tools** required — [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) **Packaged DevTools** |
 | Keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Tests | Vitest + Playwright — [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
 | Feature / UI | `src/` Vue — [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) |

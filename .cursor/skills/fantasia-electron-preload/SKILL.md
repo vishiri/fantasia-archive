@@ -40,6 +40,7 @@ description: >-
 - Privileged calls via **`invoke`** — no **`@electron/remote`** without documented reason
 - **No `neverthrow` in preload** — **`Promise`** chains; see [neverthrow.mdc](../../rules/neverthrow.mdc)
 - Structured IPC args validated in **main** with Zod — [fantasia-electron-main](../fantasia-electron-main/SKILL.md)
+- **`faDevToolsControl`**: packaged installs must still toggle DevTools — product law, not optional hardening. [fantasia-electron-main](../fantasia-electron-main/SKILL.md) **Packaged DevTools**; rule [electron-preload.mdc](../../rules/electron-preload.mdc)
 
 ## Related skills
 
