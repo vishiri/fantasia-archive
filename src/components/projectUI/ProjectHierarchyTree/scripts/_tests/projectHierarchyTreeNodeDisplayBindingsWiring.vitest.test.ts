@@ -43,6 +43,7 @@ test('Test that createProjectHierarchyTreeNodeDisplayBindings resolves order bad
   const showsOrderNumberBadge = computed(() => true)
   const bindings = createProjectHierarchyTreeNodeDisplayBindings({
     resolvePlacementCountDisplayForCounts: () => ({
+      doubleDashDivider: false,
       segments: [],
       showDivider: false,
       shows: true
@@ -58,6 +59,7 @@ test('Test that createProjectHierarchyTreeNodeDisplayBindings resolves placement
   const showsOrderNumberBadge = computed(() => false)
   const bindings = createProjectHierarchyTreeNodeDisplayBindings({
     resolvePlacementCountDisplayForCounts: ({ categoryCount, documentCount }) => ({
+      doubleDashDivider: false,
       segments: [
         {
           kind: 'category',
@@ -78,6 +80,7 @@ test('Test that createProjectHierarchyTreeNodeDisplayBindings resolves placement
   expect(bindings.resolvePlacementCountDisplayForNode(placementNode)).toEqual({
     categoryCount: 2,
     display: {
+      doubleDashDivider: false,
       segments: [
         {
           kind: 'category',

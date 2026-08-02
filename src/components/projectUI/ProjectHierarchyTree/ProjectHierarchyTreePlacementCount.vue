@@ -9,7 +9,7 @@
   ><span
     v-if="index > 0 && display.showDivider"
     class="projectHierarchyTreePlacementCount__divider"
-  > | </span><span
+  >{{ display.doubleDashDivider ? ' || ' : ' | ' }}</span><span
     :class="segment.kind === 'document'
       ? 'projectHierarchyTreePlacementCount__docCount text-primary-bright'
       : 'projectHierarchyTreePlacementCount__catCount'"

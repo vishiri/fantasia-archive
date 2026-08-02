@@ -34,6 +34,7 @@ test('Test that ProjectHierarchyTreePlacementCount renders visible segments and 
     props: {
       categoryCount: 2,
       display: {
+        doubleDashDivider: false,
         segments: [
           {
             kind: 'document',
@@ -59,6 +60,39 @@ test('Test that ProjectHierarchyTreePlacementCount renders visible segments and 
   expect(wrapper.find('.projectHierarchyTreePlacementCount__divider').exists()).toBe(true)
 })
 
+test('Test that ProjectHierarchyTreePlacementCount renders pronounced double-pipe divider', () => {
+  const wrapper = mount(ProjectHierarchyTreePlacementCount, {
+    global: {
+      plugins: [placementCountI18n],
+      stubs: {
+        QTooltip: true
+      }
+    },
+    props: {
+      categoryCount: 2,
+      display: {
+        doubleDashDivider: true,
+        segments: [
+          {
+            kind: 'document',
+            value: 3
+          },
+          {
+            kind: 'category',
+            value: 2
+          }
+        ],
+        showDivider: true,
+        shows: true
+      },
+      documentCount: 3,
+      testLocator: 'projectHierarchyTree-placementCount-test'
+    }
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-placementCount-test"]').text()).toBe('(3 || 2)')
+})
+
 test('Test that ProjectHierarchyTreePlacementCount renders tooltip labels', () => {
   const wrapper = mount(ProjectHierarchyTreePlacementCount, {
     global: {
@@ -72,6 +106,7 @@ test('Test that ProjectHierarchyTreePlacementCount renders tooltip labels', () =
     props: {
       categoryCount: 2,
       display: {
+        doubleDashDivider: false,
         segments: [
           {
             kind: 'document',
@@ -105,6 +140,7 @@ test('Test that ProjectHierarchyTreePlacementCount hides when display.shows is f
     props: {
       categoryCount: 0,
       display: {
+        doubleDashDivider: false,
         segments: [],
         showDivider: false,
         shows: false

@@ -2,7 +2,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 type T_placementCountVisibilityDefaults = Pick<
   I_faUserSettings,
-  'disableCategoryCount' | 'disableDocumentCounts' | 'invertCategoryPosition'
+  'disableCategoryCount' | 'disableDocumentCounts' | 'doubleDashDocCount' | 'invertCategoryPosition'
 >
 
 function resolveEffectiveBooleanSetting (
@@ -28,6 +28,7 @@ export function resolveProjectHierarchyTreePlacementCountVisibility (
 ): {
     disableCategoryCount: boolean
     disableDocumentCounts: boolean
+    doubleDashDocCount: boolean
     invertCategoryPosition: boolean
   } {
   const disableDocumentCounts = resolveEffectiveBooleanSetting(
@@ -48,10 +49,17 @@ export function resolveProjectHierarchyTreePlacementCountVisibility (
     'invertCategoryPosition',
     defaults
   )
+  const doubleDashDocCount = resolveEffectiveBooleanSetting(
+    settings,
+    preview,
+    'doubleDashDocCount',
+    defaults
+  )
 
   return {
     disableCategoryCount,
     disableDocumentCounts,
+    doubleDashDocCount,
     invertCategoryPosition
   }
 }

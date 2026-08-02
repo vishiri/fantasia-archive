@@ -5,6 +5,7 @@ import { resolveProjectHierarchyTreePlacementCountVisibility } from '../projectH
 const defaults = {
   disableCategoryCount: false,
   disableDocumentCounts: false,
+  doubleDashDocCount: false,
   invertCategoryPosition: false
 }
 
@@ -14,6 +15,7 @@ test('Test that placement count visibility uses persisted settings when preview 
       ...defaults,
       disableCategoryCount: true,
       disableDocumentCounts: false,
+      doubleDashDocCount: true,
       invertCategoryPosition: true
     } as never,
     null,
@@ -21,6 +23,7 @@ test('Test that placement count visibility uses persisted settings when preview 
   )
   expect(result.disableCategoryCount).toBe(true)
   expect(result.invertCategoryPosition).toBe(true)
+  expect(result.doubleDashDocCount).toBe(true)
 })
 
 test('Test that placement count visibility prefers app settings preview overrides', () => {
@@ -29,16 +32,19 @@ test('Test that placement count visibility prefers app settings preview override
       ...defaults,
       disableCategoryCount: false,
       disableDocumentCounts: true,
+      doubleDashDocCount: false,
       invertCategoryPosition: false
     } as never,
     {
       disableCategoryCount: true,
-      disableDocumentCounts: false
+      disableDocumentCounts: false,
+      doubleDashDocCount: true
     },
     defaults
   )
   expect(result.disableCategoryCount).toBe(true)
   expect(result.disableDocumentCounts).toBe(false)
+  expect(result.doubleDashDocCount).toBe(true)
 })
 
 test('Test that placement count visibility falls back to defaults when settings missing', () => {
@@ -48,12 +54,14 @@ test('Test that placement count visibility falls back to defaults when settings 
     {
       disableCategoryCount: true,
       disableDocumentCounts: true,
+      doubleDashDocCount: true,
       invertCategoryPosition: true
     }
   )
   expect(result).toEqual({
     disableCategoryCount: true,
     disableDocumentCounts: true,
+    doubleDashDocCount: true,
     invertCategoryPosition: true
   })
 })

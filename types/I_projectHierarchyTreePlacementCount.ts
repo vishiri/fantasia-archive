@@ -6,6 +6,7 @@ export interface I_projectHierarchyTreePlacementCountSegment {
 }
 
 export interface I_projectHierarchyTreePlacementCountDisplay {
+  doubleDashDivider: boolean
   segments: I_projectHierarchyTreePlacementCountSegment[]
   showDivider: boolean
   shows: boolean

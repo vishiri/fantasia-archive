@@ -25,6 +25,7 @@ export function createProjectHierarchyTreePlacementCountWiring (deps: {
       {
         disableCategoryCount: FA_USER_SETTINGS_DEFAULTS.disableCategoryCount,
         disableDocumentCounts: FA_USER_SETTINGS_DEFAULTS.disableDocumentCounts,
+        doubleDashDocCount: FA_USER_SETTINGS_DEFAULTS.doubleDashDocCount,
         invertCategoryPosition: FA_USER_SETTINGS_DEFAULTS.invertCategoryPosition
       }
     )
@@ -39,6 +40,7 @@ export function createProjectHierarchyTreePlacementCountWiring (deps: {
       disableCategoryCount: visibility.disableCategoryCount,
       disableDocumentCounts: visibility.disableDocumentCounts,
       documentCount: counts.documentCount,
+      doubleDashDocCount: visibility.doubleDashDocCount,
       invertCategoryPosition: visibility.invertCategoryPosition
     })
   }

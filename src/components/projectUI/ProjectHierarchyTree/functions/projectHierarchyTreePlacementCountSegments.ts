@@ -8,6 +8,7 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
   disableCategoryCount: boolean
   disableDocumentCounts: boolean
   documentCount: number
+  doubleDashDocCount: boolean
   invertCategoryPosition: boolean
 }): I_projectHierarchyTreePlacementCountDisplay {
   const documentSegment: I_projectHierarchyTreePlacementCountSegment = {
@@ -18,9 +19,11 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
     kind: 'category',
     value: input.categoryCount
   }
+  const doubleDashDivider = input.doubleDashDocCount
 
   if (input.disableDocumentCounts && input.disableCategoryCount) {
     return {
+      doubleDashDivider,
       segments: [],
       showDivider: false,
       shows: false
@@ -29,6 +32,7 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
 
   if (input.disableDocumentCounts) {
     return {
+      doubleDashDivider,
       segments: [categorySegment],
       showDivider: false,
       shows: true
@@ -37,6 +41,7 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
 
   if (input.disableCategoryCount) {
     return {
+      doubleDashDivider,
       segments: [documentSegment],
       showDivider: false,
       shows: true
@@ -48,6 +53,7 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
     : [documentSegment, categorySegment]
 
   return {
+    doubleDashDivider,
     segments,
     showDivider: true,
     shows: true

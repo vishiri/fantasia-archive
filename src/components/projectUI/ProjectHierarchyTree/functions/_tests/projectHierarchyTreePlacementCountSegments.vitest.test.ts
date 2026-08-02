@@ -8,10 +8,12 @@ test('Test that placement count segments hide entirely when both sides disabled'
     disableCategoryCount: true,
     disableDocumentCounts: true,
     documentCount: 7,
+    doubleDashDocCount: false,
     invertCategoryPosition: false
   })
   expect(result.shows).toBe(false)
   expect(result.segments).toEqual([])
+  expect(result.doubleDashDivider).toBe(false)
 })
 
 test('Test that placement count segments show category only when document count hidden', () => {
@@ -20,9 +22,11 @@ test('Test that placement count segments show category only when document count 
     disableCategoryCount: false,
     disableDocumentCounts: true,
     documentCount: 9,
+    doubleDashDocCount: false,
     invertCategoryPosition: false
   })
   expect(result).toEqual({
+    doubleDashDivider: false,
     segments: [{
       kind: 'category',
       value: 2
@@ -38,9 +42,11 @@ test('Test that placement count segments show document only when category count 
     disableCategoryCount: true,
     disableDocumentCounts: false,
     documentCount: 1,
+    doubleDashDocCount: false,
     invertCategoryPosition: false
   })
   expect(result).toEqual({
+    doubleDashDivider: false,
     segments: [{
       kind: 'document',
       value: 1
@@ -56,10 +62,12 @@ test('Test that placement count segments keep zero values visible', () => {
     disableCategoryCount: false,
     disableDocumentCounts: false,
     documentCount: 0,
+    doubleDashDocCount: false,
     invertCategoryPosition: false
   })
   expect(result.shows).toBe(true)
   expect(result.showDivider).toBe(true)
+  expect(result.doubleDashDivider).toBe(false)
   expect(result.segments).toEqual([
     {
       kind: 'document',
@@ -78,6 +86,7 @@ test('Test that placement count segments invert document and category order', ()
     disableCategoryCount: false,
     disableDocumentCounts: false,
     documentCount: 7,
+    doubleDashDocCount: false,
     invertCategoryPosition: true
   })
   expect(result.segments).toEqual([
@@ -90,5 +99,19 @@ test('Test that placement count segments invert document and category order', ()
       value: 7
     }
   ])
+  expect(result.showDivider).toBe(true)
+  expect(result.doubleDashDivider).toBe(false)
+})
+
+test('Test that placement count segments set doubleDashDivider when doubleDashDocCount is true', () => {
+  const result = resolveProjectHierarchyTreePlacementCountSegments({
+    categoryCount: 1,
+    disableCategoryCount: false,
+    disableDocumentCounts: false,
+    documentCount: 2,
+    doubleDashDocCount: true,
+    invertCategoryPosition: false
+  })
+  expect(result.doubleDashDivider).toBe(true)
   expect(result.showDivider).toBe(true)
 })
