@@ -1,43 +1,40 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { withStorybookWorkspaceHomePreview } from '../../../../.storybook-workspace/.storybook/decorators/withStorybookWorkspaceHomePreview'
-import StoryRouterShell from '../../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
+import { withStorybookWorkspaceHomePreview } from '../../../../../.storybook-workspace/.storybook/decorators/withStorybookWorkspaceHomePreview'
+import { createFaOpenedDocumentTabStoryFixture } from '../../../../../.storybook-workspace/.storybook/fixtures/createFaOpenedDocumentTabStoryFixture'
+import StoryRouterShell from '../../../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 const sampleTabs: I_faOpenedDocumentTab[] = [
-  {
+  createFaOpenedDocumentTabStoryFixture({
     documentId: 'doc-hero',
-    persistenceState: 'persisted',
-    tabLabel: 'Character',
-    templateIcon: 'mdi-account',
     displayNameDraft: 'Hero',
     savedDisplayName: 'Hero',
-    documentTextColorDraft: '',
-    savedDocumentTextColor: '',
-    documentBackgroundColorDraft: '',
-    savedDocumentBackgroundColor: '',
-    isCategoryDraft: false,
-    savedIsCategory: false,
-    hasUnsavedChanges: false,
-    editState: false
-  },
-  {
+    isFinishedDraft: true,
+    savedIsFinished: true,
+    treeOrderNumberDraft: '10',
+    savedTreeOrderNumber: 10
+  }),
+  createFaOpenedDocumentTabStoryFixture({
     documentId: 'doc-villain',
-    persistenceState: 'persisted',
-    tabLabel: 'Character',
-    templateIcon: 'mdi-skull',
     displayNameDraft: 'Villain draft',
     savedDisplayName: 'Villain',
-    documentTextColorDraft: '',
+    templateIcon: 'mdi-skull',
+    documentTextColorDraft: '#c62828',
     savedDocumentTextColor: '',
-    documentBackgroundColorDraft: '',
+    documentBackgroundColorDraft: '#fff3e0',
     savedDocumentBackgroundColor: '',
-    isCategoryDraft: false,
-    savedIsCategory: false,
+    isDeadDraft: true,
+    savedIsDead: false,
+    isMinorDraft: true,
+    savedIsMinor: false,
     hasUnsavedChanges: true,
-    editState: false
-  }
+    treeOrderNumberDraft: '3',
+    savedTreeOrderNumber: 7,
+    extraClassesDraft: 'villain-draft',
+    savedExtraClasses: ''
+  })
 ]
 
 const seedOpenedDocumentTabs: Decorator = (story) => {
@@ -85,22 +82,19 @@ export const WithMultipleDocumentTabsForContextMenu: StoryObj<typeof meta> = {
         hydrationComplete: true,
         tabs: [
           ...sampleTabs,
-          {
+          createFaOpenedDocumentTabStoryFixture({
             documentId: 'doc-location',
-            persistenceState: 'persisted',
             tabLabel: 'Location',
             templateIcon: 'mdi-map-marker',
             displayNameDraft: 'Castle',
             savedDisplayName: 'Castle',
-            documentTextColorDraft: '',
-            savedDocumentTextColor: '',
-            documentBackgroundColorDraft: '',
-            savedDocumentBackgroundColor: '',
-            isCategoryDraft: false,
-            savedIsCategory: false,
-            hasUnsavedChanges: false,
-            editState: false
-          }
+            documentBackgroundColorDraft: '#e8f5e9',
+            savedDocumentBackgroundColor: '#e8f5e9',
+            isCategoryDraft: true,
+            savedIsCategory: true,
+            treeOrderNumberDraft: '1',
+            savedTreeOrderNumber: 1
+          })
         ]
       })
       return story()

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { createPinia, setActivePinia } from 'pinia'
 
-import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
+import { createFaOpenedDocumentTabStoryFixture } from '../../../../../.storybook-workspace/.storybook/fixtures/createFaOpenedDocumentTabStoryFixture'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 
 import DialogDeleteOpenedDocument from '../DialogDeleteOpenedDocument.vue'
@@ -33,34 +33,12 @@ function seedPendingDeleteDocument (): void {
   store.replaceSessionForComponentTesting({
     activeDocumentId: 'doc-1',
     tabs: [
-      {
-        displayNameDraft: 'Hero',
+      createFaOpenedDocumentTabStoryFixture({
         documentId: 'doc-1',
-        editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
-        hasUnsavedChanges: false,
-        persistenceState: 'persisted',
+        displayNameDraft: 'Hero',
         savedDisplayName: 'Hero',
-        documentTextColorDraft: '',
-        savedDocumentTextColor: '',
-        documentBackgroundColorDraft: '',
-        savedDocumentBackgroundColor: '',
-        isCategoryDraft: false,
-        savedIsCategory: false,
-        isFinishedDraft: false,
-        isMinorDraft: false,
-        isDeadDraft: false,
-        savedIsFinished: false,
-        savedIsMinor: false,
-        savedIsDead: false,
-        parentDocumentIdDraft: '',
-        savedParentDocumentId: '',
-        treeOrderNumberDraft: '',
-        savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
-        extraClassesDraft: '',
-        savedExtraClasses: '',
-        tabLabel: 'Character',
-        templateIcon: 'mdi-account'
-      }
+        hasUnsavedChanges: false
+      })
     ]
   })
   store.requestDeleteDocument('doc-1')

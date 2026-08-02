@@ -8,6 +8,8 @@ export const FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS = {
   savedIsDead: false,
   savedIsFinished: false,
   savedIsMinor: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   treeOrderNumberDraft: '',
   extraClassesDraft: '',

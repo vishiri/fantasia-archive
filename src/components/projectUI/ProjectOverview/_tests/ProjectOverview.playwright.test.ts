@@ -12,15 +12,19 @@ import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightH
 import projectOverviewMessages from 'app/i18n/en-US/components/projectUI/ProjectOverview/L_projectOverview'
 import unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import { mdListArrayConverter } from 'app/src/scripts/_utilities/functions/mdListArrayConverter'
-import { specialCharacterFixer } from '../../../../../i18n/specialCharactersFixer'
 import type { I_faComponentTestingStoreSeed } from 'app/types/I_faComponentTestingStoreSeed'
 
 const playwrightTestDir = path.dirname(fileURLToPath(import.meta.url))
 
+/**
+ * Raw tips markdown. Do not apply specialCharacterFixer here: i18n stores the fixed
+ * form ({'@'} / {'|'}), but vue-i18n t() returns the literal characters shown in the tip
+ * card. Matching the fixed form flakes when Math.random picks the @ tip.
+ */
 const tipsTricksTriviaMarkdown = fs.readFileSync(
   path.resolve(playwrightTestDir, '../../../../../i18n/en-US/documents/tipsTricksTrivia.md'),
   'utf8'
-)
+).replaceAll('\r\n', '\n').replaceAll('\r', '\n')
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -40,9 +44,7 @@ const PLAYWRIGHT_PROJECT_OVERVIEW_NAME = 'Playwright Aurelion Overview'
 const PLAYWRIGHT_PROJECT_OVERVIEW_FILE = 'C:\\Playwright\\aurelion-overview.faproject'
 const PLAYWRIGHT_PROJECT_OVERVIEW_ID = 'playwright-project-overview-id'
 
-const tipsTricksTriviaDocument = specialCharacterFixer(tipsTricksTriviaMarkdown)
-
-const allowedTipCaptions = mdListArrayConverter(tipsTricksTriviaDocument).filter((line) => {
+const allowedTipCaptions = mdListArrayConverter(tipsTricksTriviaMarkdown).filter((line) => {
   return line.trim().length > 0
 })
 

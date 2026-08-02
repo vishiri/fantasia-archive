@@ -66,6 +66,54 @@ const storyWorlds = [
 const heroesPlacementId = '7c9e6679-7425-40de-944b-e07fc1f90ae9'
 const scenesPlacementId = '7c9e6679-7425-40de-944b-e07fc1f90aec'
 
+const storyHeroesDocumentChildren = [
+  {
+    displayName: 'Test Document - Character 01',
+    documentBackgroundColor: null,
+    documentTextColor: '#1565c0',
+    hasChildren: false,
+    id: '7c9e6679-7425-40de-944b-e07fc1f90afa',
+    isCategory: false,
+    isDead: false,
+    isFinished: true,
+    isMinor: false,
+    parentDocumentId: null,
+    placementId: heroesPlacementId,
+    sortOrder: 0,
+    treeOrderNumber: 10
+  },
+  {
+    displayName: 'Fallen Captain',
+    documentBackgroundColor: '#fff3e0',
+    documentTextColor: '#c62828',
+    hasChildren: false,
+    id: '7c9e6679-7425-40de-944b-e07fc1f90afb',
+    isCategory: false,
+    isDead: true,
+    isFinished: false,
+    isMinor: true,
+    parentDocumentId: null,
+    placementId: heroesPlacementId,
+    sortOrder: 1,
+    treeOrderNumber: 7
+  },
+  {
+    displayName: 'Heroes category',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    hasChildren: true,
+    id: '7c9e6679-7425-40de-944b-e07fc1f90afc',
+    isCategory: true,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    placementId: heroesPlacementId,
+    sortOrder: 2,
+    treeOrderNumber: 1
+  }
+]
+
 async function seedHierarchyStoryStores (options?: {
   expandedNodeIds?: string[]
   listPlacementDocumentChildren?: typeof window.faContentBridgeAPIs.projectContent.listPlacementDocumentChildren
@@ -82,6 +130,7 @@ async function seedHierarchyStoryStores (options?: {
   })
   S_FaUserSettings().$patch({
     settings: {
+      hideTreeOrderNumbers: false,
       languageCode: 'en-US'
     }
   })
@@ -91,16 +140,7 @@ async function seedHierarchyStoryStores (options?: {
       worlds: storyWorlds
     })
     contentApi.listPlacementDocumentChildren = options?.listPlacementDocumentChildren ?? (async () => ({
-      items: [
-        {
-          displayName: 'Test Document - Character 01',
-          hasChildren: false,
-          id: '7c9e6679-7425-40de-944b-e07fc1f90afa',
-          parentDocumentId: null,
-          placementId: heroesPlacementId,
-          sortOrder: 0
-        }
-      ]
+      items: storyHeroesDocumentChildren
     }))
   }
   await S_FaProjectHierarchyTree().refreshLayout()
@@ -130,6 +170,7 @@ export const Default: StoryObj<typeof meta> = {
   })
 }
 
+/** Expanded Heroes placement: add-new row plus order badges / finished / dead / minor / colors. */
 export const ExpandedPlacementWithAddNew: StoryObj<typeof meta> = {
   loaders: [
     async () => {
@@ -147,7 +188,7 @@ export const ExpandedPlacementWithAddNew: StoryObj<typeof meta> = {
     components: {
       ProjectHierarchyTree
     },
-    template: '<div style="height: 360px; width: 375px;"><ProjectHierarchyTree /></div>'
+    template: '<div style="height: 420px; width: 375px;"><ProjectHierarchyTree /></div>'
   })
 }
 

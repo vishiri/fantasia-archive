@@ -68,6 +68,15 @@ export const FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD = 'Control+Alt
 export const FA_PLAYWRIGHT_PRESS_DEFAULT_SHOW_PROJECT_DASHBOARD = 'Control+Alt+Shift+O' as const
 
 /**
+ * Default **Open App Settings** chord: **primary** + **Alt** + **Shift** + **L**.
+ */
+export function getFaPlaywrightDefaultOpenAppSettingsPressString (
+  platform: NodeJS.Platform = process.platform
+): string {
+  return platform === 'darwin' ? 'Meta+Alt+Shift+L' : 'Control+Alt+Shift+L'
+}
+
+/**
  * Default **Edit current document** chord: **primary** + **E**.
  */
 export function getFaPlaywrightDefaultEditDocumentPressString (

@@ -7,6 +7,7 @@ import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universa
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import { FA_PROJECT_SIDEBAR_MIN_WIDTH_PX } from 'app/types/I_faProjectSidebarDomain'
 import type { I_faComponentTestingStoreSeed } from 'app/types/I_faComponentTestingStoreSeed'
+import type { I_faProjectHierarchyTreeSearchHit } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 const extraEnvSettings = {
   COMPONENT_NAME: 'ProjectHierarchyTreeSearch',
@@ -16,8 +17,26 @@ const extraEnvSettings = {
 
 const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 
+const sampleSearchHit: I_faProjectHierarchyTreeSearchHit = {
+  ancestorDocumentIds: [],
+  displayName: 'Hero',
+  documentId: 'doc-search-hit',
+  placementId: 'placement-1',
+  worldId: 'world-1'
+}
+
+const searchOverrideSeed: I_faComponentTestingStoreSeed = {
+  disableAppControlBar: false,
+  projectContentOverrides: {
+    searchHitsByQuery: {
+      '*': [sampleSearchHit]
+    }
+  }
+}
+
 const selectorList = {
   projectHierarchyTreeSearch: 'projectHierarchyTreeSearch',
+  projectHierarchyTreeSearchClear: 'projectHierarchyTreeSearch-clear',
   projectHierarchyTreeSearchInput: 'projectHierarchyTreeSearch-input'
 } as const
 
@@ -52,6 +71,38 @@ async function remountHierarchyTreeSearchAfterStoreSeed (
     timeout: 30_000
   })
   await page.waitForTimeout(faFrontendRenderTimer)
+}
+
+async function readHierarchySearchCallProbe (page: Page): Promise<{
+  callCount: number
+  lastQuery: string
+}> {
+  return page.evaluate(() => {
+    return window.__faComponentTestingHierarchySearchProbe ?? {
+      callCount: 0,
+      lastQuery: ''
+    }
+  })
+}
+
+async function readHierarchySearchHitsCount (page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const root = document.querySelector('#q-app') as HTMLElement & {
+      __vue_app__?: {
+        config: {
+          globalProperties: {
+            $pinia?: {
+              _s?: Map<string, {
+                searchHits?: unknown[]
+              }>
+            }
+          }
+        }
+      }
+    }
+    const store = root?.__vue_app__?.config.globalProperties.$pinia?._s?.get('S_FaProjectHierarchyTree')
+    return store?.searchHits?.length ?? 0
+  })
 }
 
 test.describe.serial('Project hierarchy tree search layout', () => {
@@ -116,5 +167,69 @@ test.describe.serial('Project hierarchy tree search layout', () => {
       return window.innerWidth
     })
     await expect(search).toHaveCSS('width', `${viewportWidthPx}px`)
+  })
+
+  test('Check if search debounce fires one override search after typing settles', async () => {
+    await remountHierarchyTreeSearchAfterStoreSeed(appWindow, searchOverrideSeed)
+
+    const input = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchInput}"] input`)
+    await input.click()
+    await input.pressSequentially('abc', { delay: 40 })
+
+    await expect.poll(async () => {
+      return readHierarchySearchCallProbe(appWindow)
+    }, {
+      timeout: 5_000
+    }).toEqual({
+      callCount: 1,
+      lastQuery: 'abc'
+    })
+  })
+
+  test('Check if whitespace-only query clears search without override search', async () => {
+    await remountHierarchyTreeSearchAfterStoreSeed(appWindow, searchOverrideSeed)
+
+    const input = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchInput}"] input`)
+    await input.fill('hero')
+    await expect.poll(async () => {
+      return (await readHierarchySearchCallProbe(appWindow)).callCount
+    }, {
+      timeout: 5_000
+    }).toBe(1)
+    await expect.poll(async () => {
+      return readHierarchySearchHitsCount(appWindow)
+    }).toBe(1)
+
+    const callsAfterQuery = (await readHierarchySearchCallProbe(appWindow)).callCount
+    await input.fill('   ')
+    await appWindow.waitForTimeout(500)
+    const probe = await readHierarchySearchCallProbe(appWindow)
+    expect(probe.callCount).toBe(callsAfterQuery)
+    await expect.poll(async () => {
+      return readHierarchySearchHitsCount(appWindow)
+    }).toBe(0)
+  })
+
+  test('Check if clear control empties the query and clears search hits', async () => {
+    await remountHierarchyTreeSearchAfterStoreSeed(appWindow, searchOverrideSeed)
+
+    const input = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchInput}"] input`)
+    await input.fill('hero')
+    await expect.poll(async () => {
+      return readHierarchySearchHitsCount(appWindow)
+    }, {
+      timeout: 5_000
+    }).toBe(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchClear}"]`)
+    ).toBeVisible()
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchClear}"]`)
+      .click()
+    await expect(input).toHaveValue('')
+    await expect.poll(async () => {
+      return readHierarchySearchHitsCount(appWindow)
+    }).toBe(0)
   })
 })
