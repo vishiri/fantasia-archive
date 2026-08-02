@@ -7,6 +7,7 @@ import type * as S_FaUserSettingsStore from '../S_FaUserSettings'
 const {
   applyLocaleMock,
   applyAppThemeMock,
+  applyHideDeadCrossThroughMock,
   notifyCreateMock,
   tMock,
   getSettingsMock,
@@ -15,6 +16,7 @@ const {
   return {
     applyLocaleMock: vi.fn(),
     applyAppThemeMock: vi.fn(),
+    applyHideDeadCrossThroughMock: vi.fn(),
     notifyCreateMock: vi.fn(),
     tMock: vi.fn((key: string) => key),
     getSettingsMock: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),
@@ -31,6 +33,12 @@ vi.mock('quasar', () => {
 vi.mock('app/src/scripts/appInternals/faAppThemeApplyWiring', () => {
   return {
     applyFaAppThemeToDocument: applyAppThemeMock
+  }
+})
+
+vi.mock('app/src/scripts/appInternals/faHideDeadCrossThroughApplyWiring', () => {
+  return {
+    applyFaHideDeadCrossThroughToDocument: applyHideDeadCrossThroughMock
   }
 })
 
@@ -54,6 +62,7 @@ beforeEach(async () => {
   vi.resetModules()
   applyLocaleMock.mockReset()
   applyAppThemeMock.mockReset()
+  applyHideDeadCrossThroughMock.mockReset()
   notifyCreateMock.mockReset()
   tMock.mockReset()
   tMock.mockImplementation((key: string) => key)
@@ -96,6 +105,7 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
   expect(store.settings).toEqual(snapshot)
   expect(applyLocaleMock).toHaveBeenCalledWith('en-US')
   expect(applyAppThemeMock).toHaveBeenCalledWith('darkThemeFantasy')
+  expect(applyHideDeadCrossThroughMock).toHaveBeenCalledWith(false)
 })
 
 /**
@@ -348,9 +358,11 @@ test('Test that setAppSettingsDialogPreview and clearAppSettingsDialogPreview up
   store.setAppSettingsDialogPreview({ appTheme: 'darkThemeFantasy' as const })
   expect(store.appSettingsDialogPreview).toEqual({ appTheme: 'darkThemeFantasy' as const })
   expect(applyAppThemeMock).toHaveBeenCalledWith('darkThemeFantasy')
+  expect(applyHideDeadCrossThroughMock).toHaveBeenCalledWith(false)
   store.clearAppSettingsDialogPreview()
   expect(store.appSettingsDialogPreview).toBeNull()
   expect(applyAppThemeMock).toHaveBeenLastCalledWith('darkThemeFantasy')
+  expect(applyHideDeadCrossThroughMock).toHaveBeenLastCalledWith(false)
 })
 
 /**
@@ -365,4 +377,15 @@ test('Test that setAppSettingsDialogPreview merges patches and applies light the
     appTheme: 'lightThemeFlat'
   })
   expect(applyAppThemeMock).toHaveBeenLastCalledWith('lightThemeFlat')
+})
+
+/**
+ * S_FaUserSettings / app settings dialog preview
+ * hideDeadCrossThrough preview toggles the body-class applicator.
+ */
+test('Test that setAppSettingsDialogPreview applies hideDeadCrossThrough preview', () => {
+  store.setAppSettingsDialogPreview({ hideDeadCrossThrough: true })
+  expect(applyHideDeadCrossThroughMock).toHaveBeenLastCalledWith(true)
+  store.clearAppSettingsDialogPreview()
+  expect(applyHideDeadCrossThroughMock).toHaveBeenLastCalledWith(false)
 })

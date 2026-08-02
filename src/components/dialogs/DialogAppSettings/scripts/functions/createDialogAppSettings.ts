@@ -356,6 +356,24 @@ export function createDialogAppSettings (deps: {
         })
       }
 
+      if (settingKey === 'hideTabCloseButton' && typeof updatedValue === 'boolean') {
+        deps.S_FaUserSettings().setAppSettingsDialogPreview({
+          hideTabCloseButton: updatedValue
+        })
+      }
+
+      if (settingKey === 'showTabBarScrollButtons' && typeof updatedValue === 'boolean') {
+        deps.S_FaUserSettings().setAppSettingsDialogPreview({
+          showTabBarScrollButtons: updatedValue
+        })
+      }
+
+      if (settingKey === 'hideDeadCrossThrough' && typeof updatedValue === 'boolean') {
+        deps.S_FaUserSettings().setAppSettingsDialogPreview({
+          hideDeadCrossThrough: updatedValue
+        })
+      }
+
       if (settingKey === 'appTheme' && typeof updatedValue === 'string') {
         deps.S_FaUserSettings().setAppSettingsDialogPreview({
           appTheme: updatedValue as I_faUserSettings['appTheme']

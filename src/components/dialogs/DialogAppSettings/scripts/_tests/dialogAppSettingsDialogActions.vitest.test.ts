@@ -353,6 +353,123 @@ test('updateLocalSetting previews appTheme through the user-settings store', () 
 
 /**
  * createDialogAppSettingsDialogActions
+ * Dead strikethrough toggle previews through the user-settings store before Save.
+ */
+test('updateLocalSetting previews hideDeadCrossThrough through the user-settings store', () => {
+  const store = createAppSettingsStoreMock({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      hideDeadCrossThrough: false
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('hideDeadCrossThrough', true)
+
+  expect(localSettings.value?.hideDeadCrossThrough).toBe(true)
+  expect(store.setAppSettingsDialogPreview).toHaveBeenCalledWith({
+    hideDeadCrossThrough: true
+  })
+})
+
+/**
+ * createDialogAppSettingsDialogActions
+ * Tab chrome toggles preview through the user-settings store before Save.
+ */
+test('updateLocalSetting previews hideTabCloseButton through the user-settings store', () => {
+  const store = createAppSettingsStoreMock({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      hideTabCloseButton: false
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('hideTabCloseButton', true)
+
+  expect(localSettings.value?.hideTabCloseButton).toBe(true)
+  expect(store.setAppSettingsDialogPreview).toHaveBeenCalledWith({
+    hideTabCloseButton: true
+  })
+})
+
+/**
+ * createDialogAppSettingsDialogActions
+ * Tab scroll-button toggle previews through the user-settings store before Save.
+ */
+test('updateLocalSetting previews showTabBarScrollButtons through the user-settings store', () => {
+  const store = createAppSettingsStoreMock({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      showTabBarScrollButtons: false
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('showTabBarScrollButtons', true)
+
+  expect(localSettings.value?.showTabBarScrollButtons).toBe(true)
+  expect(store.setAppSettingsDialogPreview).toHaveBeenCalledWith({
+    showTabBarScrollButtons: true
+  })
+})
+
+/**
+ * createDialogAppSettingsDialogActions
  * updateLocalSetting still updates the local draft when directSettingsSnapshot props are used.
  */
 test('updateLocalSetting updates local draft for directSettingsSnapshot props without touching the store', () => {

@@ -185,7 +185,7 @@ export default {
       note: 'Needs a full app restart to take effect!'
     },
     doubleDashDocCount: {
-      title: 'TODO - Pronounced count divider',
+      title: 'Pronounced count divider',
       description: 'This setting adds another \\| character between the category and document count in the hierarchical tree.',
       tags: 'pipe, delimiter, separator, count format, tree counts'
     },
@@ -200,7 +200,7 @@ export default {
       tags: 'relationship field, cheatsheet, help icon, link picker, advanced search'
     },
     hideDeadCrossThrough: {
-      title: 'TODO - Hide strike-through',
+      title: 'Hide strike-through',
       description: 'This setting hides the strike-through effect on dead, gone, or destroyed documents in order to increase visibility.',
       tags: 'strikethrough, deceased, destroyed, gone, document status, crossed out'
     },

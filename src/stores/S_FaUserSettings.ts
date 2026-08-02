@@ -8,7 +8,10 @@ import { ResultAsync } from 'neverthrow'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 import { applyFaAppThemeToDocument } from 'app/src/scripts/appInternals/faAppThemeApplyWiring'
+import { applyFaHideDeadCrossThroughToDocument } from 'app/src/scripts/appInternals/faHideDeadCrossThroughApplyWiring'
+import { resolveFaHideDeadCrossThroughEnabled } from 'app/src/scripts/appInternals/functions/faHideDeadCrossThroughDom'
 import { applyFaI18nLocaleFromLanguageCode } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import {
   FA_USER_SETTINGS_APP_THEME_DEFAULT,
   isFaUserSettingsAppTheme
@@ -20,6 +23,7 @@ import { didObjectPatchPersist } from './functions/faPersistPatchVerify'
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.
  * Loads once on app start and handles patch-based updates with success/failure feedback.
+ * Also applies document body effects for app theme and hide-dead strike-through.
  */
 export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   const settings: Ref<I_faUserSettings | null> = ref(null)
@@ -43,17 +47,34 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     applyFaAppThemeToDocument(resolveEffectiveAppTheme())
   }
 
+  function resolveEffectiveHideDeadCrossThrough (): boolean {
+    return resolveFaHideDeadCrossThroughEnabled(
+      settings.value?.hideDeadCrossThrough,
+      appSettingsDialogPreview.value?.hideDeadCrossThrough,
+      FA_USER_SETTINGS_DEFAULTS.hideDeadCrossThrough
+    )
+  }
+
+  function applyEffectiveHideDeadCrossThrough (): void {
+    applyFaHideDeadCrossThroughToDocument(resolveEffectiveHideDeadCrossThrough())
+  }
+
+  function applyEffectiveDocumentEffects (): void {
+    applyEffectiveAppTheme()
+    applyEffectiveHideDeadCrossThrough()
+  }
+
   function setAppSettingsDialogPreview (preview: Partial<I_faUserSettings>): void {
     appSettingsDialogPreview.value = {
       ...(appSettingsDialogPreview.value ?? {}),
       ...preview
     }
-    applyEffectiveAppTheme()
+    applyEffectiveDocumentEffects()
   }
 
   function clearAppSettingsDialogPreview (): void {
     appSettingsDialogPreview.value = null
-    applyEffectiveAppTheme()
+    applyEffectiveDocumentEffects()
   }
 
   async function refreshSettings (): Promise<void> {
@@ -62,7 +83,7 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     if (s !== null && s.languageCode !== undefined && isFaUserSettingsLanguageCode(s.languageCode)) {
       applyFaI18nLocaleFromLanguageCode(s.languageCode)
     }
-    applyEffectiveAppTheme()
+    applyEffectiveDocumentEffects()
   }
 
   async function persistSettingsPatch (
@@ -94,7 +115,7 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
       applyFaI18nLocaleFromLanguageCode(updateObject.languageCode)
     }
 
-    applyEffectiveAppTheme()
+    applyEffectiveDocumentEffects()
 
     return retrievedSettings
   }

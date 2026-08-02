@@ -1,0 +1,8 @@
+/* GLOBALS - USER SETTINGS ACCESSIBILITY */
+
+body.fa-userSetting--hideDeadCrossThrough {
+  .projectHierarchyTreeNode__label--dead,
+  .projectAppControlBarTabs__tabLabelText--dead {
+    text-decoration: none;
+  }
+}

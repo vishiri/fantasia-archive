@@ -332,6 +332,46 @@ test.describe.serial('App settings dialog', () => {
     await clearAppSettingsSearch(appWindow)
   })
 
+  /**
+   * Live preview: selecting Flat theme, Light updates body classes and data-fa-app-theme (no Save, no VRT).
+   */
+  test('App theme select previews flat light body classes without Save', async () => {
+    await fillAppSettingsSearch(appWindow, 'theme')
+
+    const themeSelect = appWindow.locator(
+      `[data-test-locator="${appSettingsSearchSelector.setting('appTheme')}"] [data-test-locator="dialogAppSettings-search-settingSelect"]`
+    )
+    await expect(themeSelect).toBeVisible()
+    await themeSelect.click()
+
+    const flatLightOption = appWindow.getByRole('option', {
+      name: appSettingsMessages.appOptions.appTheme.values.lightThemeFlat
+    })
+    await expect(flatLightOption).toBeVisible({ timeout: 10_000 })
+    await flatLightOption.click()
+
+    await expect.poll(async () => {
+      return await appWindow.evaluate(() => {
+        const body = document.body
+        return {
+          dataTheme: body.getAttribute('data-fa-app-theme'),
+          hasFlat: body.classList.contains('fa-appTheme--flat'),
+          hasLight: body.classList.contains('body--light'),
+          hasFantasy: body.classList.contains('fa-appTheme--fantasy'),
+          hasDark: body.classList.contains('body--dark')
+        }
+      })
+    }, { timeout: 10_000 }).toEqual({
+      dataTheme: 'lightThemeFlat',
+      hasFlat: true,
+      hasLight: true,
+      hasFantasy: false,
+      hasDark: false
+    })
+
+    await clearAppSettingsSearch(appWindow)
+  })
+
   test('App settings search finds hide empty fields by description substring hides fields', async () => {
     await fillAppSettingsSearch(appWindow, 'hides fields')
 
