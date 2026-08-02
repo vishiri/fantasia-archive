@@ -39,13 +39,8 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-const appPackagedState = vi.hoisted(() => ({
-  isPackaged: false
-}))
-
 vi.mock('electron', () => {
   return {
-    app: appPackagedState,
     BrowserWindow: {
       fromWebContents: mocks.fromWebContentsMock
     },
@@ -57,7 +52,6 @@ vi.mock('electron', () => {
 
 beforeEach(async () => {
   vi.resetModules()
-  appPackagedState.isPackaged = false
   mocks.ipcMainHandleMock.mockReset()
   mocks.fromWebContentsMock.mockReset()
   mocks.isDevToolsOpenedMock.mockReset()
@@ -248,49 +242,16 @@ test('Test that registerFaDevToolsIpc closeAsync returns false without a window'
 
 /**
  * registerFaDevToolsIpc
- * Packaged builds reject DevTools IPC (no-op).
+ * Packaged builds still open DevTools (Help / keybind Toggle developer tools).
  */
-test('Test that registerFaDevToolsIpc toggleAsync is a no-op when the app is packaged', async () => {
-  appPackagedState.isPackaged = true
+test('Test that registerFaDevToolsIpc toggleAsync opens DevTools without requiring unpackaged app', async () => {
+  mocks.isDevToolsOpenedMock.mockReturnValueOnce(false).mockReturnValueOnce(true)
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
   const result = await handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
 
-  expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
-  expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
-  expect(result).toBe(false)
-})
-
-test('Test that registerFaDevToolsIpc statusAsync is a no-op when the app is packaged', async () => {
-  appPackagedState.isPackaged = true
-  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
-  registerFaDevToolsIpc()
-
-  const result = await handlerFor(FA_DEVTOOLS_IPC.statusAsync)({ sender: fakeSender })
-
-  expect(mocks.isDevToolsOpenedMock).not.toHaveBeenCalled()
-  expect(result).toBe(false)
-})
-
-test('Test that registerFaDevToolsIpc openAsync is a no-op when the app is packaged', async () => {
-  appPackagedState.isPackaged = true
-  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
-  registerFaDevToolsIpc()
-
-  const result = await handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })
-
-  expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
-  expect(result).toBe(false)
-})
-
-test('Test that registerFaDevToolsIpc closeAsync is a no-op when the app is packaged', async () => {
-  appPackagedState.isPackaged = true
-  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
-  registerFaDevToolsIpc()
-
-  const result = await handlerFor(FA_DEVTOOLS_IPC.closeAsync)({ sender: fakeSender })
-
-  expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
-  expect(result).toBe(false)
+  expect(mocks.openDevToolsMock).toHaveBeenCalledTimes(1)
+  expect(revealElectronDevToolsConsoleBestEffortMock).toHaveBeenCalledWith(mocks.webContents)
+  expect(result).toBe(true)
 })

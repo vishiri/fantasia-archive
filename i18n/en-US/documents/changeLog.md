@@ -1,6 +1,11 @@
 # Changelog
 ----------
 
+## 2.4.16
+
+### Bugfixes & Optimizations
+- **Help / keybinds**: **Toggle developer tools** works again in installed (packaged) builds. A security guard had been blocking DevTools IPC after packaging so the menu item and shortcut did nothing.
+
 ## 2.4.15
 
 ### New features

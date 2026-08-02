@@ -1,4 +1,4 @@
-import { ipcMain, app } from 'electron'
+import { ipcMain } from 'electron'
 
 import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { revealElectronDevToolsConsoleBestEffort } from 'app/src-electron/mainScripts/ipcManagement/revealElectronDevToolsConsoleBestEffort'
@@ -10,6 +10,10 @@ let registered = false
  * Wires async IPC handlers so preload can toggle/query DevTools without '@electron/remote'
  * 'getCurrentWindow()' (unreliable from isolated preload). Resolves the window from the IPC
  * sender so behavior stays tied to the correct 'BrowserWindow'.
+ *
+ * PRODUCT LAW: must work when app.isPackaged. Help menu and keybind Toggle developer tools
+ * are intentional in installed builds. Do not gate handlers on isPackaged or disable
+ * webPreferences.devTools for packaging. See fantasia-electron-main Packaged DevTools.
  */
 export function registerFaDevToolsIpc (): void {
   if (registered) {
@@ -18,20 +22,12 @@ export function registerFaDevToolsIpc (): void {
   registered = true
 
   ipcMain.handle(FA_DEVTOOLS_IPC.statusAsync, (event) => {
-    if (app.isPackaged) {
-      return false
-    }
-
     const w = windowFromIpcEvent(event)
 
     return w?.webContents.isDevToolsOpened() ?? false
   })
 
   ipcMain.handle(FA_DEVTOOLS_IPC.toggleAsync, async (event) => {
-    if (app.isPackaged) {
-      return false
-    }
-
     const w = windowFromIpcEvent(event)
     if (w === undefined) {
       return false
@@ -48,10 +44,6 @@ export function registerFaDevToolsIpc (): void {
   })
 
   ipcMain.handle(FA_DEVTOOLS_IPC.openAsync, async (event) => {
-    if (app.isPackaged) {
-      return false
-    }
-
     const w = windowFromIpcEvent(event)
     if (w === undefined) {
       return false
@@ -64,10 +56,6 @@ export function registerFaDevToolsIpc (): void {
   })
 
   ipcMain.handle(FA_DEVTOOLS_IPC.closeAsync, (event) => {
-    if (app.isPackaged) {
-      return false
-    }
-
     const w = windowFromIpcEvent(event)
     if (w === undefined) {
       return false
