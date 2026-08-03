@@ -20,6 +20,7 @@ type T_hierarchyStore = {
   refreshLayout: () => Promise<void>
   refreshUiState: () => Promise<void>
   resetOnProjectClose: () => void
+  uiState: { scrollTopPx: number }
 }
 
 type T_sessionWiringDeps = {
@@ -72,6 +73,7 @@ function bindProjectHierarchyTreeSessionSideEffects (
     earlyWiring,
     getStoreExpandedNodeIds: () => deps.uiState.value.expandedNodeIds,
     hierarchyStore: deps.hierarchyStore,
+    nextTick: deps.nextTick,
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
     pendingRevealPath: deps.pendingRevealPath,
@@ -128,8 +130,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: T_sessionWiringDe
     isTreeDragActive: earlyWiring.bootstrap.sessionRefs.isTreeDragActive,
     openIconExpandAnimationWiring: earlyWiring.subWiring.openIconExpandAnimationWiring,
     subWiring: earlyWiring.subWiring,
-    treeData: deps.treeData,
-    treeMountKey: earlyWiring.bootstrap.sessionRefs.treeMountKey
+    treeData: deps.treeData
   })
 }
 
@@ -211,7 +212,6 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
     suppressTreeEmit: bootstrap.sessionRefs.suppressTreeEmit,
     treeComponentRef: bootstrap.sessionRefs.treeComponentRef,
     treeData: deps.treeData,
-    treeMountKey: bootstrap.sessionRefs.treeMountKey,
     treeScrollHostRef: bootstrap.sessionRefs.treeScrollHostRef,
     uiState: deps.uiState,
     watch: deps.watch,

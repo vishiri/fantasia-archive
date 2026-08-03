@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler } from '../projectHierarchyTreeSessionExpandOpenWiring'
+import { createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler } from '../projectHierarchyTreeSessionExpandOpenOnNodeOpenWiring'
 
 function buildPlacementNode (): I_faProjectHierarchyTreeHeTreeNode {
   return {
@@ -34,11 +34,18 @@ test('Test that onNodeOpen awaits in-flight expand for the same node id', async 
   const markNodeOpen = vi.fn()
   const onNodeOpen = createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler({
     dragExpandUiFrozen: ref(false),
+    getPersistedScrollTopPx: () => 0,
+    getTreeScrollHost: () => null,
     lazyLoadWiring: {
       flushDeferredTreeRevisionPublish: vi.fn(),
       loadChildrenForNode
     },
+    nextTick: async () => undefined,
     openNodeIds: ref(new Set()),
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     runDeferredLazyLoadBatch: async (runBatch) => {
       await runBatch()
     },

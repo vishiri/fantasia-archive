@@ -60,8 +60,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionExpandWiring closes with
       return 1
     },
     suppressTreeEmit,
-    treeData,
-    treeMountKey: ref(0)
+    treeData
   })
 
   wiring.markNodeClosed('placement-1', placementNode)
@@ -89,8 +88,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionExpandWiring marks nodes
       return 1
     },
     suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey: ref(0)
+    treeData
   })
 
   wiring.markNodeOpen('world-1')

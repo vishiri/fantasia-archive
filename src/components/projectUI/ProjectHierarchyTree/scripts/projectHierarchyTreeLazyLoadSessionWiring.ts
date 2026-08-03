@@ -2,7 +2,10 @@ import type { Ref, watch as WatchFn } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode, I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { listFaProjectPlacementDocumentChildrenForRenderer } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 import { createProjectHierarchyTreeLazyLoadWiring, runProjectHierarchyTreeDeferredLazyLoadBatch } from './projectHierarchyTreeLazyLoadWiring'
-import { createProjectHierarchyTreeUiStateSessionExpandWiring, createProjectHierarchyTreeUiStateSessionRestoreWiring, attachProjectHierarchyTreeUiStateScrollListeners } from './projectHierarchyTreeUiStateSessionPartsWiring'
+import { createProjectHierarchyTreeUiStateSessionExpandWiring, createProjectHierarchyTreeUiStateSessionRestoreWiring } from './projectHierarchyTreeUiStateSessionPartsWiring'
+import { attachProjectHierarchyTreeUiStateScrollListeners } from './projectHierarchyTreeScrollPersistListenersWiring'
+import { shouldSkipProjectHierarchyTreeScrollPersistWhileDrag } from '../functions/projectHierarchyTreeScrollPreserveResolve'
+import { isProjectHierarchyTreeScrollPreserveActive } from './projectHierarchyTreeScrollPreserveWiring'
 
 type T_hierarchyStore = {
   flushUiStatePersist: () => void
@@ -10,8 +13,31 @@ type T_hierarchyStore = {
   queuePersistScrollTopPx: (scrollTopPx: number) => void
 }
 
-export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
+function createProjectHierarchyTreeLazyLoadScrollPersistAttacher (deps: {
+  dragCommitPending: Ref<boolean>
+  getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
+  getTreeScrollHost: () => HTMLElement | null
+  isTreeDragActive: Ref<boolean>
+  queuePersistScrollTopPx: (scrollTopPx: number) => void
+  requestAnimationFrame: (callback: () => void) => number
+}): () => (() => void) {
+  return () => attachProjectHierarchyTreeUiStateScrollListeners({
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    queuePersistScrollTopPx: deps.queuePersistScrollTopPx,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    shouldSkipPersistScrollTopPx: (scrollTopPx) => shouldSkipProjectHierarchyTreeScrollPersistWhileDrag({
+      dragCommitPending: deps.dragCommitPending.value,
+      isTreeDragActive: deps.isTreeDragActive.value,
+      scrollPreserveActive: isProjectHierarchyTreeScrollPreserveActive(),
+      scrollTopPx
+    })
+  })
+}
+
+type T_projectHierarchyTreeLazyLoadSessionWiringDeps = {
   deferLazyLoadTreeRevisionPublish: Ref<boolean>
+  dragCommitPending: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   flushUiStatePersist: () => void
   getExpandedNodeIds: () => string[]
@@ -23,15 +49,19 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   getTreeScrollHost: () => HTMLElement | null
   getWorlds: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeWorkspaceWorld[]
   hierarchyStore: T_hierarchyStore
+  isTreeDragActive: Ref<boolean>
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
   pendingRevealPath: Ref<string[]>
   requestAnimationFrame: (callback: () => void) => number
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
   watch: typeof WatchFn
-}) {
+}
+
+export function createProjectHierarchyTreeLazyLoadSessionWiring (
+  deps: T_projectHierarchyTreeLazyLoadSessionWiringDeps
+) {
   const treeRevisionPublishHooks: {
     reapplyHeTreeOpenState: (() => void) | null
   } = {
@@ -99,7 +129,6 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey,
     watch: deps.watch
   })
   uiStateWiringHolder.wiring = uiStateWiring
@@ -107,10 +136,22 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     uiStateWiring.reapplyHeTreeOpenState()
   }
 
+  const attachScrollPersist = createProjectHierarchyTreeLazyLoadScrollPersistAttacher({
+    dragCommitPending: deps.dragCommitPending,
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    isTreeDragActive: deps.isTreeDragActive,
+    queuePersistScrollTopPx: deps.hierarchyStore.queuePersistScrollTopPx,
+    requestAnimationFrame: deps.requestAnimationFrame
+  })
+
   return {
     lazyLoadWiring,
     runDeferredLazyLoadBatch,
-    uiStateWiring
+    uiStateWiring: {
+      ...uiStateWiring,
+      attachScrollPersist
+    }
   }
 }
 
@@ -135,7 +176,6 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
   watch: typeof WatchFn
 }) {
   const expandWiring = createProjectHierarchyTreeUiStateSessionExpandWiring({
@@ -149,8 +189,7 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     requestAnimationFrame: deps.requestAnimationFrame,
     suppressTreeEmit: deps.suppressTreeEmit,
-    treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey
+    treeData: deps.treeData
   })
   const restoreWiring = createProjectHierarchyTreeUiStateSessionRestoreWiring({
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
@@ -173,8 +212,10 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
 
   return {
     attachScrollPersist: () => attachProjectHierarchyTreeUiStateScrollListeners({
+      getTreeRef: deps.getTreeRef,
       getTreeScrollHost: deps.getTreeScrollHost,
-      queuePersistScrollTopPx: deps.queuePersistScrollTopPx
+      queuePersistScrollTopPx: deps.queuePersistScrollTopPx,
+      requestAnimationFrame: deps.requestAnimationFrame
     }),
     awaitHeTreeResyncIdle: expandWiring.awaitHeTreeResyncIdle,
     isProgrammaticHeTreeResyncActive: expandWiring.isProgrammaticHeTreeResyncActive,

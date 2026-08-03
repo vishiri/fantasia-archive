@@ -9,9 +9,7 @@ import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
 import { refreshProjectHierarchyTreeDragCommitSourceContainer } from './projectHierarchyTreeDnDCommitWiring'
-import {
-  remountProjectHierarchyTreeAndRestoreExpandedSnapshot
-} from './projectHierarchyTreeDnDSessionStateWiring'
+import { touchProjectHierarchyTreePreservedScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
 import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
 
 export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
@@ -43,11 +41,13 @@ export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
     deps.expandedSnapshot,
     PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
   )
+  touchProjectHierarchyTreePreservedScrollTop()
   await deps.reapplyLatentDescendantExpandState()
   deps.reapplyHeTreeOpenState()
   deps.flushUiStatePersist()
   deps.clearDragSessionFlags()
   await deps.nextTick()
+  touchProjectHierarchyTreePreservedScrollTop()
   await new Promise<void>((resolve) => {
     deps.requestAnimationFrame(() => {
       resolve()
@@ -56,6 +56,7 @@ export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
   deps.reapplyHeTreeOpenState()
   await deps.reapplyLatentDescendantExpandState()
   deps.reapplyHeTreeOpenState()
+  touchProjectHierarchyTreePreservedScrollTop()
   deps.dragExpandPostCommitGuard.value = false
 }
 
@@ -133,12 +134,8 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     expandedSnapshotSet: deps.expandedSnapshotSet
   })
   const effectiveExpandedSnapshotSet = new Set(effectiveExpandedSnapshot)
-  await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-    expandedNodeIds: effectiveExpandedSnapshot,
-    nextTick: deps.nextTick,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
-    restoreOptions: PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
-  })
+  // One expand restore only (in finalizeExpandState). Early remount+restore caused
+  // nest/un-nest double scroll jumps while preserve lock lagged remounted containers.
   await refreshProjectHierarchyTreeDragCommitSourceContainer({
     committed: deps.commitResult.committed,
     dragParentDocumentIdAtDragStart: deps.dragParentDocumentIdAtDragStart,
@@ -147,6 +144,7 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     treeData: deps.treeData
   })
+  touchProjectHierarchyTreePreservedScrollTop()
   const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(
     deps.treeData.value
   )

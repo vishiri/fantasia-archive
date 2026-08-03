@@ -12,6 +12,7 @@ import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRo
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
 import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreeDisplayChromeWiring'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
+import './projectHierarchyTreeVirtualListBufferWiring'
 
 export {
   applyProjectHierarchyTreeTreeNodeKindClass,

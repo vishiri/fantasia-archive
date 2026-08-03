@@ -45,11 +45,42 @@ export const PROJECT_HIERARCHY_TREE_OPEN_ICON_ROTATE_TRANSITION_MS = 300
 export const PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON = 'mdi-file-outline'
 
 /**
- * Quiet period (ms) after drag ends before remounting he-tree so drag-open timers
- * cannot call beforeDragOpen on a destroyed Draggable instance.
+ * Matches styles/_variables.scss $projectHierarchyTree-node-minHeight.
  */
-export const PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS =
-  PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS + 50
+export const PROJECT_HIERARCHY_TREE_NODE_MIN_HEIGHT_PX = 29
+
+/**
+ * Matches styles/_variables.scss $projectHierarchyTree-node-marginTop.
+ * VirtualList size includes margin; unmeasured rows use min-height + margin.
+ */
+export const PROJECT_HIERARCHY_TREE_NODE_MARGIN_TOP_PX = 3
+
+/**
+ * Estimated row stride for @virtual-list/vue itemSize before DOM measure.
+ */
+export const PROJECT_HIERARCHY_TREE_VIRTUAL_ROW_SIZE_PX =
+  PROJECT_HIERARCHY_TREE_NODE_MIN_HEIGHT_PX + PROJECT_HIERARCHY_TREE_NODE_MARGIN_TOP_PX
+
+/**
+ * @virtual-list/vue buffer (px) beyond viewport. he-tree does not forward buffer;
+ * hierarchy boot mutates VirtualList default (~8 rows).
+ * Keep modest: VirtualList skips onscroll updates while |delta| <= buffer-10;
+ * hierarchy forces update on scroll, so huge buffer is not required for blank gaps.
+ */
+export const PROJECT_HIERARCHY_TREE_VIRTUAL_LIST_BUFFER_PX =
+  PROJECT_HIERARCHY_TREE_VIRTUAL_ROW_SIZE_PX * 8
+
+/**
+ * Animation frames to re-apply scrollTop after preserved work settles
+ * (covers late virt remount / expand reapply after drag commit).
+ */
+export const PROJECT_HIERARCHY_TREE_SCROLL_PRESERVE_SETTLE_FRAMES = 6
+
+/**
+ * Settle delay (ms) after drag ends before expand snapshot restore.
+ * Kept at 0 — drag-open is gated by isTreeDragActive; remount quiet no longer needed.
+ */
+export const PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS = 0
 
 /** nextTick polls while suppressTreeEmit blocks drag commit persist. */
 export const PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS = 30

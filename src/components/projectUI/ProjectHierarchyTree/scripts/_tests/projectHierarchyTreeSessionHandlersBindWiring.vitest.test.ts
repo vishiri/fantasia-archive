@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
@@ -6,9 +7,15 @@ import { createProjectHierarchyTreeSessionHandlersBindWiring } from '../projectH
 vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
   return {
     createProjectHierarchyTreeSessionHandlersWiring: (deps: {
+      getPersistedScrollTopPx: () => number
+      getTreeScrollHost: () => HTMLElement | null
       queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+      requestAnimationFrame: (callback: () => void) => number
     }) => {
       deps.queuePersistExpandedNodeIds(['world-1'])
+      expect(deps.getPersistedScrollTopPx()).toBe(42)
+      expect(deps.getTreeScrollHost()).toBeInstanceOf(HTMLElement)
+      deps.requestAnimationFrame(() => undefined)
       return {
         onNodeRowContextMenu: vi.fn()
       }
@@ -18,6 +25,7 @@ vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
 
 test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistExpandedNodeIds', () => {
   const queuePersistExpandedNodeIds = vi.fn()
+  const host = document.createElement('div')
   const wiring = createProjectHierarchyTreeSessionHandlersBindWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     dragContext: {
@@ -32,8 +40,7 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
           openNodeIds: ref(new Set()),
           suppressTreeEmit: ref(false),
           treeComponentRef: ref(null),
-          treeMountKey: ref(0),
-          treeScrollHostRef: ref(null)
+          treeScrollHostRef: ref(host)
         }
       },
       documentRowDragHoldWiring: {},
@@ -45,16 +52,26 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
           flushDeferredTreeRevisionPublish: vi.fn(),
           loadChildrenForNode: vi.fn(async () => {})
         },
+        openIconExpandAnimationWiring: {
+          scheduleOpenIconExpandAnimation: vi.fn()
+        },
+        runDeferredLazyLoadBatch: vi.fn(async (runBatch: () => Promise<void>) => {
+          await runBatch()
+        }),
         uiStateWiring: {
+          awaitHeTreeResyncIdle: vi.fn(async () => {}),
+          isProgrammaticHeTreeResyncActive: () => false,
           markNodeClosed: vi.fn(),
           markNodeOpen: vi.fn(),
           reapplyHeTreeOpenState: vi.fn(),
-          reapplyLatentDescendantExpandState: vi.fn(async () => {})
+          reapplyLatentDescendantExpandState: vi.fn(async () => {}),
+          resyncHeTreeAfterExpandPublish: vi.fn(async () => {})
         }
       }
     } as never,
     hierarchyStore: {
-      queuePersistExpandedNodeIds
+      queuePersistExpandedNodeIds,
+      uiState: { scrollTopPx: 42 }
     },
     nextTick: async () => {},
     onDocumentOpenRequest: vi.fn(),

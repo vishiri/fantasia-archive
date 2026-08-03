@@ -49,6 +49,7 @@ function createPassthroughDeferredLazyLoadBatchMock (
 
 function createBulkExpandWiringDeps (overrides: {
   dragExpandUiFrozen?: Ref<boolean>
+  getTreeRef?: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   nextTick?: () => Promise<void>
   openNodeIds?: Ref<Set<string>>
   queuePersistExpandedNodeIds?: (expandedNodeIds: string[]) => void
@@ -59,7 +60,6 @@ function createBulkExpandWiringDeps (overrides: {
   runDeferredLazyLoadBatch?: (runBatch: () => Promise<void>) => Promise<void>
   suppressTreeEmit?: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey?: Ref<number>
 }) {
   const reapplyHeTreeOpenState = overrides.reapplyHeTreeOpenState ?? vi.fn()
   const reapplyLatentDescendantExpandState =
@@ -69,6 +69,7 @@ function createBulkExpandWiringDeps (overrides: {
     createPassthroughDeferredLazyLoadBatchMock(reapplyHeTreeOpenState)
   return {
     dragExpandUiFrozen: overrides.dragExpandUiFrozen ?? ref(false),
+    getTreeRef: overrides.getTreeRef ?? (() => null),
     nextTick: overrides.nextTick ?? (async () => {}),
     openNodeIds: overrides.openNodeIds ?? ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: overrides.queuePersistExpandedNodeIds ?? vi.fn(),
@@ -76,15 +77,13 @@ function createBulkExpandWiringDeps (overrides: {
     reapplyLatentDescendantExpandState,
     runDeferredLazyLoadBatch,
     suppressTreeEmit: overrides.suppressTreeEmit ?? ref(false),
-    treeData: overrides.treeData,
-    treeMountKey: overrides.treeMountKey ?? ref(0)
+    treeData: overrides.treeData
   }
 }
 
 test('expandAllUnderNode merges target ids and runs latent reapply in background', async () => {
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createWorldNode()])
   const openNodeIds = ref<Set<string>>(new Set())
-  const treeMountKey = ref(0)
   const suppressTreeEmit = ref(false)
   const reapplyLatentDescendantExpandState = vi.fn(async () => {})
   const reapplyHeTreeOpenState = vi.fn()
@@ -97,8 +96,7 @@ test('expandAllUnderNode merges target ids and runs latent reapply in background
       reapplyHeTreeOpenState,
       reapplyLatentDescendantExpandState,
       suppressTreeEmit,
-      treeData,
-      treeMountKey
+      treeData
     })
   )
 
@@ -130,22 +128,27 @@ test('expandAllUnderNode no-ops while drag-expand frozen', () => {
   expect(openNodeIds.value.size).toBe(0)
 })
 
-test('collapseAllUnderNode prunes open ids, remounts tree, and reopens remaining rows', async () => {
+test('collapseAllUnderNode prunes open ids and reapplies remaining rows without remount', async () => {
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createWorldNode()])
   const openNodeIds = ref<Set<string>>(new Set(['world-1', 'group-1', 'doc-latent']))
-  const treeMountKey = ref(0)
   const suppressTreeEmit = ref(false)
+  const closeAll = vi.fn()
   const reapplyHeTreeOpenState = vi.fn()
   const queuePersistExpandedNodeIds = vi.fn()
 
   const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
     createBulkExpandWiringDeps({
+      getTreeRef: () => ({
+        $refs: {},
+        closeAll,
+        getData: () => [],
+        openNodeAndParents: vi.fn()
+      }),
       openNodeIds,
       queuePersistExpandedNodeIds,
       reapplyHeTreeOpenState,
       suppressTreeEmit,
-      treeData,
-      treeMountKey
+      treeData
     })
   )
 
@@ -153,8 +156,8 @@ test('collapseAllUnderNode prunes open ids, remounts tree, and reopens remaining
   expect(openNodeIds.value.has('group-1')).toBe(false)
   expect(openNodeIds.value.has('doc-latent')).toBe(false)
   expect(openNodeIds.value.has('world-1')).toBe(true)
-  expect(treeMountKey.value).toBe(1)
   expect(suppressTreeEmit.value).toBe(false)
+  expect(closeAll).toHaveBeenCalled()
   expect(reapplyHeTreeOpenState).toHaveBeenCalled()
   expect(queuePersistExpandedNodeIds).toHaveBeenCalled()
 })
@@ -224,20 +227,105 @@ function createPlacementSubtree (): I_faProjectHierarchyTreeHeTreeNode {
 test('collapseAllUnderNode no-ops while drag-expand frozen', async () => {
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createWorldNode()])
   const openNodeIds = ref<Set<string>>(new Set(['world-1', 'group-1']))
-  const treeMountKey = ref(0)
 
   const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
     createBulkExpandWiringDeps({
       dragExpandUiFrozen: ref(true),
       openNodeIds,
-      treeData,
-      treeMountKey
+      treeData
     })
   )
 
   await wiring.collapseAllUnderNode('group-1')
   expect(openNodeIds.value.has('group-1')).toBe(true)
-  expect(treeMountKey.value).toBe(0)
+})
+
+test('collapseAllUnderNode preempts in-flight expand instead of no-op', async () => {
+  const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createPlacementSubtree()])
+  const openNodeIds = ref<Set<string>>(new Set(['world-1', 'placement-1', 'doc-parent']))
+  let resolveLatent: (() => void) | undefined
+  const reapplyLatentDescendantExpandState = vi.fn(() => {
+    return new Promise<void>((resolve) => {
+      resolveLatent = resolve
+    })
+  })
+  const reapplyHeTreeOpenState = vi.fn()
+
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      reapplyHeTreeOpenState,
+      reapplyLatentDescendantExpandState,
+      runDeferredLazyLoadBatch: async (runBatch) => {
+        await Promise.resolve()
+        await runBatch()
+        reapplyHeTreeOpenState()
+      },
+      treeData
+    })
+  )
+
+  wiring.expandAllUnderNode('placement-1')
+  expect(wiring.isBulkExpandCollapseInFlight()).toBe(true)
+  await wiring.collapseAllUnderNode('placement-1')
+  expect(openNodeIds.value.has('doc-parent')).toBe(false)
+  expect(reapplyHeTreeOpenState).toHaveBeenCalled()
+  resolveLatent?.()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(openNodeIds.value.has('doc-parent')).toBe(false)
+})
+
+test('collapseAllUnderNode no-ops eviction when anchor id is missing', async () => {
+  const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createWorldNode()])
+  const openNodeIds = ref<Set<string>>(new Set(['world-1']))
+  const reapplyHeTreeOpenState = vi.fn()
+
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      reapplyHeTreeOpenState,
+      treeData
+    })
+  )
+
+  await wiring.collapseAllUnderNode('missing-anchor')
+  expect(reapplyHeTreeOpenState).toHaveBeenCalled()
+  expect(openNodeIds.value.has('world-1')).toBe(true)
+})
+
+test('collapseAllUnderNode aborts expand deep passes after latent resume', async () => {
+  const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createPlacementSubtree()])
+  const openNodeIds = ref<Set<string>>(new Set(['world-1', 'placement-1']))
+  let resolveLatent: (() => void) | undefined
+  let latentCalls = 0
+  const reapplyLatentDescendantExpandState = vi.fn(() => {
+    latentCalls += 1
+    return new Promise<void>((resolve) => {
+      resolveLatent = resolve
+    })
+  })
+  const reapplyHeTreeOpenState = vi.fn()
+
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      reapplyHeTreeOpenState,
+      reapplyLatentDescendantExpandState,
+      treeData
+    })
+  )
+
+  wiring.expandAllUnderNode('placement-1')
+  await vi.waitFor(() => {
+    expect(latentCalls).toBe(1)
+  })
+  await wiring.collapseAllUnderNode('placement-1')
+  resolveLatent?.()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(latentCalls).toBe(1)
+  expect(openNodeIds.value.has('doc-parent')).toBe(false)
 })
 
 test('expandAllUnderNode ignores stacked calls while background work is in flight', async () => {

@@ -9,9 +9,7 @@ import type {
   createProjectHierarchyTreeDocumentRowDragHoldWiring,
   createProjectHierarchyTreeDocumentRowExpandClickGestureWiring
 } from './projectHierarchyTreeDocumentRowDragHoldWiring'
-import { isProjectHierarchyTreeDragExpandUiFrozen } from '../functions/projectHierarchyTreeDragExpandFreeze'
-import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
-import { runProjectHierarchyTreePostDragExpandCloseGuard } from './projectHierarchyTreeDnDWiring'
+import { createProjectHierarchyTreeSessionExpandCloseHandler } from './projectHierarchyTreeSessionExpandCloseWiring'
 import { createProjectHierarchyTreeSessionExpandOpenHandlersWiring } from './projectHierarchyTreeSessionExpandOpenWiring'
 
 function shouldRouteHierarchyTreeRowExpandClick (
@@ -122,6 +120,8 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   getDragExpandedSnapshotNodeIds: () => string[] | null
+  getPersistedScrollTopPx: () => number
+  getTreeScrollHost: () => HTMLElement | null
   lazyLoadWiring: {
     commitStagedLoadedChildren?: () => boolean
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -132,6 +132,7 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
   }
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
+  requestAnimationFrame: (callback: () => void) => number
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
@@ -148,37 +149,27 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
     resyncHeTreeAfterExpandPublish: (nodeId: string) => Promise<void>
   }
 }) {
-  function shouldIgnoreExpandPersistMutation (): boolean {
-    return isProjectHierarchyTreeDragExpandUiFrozen({
-      dragExpandUiFrozen: deps.dragExpandUiFrozen.value
-    }) || deps.suppressTreeEmit.value
-  }
-
-  function onNodeClose (
-    stat: { data: I_faProjectHierarchyTreeHeTreeNode },
-    options?: { source: 'heTreeEvent' | 'openIcon' }
-  ): void {
-    const fromOpenIcon = options?.source === 'openIcon'
-    if (!fromOpenIcon && shouldIgnoreExpandPersistMutation()) {
-      return
-    }
-    runProjectHierarchyTreePostDragExpandCloseGuard({
-      dragExpandPostCommitGuard: () => deps.dragExpandPostCommitGuard.value,
-      getDragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds,
-      markNodeClosed: deps.uiStateWiring.markNodeClosed,
-      node: findProjectHierarchyTreeNodeById(deps.treeData.value, stat.data.id) ?? stat.data,
-      nodeId: stat.data.id,
-      treeData: deps.treeData
-    })
-  }
+  const onNodeClose = createProjectHierarchyTreeSessionExpandCloseHandler({
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getDragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    suppressTreeEmit: deps.suppressTreeEmit,
+    treeComponentRef: deps.treeComponentRef,
+    treeData: deps.treeData,
+    uiStateWiring: deps.uiStateWiring
+  })
 
   const expandOpenHandlersWiring = createProjectHierarchyTreeSessionExpandOpenHandlersWiring({
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
+    getTreeScrollHost: deps.getTreeScrollHost,
     lazyLoadWiring: deps.lazyLoadWiring,
     onNodeClose,
     openIconExpandAnimationWiring: deps.openIconExpandAnimationWiring,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
+    requestAnimationFrame: deps.requestAnimationFrame,
     runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeComponentRef: deps.treeComponentRef,

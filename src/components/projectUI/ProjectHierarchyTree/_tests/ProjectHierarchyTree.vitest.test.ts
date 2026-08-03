@@ -270,7 +270,6 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         showsProjectNameTitle,
         showsTreeLines,
         treeData,
-        treeMountKey: ref(0),
         treeRootClassList: ref({}),
         treeStyle: ref({
           height: '100%'

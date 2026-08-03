@@ -42,6 +42,7 @@ Playbook: [fantasia-he-tree](../skills/fantasia-he-tree/SKILL.md) **DnD + scroll
 - **Topology key** for resync: canonical sorted ids + membership — not draft array order or sort fields (**`mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey`**).
 - Topology match → label patch in place; mismatch → rebuild **`treeData`**.
 - **No post-drop scroll restore** — fights **`virtualization`**; fix rebuild/remount instead.
+- Expand / drag freeze snapshots: **model `openNodeIds` (and stats)** — not DOM row queries (virtual list mounts viewport only).
 - Append scroll: separate count watch; scroll container = he-tree root (**`resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer`**).
 
 ## Project layout

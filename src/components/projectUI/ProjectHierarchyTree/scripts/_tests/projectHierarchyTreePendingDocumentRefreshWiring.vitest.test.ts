@@ -11,6 +11,15 @@ import {
   wireProjectHierarchyTreePendingDocumentRefresh
 } from '../projectHierarchyTreePendingDocumentRefreshWiring'
 
+const pendingRefreshScrollPreserveDeps = {
+  getTreeScrollHost: () => null as HTMLElement | null,
+  nextTick: async () => undefined,
+  requestAnimationFrame: (callback: () => void) => {
+    callback()
+    return 0
+  }
+}
+
 function buildPlacementNode (): I_faProjectHierarchyTreeHeTreeNode {
   return {
     children: [
@@ -138,6 +147,7 @@ test('Test that wireProjectHierarchyTreePendingDocumentRefresh drains queued ids
     clearPendingHierarchyNodeRefreshIds: () => {
       pendingHierarchyNodeRefreshIds.value = []
     },
+    ...pendingRefreshScrollPreserveDeps,
     pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,
@@ -163,6 +173,7 @@ test('Test that wireProjectHierarchyTreePendingDocumentRefresh drains queued hie
     clearPendingHierarchyNodeRefreshIds: () => {
       pendingHierarchyNodeRefreshIds.value = []
     },
+    ...pendingRefreshScrollPreserveDeps,
     pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,
@@ -198,6 +209,7 @@ test('Test that wireProjectHierarchyTreePendingDocumentRefresh ignores empty que
     clearPendingHierarchyNodeRefreshIds: () => {
       pendingHierarchyNodeRefreshIds.value = []
     },
+    ...pendingRefreshScrollPreserveDeps,
     pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,
@@ -222,6 +234,7 @@ test('Test that bindProjectHierarchyTreeSessionPendingRefresh wires hierarchy no
       clearPendingDocumentRefreshIds: vi.fn(),
       clearPendingHierarchyNodeRefreshIds
     },
+    ...pendingRefreshScrollPreserveDeps,
     pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,

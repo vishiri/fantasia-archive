@@ -59,6 +59,7 @@ test('Test that lazy load session skips reapply while deferred publish flag is s
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const wiring = createProjectHierarchyTreeLazyLoadSessionWiring({
     deferLazyLoadTreeRevisionPublish,
+    dragCommitPending: ref(false),
     dragExpandUiFrozen: ref(false),
     flushUiStatePersist: vi.fn(),
     getExpandedNodeIds: () => [],
@@ -74,6 +75,7 @@ test('Test that lazy load session skips reapply while deferred publish flag is s
       queuePersistExpandedNodeIds: vi.fn(),
       queuePersistScrollTopPx: vi.fn()
     },
+    isTreeDragActive: ref(false),
     nextTick: async () => undefined,
     openNodeIds: ref(new Set()),
     pendingRevealPath: ref([]),
@@ -83,7 +85,6 @@ test('Test that lazy load session skips reapply while deferred publish flag is s
     },
     suppressTreeEmit: ref(false),
     treeData,
-    treeMountKey: ref(0),
     watch
   })
   const reapplySpy = vi.spyOn(wiring.uiStateWiring, 'reapplyHeTreeOpenState')

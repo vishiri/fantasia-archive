@@ -14,7 +14,6 @@
     >
       <Draggable
         v-if="treeData.length > 0"
-        :key="treeMountKey"
         ref="treeComponentRef"
         :model-value="treeData"
         class="projectHierarchyTree hasScrollbar"
@@ -32,6 +31,7 @@
         :root-droppable="rootDroppableHandler"
         :style="treeStyle"
         :trigger-class="PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS"
+        virtualization
         @after-drop="onTreeAfterDrop"
         @before-drag-open="onBeforeDragOpen"
         @before-drag-start="onBeforeDragStart"
@@ -204,7 +204,6 @@ const {
   setTreeScrollHostRef,
   showsTreeLines,
   treeData,
-  treeMountKey,
   treeRootClassList,
   treeStyle
 } = useProjectHierarchyTree({
