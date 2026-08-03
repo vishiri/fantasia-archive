@@ -6,14 +6,14 @@ import {
   addDialogProjectSettingsWorldDraftRow,
   removeDialogProjectSettingsWorldDraftRow,
   updateDialogProjectSettingsWorldDraftColor,
-  updateDialogProjectSettingsWorldDraftColorPallete,
+  updateDialogProjectSettingsWorldDraftColorPalette,
   updateDialogProjectSettingsWorldDraftDisplayNameTranslations,
   updateDialogProjectSettingsWorldDraftTemplateLayout
 } from '../dialogProjectSettingsWorldRowMutationsWiring'
 
 const baseWorld: I_dialogProjectSettingsWorldDraft = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
@@ -52,7 +52,7 @@ test('Test that addDialogProjectSettingsWorldDraftRow no-ops when localWorlds is
 test('Test that removeDialogProjectSettingsWorldDraftRow removes the matching id', () => {
   const otherWorld: I_dialogProjectSettingsWorldDraft = {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Other' },
     documentCount: 0,
     templateLayout: {
@@ -117,22 +117,22 @@ test('Test that updateDialogProjectSettingsWorldDraftColor no-ops when localWorl
 })
 
 /**
- * updateDialogProjectSettingsWorldDraftColorPallete
+ * updateDialogProjectSettingsWorldDraftColorPalette
  * Updates the color palette for the matching world id.
  */
-test('Test that updateDialogProjectSettingsWorldDraftColorPallete updates the matching row', () => {
+test('Test that updateDialogProjectSettingsWorldDraftColorPalette updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
-  updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, baseWorld.id, '#112233;#445566')
-  expect(localWorlds.value?.[0]!.colorPallete).toBe('#112233;#445566')
+  updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#112233;#445566')
+  expect(localWorlds.value?.[0]!.colorPalette).toBe('#112233;#445566')
 })
 
 /**
- * updateDialogProjectSettingsWorldDraftColorPallete
+ * updateDialogProjectSettingsWorldDraftColorPalette
  * No-ops when localWorlds is null.
  */
-test('Test that updateDialogProjectSettingsWorldDraftColorPallete no-ops when localWorlds is null', () => {
+test('Test that updateDialogProjectSettingsWorldDraftColorPalette no-ops when localWorlds is null', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
-  updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, baseWorld.id, '#112233')
+  updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#112233')
   expect(localWorlds.value).toBeNull()
 })
 

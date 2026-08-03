@@ -8,7 +8,7 @@ export function dialogProjectSettingsWorldDraftFixture (
 ): I_dialogProjectSettingsWorldDraft {
   return {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'World' },
     documentCount: 0,
     id: 'world-id-1',

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers } from '../projectHierarchyTreeNodeContextMenuDocumentActionWiring'
+import { buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers } from '../projectHierarchyTreeNodeContextMenuHandlersWiring'
 
 const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

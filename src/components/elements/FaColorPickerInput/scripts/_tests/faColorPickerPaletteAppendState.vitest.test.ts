@@ -2,10 +2,10 @@ import { expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH } from 'app/types/I_faProjectWorldDomain'
 import {
-  appendFaProjectWorldColorPalleteHex,
-  faProjectWorldColorPalleteContainsHex,
+  appendFaProjectWorldColorPaletteHex,
+  faProjectWorldColorPaletteContainsHex,
   isFaProjectWorldStorageHexColor
-} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 
 import { readFaColorPickerPaletteAppendWorldId } from '../functions/faColorPickerPaletteAppendWorldId'
 import {
@@ -33,21 +33,21 @@ test('Test that isFaColorPickerPaletteAppendDuplicate detects palette duplicates
   expect(isFaColorPickerPaletteAppendDuplicate(
     undefined,
     '#112233',
-    faProjectWorldColorPalleteContainsHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor
   )).toBe(false)
 
   expect(isFaColorPickerPaletteAppendDuplicate(
     draftConfig,
     '#112233',
-    faProjectWorldColorPalleteContainsHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor
   )).toBe(true)
 
   expect(isFaColorPickerPaletteAppendDuplicate(
     draftConfig,
     'not-a-color',
-    faProjectWorldColorPalleteContainsHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor
   )).toBe(false)
 })
@@ -60,8 +60,8 @@ test('Test that isFaColorPickerPaletteAppendDisabled blocks invalid append state
   expect(isFaColorPickerPaletteAppendDisabled(
     undefined,
     '#112233',
-    appendFaProjectWorldColorPalleteHex,
-    faProjectWorldColorPalleteContainsHex,
+    appendFaProjectWorldColorPaletteHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     readFaColorPickerPaletteAppendWorldId
@@ -70,8 +70,8 @@ test('Test that isFaColorPickerPaletteAppendDisabled blocks invalid append state
   expect(isFaColorPickerPaletteAppendDisabled(
     draftConfig,
     '#aabbcc',
-    appendFaProjectWorldColorPalleteHex,
-    faProjectWorldColorPalleteContainsHex,
+    appendFaProjectWorldColorPaletteHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     readFaColorPickerPaletteAppendWorldId
@@ -83,8 +83,8 @@ test('Test that isFaColorPickerPaletteAppendDisabled blocks invalid append state
       worldColorPalette: '#112233'
     },
     '#aabbcc',
-    appendFaProjectWorldColorPalleteHex,
-    faProjectWorldColorPalleteContainsHex,
+    appendFaProjectWorldColorPaletteHex,
+    faProjectWorldColorPaletteContainsHex,
     isFaProjectWorldStorageHexColor,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     readFaColorPickerPaletteAppendWorldId
@@ -100,13 +100,13 @@ test('Test that runFaColorPickerPaletteAppendClick emits draft palette updates',
   await runFaColorPickerPaletteAppendClick(
     draftConfig,
     '#aabbcc',
-    appendFaProjectWorldColorPalleteHex,
+    appendFaProjectWorldColorPaletteHex,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     vi.fn(async () => true),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     }
   )
   expect(emitted).toEqual(['#112233;#AABBCC'])
@@ -124,13 +124,13 @@ test('Test that runFaColorPickerPaletteAppendClick persists palette updates', as
   await runFaColorPickerPaletteAppendClick(
     persistConfig,
     '#aabbcc',
-    appendFaProjectWorldColorPalleteHex,
+    appendFaProjectWorldColorPaletteHex,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     persistWorldColorPalette,
     readFaColorPickerPaletteAppendWorldId,
     refreshProjectWorldColorPalette,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     }
   )
 
@@ -148,13 +148,13 @@ test('Test that runFaColorPickerPaletteAppendClick no-ops on persist failure', a
   await runFaColorPickerPaletteAppendClick(
     persistConfig,
     '#aabbcc',
-    appendFaProjectWorldColorPalleteHex,
+    appendFaProjectWorldColorPaletteHex,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
     vi.fn(async () => false),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     }
   )
   expect(emitted).toHaveLength(0)
@@ -167,8 +167,8 @@ test('Test that runFaColorPickerPaletteAppendClick no-ops on persist failure', a
     vi.fn(async () => true),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     }
   )
   expect(emitted).toHaveLength(0)

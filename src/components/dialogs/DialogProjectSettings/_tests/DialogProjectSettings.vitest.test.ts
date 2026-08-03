@@ -21,7 +21,7 @@ vi.mock('app/src/stores/scripts/sFaProjectWorldsBridge', () => ({
   faProjectWorldsFetchFreshForDialog: vi.fn(async () => ([
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Stub' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',
@@ -483,7 +483,7 @@ test('Test that DialogProjectSettings switches category tabs from the tab bar', 
 test('Test that DialogProjectSettings updates local order drafts from panels column', async () => {
   const reorderedWorld = {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Beta' },
     documentCount: 0,
     id: 'world-b',

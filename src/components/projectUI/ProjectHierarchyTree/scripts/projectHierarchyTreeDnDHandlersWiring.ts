@@ -8,13 +8,15 @@ import {
 import {
   clearFaVerticalDraggableTabsDocumentDragCursor
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
-import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
-import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { runProjectHierarchyTreeBeforeDragStart } from './projectHierarchyTreeDragStartHandlerWiring'
+import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDnDSessionStateWiring'
+import type {
+  createProjectHierarchyTreeDocumentRowDragHoldWiring,
+  createProjectHierarchyTreeDocumentRowExpandClickGestureWiring
+} from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import { runProjectHierarchyTreeBeforeDragStart } from './projectHierarchyTreeDnDStartHandlersWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
-import { applyProjectHierarchyTreeHeTreeModelValueUpdate } from './projectHierarchyTreeDnDModelValueUpdateWiring'
-import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from './projectHierarchyTreeDragAfterDropSiblingOrderSyncWiring'
+import { applyProjectHierarchyTreeHeTreeModelValueUpdate } from './projectHierarchyTreeDnDStartHandlersWiring'
+import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from './projectHierarchyTreeDnDOrderResolveWiring'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   clearDragSessionFlags: () => void

@@ -30,7 +30,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '#112233;#112233',
+      colorPalette: '#112233;#112233',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
@@ -74,7 +74,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {
@@ -113,7 +113,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
   const tooltip = buildTooltip('   ', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       templateLayout: {
@@ -260,7 +260,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds tem
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
@@ -305,7 +305,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
@@ -371,7 +371,7 @@ test('Test that duplicate template tooltip prefers placement nickname over canon
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
@@ -435,7 +435,7 @@ test('Test that duplicate template tooltip falls back to default name when label
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
@@ -512,7 +512,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
@@ -549,7 +549,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses defau
   const tooltip = buildTooltip('Project', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {

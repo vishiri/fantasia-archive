@@ -121,7 +121,7 @@ async function seedTreeDocumentAndRefreshHierarchy (
       id: world.id,
       displayNameTranslations: { 'en-US': world.displayName },
       color: world.color,
-      colorPallete: world.colorPallete,
+      colorPalette: world.colorPalette,
       templateLayout: {
         groups: [],
         placements: [{

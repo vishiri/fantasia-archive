@@ -6,7 +6,7 @@ import { createProjectHierarchyTreeSettingsSurfaceWiring } from '../projectHiera
 const sampleWorlds = ref([
   {
     color: '#ff0000',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'World A',
     groups: [],
     id: 'world-1',
@@ -15,7 +15,7 @@ const sampleWorlds = ref([
   },
   {
     color: '#00ff00',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'World B',
     groups: [],
     id: 'world-2',

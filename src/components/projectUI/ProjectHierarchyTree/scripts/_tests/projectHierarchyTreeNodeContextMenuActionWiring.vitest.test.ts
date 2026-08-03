@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeNodeContextMenuActionWiring } from '../projectHierarchyTreeNodeContextMenuActionWiring'
+import { createProjectHierarchyTreeNodeContextMenuActionWiring } from '../projectHierarchyTreeNodeContextMenuWiring'
 
 const placementNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

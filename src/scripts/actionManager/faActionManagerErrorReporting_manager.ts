@@ -11,7 +11,7 @@ import {
   normalizeFaActionError as normalizeFaActionErrorImpl,
   readFaProjectOpenFailedShape,
   resolveFaActionFailureNotifyCaption
-} from './faActionManagerErrorReportingNormalize'
+} from './functions/faActionManagerErrorReportingNormalize'
 
 const faActionManagerErrorReportingApi = createFaActionManagerErrorReporting({
   fromThrowable: Result.fromThrowable,

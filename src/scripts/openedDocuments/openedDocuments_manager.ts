@@ -10,22 +10,25 @@ export {
   resolveOpenedDocumentDisplayNameFromTab
 } from './functions/openedDocumentEditStateDomain'
 export {
+  normalizeOpenedDocumentAppearanceColorFromDb,
   normalizeOpenedDocumentExtraClassesFromDb,
+  normalizeOpenedDocumentNullableStringFromDb,
+  normalizeOpenedDocumentParentIdFromDb
+} from './functions/openedDocumentNullableStringFromDb'
+export {
   resolveOpenedDocumentExtraClassesDraftForPersist,
   resolveDocumentWorkspacePageExtraHtmlClassList
 } from './functions/openedDocumentExtraClasses'
 export {
-  normalizeOpenedDocumentParentIdFromDb,
   resolveOpenedDocumentParentIdDraftForPersist,
   resolveOpenedDocumentParentMoveAppendSortOrder
 } from './functions/openedDocumentParentId'
 export {
   computeOpenedDocumentHasUnsavedChanges,
-  normalizeOpenedDocumentAppearanceColorFromDb,
   normalizeOpenedDocumentTabAppearanceColors,
   recomputeOpenedDocumentTabHasUnsavedChanges,
   resolveOpenedDocumentAppearanceColorDraftForPersist
-} from './functions/openedDocumentTabAppearance'
+} from './openedDocumentTabAppearanceWiring'
 export {
   appendOpenedDocumentTabToRight,
   duplicateOpenedDocumentTab,
@@ -44,6 +47,8 @@ export { resolveOpenedDocumentTabDocumentActionContext } from './functions/opene
 export { reorderOpenedDocumentTabsByIndex } from './functions/openedDocumentTabReorder'
 export {
   applyTemporaryOpenedDocumentParent,
+  createTemporaryOpenedDocumentTabCopySeed,
+  createTemporaryOpenedDocumentTabSeed,
   normalizeOpenedDocumentTabPersistenceState,
   promoteTemporaryOpenedDocumentTabAfterCreate,
   remapOpenedDocumentTabDocumentId,
@@ -51,16 +56,12 @@ export {
   resolveOpenedDocumentTabIsTemporary,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
-} from './functions/openedDocumentTemporaryDomain'
+} from './openedDocumentTemporaryDomainWiring'
 export {
   buildTemporaryDocumentParentResolveDocumentIds,
   buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
   resolveTemporaryDocumentParentDocumentIdForSave
 } from './functions/openedDocumentTemporaryParentResolve'
-export {
-  createTemporaryOpenedDocumentTabCopySeed,
-  createTemporaryOpenedDocumentTabSeed
-} from './functions/openedDocumentTemporaryTabSeed'
 export {
   isFaDocumentTreeOrderNumberEmpty,
   normalizeOpenedDocumentTreeOrderNumberFromDb,

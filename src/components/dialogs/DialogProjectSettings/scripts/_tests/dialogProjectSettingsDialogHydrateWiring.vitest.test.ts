@@ -29,7 +29,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   const fetchWorlds = vi.fn(async () => [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Fetched world' },
       documentCount: 0,
       templateLayout: {
@@ -121,7 +121,7 @@ test('Test that hydrateDialogProjectSettingsDrafts localizes world template layo
   const fetchWorlds = vi.fn(async () => [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',

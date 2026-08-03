@@ -20,7 +20,7 @@ export function appendDialogProjectSettingsWorldDraft (
     ...worlds,
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations,
       documentCount: 0,
       id,

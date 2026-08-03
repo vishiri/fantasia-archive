@@ -20,7 +20,7 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles updates pl
   const localWorlds = ref([
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-a',
@@ -75,7 +75,7 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops whe
   const localWorlds = ref([
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-a',
@@ -103,7 +103,7 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops whe
   const localWorlds = ref([
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-a',

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { bindProjectHierarchyTreeAddNewDocumentLanguageRefresh } from '../projectHierarchyTreeAddNewDocumentLanguageRefreshWiring'
+import { bindProjectHierarchyTreeAddNewDocumentLanguageRefresh } from '../projectHierarchyTreeSyncMapperWiring'
 
 test('Test that add-new language refresh wiring updates labels when preferred language changes', () => {
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([

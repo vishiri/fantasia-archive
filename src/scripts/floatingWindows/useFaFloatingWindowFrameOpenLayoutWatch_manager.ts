@@ -3,7 +3,7 @@ import { nextTick, watch } from 'vue'
 import { clampFaFloatingWindowFrameToViewport } from './faFloatingWindowResizeClamp_manager'
 import { centerFloatingWindowFrameInViewport } from './faFloatingWindowFrameCenterInViewport_manager'
 import { isUsableFaFloatingWindowPersistedRect } from './faFloatingWindowPersistedGeometry_manager'
-import { registerFaFloatingWindowFrameOpenLayoutWatch as registerFaFloatingWindowFrameOpenLayoutWatchImpl } from './registerFaFloatingWindowFrameOpenLayoutWatchImpl'
+import { registerFaFloatingWindowFrameOpenLayoutWatch as registerFaFloatingWindowFrameOpenLayoutWatchImpl } from './registerFaFloatingWindowFrameOpenLayoutWatchWiring'
 
 import { createRegisterFaFloatingWindowFrameOpenLayoutWatch } from './functions/createRegisterFaFloatingWindowFrameOpenLayoutWatch'
 

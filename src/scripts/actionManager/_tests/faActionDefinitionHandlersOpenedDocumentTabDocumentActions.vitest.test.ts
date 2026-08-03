@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from '../faActionDefinitionHandlersOpenedDocumentTabDocumentActions'
+import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from '../faActionDefinitionHandlersOpenedDocumentTabDocumentActionsWiring'
 
 function createHandlers (input: {
   createTemporaryDocumentCopyFromOpenedTab?: (documentId: string) => Promise<string | null>

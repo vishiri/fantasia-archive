@@ -1,5 +1,6 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { I_faActionHistoryEntry, T_faActionHistoryStatus, T_faActionKind } from 'app/types/I_faActionManagerDomain'
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type {
   T_dialogActionMonitorStatusBadge,
@@ -11,7 +12,7 @@ export type T_createDialogActionMonitorApi = {
   buildDialogActionMonitorStatusBadgeForUi: (
     status: T_faActionHistoryStatus
   ) => T_dialogActionMonitorStatusBadge
-  resolveDialogComponentStore: () => { dialogToOpen?: unknown; dialogUUID?: unknown } | null
+  resolveDialogComponentStore: () => I_dialogComponentStoreLike | null
   buildDialogActionMonitorColumns: () => T_dialogActionMonitorTableColumn[]
   copyDialogActionMonitorRowToClipboard: (row: I_faActionHistoryEntry) => Promise<void>
   useDialogActionMonitorTableLayout: (dialogModel: I_ref<boolean>) => {

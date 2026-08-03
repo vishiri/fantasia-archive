@@ -1,3 +1,5 @@
+import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
+
 /** Default opened-document tab status flag fields for tests and harness stubs. */
 export const FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS = {
   isCategoryDraft: false,
@@ -10,7 +12,7 @@ export const FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS = {
   savedIsMinor: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
-  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   treeOrderNumberDraft: '',
   extraClassesDraft: '',
   savedExtraClasses: ''
@@ -18,7 +20,7 @@ export const FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS = {
 
 /** Default opened-document tab tree order fields for tests and harness stubs. */
 export const FA_OPENED_DOCUMENT_TAB_TREE_ORDER_NUMBER_DEFAULTS = {
-  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   treeOrderNumberDraft: '',
   extraClassesDraft: '',
   savedExtraClasses: ''
@@ -36,7 +38,7 @@ export const FA_PROJECT_DOCUMENT_STATUS_FLAG_DEFAULTS = {
   isDead: false,
   isFinished: false,
   isMinor: false,
-  treeOrderNumber: Number.MIN_SAFE_INTEGER,
+  treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   extraClasses: ''
 } as const
 
@@ -46,7 +48,7 @@ export const FA_SQL_PROJECT_DOCUMENT_STATUS_FLAG_DEFAULTS = {
   is_dead: 0,
   is_finished: 0,
   is_minor: 0,
-  tree_order_number: Number.MIN_SAFE_INTEGER,
+  tree_order_number: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   extra_classes: ''
 } as const
 
@@ -57,5 +59,5 @@ export const FA_SQL_PROJECT_DOCUMENT_EXTRA_CLASSES_DEFAULTS = {
 
 /** Default SQLite document row tree order column for tests. */
 export const FA_SQL_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_DEFAULTS = {
-  tree_order_number: Number.MIN_SAFE_INTEGER
+  tree_order_number: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
 } as const

@@ -6,12 +6,12 @@ import {
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
 } from 'app/types/I_faProjectWorldDomain'
 import {
-  collectFaProjectWorldColorPalleteDuplicateHexKeys,
-  parseFaProjectWorldColorPalleteToHexList,
-  parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
-  serializeFaProjectWorldColorPalleteFromHexList,
-  wouldFaProjectWorldColorPalleteExceedMaxLength
-} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+  collectFaProjectWorldColorPaletteDuplicateHexKeys,
+  parseFaProjectWorldColorPaletteToHexList,
+  parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
+  serializeFaProjectWorldColorPaletteFromHexList,
+  wouldFaProjectWorldColorPaletteExceedMaxLength
+} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/functions/hideNativeSortableDragGhost'
 import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
@@ -37,21 +37,21 @@ export const useDialogProjectSettingsWorldColorPaletteEditor = createUseDialogPr
   applyFaVerticalDraggableTabsDocumentDragCursor,
   buildDialogProjectSettingsWorldColorPaletteEntries,
   clearFaVerticalDraggableTabsDocumentDragCursor,
-  collectFaProjectWorldColorPalleteDuplicateHexKeys,
+  collectFaProjectWorldColorPaletteDuplicateHexKeys,
   computed,
   createEntryId: () => crypto.randomUUID(),
   duplicateDialogProjectSettingsWorldColorPaletteEntryAfter,
   faVerticalDraggableTabsSortableDragOptions,
   hideNativeSortableDragGhost,
   paletteMaxLength: FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
-  parseFaProjectWorldColorPalleteToHexList,
-  parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
+  parseFaProjectWorldColorPaletteToHexList,
+  parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
   readFaSortableDragItemDataAttribute,
   ref,
   removeDialogProjectSettingsWorldColorPaletteEntry,
   replaceDialogProjectSettingsWorldColorPaletteEntryHex,
-  serializeFaProjectWorldColorPalleteFromHexList,
+  serializeFaProjectWorldColorPaletteFromHexList,
   watch,
   wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength,
-  wouldFaProjectWorldColorPalleteExceedMaxLength
+  wouldFaProjectWorldColorPaletteExceedMaxLength
 })

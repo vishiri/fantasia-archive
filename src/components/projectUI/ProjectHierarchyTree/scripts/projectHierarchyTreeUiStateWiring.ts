@@ -19,8 +19,10 @@ import {
   findProjectHierarchyTreeNodeById
 } from '../functions/projectHierarchyTreeExpandState'
 import { shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
-import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
-import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
+import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeHelpersWiring'
+import {
+  reapplyProjectHierarchyTreeLatentDescendantExpandState
+} from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
@@ -182,4 +184,4 @@ export {
   markProjectHierarchyTreeNodeClosed,
   markProjectHierarchyTreeNodeOpen,
   syncProjectHierarchyTreeOpenSetToPersist
-} from './projectHierarchyTreeNodeOpenCloseStateWiring'
+} from './projectHierarchyTreeLatentExpandReapplyWiring'

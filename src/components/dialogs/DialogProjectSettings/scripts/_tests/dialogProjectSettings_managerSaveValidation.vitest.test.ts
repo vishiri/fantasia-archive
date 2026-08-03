@@ -49,7 +49,7 @@ test('Test that manager save validation tooltip factory resolves i18n defaults',
   api.localWorlds.value = [
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: {},
       documentCount: 0,
       id: 'world-a',

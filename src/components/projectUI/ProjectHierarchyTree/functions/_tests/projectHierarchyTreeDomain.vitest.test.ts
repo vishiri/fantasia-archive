@@ -8,20 +8,20 @@ import type {
 import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
-} from '../../scripts/projectHierarchyTreeMapperWiring'
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../../scripts/projectHierarchyTreeMapperWiring'
-import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../../scripts/projectHierarchyTreeSiblingOrderPatchWiring'
+} from '../../scripts/projectHierarchyTreeSyncMapperWiring'
+import { mapHierarchyDocumentChildrenToTreeNodes } from '../../scripts/projectHierarchyTreeSyncMapperWiring'
+import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../../scripts/projectHierarchyTreeDnDOrderSupportWiring'
 import { refreshProjectHierarchyTreeAddNewDocumentLabelsInTree } from '../../scripts/projectHierarchyTreeAddNewDocumentNode'
 import { isProjectHierarchyTreeSameBucketSiblingReorder } from '../projectHierarchyTreeSameBucketSiblingReorder'
 import { createWaitForProjectHierarchyTreeDragCommitWindow } from '../waitForProjectHierarchyTreeDragCommitWindow'
-import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from '../../scripts/projectHierarchyTreeDragGetDataOrderStableWiring'
+import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from '../../scripts/projectHierarchyTreeDnDOrderPostDropWiring'
 import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../projectHierarchyTreeOrderedDocumentIdsEqual'
 import { computeProjectHierarchyTreePostDropSiblingOrder } from '../computeProjectHierarchyTreePostDropSiblingOrder'
 import {
   finalizeProjectHierarchyTreeDragSiblingOrderSnapshot,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
-} from '../../scripts/projectHierarchyTreeDragSiblingOrderSnapshotWiring'
-import { resolveProjectHierarchyTreePlacementDisplayIcon } from '../../scripts/projectHierarchyTreePlacementDisplayIconWiring'
+} from '../../scripts/projectHierarchyTreeDnDOrderSupportWiring'
+import { resolveProjectHierarchyTreePlacementDisplayIcon } from '../../scripts/projectHierarchyTreeDisplayChromeWiring'
 import {
   applyPersistedProjectHierarchyTreeOpenNodeIds,
   collectProjectHierarchyTreeLatentDocumentOpenNodeIds,
@@ -39,7 +39,7 @@ import {
   buildProjectHierarchyTreeVisibleFlatVirtualScrollKey,
   collectProjectHierarchyTreeVisibleFlatNodes
 } from '../projectHierarchyTreeVisibleFlatNodes'
-import { mergeLoadedChildrenIntoNode } from '../../scripts/projectHierarchyTreeMergeLoadedChildrenWiring'
+import { mergeLoadedChildrenIntoNode } from '../../scripts/projectHierarchyTreeLazyLoadChildrenWiring'
 import {
   isProjectHierarchyTreeNodeDraggable,
   isProjectHierarchyTreeNodeDroppable,
@@ -49,7 +49,7 @@ import {
 } from '../projectHierarchyTreeDnD'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../projectHierarchyTreeDocumentPlacementGuard'
 import { replaceProjectHierarchyTreeNodeByIdInPlace } from '../projectHierarchyTreeCloneLoadedNodeForPublish'
-import { resolveProjectHierarchyTreeDragExpandedSnapshot, captureProjectHierarchyTreeDragExpandSnapshots } from '../../scripts/projectHierarchyTreeDragExpandSnapshotWiring'
+import { resolveProjectHierarchyTreeDragExpandedSnapshot, captureProjectHierarchyTreeDragExpandSnapshots } from '../../scripts/projectHierarchyTreeDnDStartHandlersWiring'
 import { mapProjectHierarchyTreeToTopologyKey } from '../projectHierarchyTreeTopologyKey'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from '../../scripts/projectHierarchyTreeLayoutStructureMatch'
 import {
@@ -93,7 +93,7 @@ function resolveProjectHierarchyTreePlacementDisplayIconForTest (icon: string): 
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [
     {
@@ -271,7 +271,7 @@ test('Test that needsProjectHierarchyTreeLazyLoadBeforeOpen is true only for unl
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#ff0000',
-      colorPallete: '',
+      colorPalette: '',
       displayName: 'World A',
       groups: [],
       id: 'world-1',
@@ -1069,7 +1069,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton always adds lazy place
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#000',
-      colorPallete: '',
+      colorPalette: '',
       displayName: 'Solo world',
       groups: [],
       id: 'world-solo',
@@ -1229,7 +1229,7 @@ test('Test that isProjectHierarchyTreeRootDroppable rejects null drag nodes', ()
 test('Test that mapProjectHierarchyTreeToTopologyKey records root placement rows', () => {
   const world = {
     color: '#000',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'Solo',
     groups: [],
     id: 'world-solo',
@@ -1287,7 +1287,7 @@ test('Test that resolveDefaultProjectHierarchyTreeExpandedNodeIds skips empty wo
   const expandedNodeIds = resolveDefaultProjectHierarchyTreeExpandedNodeIds([
     {
       color: '#000',
-      colorPallete: '',
+      colorPalette: '',
       displayName: 'Empty',
       groups: [],
       id: 'world-empty',
@@ -1742,7 +1742,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton marks empty worlds wit
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#000',
-      colorPallete: '',
+      colorPalette: '',
       displayName: 'Empty',
       groups: [],
       id: 'world-empty',
@@ -2755,7 +2755,7 @@ test('Test that createWaitForProjectHierarchyTreeDragModelSettle resolves when m
 
 test('Test that createProjectHierarchyTreeDragSessionState tracks drag session bindings', async () => {
   const { ref } = await import('vue')
-  const { createProjectHierarchyTreeDragSessionState } = await import('../../scripts/projectHierarchyTreeDragSessionStateWiring')
+  const { createProjectHierarchyTreeDragSessionState } = await import('../../scripts/projectHierarchyTreeDnDSessionStateWiring')
   const session = createProjectHierarchyTreeDragSessionState({
     dragCommitPending: ref(false),
     dragCommitScheduled: ref(false),

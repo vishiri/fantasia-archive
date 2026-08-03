@@ -71,7 +71,7 @@ test('Test that collectDialogProjectSettingsFullSaveValidationErrors merges all 
   const errors = collectDialogProjectSettingsFullSaveValidationErrors('   ', [
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {

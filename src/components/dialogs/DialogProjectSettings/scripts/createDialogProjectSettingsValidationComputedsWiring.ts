@@ -9,7 +9,7 @@ export function createDialogProjectSettingsValidationComputeds (deps: {
   buildDialogProjectSettingsSaveValidationTooltipForDraft: T_dialogProjectSettingsUseHookDeps['buildDialogProjectSettingsSaveValidationTooltipForDraft']
   computed: T_dialogProjectSettingsUseHookDeps['computed']
   hasDialogProjectSettingsDocumentTemplateNameValidationError: T_dialogProjectSettingsUseHookDeps['hasDialogProjectSettingsDocumentTemplateNameValidationError']
-  hasDialogProjectSettingsWorldColorPalleteValidationError: T_dialogProjectSettingsUseHookDeps['hasDialogProjectSettingsWorldColorPalleteValidationError']
+  hasDialogProjectSettingsWorldColorPaletteValidationError: T_dialogProjectSettingsUseHookDeps['hasDialogProjectSettingsWorldColorPaletteValidationError']
   hasDialogProjectSettingsWorldNameValidationError: T_dialogProjectSettingsUseHookDeps['hasDialogProjectSettingsWorldNameValidationError']
   hasDialogProjectSettingsWorldTemplateLayoutValidationError: T_dialogProjectSettingsUseHookDeps['hasDialogProjectSettingsWorldTemplateLayoutValidationError']
   isDialogProjectSettingsFullDialogSaveDisabled: T_dialogProjectSettingsUseHookDeps['isDialogProjectSettingsFullDialogSaveDisabled']
@@ -31,7 +31,7 @@ export function createDialogProjectSettingsValidationComputeds (deps: {
 
   const hasWorldsSettingsValidationError = deps.computed(() => {
     return deps.hasDialogProjectSettingsWorldNameValidationError(deps.localWorlds.value) ||
-      deps.hasDialogProjectSettingsWorldColorPalleteValidationError(deps.localWorlds.value) ||
+      deps.hasDialogProjectSettingsWorldColorPaletteValidationError(deps.localWorlds.value) ||
       deps.hasDialogProjectSettingsWorldTemplateLayoutValidationError(
         deps.localWorlds.value,
         deps.localDocumentTemplates.value

@@ -8,7 +8,7 @@ const listWorkspaceHierarchyLayoutMock = vi.fn(async () => ({
   worlds: [
     {
       color: '#ff0000',
-      colorPallete: '',
+      colorPalette: '',
       displayName: 'World One',
       groups: [
         {
@@ -367,7 +367,7 @@ test('Test that S_FaProjectHierarchyTree refreshLayout re-fetches after concurre
       worlds: [
         {
           color: '#ff0000',
-          colorPallete: '',
+          colorPalette: '',
           displayName: 'World One',
           groups: [],
           id: 'world-1',
@@ -399,7 +399,7 @@ test('Test that S_FaProjectHierarchyTree refreshLayout re-fetches after concurre
     worlds: [
       {
         color: '#ff0000',
-        colorPallete: '',
+        colorPalette: '',
         displayName: 'World One',
         groups: [],
         id: 'world-1',
@@ -483,7 +483,7 @@ test('Test that S_FaProjectHierarchyTree refreshHierarchyTreeNodes no-ops withou
   expect(store.pendingHierarchyNodeRefreshIds).toEqual([])
 })
 
-test('Test that S_FaProjectHierarchyTree patchWorldColorPalleteInLayout updates matching world palette', async () => {
+test('Test that S_FaProjectHierarchyTree patchWorldColorPaletteInLayout updates matching world palette', async () => {
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -492,8 +492,8 @@ test('Test that S_FaProjectHierarchyTree patchWorldColorPalleteInLayout updates 
   })
   const store = S_FaProjectHierarchyTree()
   await store.refreshLayout()
-  store.patchWorldColorPalleteInLayout('world-1', '#aabbcc,#ddeeff')
-  expect(store.worlds[0]?.colorPallete).toBe('#aabbcc,#ddeeff')
-  store.patchWorldColorPalleteInLayout('world-missing', '#000000')
-  expect(store.worlds[0]?.colorPallete).toBe('#aabbcc,#ddeeff')
+  store.patchWorldColorPaletteInLayout('world-1', '#aabbcc,#ddeeff')
+  expect(store.worlds[0]?.colorPalette).toBe('#aabbcc,#ddeeff')
+  store.patchWorldColorPaletteInLayout('world-missing', '#000000')
+  expect(store.worlds[0]?.colorPalette).toBe('#aabbcc,#ddeeff')
 })

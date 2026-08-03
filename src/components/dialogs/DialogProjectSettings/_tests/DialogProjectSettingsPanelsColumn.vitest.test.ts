@@ -106,7 +106,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards worlds panel updates'
             'removeWorld',
             'update:worlds',
             'updateWorldColor',
-            'updateWorldColorPallete',
+            'updateWorldColorPalette',
             'updateWorldDisplayNameTranslations',
             'updateDocumentTemplateTitleTranslations',
             'updateWorldTemplateLayout'
@@ -117,7 +117,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards worlds panel updates'
               <button type="button" data-test-locator="emit-remove-world" @click="$emit('removeWorld', worlds[0].id)" />
               <button type="button" data-test-locator="emit-update-worlds" @click="$emit('update:worlds', worlds)" />
               <button type="button" data-test-locator="emit-world-color" @click="$emit('updateWorldColor', worlds[0].id, '#112233')" />
-              <button type="button" data-test-locator="emit-world-palette" @click="$emit('updateWorldColorPallete', worlds[0].id, '#112233;#445566')" />
+              <button type="button" data-test-locator="emit-world-palette" @click="$emit('updateWorldColorPalette', worlds[0].id, '#112233;#445566')" />
               <button type="button" data-test-locator="emit-world-name" @click="$emit('updateWorldDisplayNameTranslations', worlds[0].id, { 'en-US': 'Renamed' })" />
               <button type="button" data-test-locator="emit-template-title" @click="$emit('updateDocumentTemplateTitleTranslations', 'template-id', { plural: {}, singular: {} })" />
               <button type="button" data-test-locator="emit-world-layout" @click="$emit('updateWorldTemplateLayout', worlds[0].id, worlds[0].templateLayout)" />
@@ -144,7 +144,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards worlds panel updates'
   expect(w.emitted('updateWorldColor')?.[0]!).toEqual([world.id, '#112233'])
 
   await w.find('[data-test-locator="emit-world-palette"]').trigger('click')
-  expect(w.emitted('updateWorldColorPallete')?.[0]!).toEqual([world.id, '#112233;#445566'])
+  expect(w.emitted('updateWorldColorPalette')?.[0]!).toEqual([world.id, '#112233;#445566'])
 
   await w.find('[data-test-locator="emit-world-name"]').trigger('click')
   expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]!).toEqual([world.id, { 'en-US': 'Renamed' }])

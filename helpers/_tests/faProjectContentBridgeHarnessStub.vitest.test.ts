@@ -15,7 +15,7 @@ const stubNamedEntityShape = {
 const stubWorldShape = {
   ...stubNamedEntityShape,
   color: '#808080',
-  colorPallete: '',
+  colorPalette: '',
   sortOrder: 0
 }
 

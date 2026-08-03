@@ -27,7 +27,7 @@ test('Test that faColorPickerInputPaletteAppendWiring persists through projectCo
   )
 
   expect(persisted).toBe(true)
-  expect(updateWorld).toHaveBeenCalledWith('world-1', { colorPallete: '#112233;#445566' })
+  expect(updateWorld).toHaveBeenCalledWith('world-1', { colorPalette: '#112233;#445566' })
 })
 
 /**

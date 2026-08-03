@@ -1,10 +1,9 @@
 import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
 import type { T_faFloatingWindowResizeEdge } from 'app/types/I_faFloatingWindowResize'
-import type { T_faFloatingWindowResizePointerSampleDeps } from 'app/types/I_faFloatingWindowResizePointerSession'
-
-interface I_faFloatingWindowFrameAxisRef {
-  value: number
-}
+import type {
+  I_faFloatingWindowFrameAxisRef,
+  T_faFloatingWindowResizePointerSampleDeps
+} from 'app/types/I_faFloatingWindowResizePointerSession'
 
 type T_applyFaFloatingWindowResizePointerSampleFull = (
   sampleDeps: T_faFloatingWindowResizePointerSampleDeps,

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { areFaJsonSnapshotsEqual } from '../faJsonSnapshotsEqual'
+import { areFaJsonSnapshotsEqual } from '../functions/faJsonSnapshotsEqual'
 
 /**
  * areFaJsonSnapshotsEqual

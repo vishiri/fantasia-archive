@@ -5,32 +5,34 @@ import type { Ref, WatchCallback, WatchOptions, WatchSource, watch as watchFn } 
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeSyncMapperWiring'
 import { findProjectHierarchyTreeNodeById } from '../../functions/projectHierarchyTreeExpandState'
-import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildrenWiring'
+import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeLazyLoadChildrenWiring'
 import {
   cloneProjectHierarchyTreeLoadedNodeForPublish,
   replaceProjectHierarchyTreeNodeByIdInPlace
 } from '../../functions/projectHierarchyTreeCloneLoadedNodeForPublish'
-import { syncProjectHierarchyTreeSiblingOrderFromHeTreeGetData } from '../projectHierarchyTreeDragGetDataSiblingSyncWiring'
+import { syncProjectHierarchyTreeSiblingOrderFromHeTreeGetData } from '../projectHierarchyTreeDnDOrderPostDropWiring'
 import { finalizeProjectHierarchyTreeDragCommitAfterPersist } from '../projectHierarchyTreeDnDCommitAfterPersistWiring'
-import { createProjectHierarchyTreeDragSessionState } from '../projectHierarchyTreeDragSessionStateWiring'
-import { createProjectHierarchyTreeDroppableHandlers } from '../projectHierarchyTreeDroppableHandlerWiring'
+import { createProjectHierarchyTreeDragSessionState } from '../projectHierarchyTreeDnDSessionStateWiring'
+import { createProjectHierarchyTreeDroppableHandlers } from '../projectHierarchyTreeDnDWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from '../projectHierarchyTreeSessionExpandHandlersWiring'
-import { createProjectHierarchyTreeDocumentRowDragHoldSession } from '../projectHierarchyTreeDocumentRowDragHoldSessionWiring'
-import { createProjectHierarchyTreeDocumentRowDragHoldDragStartHandler } from '../projectHierarchyTreeDocumentRowDragHoldDragStartHandlerWiring'
-import { bindProjectHierarchyTreeDocumentRowDragHoldDragStartCapture } from '../projectHierarchyTreeDocumentRowDragHoldBindWiring'
-import { createProjectHierarchyTreeBeforeDragOpenWiring } from '../projectHierarchyTreeBeforeDragOpenWiring'
+import { createProjectHierarchyTreeDocumentRowDragHoldSession } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
+import { createProjectHierarchyTreeDocumentRowDragHoldDragStartHandler } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
+import { bindProjectHierarchyTreeDocumentRowDragHoldDragStartCapture } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
+import { createProjectHierarchyTreeBeforeDragOpenWiring } from '../projectHierarchyTreeDnDWiring'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass
-} from '../projectHierarchyTreeTreeNodeKindClassWiring'
-import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { openProjectHierarchyTreeNestParentAfterDragDrop } from '../projectHierarchyTreeNestParentOpenWiring'
+} from '../projectHierarchyTreeDisplayChromeWiring'
+import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
+import {
+  openProjectHierarchyTreeNestParentAfterDragDrop
+} from '../projectHierarchyTreeExpandDomWiring'
 import {
   finalizeProjectHierarchyTreeDragSiblingOrderSnapshot,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
-} from '../projectHierarchyTreeDragSiblingOrderSnapshotWiring'
+} from '../projectHierarchyTreeDnDOrderSupportWiring'
 import {
   appendOrRefreshProjectHierarchyTreeAddNewDocumentNode,
   isProjectHierarchyTreeAddNewDocumentNode
@@ -83,27 +85,27 @@ import {
   readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats,
   resolveProjectHierarchyTreeDragDropTargetParentDocumentId,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId
-} from '../projectHierarchyTreeDragPostDropOrderWiring'
+} from '../projectHierarchyTreeDnDOrderPostDropWiring'
 import {
   loadProjectHierarchyTreeNodeChildren,
   refreshProjectHierarchyTreeNodeChildrenFromDatabase
 } from '../projectHierarchyTreeLazyLoadChildrenWiring'
-import { persistProjectHierarchyTreeDraggedDocumentMove } from '../projectHierarchyTreeDnDCommitPersistWiring'
-import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from '../projectHierarchyTreeDragAfterDropSiblingOrderSyncWiring'
+import { persistProjectHierarchyTreeDraggedDocumentMove } from '../projectHierarchyTreeDnDCommitWiring'
+import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from '../projectHierarchyTreeDnDOrderResolveWiring'
 import {
   prepareProjectHierarchyTreeDragCommitOrderSnapshot,
   readProjectHierarchyTreeDragSiblingOrderFromGetData
-} from '../projectHierarchyTreeDragCommitOrderCaptureWiring'
+} from '../projectHierarchyTreeDnDOrderCaptureWiring'
 import {
   resolveProjectHierarchyTreeDragSiblingOrderAfterDrop,
   resolveProjectHierarchyTreeDragSiblingOrderAtDragStart
-} from '../projectHierarchyTreeDragSiblingOrderResolveWiring'
-import { resolveProjectHierarchyTreeDragCommitOrderFallback } from '../projectHierarchyTreeDragCommitOrderFallbackWiring'
-import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../projectHierarchyTreeSiblingOrderPatchWiring'
+} from '../projectHierarchyTreeDnDOrderResolveWiring'
+import { resolveProjectHierarchyTreeDragCommitOrderFallback } from '../projectHierarchyTreeDnDOrderCaptureWiring'
+import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../projectHierarchyTreeDnDOrderSupportWiring'
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [
     {
@@ -1539,7 +1541,7 @@ test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop clears snapshot wh
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom handles missing host and row metadata', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
@@ -1661,7 +1663,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats sk
 })
 
 test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false for missing buckets', async () => {
-  const { applyProjectHierarchyTreeSiblingOrderToTreeData, applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  const { applyProjectHierarchyTreeSiblingOrderToTreeData, applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   expect(applyProjectHierarchyTreeSiblingOrderToTreeData([], 'missing', ['doc-a'])).toBe(false)
   applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
     committed: false,
@@ -1770,7 +1772,7 @@ test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop keeps null snapsho
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling bucket order from DOM', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')
@@ -1819,7 +1821,7 @@ test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false fo
 })
 
 test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch applies committed snapshot', async () => {
-  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
@@ -1883,7 +1885,7 @@ test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop nulls snapshot whe
 })
 
 test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch skips uncommitted and incomplete inputs', async () => {
-  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const before = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!.children.map((row) => row.id)
@@ -1931,7 +1933,7 @@ test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData skips non-siblin
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null for missing moved row and empty sibling ids', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
@@ -1996,7 +1998,7 @@ test('Test that document row drag hold timer no-ops when pointer already ended',
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips invalid rows and non-sibling DOM nodes', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')
@@ -2031,7 +2033,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips invalid ro
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when sibling bucket has no document ids', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const invalidDoc = buildDocumentNode({
     documentId: null,
@@ -2047,7 +2049,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null whe
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when moved row is absent from DOM bucket', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')

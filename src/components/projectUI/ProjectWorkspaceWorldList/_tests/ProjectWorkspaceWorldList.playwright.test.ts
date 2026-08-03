@@ -5,7 +5,7 @@ import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwright
 import { patchFaPlaywrightComponentHarnessStores } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessPiniaSeed'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
-import type { I_faProjectWorld } from 'app/types/I_faProjectWorldDomain'
+import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 const extraEnvSettings = {
   COMPONENT_NAME: 'ProjectWorkspaceWorldList',
@@ -20,32 +20,30 @@ const selectorList = {
   root: 'projectWorkspaceWorldList'
 } as const
 
-const sampleWorkspaceWorlds: I_faProjectWorld[] = [
+const sampleWorkspaceWorlds: I_faProjectHierarchyTreeWorkspaceWorld[] = [
   {
     color: '#112233',
-    colorPallete: '',
-    createdAtMs: 1,
+    colorPalette: '',
     displayName: 'Eldoria',
-    displayNameTranslations: { 'en-US': 'Eldoria' },
+    groups: [],
     id: 'world-eldoria',
-    sortOrder: 0,
-    updatedAtMs: 1
+    placements: [],
+    sortOrder: 0
   },
   {
     color: '#445566',
-    colorPallete: '',
-    createdAtMs: 2,
+    colorPalette: '',
     displayName: 'Mirefall',
-    displayNameTranslations: { 'en-US': 'Mirefall' },
+    groups: [],
     id: 'world-mirefall',
-    sortOrder: 1,
-    updatedAtMs: 2
+    placements: [],
+    sortOrder: 1
   }
 ]
 
 async function remountWorldListAfterStoreSeed (
   page: Page,
-  worlds: I_faProjectWorld[]
+  worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
 ): Promise<void> {
   await page.waitForFunction(() => {
     return typeof window.__faComponentTestingPatchStores === 'function'
@@ -86,6 +84,10 @@ test.describe.serial('Project workspace world list', () => {
     })
   })
 
+  /**
+   * ProjectWorkspaceWorldList
+   * Renders seeded hierarchy-derived world names in list order.
+   */
   test('Check if seeded worlds render in list order', async () => {
     await remountWorldListAfterStoreSeed(appWindow, sampleWorkspaceWorlds)
 
@@ -100,6 +102,10 @@ test.describe.serial('Project workspace world list', () => {
     await expect(items.nth(1)).toHaveAttribute('data-test-world-id', 'world-mirefall')
   })
 
+  /**
+   * ProjectWorkspaceWorldList
+   * Empty seed hides the list root.
+   */
   test('Check if empty seed hides the world list root', async () => {
     await remountWorldListAfterStoreSeed(appWindow, [])
 

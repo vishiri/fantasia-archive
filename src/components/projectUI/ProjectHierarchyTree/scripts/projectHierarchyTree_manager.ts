@@ -10,17 +10,18 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
-import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreePlacementDisplayIconWiring'
+import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreeDisplayChromeWiring'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
 export {
   applyProjectHierarchyTreeTreeNodeKindClass,
-  clearProjectHierarchyTreeTreeNodeKindClass
-} from './projectHierarchyTreeTreeNodeKindClassWiring'
+  clearProjectHierarchyTreeTreeNodeKindClass,
+  resolveProjectHierarchyTreeDocumentAppearanceChrome
+} from './projectHierarchyTreeDisplayChromeWiring'
 
 export { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
 export { resolveProjectHierarchyTreeWorldDisplayColor } from '../functions/resolveProjectHierarchyTreeWorldDisplayColor'
-export { resolveProjectHierarchyTreeDocumentAppearanceChrome } from './projectHierarchyTreeDocumentAppearanceChromeWiring'
+export { resolveProjectHierarchyTreeNodeContextMenuLabels } from './projectHierarchyTreeNodeContextMenuWiring'
 export { resolveProjectHierarchyTreePlacementDisplayIcon }
 export { buildFaColorGlyphCssCustomProperties } from 'app/src/scripts/faColorContrast/faColorContrast_manager'
 

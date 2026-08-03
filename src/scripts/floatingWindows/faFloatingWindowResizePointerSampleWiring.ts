@@ -3,10 +3,7 @@ import type {
   I_faFloatingWindowResizeViewport,
   T_faFloatingWindowResizeEdge
 } from 'app/types/I_faFloatingWindowResize'
-
-interface I_faFloatingWindowFrameAxisRef {
-  value: number
-}
+import type { I_faFloatingWindowFrameAxisRef } from 'app/types/I_faFloatingWindowResizePointerSession'
 
 export function applyFaFloatingWindowResizePointerSample (
   deps: {

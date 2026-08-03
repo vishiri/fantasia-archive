@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { expect, test, vi } from 'vitest'
 
-import { createProjectHierarchyTreeDocumentButtonGroupWiring } from '../projectHierarchyTreeDocumentButtonGroupWiring'
+import { createProjectHierarchyTreeDocumentButtonGroupWiring } from '../projectHierarchyTreeSettingsSurfaceWiring'
 
 /**
  * createProjectHierarchyTreeDocumentButtonGroupWiring

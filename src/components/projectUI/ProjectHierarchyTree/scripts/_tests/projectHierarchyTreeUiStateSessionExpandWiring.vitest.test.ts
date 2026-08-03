@@ -4,7 +4,7 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeUiStateSessionExpandWiring } from '../projectHierarchyTreeUiStateSessionExpandWiring'
+import { createProjectHierarchyTreeUiStateSessionExpandWiring } from '../projectHierarchyTreeUiStateSessionPartsWiring'
 
 const placementNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

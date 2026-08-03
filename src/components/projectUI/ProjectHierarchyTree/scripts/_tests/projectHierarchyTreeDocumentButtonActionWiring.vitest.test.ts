@@ -2,7 +2,7 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { buildProjectHierarchyTreeDocumentButtonActionHandlers } from '../projectHierarchyTreeDocumentButtonActionWiring'
+import { buildProjectHierarchyTreeDocumentButtonActionHandlers } from '../projectHierarchyTreeSettingsSurfaceWiring'
 
 const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

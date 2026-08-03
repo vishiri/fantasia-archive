@@ -29,7 +29,7 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
       updateDocumentTemplateIcon: vi.fn(),
       updateDocumentTemplateWorldAppendixTranslations: vi.fn(),
       updateWorldColor: vi.fn(),
-      updateWorldColorPallete: vi.fn(),
+      updateWorldColorPalette: vi.fn(),
       updateWorldDisplayNameTranslations: vi.fn(),
       updateWorldTemplateLayout: vi.fn()
     }),
@@ -45,7 +45,7 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
       selectedCategoryTab: ref('generalSettings')
     }),
     hasDialogProjectSettingsDocumentTemplateNameValidationError: () => true,
-    hasDialogProjectSettingsWorldColorPalleteValidationError: () => false,
+    hasDialogProjectSettingsWorldColorPaletteValidationError: () => false,
     hasDialogProjectSettingsWorldNameValidationError: () => false,
     hasDialogProjectSettingsWorldTemplateLayoutValidationError: () => false,
     isDialogProjectSettingsFullDialogSaveDisabled: () => true,

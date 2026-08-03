@@ -71,10 +71,10 @@ export function updateDialogProjectSettingsWorldDraftColor (
   })
 }
 
-export function updateDialogProjectSettingsWorldDraftColorPallete (
+export function updateDialogProjectSettingsWorldDraftColorPalette (
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>,
   id: string,
-  colorPallete: string
+  colorPalette: string
 ): void {
   if (localWorlds.value === null) {
     return
@@ -85,7 +85,7 @@ export function updateDialogProjectSettingsWorldDraftColorPallete (
     }
     return {
       ...world,
-      colorPallete
+      colorPalette
     }
   })
 }

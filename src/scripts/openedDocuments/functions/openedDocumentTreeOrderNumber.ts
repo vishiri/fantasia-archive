@@ -1,3 +1,7 @@
+/**
+ * Local sentinel alias; functions/ cannot value-import from types/.
+ * Keep equal to FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY in types/I_faDocumentTreeOrderNumber.
+ */
 const FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY = Number.MIN_SAFE_INTEGER
 
 /**

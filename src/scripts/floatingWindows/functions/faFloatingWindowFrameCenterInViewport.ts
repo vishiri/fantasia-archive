@@ -1,8 +1,5 @@
 import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
-
-interface I_faFloatingWindowFrameAxisRef {
-  value: number
-}
+import type { I_faFloatingWindowFrameAxisRef } from 'app/types/I_faFloatingWindowResizePointerSession'
 
 export function createFaFloatingWindowFrameCenterInViewport (deps: {
   getInnerHeight: () => number

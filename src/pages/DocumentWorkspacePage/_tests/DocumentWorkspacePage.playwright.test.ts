@@ -77,7 +77,7 @@ const sampleTemplate: I_faProjectDocumentTemplate = {
 
 const sampleWorld: I_faProjectWorld = {
   color: '#4caf50',
-  colorPallete: '',
+  colorPalette: '',
   createdAtMs: 1,
   displayName: 'Eldoria',
   displayNameTranslations: { 'en-US': 'Eldoria' },

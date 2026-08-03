@@ -8,6 +8,7 @@ import type {
   T_dialogKeybindCaptureKeydownDeps,
   T_dialogKeybindCaptureRefsBundle
 } from 'app/types/I_dialogKeybindSettings'
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type {
   I_faChordSerialized,
   I_faKeybindsRoot,
@@ -66,11 +67,6 @@ export type T_dialogKeybindSettingsCaptureHandlersFactoryDeps =
     addKeydownListener: (handler: (e: KeyboardEvent) => void) => void
   }
 
-export interface I_dialogKeybindSettingsComponentStoreLike {
-  dialogToOpen?: unknown | undefined
-  dialogUUID?: unknown | undefined
-}
-
 export type T_dialogKeybindSettingsDialogOpenFactoryDeps = {
   refreshKeybindsAsync: (
     refresh: () => Promise<unknown>,
@@ -90,7 +86,7 @@ export type T_dialogKeybindSettingsDialogRoutingFactoryDeps =
     computed: <T>(getter: () => T) => I_computedRef<T>
     formatFaKeybindChordForUi: (chord: I_faChordSerialized, platform: NodeJS.Platform) => string
     fromThrowable: T_injectedResultFromThrowable
-    getDialogComponentStore: () => I_dialogKeybindSettingsComponentStoreLike
+    getDialogComponentStore: () => I_dialogComponentStoreLike
     onMounted: (hook: () => void) => void
     watch: (
       source: (() => unknown) | I_ref<unknown>,

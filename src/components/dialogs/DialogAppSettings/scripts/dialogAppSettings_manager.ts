@@ -13,7 +13,7 @@ import { createDialogAppSettings } from './functions/createDialogAppSettings'
 import { buildAppSettingsRenderTree } from './functions/dialogAppSettingsTreeBuild'
 import { filterAppSettingsTreeForSearch } from './functions/dialogAppSettingsSearch'
 import { updateLocalAppSettingsField } from './functions/dialogAppSettingsUpdateLocalField'
-import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/faJsonSnapshotsEqual'
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/functions/faJsonSnapshotsEqual'
 
 const dialogAppSettingsApi = createDialogAppSettings({
   APP_SETTINGS_OPTIONS,

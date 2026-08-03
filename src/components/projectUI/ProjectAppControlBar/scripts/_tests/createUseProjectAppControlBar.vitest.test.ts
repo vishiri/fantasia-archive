@@ -110,7 +110,7 @@ function mountUseProjectAppControlBar (input: {
   documentWorkspaceRoute?: boolean
   enterDocumentEditMode?: (documentId: string) => void
   projectNoteboardText?: string
-  projectWorlds?: Array<{ color: string, colorPallete?: string, displayName: string, id: string }>
+  projectWorlds?: Array<{ color: string, colorPalette?: string, displayName: string, id: string }>
   requestCloseTab?: (documentId: string) => void
   requestDeleteDocument?: (documentId: string) => void
   runFaAction?: (id: string, payload: unknown) => void
@@ -1561,7 +1561,7 @@ test('Test that createUseProjectAppControlBar exposes world tab indicators only 
     projectWorlds: [
       {
         color: '#00ff00',
-        colorPallete: '',
+        colorPalette: '',
         displayName: 'World 1',
         id: 'world-1'
       }
@@ -1605,13 +1605,13 @@ test('Test that createUseProjectAppControlBar exposes world tab indicators only 
     projectWorlds: [
       {
         color: '#00ff00',
-        colorPallete: '',
+        colorPalette: '',
         displayName: 'World 1',
         id: 'world-1'
       },
       {
         color: '#ff00ff',
-        colorPallete: '',
+        colorPalette: '',
         displayName: 'World 2',
         id: 'world-2'
       }

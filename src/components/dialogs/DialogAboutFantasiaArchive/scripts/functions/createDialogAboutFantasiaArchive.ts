@@ -1,10 +1,6 @@
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 export function createDialogAboutFantasiaArchive (deps: {
   isDialogAboutFantasiaArchiveDirectInput: (input: T_dialogName | undefined) => boolean

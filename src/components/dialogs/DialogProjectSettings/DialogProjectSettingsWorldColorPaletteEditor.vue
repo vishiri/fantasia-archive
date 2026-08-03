@@ -57,11 +57,11 @@ defineOptions({
 })
 
 const props = defineProps<{
-  colorPallete: string
+  colorPalette: string
 }>()
 
 const emit = defineEmits<{
-  'update:colorPallete': [value: string]
+  'update:colorPalette': [value: string]
 }>()
 
 const {

@@ -32,8 +32,11 @@ export interface I_openedDocumentTabUnsavedCompareInput {
   isDeadDraft: boolean
   savedIsDead: boolean
   parentDocumentIdDraft: string
-  savedParentDocumentId: string,
-  treeOrderNumberDraft: string
+  savedParentDocumentId: string
+  /**
+   * Tree order draft already mapped through resolveOpenedDocumentTreeOrderNumberDraftForPersist.
+   */
+  treeOrderNumber: number
   savedTreeOrderNumber: number
   extraClassesDraft: string
   savedExtraClasses: string

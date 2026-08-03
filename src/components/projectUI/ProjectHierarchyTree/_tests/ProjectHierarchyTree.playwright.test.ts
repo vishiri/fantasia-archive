@@ -44,7 +44,7 @@ const sampleActiveProject = {
 const sampleWorlds: I_faProjectHierarchyTreeWorkspaceWorld[] = [
   {
     color: '#4caf50',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'Eldoria',
     groups: [],
     id: WORLD_ID,
@@ -140,7 +140,7 @@ const sampleTemplate: I_faProjectDocumentTemplate = {
 
 const sampleWorld: I_faProjectWorld = {
   color: '#4caf50',
-  colorPallete: '',
+  colorPalette: '',
   createdAtMs: 1,
   displayName: 'Eldoria',
   displayNameTranslations: { 'en-US': 'Eldoria' },
@@ -386,7 +386,7 @@ function buildLazyExpandSampleTreeData (): I_faProjectHierarchyTreeHeTreeNode[] 
 
 const sampleWorldB: I_faProjectWorld = {
   color: '#2196f3',
-  colorPallete: '',
+  colorPalette: '',
   createdAtMs: 1,
   displayName: 'Nordheim',
   displayNameTranslations: { 'en-US': 'Nordheim' },
@@ -399,7 +399,7 @@ const multiWorldWorlds: I_faProjectHierarchyTreeWorkspaceWorld[] = [
   ...sampleWorlds,
   {
     color: '#2196f3',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'Nordheim',
     groups: [],
     id: WORLD_ID_B,

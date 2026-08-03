@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeNodeDisplayBindings } from '../projectHierarchyTreeNodeDisplayBindingsWiring'
+import { createProjectHierarchyTreeNodeDisplayBindings } from '../projectHierarchyTreeSettingsSurfaceWiring'
 
 const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

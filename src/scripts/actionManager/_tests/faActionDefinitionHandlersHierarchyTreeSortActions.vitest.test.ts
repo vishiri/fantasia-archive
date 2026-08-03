@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
-import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from '../faActionDefinitionHandlersHierarchyTreeSortActions'
+import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from '../faActionDefinitionHandlersHierarchyTreeSortActionsWiring'
 import { setFaComponentTestingProjectContentOverrides } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 
 afterEach(() => {

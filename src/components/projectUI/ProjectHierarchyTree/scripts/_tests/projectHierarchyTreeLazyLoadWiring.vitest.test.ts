@@ -5,8 +5,12 @@ import { ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { evictCollapsedNodeChildren } from '../../functions/projectHierarchyTreeExpandState'
-import { markProjectHierarchyTreeNodeClosed } from '../projectHierarchyTreeNodeOpenCloseStateWiring'
-import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from '../projectHierarchyTreeLatentExpandReapplyWiring'
+import {
+  markProjectHierarchyTreeNodeClosed
+} from '../projectHierarchyTreeLatentExpandReapplyWiring'
+import {
+  reapplyProjectHierarchyTreeLatentDescendantExpandState
+} from '../projectHierarchyTreeLatentExpandReapplyWiring'
 import { runProjectHierarchyTreeSessionExpandOpen } from '../projectHierarchyTreeSessionExpandOpenWiring'
 import { createProjectHierarchyTreeLazyLoadWiring } from '../projectHierarchyTreeLazyLoadWiring'
 

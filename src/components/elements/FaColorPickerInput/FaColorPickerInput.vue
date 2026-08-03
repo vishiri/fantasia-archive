@@ -126,7 +126,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'append-to-world-palette': [colorPallete: string]
+  'append-to-world-palette': [colorPalette: string]
   'update:modelValue': [value: string]
 }>()
 
@@ -137,8 +137,8 @@ function emitModelValueUpdate (value: string): void {
   emit('update:modelValue', value)
 }
 
-function emitAppendToWorldPalette (colorPallete: string): void {
-  emit('append-to-world-palette', colorPallete)
+function emitAppendToWorldPalette (colorPalette: string): void {
+  emit('append-to-world-palette', colorPalette)
 }
 
 const {

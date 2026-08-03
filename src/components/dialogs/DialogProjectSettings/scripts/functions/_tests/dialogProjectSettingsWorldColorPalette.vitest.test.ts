@@ -150,8 +150,8 @@ test('Test that wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedM
     id: 'a'
   }]
   const serialize = (hexList: readonly string[]) => hexList.join(';')
-  const wouldExceed = (colorPallete: string, appendHex: string, maxLength: number) => {
-    return colorPallete.length + 1 + appendHex.length > maxLength
+  const wouldExceed = (colorPalette: string, appendHex: string, maxLength: number) => {
+    return colorPalette.length + 1 + appendHex.length > maxLength
   }
   expect(wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength(
     entries,

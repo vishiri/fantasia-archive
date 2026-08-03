@@ -79,11 +79,11 @@ export function removeDialogProjectSettingsWorldColorPaletteEntry (
 export function wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength (
   entries: readonly I_dialogProjectSettingsWorldColorPaletteEntry[],
   entryId: string,
-  serializeFaProjectWorldColorPalleteFromHexList: (
+  serializeFaProjectWorldColorPaletteFromHexList: (
     hexList: readonly string[]
   ) => string,
-  wouldFaProjectWorldColorPalleteExceedMaxLength: (
-    colorPallete: string,
+  wouldFaProjectWorldColorPaletteExceedMaxLength: (
+    colorPalette: string,
     appendHex: string,
     maxLength: number
   ) => boolean,
@@ -93,10 +93,10 @@ export function wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedM
   if (sourceEntry === undefined) {
     return true
   }
-  const currentSerialized = serializeFaProjectWorldColorPalleteFromHexList(
+  const currentSerialized = serializeFaProjectWorldColorPaletteFromHexList(
     readDialogProjectSettingsWorldColorPaletteEntryHexList(entries)
   )
-  return wouldFaProjectWorldColorPalleteExceedMaxLength(
+  return wouldFaProjectWorldColorPaletteExceedMaxLength(
     currentSerialized,
     sourceEntry.hex,
     maxLength
@@ -118,13 +118,13 @@ export function isDialogProjectSettingsWorldColorPaletteSwatchDuplicate (
 
 export function shouldResyncDialogProjectSettingsWorldColorPaletteFromProp (
   entries: readonly I_dialogProjectSettingsWorldColorPaletteEntry[],
-  colorPallete: string,
-  serializeFaProjectWorldColorPalleteFromHexList: (
+  colorPalette: string,
+  serializeFaProjectWorldColorPaletteFromHexList: (
     hexList: readonly string[]
   ) => string
 ): boolean {
-  const trimmedNext = colorPallete.trim()
-  const currentSerialized = serializeFaProjectWorldColorPalleteFromHexList(
+  const trimmedNext = colorPalette.trim()
+  const currentSerialized = serializeFaProjectWorldColorPaletteFromHexList(
     readDialogProjectSettingsWorldColorPaletteEntryHexList(entries)
   )
   return currentSerialized !== trimmedNext

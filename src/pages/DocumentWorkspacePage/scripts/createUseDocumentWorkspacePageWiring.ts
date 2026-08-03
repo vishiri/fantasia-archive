@@ -3,7 +3,7 @@ import type {
   T_useDocumentWorkspacePageApi
 } from 'app/types/I_documentWorkspacePage'
 
-import { createDocumentWorkspacePageCoreModels } from './createDocumentWorkspacePageCoreModels'
+import { createDocumentWorkspacePageCoreModels } from './functions/createDocumentWorkspacePageCoreModels'
 import {
   wireDocumentWorkspacePageColorPickers,
   wireDocumentWorkspacePageIsCategoryToggle

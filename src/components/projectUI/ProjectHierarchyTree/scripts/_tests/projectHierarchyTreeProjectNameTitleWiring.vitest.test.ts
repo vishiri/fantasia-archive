@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { expect, test } from 'vitest'
 
-import { createProjectHierarchyTreeProjectNameTitleWiring } from '../projectHierarchyTreeProjectNameTitleWiring'
+import { createProjectHierarchyTreeProjectNameTitleWiring } from '../projectHierarchyTreeDisplayChromeWiring'
 
 test('createProjectHierarchyTreeProjectNameTitleWiring shows multi-world project name', () => {
   const activeProject = ref({

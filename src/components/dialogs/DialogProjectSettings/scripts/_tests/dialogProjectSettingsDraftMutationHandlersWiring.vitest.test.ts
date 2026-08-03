@@ -9,7 +9,7 @@ import { createDialogProjectSettingsDraftMutationHandlers } from '../dialogProje
 
 const baseWorld: I_dialogProjectSettingsWorldDraft = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',
@@ -44,7 +44,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
 
   handlers.updateWorldDisplayNameTranslations(addedWorldId, { 'en-US': 'Renamed world' })
   handlers.updateWorldColor(addedWorldId, '#aabbcc')
-  handlers.updateWorldColorPallete(addedWorldId, '#112233')
+  handlers.updateWorldColorPalette(addedWorldId, '#112233')
   handlers.updateWorldTemplateLayout(addedWorldId, {
     groups: [
       {
@@ -91,7 +91,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
 
   expect(localWorlds.value?.[1]!.displayNameTranslations).toEqual({ 'en-US': 'Renamed world' })
   expect(localWorlds.value?.[1]!.color).toBe('#aabbcc')
-  expect(localWorlds.value?.[1]!.colorPallete).toBe('#112233')
+  expect(localWorlds.value?.[1]!.colorPalette).toBe('#112233')
   expect(localWorlds.value?.[1]!.templateLayout.groups).toHaveLength(1)
   expect(localDocumentTemplates.value?.[1]!.titlePluralTranslations).toEqual({ 'en-US': 'Renamed template' })
   expect(localDocumentTemplates.value?.[1]!.icon).toBe('person')

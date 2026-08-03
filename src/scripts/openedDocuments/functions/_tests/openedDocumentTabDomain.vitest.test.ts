@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
 import {
   appendOpenedDocumentTabToRight,
@@ -38,7 +39,7 @@ const sampleTab: I_faOpenedDocumentTab = {
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
-  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   extraClassesDraft: '',
   savedExtraClasses: '',
   hasUnsavedChanges: true,
@@ -65,8 +66,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
     savedDocumentTextColor: ''
@@ -87,8 +88,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
     savedDocumentTextColor: ''
@@ -112,8 +113,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects color draft chang
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
     savedDocumentTextColor: ''

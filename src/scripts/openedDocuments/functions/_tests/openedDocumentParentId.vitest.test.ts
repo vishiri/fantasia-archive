@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest'
 
 import {
-  normalizeOpenedDocumentParentIdFromDb,
+  normalizeOpenedDocumentParentIdFromDb
+} from '../openedDocumentNullableStringFromDb'
+import {
   resolveOpenedDocumentParentIdDraftForPersist,
   resolveOpenedDocumentParentMoveAppendSortOrder
 } from '../openedDocumentParentId'

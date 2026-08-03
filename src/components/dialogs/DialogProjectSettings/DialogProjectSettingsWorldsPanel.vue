@@ -28,7 +28,7 @@
           :world="selectedWorld"
           @remove="emitRemove(selectedWorld.id)"
           @update:color="emitUpdateColor(selectedWorld.id, $event)"
-          @update:color-pallete="emitUpdateColorPallete(selectedWorld.id, $event)"
+          @update:color-palette="emitUpdateColorPalette(selectedWorld.id, $event)"
           @update:display-name-translations="emitUpdateDisplayNameTranslations(selectedWorld.id, $event)"
           @update:template-layout="emitUpdateTemplateLayout(selectedWorld.id, $event)"
         />
@@ -71,7 +71,7 @@ const emit = defineEmits<{
   removeWorld: [id: string]
   'update:worlds': [worlds: I_dialogProjectSettingsWorldDraft[]]
   updateWorldColor: [id: string, color: string]
-  updateWorldColorPallete: [id: string, colorPallete: string]
+  updateWorldColorPalette: [id: string, colorPalette: string]
   updateWorldDisplayNameTranslations: [id: string, displayNameTranslations: I_faProjectWorldDisplayNameTranslations]
   updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
@@ -138,8 +138,8 @@ function emitUpdateColor (id: string, color: string): void {
   emit('updateWorldColor', id, color)
 }
 
-function emitUpdateColorPallete (id: string, colorPallete: string): void {
-  emit('updateWorldColorPallete', id, colorPallete)
+function emitUpdateColorPalette (id: string, colorPalette: string): void {
+  emit('updateWorldColorPalette', id, colorPalette)
 }
 
 function emitUpdateTemplateLayout (

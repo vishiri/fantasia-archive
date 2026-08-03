@@ -3,7 +3,7 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from './projectHierarchyTreeMapperWiring'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from './projectHierarchyTreeSyncMapperWiring'
 import { mapProjectHierarchyTreeToTopologyKey } from '../functions/projectHierarchyTreeTopologyKey'
 
 function resolveProjectHierarchyTreeWorldStructuralChildCount (

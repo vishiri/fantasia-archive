@@ -3,10 +3,10 @@ import { expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH } from 'app/types/I_faProjectWorldDomain'
 import {
-  appendFaProjectWorldColorPalleteHex,
-  faProjectWorldColorPalleteContainsHex,
+  appendFaProjectWorldColorPaletteHex,
+  faProjectWorldColorPaletteContainsHex,
   isFaProjectWorldStorageHexColor
-} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 
 import { readFaColorPickerPaletteAppendWorldId } from '../functions/faColorPickerPaletteAppendWorldId'
 import {
@@ -18,9 +18,9 @@ import {
 import { createUseFaColorPickerPaletteAppend } from '../functions/createUseFaColorPickerPaletteAppend'
 
 const paletteAppendFactoryDeps = {
-  appendFaProjectWorldColorPalleteHex,
+  appendFaProjectWorldColorPaletteHex,
   computed,
-  faProjectWorldColorPalleteContainsHex,
+  faProjectWorldColorPaletteContainsHex,
   isFaColorPickerPaletteAppendDisabled,
   isFaColorPickerPaletteAppendDuplicate,
   isFaProjectWorldStorageHexColor,
@@ -48,8 +48,8 @@ test('Test that createUseFaColorPickerPaletteAppend emits draft palette updates'
   })
   const api = usePaletteAppend(
     props,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => props.modelValue
   )
@@ -112,8 +112,8 @@ test('Test that createUseFaColorPickerPaletteAppend persists palette updates', a
   })
   const api = usePersistAppend(
     props,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => props.modelValue,
     refreshProjectWorldColorPalette
@@ -152,8 +152,8 @@ test('Test that createUseFaColorPickerPaletteAppend no-ops without paletteAppend
   })
   const api = usePaletteAppend(
     props,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => props.modelValue
   )
@@ -212,8 +212,8 @@ test('Test that createUseFaColorPickerPaletteAppend no-ops on blocked clicks', a
   })
   const api = usePaletteAppend(
     props,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => props.modelValue
   )
@@ -236,8 +236,8 @@ test('Test that createUseFaColorPickerPaletteAppend no-ops on blocked clicks', a
   })
   const persistApi = useFailedPersist(
     persistProps,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => persistProps.modelValue
   )
@@ -280,7 +280,7 @@ test('Test that createUseFaColorPickerPaletteAppend ignores null append results 
   let appendCalls = 0
   const appendWithSecondNull = createUseFaColorPickerPaletteAppend({
     ...paletteAppendFactoryDeps,
-    appendFaProjectWorldColorPalleteHex: () => {
+    appendFaProjectWorldColorPaletteHex: () => {
       appendCalls++
       if (appendCalls === 1) {
         return '#112233;#AABBCC'
@@ -298,8 +298,8 @@ test('Test that createUseFaColorPickerPaletteAppend ignores null append results 
   })
   const api = appendWithSecondNull(
     props,
-    (colorPallete) => {
-      emitted.push(colorPallete)
+    (colorPalette) => {
+      emitted.push(colorPalette)
     },
     () => props.modelValue
   )

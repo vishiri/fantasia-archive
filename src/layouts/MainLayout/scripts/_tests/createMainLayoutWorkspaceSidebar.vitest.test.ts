@@ -5,7 +5,6 @@ import { createMainLayoutWorkspaceSidebar } from '../functions/createMainLayoutW
 
 const persistSidebarWidthMock = vi.fn(async (): Promise<boolean> => true)
 const refreshProjectSidebarMock = vi.fn(async (): Promise<boolean> => true)
-const refreshWorkspaceWorldsMock = vi.fn(async (): Promise<void> => undefined)
 const refreshHierarchyLayoutMock = vi.fn(async (): Promise<void> => undefined)
 const flushHierarchyUiStateMock = vi.fn()
 const resetHierarchyTreeMock = vi.fn()
@@ -69,9 +68,6 @@ function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorksp
       setLiveWorkspaceSidebarWidthPx: setLiveWorkspaceSidebarWidthPxMock,
       widthPx: sidebarWidthPx
     }) as never,
-    S_FaProjectWorkspaceWorlds: () => ({
-      refreshWorkspaceWorlds: refreshWorkspaceWorldsMock
-    }) as never,
     attachWorkspaceSidebarLiveWidthSync: attachWorkspaceSidebarLiveWidthSyncMock,
     bindWorkspaceSidebarLiveWidthSync: ({
       attachWorkspaceSidebarLiveWidthSync,
@@ -134,7 +130,6 @@ beforeEach(() => {
   persistSidebarWidthMock.mockResolvedValue(true)
   refreshProjectSidebarMock.mockReset()
   refreshProjectSidebarMock.mockResolvedValue(true)
-  refreshWorkspaceWorldsMock.mockReset()
   refreshHierarchyLayoutMock.mockReset()
   flushHierarchyUiStateMock.mockReset()
   resetHierarchyTreeMock.mockReset()

@@ -1,6 +1,7 @@
 import type { T_injectedResultFromThrowable } from 'app/types/I_injectedNeverthrow'
 import type { ComputedRef, Ref } from 'vue'
 
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type {
   I_faChordSerialized,
   I_faKeybindsRoot,
@@ -139,10 +140,7 @@ export type T_dialogKeybindSettingsDialogWiringModuleDeps = {
   computed: <T>(getter: () => T) => ComputedRef<T>
   formatFaKeybindChordForUi: (chord: I_faChordSerialized, platform: NodeJS.Platform) => string
   fromThrowable: T_injectedResultFromThrowable
-  getDialogComponentStore: () => {
-    dialogToOpen?: unknown | undefined
-    dialogUUID?: unknown | undefined
-  }
+  getDialogComponentStore: () => I_dialogComponentStoreLike
   getKeybindsStore: () => {
     setSuspendGlobalKeybindDispatch: (active: boolean) => void
   }

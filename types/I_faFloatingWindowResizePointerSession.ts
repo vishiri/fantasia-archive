@@ -4,8 +4,14 @@ import type {
   T_faFloatingWindowResizeEdge
 } from 'app/types/I_faFloatingWindowResize'
 
-interface I_faFloatingWindowFrameAxisRef {
+/** Mutable numeric axis ref (Vue ref-like) for floating window frame geometry. */
+export interface I_faFloatingWindowFrameAxisRef {
   value: number
+}
+
+/** Mutable boolean ref (Vue ref-like) for floating window resize-active flag. */
+export interface I_faFloatingWindowFrameBoolRef {
+  value: boolean
 }
 
 /** Session wiring deps built in faFloatingWindowResizePointerDrive_manager. */

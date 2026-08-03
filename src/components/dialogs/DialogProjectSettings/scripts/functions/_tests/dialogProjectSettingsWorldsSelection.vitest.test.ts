@@ -10,7 +10,7 @@ import {
 
 const worldA = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Alpha' },
   documentCount: 0,
   templateLayout: {
@@ -22,7 +22,7 @@ const worldA = {
 
 const worldB = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Beta' },
   documentCount: 0,
   templateLayout: {
@@ -34,7 +34,7 @@ const worldB = {
 
 const worldC = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Gamma' },
   documentCount: 0,
   templateLayout: {

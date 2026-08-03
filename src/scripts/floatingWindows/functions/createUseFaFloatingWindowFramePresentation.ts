@@ -1,20 +1,9 @@
+import type { I_faFloatingWindowFrameCssProperties } from 'app/types/I_faFloatingWindowFrameCssProperties'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
 interface I_faFloatingWindowFrameLayoutLike {
   minHeightPx: number
   minWidthPx: number
-}
-
-interface I_cssPropertiesLike {
-  height?: string
-  left?: string
-  minHeight?: string
-  minWidth?: string
-  overflow?: string
-  position?: string
-  top?: string
-  width?: string
-  zIndex?: number
 }
 
 export function createUseFaFloatingWindowFramePresentation (deps: {
@@ -30,7 +19,7 @@ export function createUseFaFloatingWindowFramePresentation (deps: {
     y: I_ref<number>
     z: I_ref<number>
   }) => {
-    frameStyle: I_computedRef<I_cssPropertiesLike>
+    frameStyle: I_computedRef<I_faFloatingWindowFrameCssProperties>
     onFramePointerDown: () => void
     titleShortFrameClass: I_computedRef<string | undefined>
   } {
@@ -41,7 +30,7 @@ export function createUseFaFloatingWindowFramePresentation (deps: {
       raiseZ()
     }
 
-    const frameStyle = deps.computed((): I_cssPropertiesLike => ({
+    const frameStyle = deps.computed((): I_faFloatingWindowFrameCssProperties => ({
       height: `${h.value}px`,
       left: `${x.value}px`,
       minHeight: `${layout.minHeightPx}px`,

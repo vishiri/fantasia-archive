@@ -9,10 +9,10 @@ export function createUseDialogProjectSettingsWorldColorPaletteEditor (
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps
 ): (
     props: {
-      colorPallete: string
+      colorPalette: string
     },
     emit: {
-      (event: 'update:colorPallete', value: string): void
+      (event: 'update:colorPalette', value: string): void
     }
   ) => I_dialogProjectSettingsWorldColorPaletteEditorApi {
   return function useDialogProjectSettingsWorldColorPaletteEditor (props, emit) {

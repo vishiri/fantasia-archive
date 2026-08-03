@@ -8,6 +8,8 @@ import {
 import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 import { findProjectHierarchyTreeDocumentNodeByDocumentId } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentNodeLookup'
 
+import { createFaActionClipboardCopyResolvedText } from './functions/createFaActionClipboardCopyResolvedText'
+
 type T_hierarchyTreeDocumentClipboardHandlerDeps = {
   S_FaProjectHierarchyTree: () => {
     treeData: I_faProjectHierarchyTreeHeTreeNode[]
@@ -38,32 +40,12 @@ function findHierarchyTreeDocumentNode (
   )
 }
 
-function notifyHierarchyTreeDocumentClipboardCopySuccess (
-  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
-  messageKey: string
-): void {
-  deps.notifyCreate({
-    color: 'positive',
-    faSkipNotifyConsoleLog: true,
-    icon: 'mdi-clipboard-check-outline',
-    message: deps.i18n.global.t(messageKey),
-    timeout: 2500,
-    type: 'positive'
-  })
-}
-
-async function copyHierarchyTreeDocumentResolvedText (
-  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
-  copyText: string,
-  successMessageKey: string
-): Promise<T_faActionHandlerContinuation> {
-  await deps.copyToClipboard(copyText)
-  notifyHierarchyTreeDocumentClipboardCopySuccess(deps, successMessageKey)
-  return { payloadPreview: copyText }
-}
-
 function createHandleCopyHierarchyTreeDocumentName (
-  deps: T_hierarchyTreeDocumentClipboardHandlerDeps
+  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyHierarchyTreeDocumentName (payload: {
     documentId: string
@@ -78,8 +60,7 @@ function createHandleCopyHierarchyTreeDocumentName (
       return
     }
 
-    return copyHierarchyTreeDocumentResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyNameSuccess'
     )
@@ -87,7 +68,11 @@ function createHandleCopyHierarchyTreeDocumentName (
 }
 
 function createHandleCopyHierarchyTreeDocumentTextColor (
-  deps: T_hierarchyTreeDocumentClipboardHandlerDeps
+  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyHierarchyTreeDocumentTextColor (payload: {
     documentId: string
@@ -104,8 +89,7 @@ function createHandleCopyHierarchyTreeDocumentTextColor (
       return
     }
 
-    return copyHierarchyTreeDocumentResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyTextColorSuccess'
     )
@@ -113,7 +97,11 @@ function createHandleCopyHierarchyTreeDocumentTextColor (
 }
 
 function createHandleCopyHierarchyTreeDocumentBackgroundColor (
-  deps: T_hierarchyTreeDocumentClipboardHandlerDeps
+  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyHierarchyTreeDocumentBackgroundColor (payload: {
     documentId: string
@@ -130,8 +118,7 @@ function createHandleCopyHierarchyTreeDocumentBackgroundColor (
       return
     }
 
-    return copyHierarchyTreeDocumentResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyBackgroundColorSuccess'
     )
@@ -151,10 +138,15 @@ export function createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard (
       payload: { documentId: string }
     ) => Promise<T_faActionHandlerContinuation | void>
   } {
-  const handleCopyHierarchyTreeDocumentName = createHandleCopyHierarchyTreeDocumentName(deps)
-  const handleCopyHierarchyTreeDocumentTextColor = createHandleCopyHierarchyTreeDocumentTextColor(deps)
+  const { copyResolvedText } = createFaActionClipboardCopyResolvedText(deps)
+  const handleCopyHierarchyTreeDocumentName = createHandleCopyHierarchyTreeDocumentName(
+    deps,
+    copyResolvedText
+  )
+  const handleCopyHierarchyTreeDocumentTextColor =
+    createHandleCopyHierarchyTreeDocumentTextColor(deps, copyResolvedText)
   const handleCopyHierarchyTreeDocumentBackgroundColor =
-    createHandleCopyHierarchyTreeDocumentBackgroundColor(deps)
+    createHandleCopyHierarchyTreeDocumentBackgroundColor(deps, copyResolvedText)
 
   return {
     handleCopyHierarchyTreeDocumentBackgroundColor,

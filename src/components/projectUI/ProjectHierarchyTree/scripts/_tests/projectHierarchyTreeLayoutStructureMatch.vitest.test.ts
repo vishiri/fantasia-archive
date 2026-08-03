@@ -2,13 +2,13 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeSyncMapperWiring'
 import * as topologyKeyModule from '../../functions/projectHierarchyTreeTopologyKey'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from '../projectHierarchyTreeLayoutStructureMatch'
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [
     {

@@ -8,7 +8,7 @@ import type {
 } from 'app/types/I_dialogKeybindSettingsFactories'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
-import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/faJsonSnapshotsEqual'
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/functions/faJsonSnapshotsEqual'
 
 function cloneOverridesPlain (o: I_faKeybindsRoot['overrides']): I_faKeybindsRoot['overrides'] {
   return JSON.parse(JSON.stringify(o)) as I_faKeybindsRoot['overrides']

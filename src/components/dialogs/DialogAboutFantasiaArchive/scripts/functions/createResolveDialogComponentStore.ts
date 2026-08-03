@@ -1,9 +1,5 @@
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_injectedResultFromThrowable } from 'app/types/I_injectedNeverthrow'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 export function createResolveDialogComponentStore (deps: {
   fromThrowable: T_injectedResultFromThrowable

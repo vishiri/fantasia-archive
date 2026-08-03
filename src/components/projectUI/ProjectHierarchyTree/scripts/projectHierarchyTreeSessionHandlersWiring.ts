@@ -10,13 +10,15 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 import {
   isProjectHierarchyTreeNodeDraggable
 } from '../functions/projectHierarchyTreeDnD'
-import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
-import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { createProjectHierarchyTreeDroppableHandlers } from './projectHierarchyTreeDroppableHandlerWiring'
-import { createProjectHierarchyTreeDocumentOpenHandlers } from './projectHierarchyTreeDocumentOpenHandlersWiring'
-import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from './projectHierarchyTreeAddNewDocumentClickHandlersWiring'
+import type {
+  createProjectHierarchyTreeDocumentRowDragHoldWiring,
+  createProjectHierarchyTreeDocumentRowExpandClickGestureWiring
+} from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import { createProjectHierarchyTreeDroppableHandlers } from './projectHierarchyTreeDnDWiring'
+import { createProjectHierarchyTreeDocumentOpenHandlers } from './projectHierarchyTreeSessionHandlersSupportWiring'
+import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from './projectHierarchyTreeSyncMapperWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from './projectHierarchyTreeSessionExpandHandlersWiring'
-import { createProjectHierarchyTreeSessionHandlersClickWiring } from './projectHierarchyTreeSessionHandlersClickWiring'
+import { createProjectHierarchyTreeSessionHandlersClickWiring } from './projectHierarchyTreeSessionHandlersSupportWiring'
 import { createProjectHierarchyTreeSessionBulkContextMenuWiring } from './projectHierarchyTreeSessionBulkContextMenuWiring'
 
 type T_projectHierarchyTreeSessionHandlersWiringDeps = {

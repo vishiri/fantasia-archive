@@ -7,7 +7,7 @@ import {
   normalizeFaActionError,
   readFaProjectOpenFailedShape,
   resolveFaActionFailureNotifyCaption
-} from '../faActionManagerErrorReportingNormalize'
+} from '../functions/faActionManagerErrorReportingNormalize'
 
 function buildEntry (
   payload: I_faActionQueueEntry['payload'] = undefined

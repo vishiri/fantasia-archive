@@ -5,7 +5,7 @@ import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjec
 
 const worldA: I_dialogProjectSettingsWorldDraft = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Gungala' },
   documentCount: 0,
   id: 'world-a',
@@ -17,7 +17,7 @@ const worldA: I_dialogProjectSettingsWorldDraft = {
 
 const worldB: I_dialogProjectSettingsWorldDraft = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'New world' },
   documentCount: 0,
   id: 'world-b',

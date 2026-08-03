@@ -4,6 +4,8 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
   applyTemporaryOpenedDocumentParent,
+  createTemporaryOpenedDocumentTabCopySeed,
+  createTemporaryOpenedDocumentTabSeed,
   normalizeOpenedDocumentTabPersistenceState,
   promoteTemporaryOpenedDocumentTabAfterCreate,
   remapOpenedDocumentTabDocumentId,
@@ -11,17 +13,13 @@ import {
   resolveOpenedDocumentTabIsTemporary,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
-} from '../openedDocumentTemporaryDomain'
-import {
-  createTemporaryOpenedDocumentTabCopySeed,
-  createTemporaryOpenedDocumentTabSeed
-} from '../openedDocumentTemporaryTabSeed'
+} from '../../openedDocumentTemporaryDomainWiring'
 import {
   buildTemporaryDocumentParentResolveDocumentIds,
   buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
   resolveTemporaryDocumentParentDocumentIdForSave
 } from '../openedDocumentTemporaryParentResolve'
-import { computeOpenedDocumentHasUnsavedChanges } from '../openedDocumentTabAppearance'
+import { recomputeOpenedDocumentTabHasUnsavedChanges } from '../../openedDocumentTabAppearanceWiring'
 
 import { resolveCopyOfDocumentDisplayName } from '../resolveCopyOfDocumentDisplayName'
 
@@ -64,7 +62,7 @@ test('Test that createTemporaryOpenedDocumentTabCopySeed copies extra HTML class
 
   expect(tab.extraClassesDraft).toBe('foo bar')
   expect(tab.savedExtraClasses).toBe('foo bar')
-  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
+  expect(recomputeOpenedDocumentTabHasUnsavedChanges(tab)).toBe(false)
 })
 
 test('Test that createTemporaryOpenedDocumentTabCopySeed copies Custom order from source', () => {
@@ -83,7 +81,7 @@ test('Test that createTemporaryOpenedDocumentTabCopySeed copies Custom order fro
 
   expect(tab.treeOrderNumberDraft).toBe('42')
   expect(tab.savedTreeOrderNumber).toBe(42)
-  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
+  expect(recomputeOpenedDocumentTabHasUnsavedChanges(tab)).toBe(false)
 })
 
 test('Test that createTemporaryOpenedDocumentTabCopySeed copies Category and status flags from source', () => {
@@ -111,7 +109,7 @@ test('Test that createTemporaryOpenedDocumentTabCopySeed copies Category and sta
   expect(tab.savedIsMinor).toBe(true)
   expect(tab.isDeadDraft).toBe(true)
   expect(tab.savedIsDead).toBe(true)
-  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
+  expect(recomputeOpenedDocumentTabHasUnsavedChanges(tab)).toBe(false)
 })
 
 test('Test that resolveCopyOfDocumentDisplayName applies translated prefix', () => {
@@ -153,27 +151,9 @@ test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only 
   })
 
   expect(tab.hasUnsavedChanges).toBe(false)
-  expect(computeOpenedDocumentHasUnsavedChanges({
-    displayNameDraft: 'Renamed hero',
-    documentBackgroundColorDraft: tab.documentBackgroundColorDraft,
-    documentTextColorDraft: tab.documentTextColorDraft,
-    savedDisplayName: tab.savedDisplayName,
-    savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor,
-    isCategoryDraft: false,
-    savedIsCategory: false,
-    isFinishedDraft: false,
-    isMinorDraft: false,
-    isDeadDraft: false,
-    savedIsFinished: false,
-    savedIsMinor: false,
-    savedIsDead: false,
-    parentDocumentIdDraft: '',
-    savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
-    extraClassesDraft: '',
-    savedExtraClasses: '',
-    savedDocumentTextColor: tab.savedDocumentTextColor
+  expect(recomputeOpenedDocumentTabHasUnsavedChanges({
+    ...tab,
+    displayNameDraft: 'Renamed hero'
   })).toBe(true)
 })
 

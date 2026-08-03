@@ -1,7 +1,9 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { createProjectHierarchyTreeOpenIconExpandAnimationWiring } from '../projectHierarchyTreeOpenIconExpandAnimationWiring'
+import {
+  createProjectHierarchyTreeOpenIconExpandAnimationWiring
+} from '../projectHierarchyTreeExpandDomWiring'
 
 test('Test that open icon expand animation wiring schedules and clears pending node ids', () => {
   vi.useFakeTimers()

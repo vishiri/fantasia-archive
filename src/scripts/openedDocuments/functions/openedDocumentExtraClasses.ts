@@ -1,16 +1,4 @@
 /**
- * Maps nullable SQLite extra_classes to tab session empty-string baseline.
- */
-export function normalizeOpenedDocumentExtraClassesFromDb (
-  value: string | null | undefined
-): string {
-  if (value === null || value === undefined) {
-    return ''
-  }
-  return value
-}
-
-/**
  * Maps tab extra-classes drafts to SQLite storage (trimmed).
  */
 export function resolveOpenedDocumentExtraClassesDraftForPersist (

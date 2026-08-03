@@ -1,10 +1,6 @@
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 type T_createDialogNewProjectDeps = {
   FA_PROJECT_NAME_MAX_LEN: number

@@ -229,7 +229,7 @@ test('Test that patchFaComponentTestingStores replaces hierarchy tree session', 
       worlds: [
         {
           color: '#ff0000',
-          colorPallete: '',
+          colorPalette: '',
           displayName: 'Seed World',
           groups: [],
           id: 'world-1',

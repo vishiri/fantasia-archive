@@ -23,10 +23,10 @@ function hasAnyLocaleStringTranslation (
 
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 
-function hasDialogProjectSettingsColorPalleteCaseInsensitiveDuplicates (
-  colorPallete: string
+function hasDialogProjectSettingsColorPaletteCaseInsensitiveDuplicates (
+  colorPalette: string
 ): boolean {
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return false
   }
@@ -115,10 +115,10 @@ export function isDialogProjectSettingsWorldNameInvalid (
   return !dialogProjectSettingsWorldNameTranslationsHasValue(displayNameTranslations)
 }
 
-export function isDialogProjectSettingsWorldColorPalleteInvalid (
-  colorPallete: string
+export function isDialogProjectSettingsWorldColorPaletteInvalid (
+  colorPalette: string
 ): boolean {
-  return hasDialogProjectSettingsColorPalleteCaseInsensitiveDuplicates(colorPallete)
+  return hasDialogProjectSettingsColorPaletteCaseInsensitiveDuplicates(colorPalette)
 }
 
 export function collectDialogProjectSettingsSaveValidationErrors (
@@ -146,7 +146,7 @@ export function collectDialogProjectSettingsSaveValidationErrors (
         worldIndexOneBased
       })
     }
-    if (isDialogProjectSettingsWorldColorPalleteInvalid(world.colorPallete)) {
+    if (isDialogProjectSettingsWorldColorPaletteInvalid(world.colorPalette)) {
       errors.push({
         kind: 'duplicatePaletteColors',
         worldIndexOneBased
@@ -211,7 +211,7 @@ export function isDialogProjectSettingsWorldTabValidationError (
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null = null
 ): boolean {
   return isDialogProjectSettingsWorldNameInvalid(world.displayNameTranslations) ||
-    isDialogProjectSettingsWorldColorPalleteInvalid(world.colorPallete) ||
+    isDialogProjectSettingsWorldColorPaletteInvalid(world.colorPalette) ||
     worldTemplateLayoutHasValidationError(world.templateLayout) ||
     worldTemplateLayoutHasDocumentTemplatePlacementValidationError(
       world.templateLayout,
@@ -234,13 +234,13 @@ export function hasDialogProjectSettingsWorldTemplateLayoutValidationError (
   })
 }
 
-export function hasDialogProjectSettingsWorldColorPalleteValidationError (
+export function hasDialogProjectSettingsWorldColorPaletteValidationError (
   worlds: I_dialogProjectSettingsWorldDraft[] | null
 ): boolean {
   if (worlds === null) {
     return true
   }
-  return worlds.some((world) => isDialogProjectSettingsWorldColorPalleteInvalid(world.colorPallete))
+  return worlds.some((world) => isDialogProjectSettingsWorldColorPaletteInvalid(world.colorPalette))
 }
 
 export function isDialogProjectSettingsDialogSaveDisabled (
@@ -249,7 +249,7 @@ export function isDialogProjectSettingsDialogSaveDisabled (
 ): boolean {
   if (isDialogProjectSettingsProjectNameInvalid(projectName) ||
     hasDialogProjectSettingsWorldNameValidationError(worlds) ||
-    hasDialogProjectSettingsWorldColorPalleteValidationError(worlds)) {
+    hasDialogProjectSettingsWorldColorPaletteValidationError(worlds)) {
     return true
   }
   return hasDialogProjectSettingsWorldTemplateLayoutValidationError(worlds)

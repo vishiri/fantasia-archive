@@ -2,7 +2,7 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeDocumentOpenHandlers } from '../projectHierarchyTreeDocumentOpenHandlersWiring'
+import { createProjectHierarchyTreeDocumentOpenHandlers } from '../projectHierarchyTreeSessionHandlersSupportWiring'
 
 const leafDocument: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

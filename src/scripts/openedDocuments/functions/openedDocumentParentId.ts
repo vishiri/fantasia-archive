@@ -1,16 +1,4 @@
 /**
- * Maps nullable SQLite parent document ids to tab session empty-string baseline.
- */
-export function normalizeOpenedDocumentParentIdFromDb (
-  value: string | null | undefined
-): string {
-  if (value === null || value === undefined) {
-    return ''
-  }
-  return value
-}
-
-/**
  * Maps tab parent id drafts to nullable SQLite values.
  */
 export function resolveOpenedDocumentParentIdDraftForPersist (

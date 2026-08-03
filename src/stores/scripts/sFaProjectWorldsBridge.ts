@@ -27,7 +27,7 @@ export async function faProjectWorldsFetchFreshForDialog (): Promise<I_dialogPro
   }
   return readResult.value.items.map((world) => ({
     color: world.color,
-    colorPallete: world.colorPallete,
+    colorPalette: world.colorPalette,
     displayNameTranslations: world.displayNameTranslations,
     documentCount: world.documentCount,
     id: world.id,

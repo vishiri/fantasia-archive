@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { T_faProjectHierarchyTreeSortByMenuItemId } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { buildProjectHierarchyTreeNodeContextMenuSortHandlers } from '../projectHierarchyTreeNodeContextMenuSortWiring'
+import { buildProjectHierarchyTreeNodeContextMenuSortHandlers } from '../projectHierarchyTreeNodeContextMenuHandlersWiring'
 
 function documentNode (): I_faProjectHierarchyTreeHeTreeNode {
   return {

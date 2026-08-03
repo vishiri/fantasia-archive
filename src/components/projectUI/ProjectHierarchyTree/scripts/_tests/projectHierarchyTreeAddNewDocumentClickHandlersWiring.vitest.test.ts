@@ -3,7 +3,7 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from '../projectHierarchyTreeAddNewDocumentClickHandlersWiring'
+import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from '../projectHierarchyTreeSyncMapperWiring'
 import { createProjectHierarchyTreeAddNewDocumentNode } from '../projectHierarchyTreeAddNewDocumentNode'
 
 function createAddNewNode (): I_faProjectHierarchyTreeHeTreeNode {

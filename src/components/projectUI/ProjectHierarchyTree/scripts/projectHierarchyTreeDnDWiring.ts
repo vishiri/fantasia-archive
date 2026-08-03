@@ -1,15 +1,10 @@
 import type { Ref } from 'vue'
-
-import type {
-  I_faProjectHierarchyTreeHeTreeInstance,
-  I_faProjectHierarchyTreeHeTreeNode
-} from 'app/types/I_faProjectHierarchyTreeDomain'
-
-import { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
-import { createProjectHierarchyTreeDragSessionState } from './projectHierarchyTreeDragSessionStateWiring'
-import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
-import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
+import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import { createProjectHierarchyTreeDragCancelWiring, createProjectHierarchyTreeDragSessionState } from './projectHierarchyTreeDnDSessionStateWiring'
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring, createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import { createProjectHierarchyTreeDnDHandlers } from './projectHierarchyTreeDnDHandlersWiring'
+import { isProjectHierarchyTreeNodeDroppable, isProjectHierarchyTreeRootDroppable } from '../functions/projectHierarchyTreeDnD'
+import { collectProjectHierarchyTreeAncestorIds } from '../functions/projectHierarchyTreeExpandState'
 
 export function createProjectHierarchyTreeDnDWiring (deps: {
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
@@ -111,4 +106,95 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
+}
+
+export function createProjectHierarchyTreeBeforeDragOpenWiring (deps: {
+  lazyLoadWiring: {
+    loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  }
+}) {
+  async function onBeforeDragOpen (
+    stat: { data: I_faProjectHierarchyTreeHeTreeNode }
+  ): Promise<void> {
+    const node = stat.data
+    if (node.nodeKind !== 'document' && node.nodeKind !== 'templatePlacement') {
+      return
+    }
+    await deps.lazyLoadWiring.loadChildrenForNode(node)
+  }
+
+  return {
+    onBeforeDragOpen
+  }
+}
+
+export function createProjectHierarchyTreeDroppableHandlers (deps: {
+  dragContext: {
+    dragNode: {
+      data: I_faProjectHierarchyTreeHeTreeNode
+    } | null
+  }
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}) {
+  function eachDroppableHandler (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): boolean {
+    return isProjectHierarchyTreeNodeDroppable(
+      stat.data,
+      deps.dragContext,
+      deps.treeData.value
+    )
+  }
+
+  function rootDroppableHandler (): boolean {
+    return isProjectHierarchyTreeRootDroppable(deps.dragContext)
+  }
+
+  return {
+    eachDroppableHandler,
+    rootDroppableHandler
+  }
+}
+
+function shouldSuppressPostDragExpandNodeClose (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  dragExpandedSnapshotNodeIds: string[] | null,
+  nodeId: string
+): boolean {
+  if (dragExpandedSnapshotNodeIds === null || dragExpandedSnapshotNodeIds.length === 0) {
+    return false
+  }
+  const snapshotSet = new Set(dragExpandedSnapshotNodeIds)
+  if (snapshotSet.has(nodeId)) {
+    return true
+  }
+  for (const snapshotNodeId of dragExpandedSnapshotNodeIds) {
+    const ancestors = collectProjectHierarchyTreeAncestorIds(treeNodes, snapshotNodeId)
+    if (ancestors?.includes(nodeId) === true) {
+      return true
+    }
+  }
+  return false
+}
+
+export function runProjectHierarchyTreePostDragExpandCloseGuard (deps: {
+  dragExpandPostCommitGuard: () => boolean
+  getDragExpandedSnapshotNodeIds: () => string[] | null
+  markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
+  node: I_faProjectHierarchyTreeHeTreeNode
+  nodeId: string
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}): void {
+  if (deps.dragExpandPostCommitGuard()) {
+    return
+  }
+  const snapshotNodeIds = deps.getDragExpandedSnapshotNodeIds()
+  if (
+    shouldSuppressPostDragExpandNodeClose(
+      deps.treeData.value,
+      snapshotNodeIds,
+      deps.nodeId
+    )
+  ) {
+    return
+  }
+  deps.markNodeClosed(deps.nodeId, deps.node)
 }

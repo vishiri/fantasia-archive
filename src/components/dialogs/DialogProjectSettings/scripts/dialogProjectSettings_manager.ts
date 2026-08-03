@@ -23,7 +23,7 @@ import {
 import { hasDialogProjectSettingsDocumentTemplateNameValidationError } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSettingsDialogSaveValidation'
 import {
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldColorPaletteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
   hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsProjectNameInvalid
@@ -73,7 +73,7 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
   },
   createDialogProjectSettingsUseHook,
   hasDialogProjectSettingsDocumentTemplateNameValidationError,
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldColorPaletteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
   hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsFullDialogSaveDisabled,
@@ -102,3 +102,5 @@ export const createDialogProjectSettingsDialogActions = dialogProjectSettingsApi
 export const registerDialogProjectSettingsWatchers = dialogProjectSettingsApi.registerDialogProjectSettingsWatchers
 
 export const useDialogProjectSettings = dialogProjectSettingsApi.useDialogProjectSettings
+
+export { FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT } from './functions/dialogProjectSettingsDialogInput'

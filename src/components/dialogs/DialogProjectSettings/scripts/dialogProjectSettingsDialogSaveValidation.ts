@@ -8,7 +8,7 @@ import {
 } from './dialogProjectSettingsDocumentTemplatesDraft'
 import {
   collectDialogProjectSettingsSaveValidationErrors,
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldColorPaletteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
   isDialogProjectSettingsDialogSaveDisabled,
   isDialogProjectSettingsProjectNameInvalid
@@ -66,7 +66,7 @@ export function collectDialogProjectSettingsFullSaveValidationErrors (
 }
 
 export {
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldColorPaletteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
   isDialogProjectSettingsProjectNameInvalid
 }

@@ -6,12 +6,12 @@ import {
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
 } from 'app/types/I_faProjectWorldDomain'
 import {
-  collectFaProjectWorldColorPalleteDuplicateHexKeys,
-  parseFaProjectWorldColorPalleteToHexList,
-  parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
-  serializeFaProjectWorldColorPalleteFromHexList,
-  wouldFaProjectWorldColorPalleteExceedMaxLength
-} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+  collectFaProjectWorldColorPaletteDuplicateHexKeys,
+  parseFaProjectWorldColorPaletteToHexList,
+  parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
+  serializeFaProjectWorldColorPaletteFromHexList,
+  wouldFaProjectWorldColorPaletteExceedMaxLength
+} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 import {
   appendDialogProjectSettingsWorldColorPaletteEntry,
   buildDialogProjectSettingsWorldColorPaletteEntries,
@@ -31,20 +31,20 @@ const useEditor = createUseDialogProjectSettingsWorldColorPaletteEditor({
   applyFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
   buildDialogProjectSettingsWorldColorPaletteEntries,
   clearFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
-  collectFaProjectWorldColorPalleteDuplicateHexKeys,
+  collectFaProjectWorldColorPaletteDuplicateHexKeys,
   computed,
   createEntryId: () => `entry-${String(++entryCounter)}`,
   duplicateDialogProjectSettingsWorldColorPaletteEntryAfter,
   faVerticalDraggableTabsSortableDragOptions: {},
   hideNativeSortableDragGhost: vi.fn(),
   paletteMaxLength: FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
-  parseFaProjectWorldColorPalleteToHexList,
-  parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
+  parseFaProjectWorldColorPaletteToHexList,
+  parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
   readFaSortableDragItemDataAttribute: vi.fn(() => 'entry-1'),
   ref,
   removeDialogProjectSettingsWorldColorPaletteEntry,
   replaceDialogProjectSettingsWorldColorPaletteEntryHex,
-  serializeFaProjectWorldColorPalleteFromHexList,
+  serializeFaProjectWorldColorPaletteFromHexList,
   watch: (source, effect, options) => {
     if (options?.immediate) {
       effect(source())
@@ -52,7 +52,7 @@ const useEditor = createUseDialogProjectSettingsWorldColorPaletteEditor({
     return () => undefined
   },
   wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength,
-  wouldFaProjectWorldColorPalleteExceedMaxLength
+  wouldFaProjectWorldColorPaletteExceedMaxLength
 })
 
 /**
@@ -63,12 +63,12 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor emits pale
   entryCounter = 0
   const emitted: string[] = []
   const props = {
-    colorPallete: '#112233'
+    colorPalette: '#112233'
   }
   const api = useEditor(props, (event, value) => {
-    if (event === 'update:colorPallete') {
+    if (event === 'update:colorPalette') {
       emitted.push(value)
-      props.colorPallete = value
+      props.colorPalette = value
     }
   })
 
@@ -106,10 +106,10 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor emits pale
  * createUseDialogProjectSettingsWorldColorPaletteEditor
  * Derives QColor footer swatches from the current world palette string only.
  */
-test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor derives worldPickerPalette from colorPallete', () => {
+test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor derives worldPickerPalette from colorPalette', () => {
   entryCounter = 0
   const props = {
-    colorPallete: '#112233;#445566'
+    colorPalette: '#112233;#445566'
   }
   const api = useEditor(props, () => undefined)
 
@@ -123,7 +123,7 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor derives wo
 test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor exposes drag and duplicate state', () => {
   entryCounter = 0
   const props = {
-    colorPallete: '#112233;#112233'
+    colorPalette: '#112233;#112233'
   }
   const api = useEditor(props, () => undefined)
 
@@ -152,20 +152,20 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips appe
     applyFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
     buildDialogProjectSettingsWorldColorPaletteEntries,
     clearFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
-    collectFaProjectWorldColorPalleteDuplicateHexKeys,
+    collectFaProjectWorldColorPaletteDuplicateHexKeys,
     computed,
     createEntryId: () => `entry-${String(++entryCounter)}`,
     duplicateDialogProjectSettingsWorldColorPaletteEntryAfter,
     faVerticalDraggableTabsSortableDragOptions: {},
     hideNativeSortableDragGhost: vi.fn(),
     paletteMaxLength: 7,
-    parseFaProjectWorldColorPalleteToHexList,
-    parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
+    parseFaProjectWorldColorPaletteToHexList,
+    parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
     readFaSortableDragItemDataAttribute: vi.fn(() => 'entry-1'),
     ref,
     removeDialogProjectSettingsWorldColorPaletteEntry,
     replaceDialogProjectSettingsWorldColorPaletteEntryHex,
-    serializeFaProjectWorldColorPalleteFromHexList,
+    serializeFaProjectWorldColorPaletteFromHexList,
     watch: (source, effect, options) => {
       if (options?.immediate) {
         effect(source())
@@ -173,10 +173,10 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips appe
       return () => undefined
     },
     wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength,
-    wouldFaProjectWorldColorPalleteExceedMaxLength
+    wouldFaProjectWorldColorPaletteExceedMaxLength
   })
   const props = {
-    colorPallete: '#112233'
+    colorPalette: '#112233'
   }
   const api = cappedUseEditor(props, () => undefined)
   expect(api.isAddDisabled.value).toBe(true)
@@ -191,7 +191,7 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips appe
 test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor tracks duplicate hex keys', () => {
   entryCounter = 0
   const props = {
-    colorPallete: '#112233;#112233'
+    colorPalette: '#112233;#112233'
   }
   const api = useEditor(props, () => undefined)
   expect(api.duplicateHexKeys.value.has('#112233')).toBe(true)
@@ -199,7 +199,7 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor tracks dup
 
   entryCounter = 0
   const uniqueProps = {
-    colorPallete: '#112233'
+    colorPalette: '#112233'
   }
   const uniqueApi = useEditor(uniqueProps, () => undefined)
   expect(uniqueApi.duplicateHexKeys.value.size).toBe(0)
@@ -221,20 +221,20 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips bloc
     applyFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
     buildDialogProjectSettingsWorldColorPaletteEntries,
     clearFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
-    collectFaProjectWorldColorPalleteDuplicateHexKeys,
+    collectFaProjectWorldColorPaletteDuplicateHexKeys,
     computed,
     createEntryId: () => `entry-${String(++entryCounter)}`,
     duplicateDialogProjectSettingsWorldColorPaletteEntryAfter: duplicateAfter,
     faVerticalDraggableTabsSortableDragOptions: {},
     hideNativeSortableDragGhost: vi.fn(),
     paletteMaxLength: FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
-    parseFaProjectWorldColorPalleteToHexList,
-    parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
+    parseFaProjectWorldColorPaletteToHexList,
+    parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
     readFaSortableDragItemDataAttribute: vi.fn(() => 'entry-1'),
     ref,
     removeDialogProjectSettingsWorldColorPaletteEntry: removeEntry,
     replaceDialogProjectSettingsWorldColorPaletteEntryHex,
-    serializeFaProjectWorldColorPalleteFromHexList,
+    serializeFaProjectWorldColorPaletteFromHexList,
     watch: (source, effect, options) => {
       if (options?.immediate) {
         effect(source())
@@ -242,14 +242,14 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips bloc
       return () => undefined
     },
     wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength: wouldDuplicateExceed,
-    wouldFaProjectWorldColorPalleteExceedMaxLength
+    wouldFaProjectWorldColorPaletteExceedMaxLength
   })
   const emitted: string[] = []
   const props = {
-    colorPallete: '#112233'
+    colorPalette: '#112233'
   }
   const api = guardedUseEditor(props, (event, value) => {
-    if (event === 'update:colorPallete') {
+    if (event === 'update:colorPalette') {
       emitted.push(value)
     }
   })
@@ -280,20 +280,20 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips dupl
     applyFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
     buildDialogProjectSettingsWorldColorPaletteEntries,
     clearFaVerticalDraggableTabsDocumentDragCursor: vi.fn(),
-    collectFaProjectWorldColorPalleteDuplicateHexKeys,
+    collectFaProjectWorldColorPaletteDuplicateHexKeys,
     computed,
     createEntryId: () => `entry-${String(++entryCounter)}`,
     duplicateDialogProjectSettingsWorldColorPaletteEntryAfter: duplicateAfter,
     faVerticalDraggableTabsSortableDragOptions: {},
     hideNativeSortableDragGhost: vi.fn(),
     paletteMaxLength: FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
-    parseFaProjectWorldColorPalleteToHexList,
-    parseFaProjectWorldColorPalleteToHexListPreservingDuplicates,
+    parseFaProjectWorldColorPaletteToHexList,
+    parseFaProjectWorldColorPaletteToHexListPreservingDuplicates,
     readFaSortableDragItemDataAttribute: vi.fn(() => 'entry-1'),
     ref,
     removeDialogProjectSettingsWorldColorPaletteEntry,
     replaceDialogProjectSettingsWorldColorPaletteEntryHex,
-    serializeFaProjectWorldColorPalleteFromHexList,
+    serializeFaProjectWorldColorPaletteFromHexList,
     watch: (source, effect, options) => {
       if (options?.immediate) {
         effect(source())
@@ -301,14 +301,14 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips dupl
       return () => undefined
     },
     wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength,
-    wouldFaProjectWorldColorPalleteExceedMaxLength
+    wouldFaProjectWorldColorPaletteExceedMaxLength
   })
   const emitted: string[] = []
   const props = {
-    colorPallete: '#112233'
+    colorPalette: '#112233'
   }
   const api = guardedUseEditor(props, (event, value) => {
-    if (event === 'update:colorPallete') {
+    if (event === 'update:colorPalette') {
       emitted.push(value)
     }
   })

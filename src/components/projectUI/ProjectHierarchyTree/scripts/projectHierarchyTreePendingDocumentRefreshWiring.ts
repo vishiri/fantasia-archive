@@ -3,8 +3,10 @@ import type { watch as watchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { openProjectHierarchyTreeNodeInHeTree } from './projectHierarchyTreeNestParentOpenWiring'
-import type { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
+import {
+  openProjectHierarchyTreeNodeInHeTree
+} from './projectHierarchyTreeExpandDomWiring'
+import type { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionWiring'
 import { collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh } from '../functions/projectHierarchyTreeDocumentParentBucket'
 
 export async function flushPendingProjectHierarchyTreeDocumentRefresh (deps: {

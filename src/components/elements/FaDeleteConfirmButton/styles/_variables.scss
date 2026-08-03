@@ -2,3 +2,13 @@
 
 /* COMPONENT - FA DELETE CONFIRM BUTTON */
 $faDeleteConfirmButton-confirmMessage-color: fa-v('accent', $accent);
+$faDeleteConfirmButton-confirm-actions-gap: 8px;
+$faDeleteConfirmButton-confirm-backgroundColor: var(--fa-color-black);
+$faDeleteConfirmButton-confirm-countdown-lineHeight: 1;
+$faDeleteConfirmButton-confirm-maxWidth: 330px;
+$faDeleteConfirmButton-confirm-menu-zIndex: 7002;
+$faDeleteConfirmButton-confirm-message-marginBottom: 16px;
+$faDeleteConfirmButton-confirm-paddingX: 20px;
+$faDeleteConfirmButton-confirm-paddingY: 20px;
+$faDeleteConfirmButton-trigger-paddingX: 16px;
+$faDeleteConfirmButton-trigger-paddingY: 8px;

@@ -1,15 +1,11 @@
 import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import type {
+  I_faFloatingWindowFrameAxisRef,
+  I_faFloatingWindowFrameBoolRef
+} from 'app/types/I_faFloatingWindowResizePointerSession'
 
 import { FaFloatingWindowResizePointerSession } from './faFloatingWindowResizePointerSession'
 import { faFloatingWindowResizePointerSessionDeps } from './faFloatingWindowResizePointerSessionWiring'
-
-interface I_faFloatingWindowFrameAxisRef {
-  value: number
-}
-
-interface I_faFloatingWindowFrameBoolRef {
-  value: boolean
-}
 
 export class FaFloatingWindowResizePointerSessionBound extends FaFloatingWindowResizePointerSession {
   public constructor (

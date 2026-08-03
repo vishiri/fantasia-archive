@@ -20,7 +20,7 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
   const localWorlds = ref([
     {
       color: '',
-      colorPallete: '#112233;#112233',
+      colorPalette: '#112233;#112233',
       displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {
@@ -45,7 +45,7 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
     buildDialogProjectSettingsSaveValidationTooltipForDraft: buildTooltip,
     computed,
     hasDialogProjectSettingsDocumentTemplateNameValidationError: () => true,
-    hasDialogProjectSettingsWorldColorPalleteValidationError: () => true,
+    hasDialogProjectSettingsWorldColorPaletteValidationError: () => true,
     hasDialogProjectSettingsWorldNameValidationError: () => true,
     hasDialogProjectSettingsWorldTemplateLayoutValidationError: () => false,
     isDialogProjectSettingsFullDialogSaveDisabled: () => true,

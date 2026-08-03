@@ -7,8 +7,8 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
-} from '../projectHierarchyTreeMapperWiring'
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../projectHierarchyTreeMapperWiring'
+} from '../projectHierarchyTreeSyncMapperWiring'
+import { mapHierarchyDocumentChildrenToTreeNodes } from '../projectHierarchyTreeSyncMapperWiring'
 import {
   collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths,
   sortProjectHierarchyTreeExpandedNodeIdsForRestore
@@ -22,9 +22,9 @@ import {
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors,
   publishProjectHierarchyTreeRootRevision
 } from '../../functions/projectHierarchyTreeExpandState'
-import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildrenWiring'
+import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeLazyLoadChildrenWiring'
 import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../../functions/projectHierarchyTreeConstants'
-import { createProjectHierarchyTreeDragSessionState } from '../projectHierarchyTreeDragSessionStateWiring'
+import { createProjectHierarchyTreeDragSessionState } from '../projectHierarchyTreeDnDSessionStateWiring'
 import * as projectHierarchyTreeExpandState from '../../functions/projectHierarchyTreeExpandState'
 import {
   isProjectHierarchyTreeDocumentDropParentValid,
@@ -49,24 +49,34 @@ import {
   findProjectHierarchyTreeDocumentParentBucket
 } from '../projectHierarchyTreeDnDCommitWiring'
 import { createProjectHierarchyTreeSessionHandlersWiring } from '../projectHierarchyTreeSessionHandlersWiring'
-import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { createProjectHierarchyTreeSessionHydrateWiring } from '../projectHierarchyTreeSessionHydrateWiring'
-import { createProjectHierarchyTreeSessionRefs } from '../projectHierarchyTreeSessionRefsWiring'
+import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
+import { createProjectHierarchyTreeSessionHydrateWiring } from '../projectHierarchyTreeSessionBootstrapWiring'
+import { createProjectHierarchyTreeSessionRefs } from '../projectHierarchyTreeSessionBootstrapWiring'
 import { createProjectHierarchyTreeSessionSubWiring } from '../projectHierarchyTreeSessionSubWiring'
-import { createProjectHierarchyTreeSyncWiring } from '../projectHierarchyTreeSyncWiring'
+import { createProjectHierarchyTreeSyncWiring } from '../projectHierarchyTreeSyncMapperWiring'
 import { createProjectHierarchyTreeDnDWiring } from '../projectHierarchyTreeDnDWiring'
 import { createProjectHierarchyTreeDnDHandlers } from '../projectHierarchyTreeDnDHandlersWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from '../projectHierarchyTreeDnDScheduleWiring'
-import { openProjectHierarchyTreeNestParentAfterDragDrop } from '../projectHierarchyTreeNestParentOpenWiring'
-import { createProjectHierarchyTreeDragCancelWiring } from '../projectHierarchyTreeDragCancelWiring'
+import {
+  openProjectHierarchyTreeNestParentAfterDragDrop
+} from '../projectHierarchyTreeExpandDomWiring'
+import { createProjectHierarchyTreeDragCancelWiring } from '../projectHierarchyTreeDnDSessionStateWiring'
 import { isProjectHierarchyTreeDragExpandUiFrozen } from '../../functions/projectHierarchyTreeDragExpandFreeze'
-import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from '../projectHierarchyTreeMountRemountWiring'
-import { collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom } from '../projectHierarchyTreeLiveExpandDomWiring'
-import { restoreProjectHierarchyTreeExpandedSnapshot } from '../projectHierarchyTreeExpandedSnapshotWiring'
-import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeScrollPersistWiring'
-import { finalizeProjectHierarchyTreeDragCommitExpandState } from '../projectHierarchyTreeDnDCommitFinalizeWiring'
-import { runProjectHierarchyTreePostDragExpandCloseGuard } from '../projectHierarchyTreePostDragExpandCloseGuardWiring'
-import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from '../projectHierarchyTreeLatentExpandReapplyWiring'
+import {
+  remountProjectHierarchyTreeAndRestoreExpandedSnapshot
+} from '../projectHierarchyTreeDnDSessionStateWiring'
+import {
+  collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom
+} from '../projectHierarchyTreeExpandDomWiring'
+import {
+  restoreProjectHierarchyTreeExpandedSnapshot
+} from '../projectHierarchyTreeExpandSnapshotWiring'
+import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeUiStateSessionPartsWiring'
+import { finalizeProjectHierarchyTreeDragCommitExpandState } from '../projectHierarchyTreeDnDCommitAfterPersistWiring'
+import { runProjectHierarchyTreePostDragExpandCloseGuard } from '../projectHierarchyTreeDnDWiring'
+import {
+  reapplyProjectHierarchyTreeLatentDescendantExpandState
+} from '../projectHierarchyTreeLatentExpandReapplyWiring'
 import { runProjectHierarchyTreeSessionExpandOpen } from '../projectHierarchyTreeSessionExpandOpenWiring'
 import {
   markProjectHierarchyTreeNodeClosed,
@@ -76,9 +86,9 @@ import {
   reapplyProjectHierarchyTreeHeTreeOpenState,
   syncProjectHierarchyTreeOpenSetToPersist
 } from '../projectHierarchyTreeUiStateWiring'
-import { wireProjectHierarchyTreeSessionLifecycle } from '../projectHierarchyTreeSessionWatchWiring'
-import { createProjectHierarchyTreeSessionEarlyWiring } from '../projectHierarchyTreeSessionEarlyWiring'
-import { bindProjectHierarchyTreeHeTreeNodeTabIndexGuard } from '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+import { wireProjectHierarchyTreeSessionLifecycle } from '../projectHierarchyTreeSessionBootstrapWiring'
+import { createProjectHierarchyTreeSessionEarlyWiring } from '../projectHierarchyTreeSessionWiring'
+import { bindProjectHierarchyTreeHeTreeNodeTabIndexGuard } from '../projectHierarchyTreeHeTreeHelpersWiring'
 import { bindProjectHierarchyTreeSessionPendingRefresh } from '../projectHierarchyTreePendingDocumentRefreshWiring'
 import { bindProjectHierarchyTreeSessionLifecycle } from '../projectHierarchyTreeSessionLifecycleBindWiring'
 import {
@@ -87,7 +97,7 @@ import {
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [
     {
@@ -2158,7 +2168,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
 })
 
 test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI helpers', async () => {
-  const { createProjectHierarchyTreeUiStateSessionWiring } = await import('../projectHierarchyTreeUiStateSessionWiring')
+  const { createProjectHierarchyTreeUiStateSessionWiring } = await import('../projectHierarchyTreeLazyLoadSessionWiring')
   const openNodeIds = ref(new Set<string>())
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const wiring = createProjectHierarchyTreeUiStateSessionWiring({
@@ -4223,7 +4233,7 @@ test('Test that revealProjectHierarchyTreePendingPath skips scroll when focus ro
  */
 test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex forces he-tree rows out of tab order', async () => {
   const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import(
-    '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+    '../projectHierarchyTreeHeTreeHelpersWiring'
   )
   const host = document.createElement('div')
   const tree = document.createElement('div')
@@ -4259,7 +4269,7 @@ test('Test that drag model settle waits for post-drop model-value revision', () 
 })
 
 test('Test that readProjectHierarchyTreeHeTreeLiveData reads getData from he-tree ref', async () => {
-  const { readProjectHierarchyTreeHeTreeLiveData } = await import('../projectHierarchyTreeHeTreeLiveDataWiring')
+  const { readProjectHierarchyTreeHeTreeLiveData } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const liveTree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   expect(readProjectHierarchyTreeHeTreeLiveData(null)).toBeNull()
   expect(readProjectHierarchyTreeHeTreeLiveData({
@@ -4275,7 +4285,7 @@ test('Test that readProjectHierarchyTreeHeTreeLiveData reads getData from he-tre
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling order from he-tree rows', async () => {
   const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import(
-    '../projectHierarchyTreeDragSiblingDomOrderWiring'
+    '../projectHierarchyTreeDnDOrderSupportWiring'
   )
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = treeData[0]?.children[0]
@@ -4840,7 +4850,7 @@ test('Test that createProjectHierarchyTreeDnDHandlers ignores null drag nodes an
 })
 
 test('Test that applyProjectHierarchyTreeHeTreeModelValueUpdate rejects escaped document rows', async () => {
-  const { applyProjectHierarchyTreeHeTreeModelValueUpdate } = await import('../projectHierarchyTreeDnDModelValueUpdateWiring')
+  const { applyProjectHierarchyTreeHeTreeModelValueUpdate } = await import('../projectHierarchyTreeDnDStartHandlersWiring')
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const escapedTree = [{
     ...treeData.value[0]!,
@@ -4868,7 +4878,7 @@ test('Test that applyProjectHierarchyTreeHeTreeModelValueUpdate rejects escaped 
 })
 
 test('Test that readProjectHierarchyTreeHeTreeLiveData rejects non-array getData results', async () => {
-  const { readProjectHierarchyTreeHeTreeLiveData } = await import('../projectHierarchyTreeHeTreeLiveDataWiring')
+  const { readProjectHierarchyTreeHeTreeLiveData } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   expect(readProjectHierarchyTreeHeTreeLiveData({
     closeAll: () => undefined,
     getData: () => ({ not: 'array' } as unknown as I_faProjectHierarchyTreeHeTreeNode[]),
@@ -4877,7 +4887,7 @@ test('Test that readProjectHierarchyTreeHeTreeLiveData rejects non-array getData
 })
 
 test('Test that tryOpenHeTreeNodeAndParents handles StatNotFoundError and rethrows others', async () => {
-  const { isHeTreeStatNotFoundError, tryOpenHeTreeNodeAndParents } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const { isHeTreeStatNotFoundError, tryOpenHeTreeNodeAndParents } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const statOpen = {
     open: true
   }
@@ -4908,7 +4918,7 @@ test('Test that tryOpenHeTreeNodeAndParents handles StatNotFoundError and rethro
 })
 
 test('Test that handleProjectHierarchyTreeOpenIconClick defers stat open until expand finishes', async () => {
-  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const node = buildDocumentNode({
     childrenLoaded: false,
     hasChildren: true,
@@ -4948,7 +4958,7 @@ test('Test that handleProjectHierarchyTreeOpenIconClick defers stat open until e
 })
 
 test('Test that handleProjectHierarchyTreeOpenIconClick reverts stat open when expand fails', async () => {
-  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const node = buildDocumentNode({
     childrenLoaded: false,
     hasChildren: true,
@@ -4974,7 +4984,7 @@ test('Test that handleProjectHierarchyTreeOpenIconClick reverts stat open when e
 })
 
 test('Test that handleProjectHierarchyTreeOpenIconClick closes rows without open icons', async () => {
-  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const onNodeClose = vi.fn()
   const node = buildDocumentNode({
     childrenLoaded: true,
@@ -5003,7 +5013,7 @@ test('Test that collectProjectHierarchyTreeLiveExpandStateFromDom reads collapse
   const {
     collectProjectHierarchyTreeLiveExpandStateFromDom,
     resolveProjectHierarchyTreeScrollHostForDomRead
-  } = await import('../projectHierarchyTreeLiveExpandDomWiring')
+  } = await import('../projectHierarchyTreeExpandDomWiring')
   expect(collectProjectHierarchyTreeLiveExpandStateFromDom(null)).toEqual({
     collapsedVisibleNodeIds: [],
     expandedNodeIds: [],
@@ -5166,7 +5176,7 @@ test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard blurs focused tr
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting ignores world open icon handlers', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const onNodeOpenIconPointerDown = vi.fn()
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
@@ -5205,7 +5215,7 @@ test('Test that cloneProjectHierarchyTreeLoadedNodeForPublish shallow-clones unl
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting routes group and placement row clicks', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -5235,7 +5245,7 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting routes group and
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting skips leaf document row clicks', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -5262,14 +5272,14 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting skips leaf docum
 })
 
 test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex no-ops without host or tree root', async () => {
-  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(null)
   const host = document.createElement('div')
   clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
 })
 
 test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard blurs focused tree nodes', async () => {
-  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const host = document.createElement('div')
   const tree = document.createElement('div')
   tree.className = 'projectHierarchyTree'
@@ -5300,7 +5310,7 @@ test('Test that runProjectHierarchyTreePostDragExpandCloseGuard suppresses snaps
 })
 
 test('Test that collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom delegates to expand state reader', async () => {
-  const { collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom, collectProjectHierarchyTreeLiveExpandStateFromDom } = await import('../projectHierarchyTreeLiveExpandDomWiring')
+  const { collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom, collectProjectHierarchyTreeLiveExpandStateFromDom } = await import('../projectHierarchyTreeExpandDomWiring')
   expect(collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom(null)).toEqual([])
   const host = document.createElement('div')
   host.setAttribute('data-test-locator', 'projectHierarchyTree-host')
@@ -5354,7 +5364,7 @@ test('Test that runProjectHierarchyTreePostDragExpandCloseGuard closes nodes whe
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards drag hold for draggable document rows', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const dragHoldWiring = createTestDocumentRowDragHoldWiring()
   const handleDocumentRowPointerDown = vi.spyOn(dragHoldWiring, 'handleDocumentRowPointerDown')
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
@@ -5380,7 +5390,7 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards drag ho
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting toggles expandable document rows on matching click', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
     isTreeDragActive: ref(false)
@@ -5433,7 +5443,7 @@ test('Test that runProjectHierarchyTreePostDragExpandCloseGuard ignores unknown 
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting ignores unknown node kinds and world open-icon handlers', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const onNodeOpenIconPointerDown = vi.fn()
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
@@ -5465,7 +5475,7 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting ignores unknown 
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards non-world open-icon handlers for group nodes', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const onNodeOpenIconPointerDown = vi.fn()
   const routing = createProjectHierarchyTreeExpandRowClickRouting({
@@ -5486,7 +5496,7 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards non-wor
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting skips document row click when gesture blocks toggle', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const onNodeOpenIconClick = vi.fn(async () => undefined)
   const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
     isTreeDragActive: ref(false)
@@ -5542,7 +5552,7 @@ test('Test that runProjectHierarchyTreePostDragExpandCloseGuard returns early wh
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting begins document row gesture on pointer down', async () => {
-  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
   const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
     isTreeDragActive: ref(false)
   })
@@ -5570,7 +5580,7 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting begins document 
 })
 
 test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex skips non-HTML tree nodes and already disabled tabindex', async () => {
-  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeHelpersWiring')
   const host = document.createElement('div')
   const tree = document.createElement('div')
   tree.className = 'projectHierarchyTree'

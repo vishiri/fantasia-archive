@@ -15,7 +15,7 @@ const placementBId = '880e8400-e29b-41d4-a716-446655440002'
 
 const worldA: I_dialogProjectSettingsWorldDraft = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm A' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',

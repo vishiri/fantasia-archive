@@ -1,5 +1,5 @@
 import { FaFloatingWindowResizePointerSessionBound } from './faFloatingWindowResizePointerSessionBound'
-import { applyFaFloatingWindowResizePointerSample as applyFaFloatingWindowResizePointerSampleFn } from './faFloatingWindowResizePointerSample'
+import { applyFaFloatingWindowResizePointerSample as applyFaFloatingWindowResizePointerSampleFn } from './faFloatingWindowResizePointerSampleWiring'
 import { computeFaFloatingWindowResizeFrame } from './faFloatingWindowResizeGeometry_manager'
 import { createBoundApplyFaFloatingWindowResizePointerSample } from './functions/createBoundApplyFaFloatingWindowResizePointerSample'
 import { createFaFloatingWindowResizePointerDrive } from './functions/createFaFloatingWindowResizePointerDrive'

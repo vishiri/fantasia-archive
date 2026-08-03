@@ -1,10 +1,6 @@
+import type { I_dialogMarkdownStoreLike } from 'app/types/I_dialogMarkdownStoreLike'
 import type { T_documentName } from 'app/types/T_appDialogsAndDocuments'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
-
-interface I_dialogMarkdownStoreLike {
-  dialogUUID?: unknown
-  documentToOpen?: unknown
-}
 
 export function createDialogMarkdownDocument (deps: {
   computed: <T>(getter: () => T) => { value: T }

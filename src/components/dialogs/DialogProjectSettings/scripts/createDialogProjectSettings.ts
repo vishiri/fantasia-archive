@@ -1,12 +1,8 @@
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import type { T_dialogProjectSettingsUseHookDeps } from 'app/types/I_dialogProjectSettings'
 
 import type { useDialogProjectSettingsImpl } from './createDialogProjectSettingsUseImpl'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 export function createDialogProjectSettings (deps: {
   S_DialogComponent: () => I_dialogComponentStoreLike

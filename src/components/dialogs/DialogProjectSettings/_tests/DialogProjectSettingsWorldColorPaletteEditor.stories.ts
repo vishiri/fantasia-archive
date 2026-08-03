@@ -12,12 +12,12 @@ export default meta
 
 export const Default: StoryObj<typeof meta> = {
   args: {
-    colorPallete: '#112233;#445566;#AABBCC'
+    colorPalette: '#112233;#445566;#AABBCC'
   }
 }
 
 export const Empty: StoryObj<typeof meta> = {
   args: {
-    colorPallete: ''
+    colorPalette: ''
   }
 }

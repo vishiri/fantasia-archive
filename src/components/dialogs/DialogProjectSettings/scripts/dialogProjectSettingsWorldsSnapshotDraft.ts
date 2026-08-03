@@ -17,8 +17,8 @@ import {
 
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 
-function normalizeDialogProjectSettingsColorPallete (colorPallete: string): string {
-  const trimmed = colorPallete.trim()
+function normalizeDialogProjectSettingsColorPalette (colorPalette: string): string {
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return ''
   }
@@ -55,9 +55,9 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
       ),
       id: world.id
     }
-    const normalizedPallete = normalizeDialogProjectSettingsColorPallete(world.colorPallete)
-    if (normalizedPallete.length > 0) {
-      item.colorPallete = normalizedPallete
+    const normalizedPalette = normalizeDialogProjectSettingsColorPalette(world.colorPalette)
+    if (normalizedPalette.length > 0) {
+      item.colorPalette = normalizedPalette
     }
     item.templateLayout = {
       groups: world.templateLayout.groups.map((group) => {

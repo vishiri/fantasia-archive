@@ -10,7 +10,7 @@ import { resolveDialogProjectSettingsWorldSaveErrorDisplayName } from '../../dia
 import {
   buildDialogProjectSettingsSaveValidationTooltip,
   collectDialogProjectSettingsSaveValidationErrors,
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldColorPaletteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
   hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsDialogSaveDisabled,
@@ -19,7 +19,7 @@ import {
 
 const baseWorld = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
@@ -46,25 +46,25 @@ test('Test that isDialogProjectSettingsDialogSaveDisabled combines project and w
 
 /**
  * isDialogProjectSettingsDialogSaveDisabled
- * Save stays disabled when any world color_pallete repeats a hex value case-insensitively.
+ * Save stays disabled when any world color_palette repeats a hex value case-insensitively.
  */
 test('Test that isDialogProjectSettingsDialogSaveDisabled rejects duplicate palette colors', () => {
   expect(isDialogProjectSettingsDialogSaveDisabled('Project', [
     {
       ...baseWorld,
-      colorPallete: '#112233;#aabbcc'
+      colorPalette: '#112233;#aabbcc'
     }
   ])).toBe(false)
   expect(isDialogProjectSettingsDialogSaveDisabled('Project', [
     {
       ...baseWorld,
-      colorPallete: '#112233;#112233'
+      colorPalette: '#112233;#112233'
     }
   ])).toBe(true)
-  expect(hasDialogProjectSettingsWorldColorPalleteValidationError([
+  expect(hasDialogProjectSettingsWorldColorPaletteValidationError([
     {
       ...baseWorld,
-      colorPallete: '#aabbcc;#AABBCC'
+      colorPalette: '#aabbcc;#AABBCC'
     }
   ])).toBe(true)
 })
@@ -78,13 +78,13 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot trims names and optiona
     {
       ...baseWorld,
       color: ' #aabbcc ',
-      colorPallete: ' #112233;#445566 ',
+      colorPalette: ' #112233;#445566 ',
       displayNameTranslations: { 'en-US': '  Realm  ' }
     }
   ])).toEqual([
     {
       color: '#aabbcc',
-      colorPallete: '#112233;#445566',
+      colorPalette: '#112233;#445566',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
@@ -97,18 +97,18 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot trims names and optiona
 
 /**
  * mapDialogProjectSettingsWorldsToSnapshot
- * Dedupes color_pallete segments case-insensitively before IPC.
+ * Dedupes color_palette segments case-insensitively before IPC.
  */
 test('Test that mapDialogProjectSettingsWorldsToSnapshot dedupes duplicate palette colors', () => {
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       ...baseWorld,
-      colorPallete: '#112233;#aabbcc;#112233'
+      colorPalette: '#112233;#aabbcc;#112233'
     }
   ])).toEqual([
     {
       color: '',
-      colorPallete: '#112233;#AABBCC',
+      colorPalette: '#112233;#AABBCC',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
@@ -120,21 +120,21 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot dedupes duplicate palet
 })
 
 /**
- * hasDialogProjectSettingsWorldColorPalleteValidationError
+ * hasDialogProjectSettingsWorldColorPaletteValidationError
  * Treats a null worlds list as invalid.
  */
-test('Test that hasDialogProjectSettingsWorldColorPalleteValidationError rejects null worlds', () => {
-  expect(hasDialogProjectSettingsWorldColorPalleteValidationError(null)).toBe(true)
-  expect(hasDialogProjectSettingsWorldColorPalleteValidationError([
+test('Test that hasDialogProjectSettingsWorldColorPaletteValidationError rejects null worlds', () => {
+  expect(hasDialogProjectSettingsWorldColorPaletteValidationError(null)).toBe(true)
+  expect(hasDialogProjectSettingsWorldColorPaletteValidationError([
     {
       ...baseWorld,
-      colorPallete: '#112233;;#112233'
+      colorPalette: '#112233;;#112233'
     }
   ])).toBe(true)
-  expect(hasDialogProjectSettingsWorldColorPalleteValidationError([
+  expect(hasDialogProjectSettingsWorldColorPaletteValidationError([
     {
       ...baseWorld,
-      colorPallete: 'bad;#112233'
+      colorPalette: 'bad;#112233'
     }
   ])).toBe(false)
 })
@@ -147,12 +147,12 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       ...baseWorld,
-      colorPallete: 'bad;#112233;;#445566'
+      colorPalette: 'bad;#112233;;#445566'
     }
   ])).toEqual([
     {
       color: '',
-      colorPallete: '#112233;#445566',
+      colorPalette: '#112233;#445566',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
@@ -164,7 +164,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       ...baseWorld,
-      colorPallete: '   '
+      colorPalette: '   '
     }
   ])).toEqual([
     {
@@ -224,7 +224,7 @@ test('Test that isDialogProjectSettingsWorldTabValidationError covers name and p
   })).toBe(true)
   expect(isDialogProjectSettingsWorldTabValidationError({
     ...baseWorld,
-    colorPallete: '#112233;#112233'
+    colorPalette: '#112233;#112233'
   })).toBe(true)
 })
 
@@ -270,7 +270,7 @@ test('Test that collectDialogProjectSettingsSaveValidationErrors lists all block
   expect(collectDialogProjectSettingsSaveValidationErrors('Project', [
     {
       ...baseWorld,
-      colorPallete: '#112233;#112233'
+      colorPalette: '#112233;#112233'
     }
   ])).toEqual([
     {

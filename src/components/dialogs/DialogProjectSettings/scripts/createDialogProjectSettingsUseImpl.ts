@@ -47,8 +47,8 @@ export function useDialogProjectSettingsImpl (
     computed: deps.computed,
     hasDialogProjectSettingsDocumentTemplateNameValidationError:
       deps.hasDialogProjectSettingsDocumentTemplateNameValidationError,
-    hasDialogProjectSettingsWorldColorPalleteValidationError:
-      deps.hasDialogProjectSettingsWorldColorPalleteValidationError,
+    hasDialogProjectSettingsWorldColorPaletteValidationError:
+      deps.hasDialogProjectSettingsWorldColorPaletteValidationError,
     hasDialogProjectSettingsWorldNameValidationError: deps.hasDialogProjectSettingsWorldNameValidationError,
     hasDialogProjectSettingsWorldTemplateLayoutValidationError:
       deps.hasDialogProjectSettingsWorldTemplateLayoutValidationError,
@@ -105,7 +105,7 @@ export function useDialogProjectSettingsImpl (
     updateDocumentTemplateTitleTranslations: actions.updateDocumentTemplateTitleTranslations,
     updateDocumentTemplateWorldAppendixTranslations: actions.updateDocumentTemplateWorldAppendixTranslations,
     updateWorldColor: actions.updateWorldColor,
-    updateWorldColorPallete: actions.updateWorldColorPallete,
+    updateWorldColorPalette: actions.updateWorldColorPalette,
     updateWorldDisplayNameTranslations: actions.updateWorldDisplayNameTranslations,
     updateWorldTemplateLayout: actions.updateWorldTemplateLayout
   }

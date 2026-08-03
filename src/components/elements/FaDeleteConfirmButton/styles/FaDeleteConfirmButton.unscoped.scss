@@ -1,31 +1,30 @@
 @use './variables' as *;
-@use '../../../dialogs/DialogProjectSettings/styles/variables' as dialogProjectSettings;
 
 .faDeleteConfirmButton__confirmMenu.q-menu {
   /* Teleported q-menu; stack above modal QDialog chrome (same band as FaColorPickerInput). */
-  min-width: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-maxWidth;
-  z-index: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-menu-zIndex !important;
+  min-width: $faDeleteConfirmButton-confirm-maxWidth;
+  z-index: $faDeleteConfirmButton-confirm-menu-zIndex !important;
 }
 
 .faDeleteConfirmButton__confirmMenu {
-  background-color: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-backgroundColor;
-  max-width: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-maxWidth;
+  background-color: $faDeleteConfirmButton-confirm-backgroundColor;
+  max-width: $faDeleteConfirmButton-confirm-maxWidth;
 }
 
 .faDeleteConfirmButton__confirmInner {
   padding:
-    dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-paddingY
-    dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-paddingX;
+    $faDeleteConfirmButton-confirm-paddingY
+    $faDeleteConfirmButton-confirm-paddingX;
 }
 
 .faDeleteConfirmButton__confirmMessage {
   color: $faDeleteConfirmButton-confirmMessage-color;
-  margin: 0 0 dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-message-marginBottom;
+  margin: 0 0 $faDeleteConfirmButton-confirm-message-marginBottom;
 }
 
 .faDeleteConfirmButton__confirmActions {
   display: flex;
-  gap: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-actions-gap;
+  gap: $faDeleteConfirmButton-confirm-actions-gap;
   justify-content: center;
 }
 
@@ -44,7 +43,7 @@
   display: flex;
   inset: 0;
   justify-content: center;
-  line-height: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-countdown-lineHeight;
+  line-height: $faDeleteConfirmButton-confirm-countdown-lineHeight;
   pointer-events: none;
   position: absolute;
 }

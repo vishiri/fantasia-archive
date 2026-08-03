@@ -11,7 +11,7 @@ import DialogProjectSettingsWorldsTabList from '../DialogProjectSettingsWorldsTa
 const worldsFixture = [
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Realm' },
     documentCount: 0,
     templateLayout: {
@@ -230,7 +230,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', asyn
 const worldsFilterFixture = [
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Gungala' },
     documentCount: 0,
     templateLayout: {
@@ -241,7 +241,7 @@ const worldsFilterFixture = [
   },
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'New world' },
     documentCount: 0,
     templateLayout: {
@@ -312,7 +312,7 @@ test('Test that DialogProjectSettingsWorldsTabList filters world tabs by display
 const worldsFilteredReorderFixture = [
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Alpha' },
     documentCount: 0,
     templateLayout: {
@@ -323,7 +323,7 @@ const worldsFilteredReorderFixture = [
   },
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Middle' },
     documentCount: 0,
     templateLayout: {
@@ -334,7 +334,7 @@ const worldsFilteredReorderFixture = [
   },
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Gamma' },
     documentCount: 0,
     templateLayout: {

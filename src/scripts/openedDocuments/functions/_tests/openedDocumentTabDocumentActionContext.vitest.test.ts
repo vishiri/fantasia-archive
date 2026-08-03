@@ -2,9 +2,16 @@ import { expect, test } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
+import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
-import { createTemporaryOpenedDocumentTabSeed } from '../openedDocumentTemporaryTabSeed'
+import { normalizeOpenedDocumentNullableStringFromDb } from '../openedDocumentNullableStringFromDb'
+import { createCreateTemporaryOpenedDocumentTabSeed } from '../openedDocumentTemporaryTabSeed'
 import { resolveOpenedDocumentTabDocumentActionContext } from '../openedDocumentTabDocumentActionContext'
+
+const createTemporaryOpenedDocumentTabSeed = createCreateTemporaryOpenedDocumentTabSeed({
+  emptyTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+  normalizeNullableStringFromDb: normalizeOpenedDocumentNullableStringFromDb
+})
 
 /**
  * Level-1 functions/_tests cannot import neverthrow; stub ResultAsync.fromPromise for DI.

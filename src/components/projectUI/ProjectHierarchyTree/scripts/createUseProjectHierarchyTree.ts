@@ -18,13 +18,17 @@ import type {
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { resolveProjectHierarchyTreeForceSublevelCollapse } from '../functions/projectHierarchyTreeForceSublevelCollapse'
 import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeSessionWiring'
-import { createProjectHierarchyTreeDocumentButtonGroupWiring } from './projectHierarchyTreeDocumentButtonGroupWiring'
-import { createProjectHierarchyTreeTreeLineWiring } from './projectHierarchyTreeTreeLineWiring'
-import { createProjectHierarchyTreePlacementCountWiring } from './projectHierarchyTreePlacementCountWiring'
-import { createProjectHierarchyTreeOrderNumberBadgeWiring } from './projectHierarchyTreeOrderNumberBadgeWiring'
-import { createProjectHierarchyTreeProjectNameTitleWiring } from './projectHierarchyTreeProjectNameTitleWiring'
-import { createProjectHierarchyTreeNodeDisplayBindings } from './projectHierarchyTreeNodeDisplayBindingsWiring'
-import { createProjectHierarchyTreeSettingsSurfaceWiring } from './projectHierarchyTreeSettingsSurfaceWiring'
+import {
+  createProjectHierarchyTreeOrderNumberBadgeWiring,
+  createProjectHierarchyTreePlacementCountWiring,
+  createProjectHierarchyTreeProjectNameTitleWiring,
+  createProjectHierarchyTreeTreeLineWiring
+} from './projectHierarchyTreeDisplayChromeWiring'
+import {
+  createProjectHierarchyTreeDocumentButtonGroupWiring,
+  createProjectHierarchyTreeNodeDisplayBindings,
+  createProjectHierarchyTreeSettingsSurfaceWiring
+} from './projectHierarchyTreeSettingsSurfaceWiring'
 
 import type {
   I_faOpenedDocumentTreeOpenMeta,

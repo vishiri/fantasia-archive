@@ -18,7 +18,7 @@ import {
   attachFaFloatingWindowResizeObserver,
   bumpZSelectorForFloatingWindowLayer,
   teardownFaFloatingWindowResizeObserver
-} from './faFloatingWindowFrameResizeObserverHelpers'
+} from './faFloatingWindowFrameResizeObserverHelpersWiring'
 
 const useFaFloatingWindowFrameApi = createUseFaFloatingWindowFrame({
   attachFaFloatingWindowResizeObserver,

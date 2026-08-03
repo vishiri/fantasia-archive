@@ -4,13 +4,9 @@ import type { I_dialogAppSettingsProps } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsFaUserSettingsStoreForSync } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsSettingUpdateValue } from 'app/types/I_dialogAppSettings'
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { ComputedRef, Ref } from 'app/types/I_vueCompositionRefs'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 export function createDialogAppSettings (deps: {
   APP_SETTINGS_OPTIONS: Record<string, { category: string; subcategory: string }>

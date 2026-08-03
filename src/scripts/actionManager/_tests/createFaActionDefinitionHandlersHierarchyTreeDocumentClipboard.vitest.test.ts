@@ -2,7 +2,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from '../faActionDefinitionHandlersHierarchyTreeDocumentClipboard'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from '../faActionDefinitionHandlersHierarchyTreeDocumentClipboardWiring'
 
 const copyToClipboardMock = vi.fn(async () => undefined)
 const notifyCreateMock = vi.fn()

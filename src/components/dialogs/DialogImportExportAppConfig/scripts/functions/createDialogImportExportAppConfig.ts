@@ -1,6 +1,7 @@
 /* eslint-disable max-lines, max-lines-per-function -- monolithic create factory; decompose when extracting concerns */
 import type { I_faAppConfigImportPartsUi } from 'app/types/I_faAppConfigDomain'
 import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { ComputedRef, Ref } from 'app/types/I_vueCompositionRefs'
 
@@ -8,11 +9,6 @@ import type {
   I_importExportDialogActionBindings,
   T_importExportView
 } from 'app/types/I_dialogImportExportAppConfig'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 export function createDialogImportExportAppConfig (deps: {
   S_DialogComponent: () => I_dialogComponentStoreLike

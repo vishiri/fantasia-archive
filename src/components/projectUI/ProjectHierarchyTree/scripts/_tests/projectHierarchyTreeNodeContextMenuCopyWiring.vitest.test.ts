@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { buildProjectHierarchyTreeNodeContextMenuCopyHandlers } from '../projectHierarchyTreeNodeContextMenuCopyWiring'
+import { buildProjectHierarchyTreeNodeContextMenuCopyHandlers } from '../projectHierarchyTreeNodeContextMenuHandlersWiring'
 
 vi.mock('../projectHierarchyTreeDocumentNodeLookup', () => ({
   resolveHierarchyTreeDocumentNodeFromAnchor: vi.fn()

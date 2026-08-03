@@ -126,8 +126,8 @@ function onConfirmDeleteClick (): void {
 .faDeleteConfirmButton {
   min-height: auto;
   padding:
-    $dialogProjectSettings-worldsDeleteButton-paddingY
-    $dialogProjectSettings-worldsDeleteButton-paddingX;
+    $faDeleteConfirmButton-trigger-paddingY
+    $faDeleteConfirmButton-trigger-paddingX;
 
   :deep(.q-btn__content) {
     min-height: auto;

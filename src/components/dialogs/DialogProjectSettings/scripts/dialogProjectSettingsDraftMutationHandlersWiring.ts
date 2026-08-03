@@ -41,7 +41,7 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
       worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
     ) => void
     updateWorldColor: (id: string, color: string) => void
-    updateWorldColorPallete: (id: string, colorPallete: string) => void
+    updateWorldColorPalette: (id: string, colorPalette: string) => void
     updateWorldDisplayNameTranslations: (
       id: string,
       displayNameTranslations: I_faProjectWorldDisplayNameTranslations
@@ -112,7 +112,7 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     updateDocumentTemplateTitleTranslations,
     updateDocumentTemplateWorldAppendixTranslations,
     updateWorldColor: worldHandlers.updateWorldColor,
-    updateWorldColorPallete: worldHandlers.updateWorldColorPallete,
+    updateWorldColorPalette: worldHandlers.updateWorldColorPalette,
     updateWorldDisplayNameTranslations: worldHandlers.updateWorldDisplayNameTranslations,
     updateWorldTemplateLayout: worldHandlers.updateWorldTemplateLayout
   }

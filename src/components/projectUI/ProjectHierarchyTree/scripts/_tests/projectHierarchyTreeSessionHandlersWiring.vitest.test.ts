@@ -2,9 +2,9 @@ import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeSyncMapperWiring'
 import { createProjectHierarchyTreeSessionHandlersWiring } from '../projectHierarchyTreeSessionHandlersWiring'
-import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowExpandClickGestureWiring'
+import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowDragHoldWiring'
 
 function createTestDocumentRowExpandClickGesture () {
   return createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
@@ -90,7 +90,7 @@ function createTestTreeComponentRef () {
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [],
   id: 'world-1',

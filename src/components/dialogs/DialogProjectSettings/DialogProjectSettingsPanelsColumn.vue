@@ -36,7 +36,7 @@
               @remove-world="emit('removeWorld', $event)"
               @update:worlds="emit('update:worlds', $event)"
               @update-world-color="onUpdateWorldColor"
-              @update-world-color-pallete="onUpdateWorldColorPallete"
+              @update-world-color-palette="onUpdateWorldColorPalette"
               @update-world-display-name-translations="onUpdateWorldDisplayNameTranslations"
               @update-document-template-title-translations="onUpdateDocumentTemplateTitleTranslations"
               @update-world-template-layout="onUpdateWorldTemplateLayout"
@@ -112,7 +112,7 @@ const emit = defineEmits<{
     worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
   ]
   updateWorldColor: [id: string, color: string]
-  updateWorldColorPallete: [id: string, colorPallete: string]
+  updateWorldColorPalette: [id: string, colorPalette: string]
   updateWorldDisplayNameTranslations: [id: string, displayNameTranslations: I_faProjectWorldDisplayNameTranslations]
   updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
@@ -125,8 +125,8 @@ function onUpdateWorldColor (id: string, color: string): void {
   emit('updateWorldColor', id, color)
 }
 
-function onUpdateWorldColorPallete (id: string, colorPallete: string): void {
-  emit('updateWorldColorPallete', id, colorPallete)
+function onUpdateWorldColorPalette (id: string, colorPalette: string): void {
+  emit('updateWorldColorPalette', id, colorPalette)
 }
 
 function onUpdateWorldDisplayNameTranslations (

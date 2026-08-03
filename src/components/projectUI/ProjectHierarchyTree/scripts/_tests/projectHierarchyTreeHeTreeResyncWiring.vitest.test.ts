@@ -2,7 +2,7 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { createProjectHierarchyTreeHeTreeResyncController } from '../projectHierarchyTreeHeTreeResyncWiring'
+import { createProjectHierarchyTreeHeTreeResyncController } from '../projectHierarchyTreeHeTreeHelpersWiring'
 
 test('Test that soft he-tree resync skips full reapply without remounting', async () => {
   const treeMountKey = ref(0)

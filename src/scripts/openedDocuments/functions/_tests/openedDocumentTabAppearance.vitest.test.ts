@@ -1,14 +1,15 @@
 import { expect, test } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
+import { normalizeOpenedDocumentAppearanceColorFromDb } from '../openedDocumentNullableStringFromDb'
 import {
   computeOpenedDocumentHasUnsavedChanges,
-  normalizeOpenedDocumentAppearanceColorFromDb,
   normalizeOpenedDocumentTabAppearanceColors,
-  recomputeOpenedDocumentTabHasUnsavedChanges,
   resolveOpenedDocumentAppearanceColorDraftForPersist
 } from '../openedDocumentTabAppearance'
+import { recomputeOpenedDocumentTabHasUnsavedChanges } from '../../openedDocumentTabAppearanceWiring'
 
 const baseTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
@@ -32,7 +33,7 @@ const baseTab: I_faOpenedDocumentTab = {
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
-  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   extraClassesDraft: '',
   savedExtraClasses: '',
   hasUnsavedChanges: false,
@@ -90,7 +91,7 @@ test('Test that normalizeOpenedDocumentTabAppearanceColors fills missing color f
   expect(normalized.savedIsFinished).toBe(false)
   expect(normalized.savedIsMinor).toBe(false)
   expect(normalized.savedIsDead).toBe(false)
-  expect(normalized.savedTreeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
+  expect(normalized.savedTreeOrderNumber).toBe(FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY)
 })
 
 /**
@@ -115,8 +116,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
   })).toBe(true)
@@ -137,8 +138,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
   })).toBe(true)
@@ -159,8 +160,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
   })).toBe(true)
@@ -192,8 +193,8 @@ test('Test that recomputeOpenedDocumentTabHasUnsavedChanges detects background c
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
   })).toBe(false)
@@ -217,8 +218,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects parent id drift',
     savedIsMinor: false,
     savedIsDead: false,
     savedParentDocumentId: 'parent-1',
-    treeOrderNumberDraft: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
   })).toBe(true)
@@ -242,34 +243,16 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects tree order drift'
     savedIsMinor: false,
     savedIsDead: false,
     savedParentDocumentId: '',
-    treeOrderNumberDraft: '7',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    treeOrderNumber: 7,
+    savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: ''
   })).toBe(true)
 })
 
-test('Test that computeOpenedDocumentHasUnsavedChanges treats non-finite tree order drafts as empty', () => {
-  expect(computeOpenedDocumentHasUnsavedChanges({
-    displayNameDraft: 'Hero',
-    documentBackgroundColorDraft: '#112233',
-    documentTextColorDraft: '#AABBCC',
-    isCategoryDraft: false,
-    isFinishedDraft: false,
-    isMinorDraft: false,
-    isDeadDraft: false,
-    parentDocumentIdDraft: '',
-    savedDisplayName: 'Hero',
-    savedDocumentBackgroundColor: '#112233',
-    savedDocumentTextColor: '#AABBCC',
-    savedIsCategory: false,
-    savedIsFinished: false,
-    savedIsMinor: false,
-    savedIsDead: false,
-    savedParentDocumentId: '',
-    treeOrderNumberDraft: 'not-a-number',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
-    extraClassesDraft: '',
-    savedExtraClasses: ''
+test('Test that recomputeOpenedDocumentTabHasUnsavedChanges treats non-finite tree order drafts as empty', () => {
+  expect(recomputeOpenedDocumentTabHasUnsavedChanges({
+    ...baseTab,
+    treeOrderNumberDraft: 'not-a-number'
   })).toBe(false)
 })

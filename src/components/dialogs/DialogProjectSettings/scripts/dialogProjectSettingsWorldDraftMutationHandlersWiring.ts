@@ -7,7 +7,7 @@ import {
   addDialogProjectSettingsWorldDraftRow,
   removeDialogProjectSettingsWorldDraftRow,
   updateDialogProjectSettingsWorldDraftColor,
-  updateDialogProjectSettingsWorldDraftColorPallete,
+  updateDialogProjectSettingsWorldDraftColorPalette,
   updateDialogProjectSettingsWorldDraftDisplayNameTranslations,
   updateDialogProjectSettingsWorldDraftTemplateLayout
 } from './dialogProjectSettingsWorldRowMutationsWiring'
@@ -21,7 +21,7 @@ export function createDialogProjectSettingsWorldDraftMutationHandlers (deps: {
     addWorld: () => void
     removeWorld: (id: string) => void
     updateWorldColor: (id: string, color: string) => void
-    updateWorldColorPallete: (id: string, colorPallete: string) => void
+    updateWorldColorPalette: (id: string, colorPalette: string) => void
     updateWorldDisplayNameTranslations: (
       id: string,
       displayNameTranslations: I_faProjectWorldDisplayNameTranslations
@@ -49,8 +49,8 @@ export function createDialogProjectSettingsWorldDraftMutationHandlers (deps: {
     updateDialogProjectSettingsWorldDraftColor(localWorlds, id, color)
   }
 
-  const updateWorldColorPallete = (id: string, colorPallete: string): void => {
-    updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, id, colorPallete)
+  const updateWorldColorPalette = (id: string, colorPalette: string): void => {
+    updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, id, colorPalette)
   }
 
   const updateWorldDisplayNameTranslations = (
@@ -75,7 +75,7 @@ export function createDialogProjectSettingsWorldDraftMutationHandlers (deps: {
     addWorld,
     removeWorld,
     updateWorldColor,
-    updateWorldColorPallete,
+    updateWorldColorPalette,
     updateWorldDisplayNameTranslations,
     updateWorldTemplateLayout
   }

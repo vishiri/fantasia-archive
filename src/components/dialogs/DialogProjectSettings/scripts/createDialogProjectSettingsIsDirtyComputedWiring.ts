@@ -3,7 +3,7 @@ import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomai
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { ComputedRef, Ref } from 'app/types/I_vueCompositionRefs'
 
-import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/faJsonSnapshotsEqual'
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/functions/faJsonSnapshotsEqual'
 
 export function createDialogProjectSettingsIsDirtyComputed (deps: {
   computed: <T>(getter: () => T) => ComputedRef<T>

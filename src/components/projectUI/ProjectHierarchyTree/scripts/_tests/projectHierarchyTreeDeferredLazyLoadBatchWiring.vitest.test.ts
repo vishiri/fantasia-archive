@@ -2,7 +2,7 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { runProjectHierarchyTreeDeferredLazyLoadBatch } from '../projectHierarchyTreeDeferredLazyLoadBatchWiring'
+import { runProjectHierarchyTreeDeferredLazyLoadBatch } from '../projectHierarchyTreeLazyLoadWiring'
 
 test('Test that runProjectHierarchyTreeDeferredLazyLoadBatch flushes and reopens after batch', async () => {
   const deferLazyLoadTreeRevisionPublish = ref(false)

@@ -4,11 +4,11 @@ import { ref, watch } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { readProjectHierarchyTreeDragSiblingOrderFromDom } from '../projectHierarchyTreeDragSiblingDomOrderWiring'
+import { readProjectHierarchyTreeDragSiblingOrderFromDom } from '../projectHierarchyTreeDnDOrderSupportWiring'
 import {
   applyProjectHierarchyTreeDragCommitSiblingOrderPatch,
   applyProjectHierarchyTreeSiblingOrderToTreeData
-} from '../projectHierarchyTreeSiblingOrderPatchWiring'
+} from '../projectHierarchyTreeDnDOrderSupportWiring'
 import { bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring } from '../projectHierarchyTreePendingDocumentRefreshWiring'
 
 function buildPlacementWithDocuments (): I_faProjectHierarchyTreeHeTreeNode {

@@ -5,7 +5,7 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { createUseDocumentWorkspacePage } from '../createUseDocumentWorkspacePage'
+import { createUseDocumentWorkspacePage } from '../createUseDocumentWorkspacePageWiring'
 import { createDocumentWorkspacePageColorPickers } from '../functions/createDocumentWorkspacePageColorPickers'
 import { createDocumentWorkspacePageDocumentBooleanToggle } from '../functions/createDocumentWorkspacePageDocumentBooleanToggle'
 import { createDocumentWorkspacePageIsCategoryToggle } from '../functions/createDocumentWorkspacePageIsCategoryToggle'
@@ -50,7 +50,7 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
   const worlds = ref<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>([
     {
       color: '#808080',
-      colorPallete: '#112233;#445566',
+      colorPalette: '#112233;#445566',
       displayName: 'Realm',
       groups: [],
       id: 'world-1',
@@ -73,7 +73,7 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
       updateExtraClassesDraft: () => {}
     }) as never,
     S_FaProjectHierarchyTree: () => ({
-      patchWorldColorPalleteInLayout: () => {}
+      patchWorldColorPaletteInLayout: () => {}
     }) as never,
     computed: computed as never,
     createDocumentWorkspacePageColorPickers,
@@ -89,8 +89,8 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
     },
     navigateToWorkspaceHomeRoute: async () => {},
     onMounted: () => {},
-    parseFaProjectWorldColorPalleteToHexList: (colorPallete: string) => {
-      return colorPallete.length === 0 ? [] : colorPallete.split(';')
+    parseFaProjectWorldColorPaletteToHexList: (colorPalette: string) => {
+      return colorPalette.length === 0 ? [] : colorPalette.split(';')
     },
     resolveOpenedDocumentDisplayNameFromTab: (row) => {
       const draft = row.displayNameDraft.trim()
@@ -99,7 +99,7 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
     resolveOpenedDocumentTabIsInEditMode: (editState) => editState,
     resolveOpenedDocumentTabIsInPreviewMode: (editState) => !editState,
     storeToRefs: (store: unknown) => {
-      if (store && typeof store === 'object' && 'patchWorldColorPalleteInLayout' in store) {
+      if (store && typeof store === 'object' && 'patchWorldColorPaletteInLayout' in store) {
         return { worlds } as never
       }
       return {

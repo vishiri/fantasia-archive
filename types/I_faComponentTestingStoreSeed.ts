@@ -199,9 +199,9 @@ export interface I_faComponentTestingStoreSeed {
   hierarchyTree?: I_faComponentTestingHierarchyTreeSeed | undefined
 
   /**
-   * When defined, replaces S_FaProjectWorkspaceWorlds session rows for WorldList Component Playwright.
+   * When defined, replaces S_FaProjectWorkspaceWorlds via hierarchy worlds for WorldList Component Playwright.
    */
-  workspaceWorlds?: I_faProjectWorld[] | undefined
+  workspaceWorlds?: I_faProjectHierarchyTreeWorkspaceWorld[] | undefined
 
   /**
    * When defined, installs projectContent entity overrides for open/temp paths (null clears).

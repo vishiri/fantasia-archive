@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { createProjectHierarchyTreeSessionHandlersBindWiring } from '../projectHierarchyTreeSessionHandlersBindWiring'
+import { createProjectHierarchyTreeSessionHandlersBindWiring } from '../projectHierarchyTreeSessionHandlersSupportWiring'
 
 vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
   return {

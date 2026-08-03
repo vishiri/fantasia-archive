@@ -2,13 +2,15 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeSyncMapperWiring'
 import { findProjectHierarchyTreeNodeById } from '../../functions/projectHierarchyTreeExpandState'
-import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from '../projectHierarchyTreeLatentExpandReapplyWiring'
+import {
+  reapplyProjectHierarchyTreeLatentDescendantExpandState
+} from '../projectHierarchyTreeLatentExpandReapplyWiring'
 
 const sampleWorld = {
   color: '#ff0000',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'World A',
   groups: [
     {

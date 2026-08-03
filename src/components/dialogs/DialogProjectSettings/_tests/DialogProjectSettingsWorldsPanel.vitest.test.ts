@@ -11,7 +11,7 @@ const emptyLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
 
 const worldA = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Alpha' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',
@@ -20,7 +20,7 @@ const worldA = {
 
 const worldB = {
   color: '#aabbcc',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Beta' },
   documentCount: 2,
   id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
@@ -46,7 +46,7 @@ const detailPanelStub = defineComponent({
       required: true
     }
   },
-  emits: ['remove', 'update:color', 'update:colorPallete', 'update:displayNameTranslations', 'update:templateLayout'],
+  emits: ['remove', 'update:color', 'update:colorPalette', 'update:displayNameTranslations', 'update:templateLayout'],
   template: `
     <div
       class="dialog-project-settings-worlds-detail-stub"
@@ -66,8 +66,8 @@ const detailPanelStub = defineComponent({
       />
       <button
         type="button"
-        data-test-locator="dialogProjectSettings-worlds-detail-colorPallete"
-        @click="$emit('update:colorPallete', '#112233;#445566')"
+        data-test-locator="dialogProjectSettings-worlds-detail-colorPalette"
+        @click="$emit('update:colorPalette', '#112233;#445566')"
       />
       <button
         type="button"
@@ -163,8 +163,8 @@ test('Test that DialogProjectSettingsWorldsPanel forwards add world and detail u
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-color"]').trigger('click')
   expect(w.emitted('updateWorldColor')?.[0]!).toEqual([worldA.id, '#112233'])
 
-  await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-colorPallete"]').trigger('click')
-  expect(w.emitted('updateWorldColorPallete')?.[0]!).toEqual([worldA.id, '#112233;#445566'])
+  await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-colorPalette"]').trigger('click')
+  expect(w.emitted('updateWorldColorPalette')?.[0]!).toEqual([worldA.id, '#112233;#445566'])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-name"]').trigger('click')
   expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]!).toEqual([worldA.id, { 'en-US': 'Renamed' }])
@@ -226,18 +226,18 @@ test('Test that DialogProjectSettingsWorldsPanel passes the selected world to th
   const w = mountWorldsPanel([
     {
       ...worldA,
-      colorPallete: '#112233;#445566'
+      colorPalette: '#112233;#445566'
     },
     {
       ...worldB,
-      colorPallete: '#aabbcc;#112233'
+      colorPalette: '#aabbcc;#112233'
     }
   ])
 
   const detail = w.findComponent(detailPanelStub)
   expect(detail.props('world')).toEqual({
     ...worldA,
-    colorPallete: '#112233;#445566'
+    colorPalette: '#112233;#445566'
   })
 })
 

@@ -39,7 +39,7 @@ const directSnapshot: I_faProjectSettingsRoot = {
 const directWorlds: I_dialogProjectSettingsWorldDraft[] = [
   {
     color: '',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'Direct world' },
     documentCount: 0,
     templateLayout: {
@@ -64,7 +64,7 @@ const directTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] = [
 const hydratedWorlds: I_dialogProjectSettingsWorldDraft[] = [
   {
     color: '#808080',
-    colorPallete: '',
+    colorPalette: '',
     displayNameTranslations: { 'en-US': 'From Db' },
     documentCount: 0,
     templateLayout: {
@@ -181,7 +181,7 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {
@@ -192,7 +192,7 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
       },
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Beta' },
         documentCount: 0,
         templateLayout: {
@@ -208,7 +208,7 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
     addWorld,
     removeWorld,
     updateWorldColor,
-    updateWorldColorPallete,
+    updateWorldColorPalette,
     updateWorldDisplayNameTranslations
   } = createDialogProjectSettingsDialogActions(bindings)
 
@@ -217,10 +217,10 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
 
   updateWorldDisplayNameTranslations(worldAId, { 'en-US': 'Renamed' })
   updateWorldColor(worldAId, '#aabbcc')
-  updateWorldColorPallete(worldAId, '#112233;#445566')
+  updateWorldColorPalette(worldAId, '#112233;#445566')
   expect(bindings.localWorlds.value?.[0]!?.displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
   expect(bindings.localWorlds.value?.[0]!?.color).toBe('#aabbcc')
-  expect(bindings.localWorlds.value?.[0]!?.colorPallete).toBe('#112233;#445566')
+  expect(bindings.localWorlds.value?.[0]!?.colorPalette).toBe('#112233;#445566')
 
   removeWorld(worldBId)
   expect(bindings.localWorlds.value?.some((world) => world.id === worldBId)).toBe(false)
@@ -287,7 +287,7 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '#aabbcc',
-        colorPallete: '#112233;#445566',
+        colorPalette: '#112233;#445566',
         displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
@@ -329,7 +329,7 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
     worlds: [
       {
         color: '#aabbcc',
-        colorPallete: '#112233;#445566',
+        colorPalette: '#112233;#445566',
         displayNameTranslations: { 'en-US': 'Realm' },
         id: worldAId,
         templateLayout: {
@@ -353,7 +353,7 @@ test('Test that saveAndCloseDialog no-ops without local settings or blank name',
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
@@ -394,7 +394,7 @@ test('Test that saveAndCloseDialog keeps the dialog open when save fails', async
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {
@@ -430,7 +430,7 @@ test('Test that saveAndCloseDialog no-ops when local document templates are null
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
@@ -463,7 +463,7 @@ test('Test that saveWithoutClosingDialog persists without closing the dialog', a
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {
@@ -499,7 +499,7 @@ test('Test that saveWithoutClosingDialog persists without closing the dialog', a
     localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
       {
         color: '',
-        colorPallete: '',
+        colorPalette: '',
         displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {

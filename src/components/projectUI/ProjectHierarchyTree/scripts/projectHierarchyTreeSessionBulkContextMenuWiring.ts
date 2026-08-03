@@ -4,11 +4,12 @@ import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionMan
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createProjectHierarchyTreeBulkExpandCollapseWiring } from './projectHierarchyTreeBulkExpandCollapseWiring'
-import { buildProjectHierarchyTreeNodeContextMenuCopyHandlers } from './projectHierarchyTreeNodeContextMenuCopyWiring'
-import { buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers } from './projectHierarchyTreeNodeContextMenuDocumentActionWiring'
-import { buildProjectHierarchyTreeNodeContextMenuSortHandlers } from './projectHierarchyTreeNodeContextMenuSortWiring'
+import {
+  buildProjectHierarchyTreeNodeContextMenuCopyHandlers,
+  buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers,
+  buildProjectHierarchyTreeNodeContextMenuSortHandlers
+} from './projectHierarchyTreeNodeContextMenuHandlersWiring'
 import { createProjectHierarchyTreeNodeContextMenuWiring } from './projectHierarchyTreeNodeContextMenuWiring'
-
 export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   lazyLoadWiring: {

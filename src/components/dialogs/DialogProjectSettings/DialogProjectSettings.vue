@@ -44,7 +44,7 @@
           @update-document-template-icon="updateDocumentTemplateIcon"
           @update-document-template-world-appendix-translations="updateDocumentTemplateWorldAppendixTranslations"
           @update-world-color="updateWorldColor"
-          @update-world-color-pallete="updateWorldColorPallete"
+          @update-world-color-palette="updateWorldColorPalette"
           @update-world-display-name-translations="updateWorldDisplayNameTranslations"
           @update-world-template-layout="updateWorldTemplateLayout"
         />
@@ -157,7 +157,7 @@ const {
   updateDocumentTemplateIcon,
   updateDocumentTemplateWorldAppendixTranslations,
   updateWorldColor,
-  updateWorldColorPallete,
+  updateWorldColorPalette,
   updateWorldDisplayNameTranslations,
   updateWorldTemplateLayout
 } = useDialogProjectSettings(props)

@@ -48,7 +48,7 @@ const swatchStub = defineComponent({
 test('Test that DialogProjectSettingsWorldColorPaletteEditor emits palette updates', async () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteEditor, {
     props: {
-      colorPallete: '#112233;#445566'
+      colorPalette: '#112233;#445566'
     },
     global: {
       mocks: {
@@ -68,10 +68,10 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor emits palette updat
   expect(w.findAll('.palette-swatch-stub')).toHaveLength(2)
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteAddButton"]').trigger('click')
-  expect(w.emitted('update:colorPallete')?.length).toBeGreaterThan(0)
+  expect(w.emitted('update:colorPalette')?.length).toBeGreaterThan(0)
 
   await w.find('.palette-swatch-stub').trigger('click')
-  expect(w.emitted('update:colorPallete')?.slice(-1)[0]?.[0]!).toContain('#AABBCC')
+  expect(w.emitted('update:colorPalette')?.slice(-1)[0]?.[0]!).toContain('#AABBCC')
 })
 
 /**
@@ -105,7 +105,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor forwards swatch and
 
   const w = mount(DialogProjectSettingsWorldColorPaletteEditor, {
     props: {
-      colorPallete: '#112233;#445566'
+      colorPalette: '#112233;#445566'
     },
     global: {
       mocks: {
@@ -128,7 +128,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor forwards swatch and
   await firstSwatch.find('[data-test-locator="emit-picker-close"]').trigger('click')
   await firstSwatch.find('[data-test-locator="emit-hex"]').trigger('click')
 
-  expect(w.emitted('update:colorPallete')?.length).toBeGreaterThan(0)
+  expect(w.emitted('update:colorPalette')?.length).toBeGreaterThan(0)
 })
 
 /**
@@ -160,7 +160,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor handles draggable v
 
   const w = mount(DialogProjectSettingsWorldColorPaletteEditor, {
     props: {
-      colorPallete: '#112233;#445566'
+      colorPalette: '#112233;#445566'
     },
     global: {
       mocks: {
@@ -194,5 +194,5 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor handles draggable v
   await firstSwatch.find('[data-test-locator="emit-picker-open"]').trigger('click')
   await firstSwatch.find('[data-test-locator="emit-picker-close"]').trigger('click')
 
-  expect(w.emitted('update:colorPallete')?.length).toBeGreaterThan(0)
+  expect(w.emitted('update:colorPalette')?.length).toBeGreaterThan(0)
 })

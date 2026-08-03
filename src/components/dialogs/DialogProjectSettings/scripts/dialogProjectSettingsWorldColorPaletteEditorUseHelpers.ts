@@ -14,18 +14,18 @@ export function registerDialogProjectSettingsWorldColorPaletteEditorWatch (
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
   params: {
     colorPaletteEntries: I_ref<I_dialogProjectSettingsWorldColorPaletteEntry[]>
-    readColorPallete: () => string
+    readColorPalette: () => string
   }
 ): void {
-  deps.watch(() => params.readColorPallete(), (nextColorPallete) => {
+  deps.watch(() => params.readColorPalette(), (nextColorPalette) => {
     if (!shouldResyncDialogProjectSettingsWorldColorPaletteFromProp(
       params.colorPaletteEntries.value,
-      nextColorPallete,
-      deps.serializeFaProjectWorldColorPalleteFromHexList
+      nextColorPalette,
+      deps.serializeFaProjectWorldColorPaletteFromHexList
     )) {
       return
     }
-    const hexList = deps.parseFaProjectWorldColorPalleteToHexListPreservingDuplicates(nextColorPallete)
+    const hexList = deps.parseFaProjectWorldColorPaletteToHexListPreservingDuplicates(nextColorPalette)
     params.colorPaletteEntries.value = deps.buildDialogProjectSettingsWorldColorPaletteEntries(
       hexList,
       deps.createEntryId
@@ -39,14 +39,14 @@ export function createDialogProjectSettingsWorldColorPaletteEditorEmit (
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
   params: {
     colorPaletteEntries: I_ref<I_dialogProjectSettingsWorldColorPaletteEntry[]>
-    emitColorPallete: (value: string) => void
+    emitColorPalette: (value: string) => void
   }
 ): (entries: I_dialogProjectSettingsWorldColorPaletteEntry[]) => void {
-  return function emitColorPalleteFromEntries (
+  return function emitColorPaletteFromEntries (
     entries: I_dialogProjectSettingsWorldColorPaletteEntry[]
   ): void {
     const hexList = readDialogProjectSettingsWorldColorPaletteEntryHexList(entries)
-    params.emitColorPallete(deps.serializeFaProjectWorldColorPalleteFromHexList(hexList))
+    params.emitColorPalette(deps.serializeFaProjectWorldColorPaletteFromHexList(hexList))
     params.colorPaletteEntries.value = entries
   }
 }
@@ -55,7 +55,7 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
   params: {
     colorPaletteEntries: I_ref<I_dialogProjectSettingsWorldColorPaletteEntry[]>
-    emitColorPalleteFromEntries: (
+    emitColorPaletteFromEntries: (
       entries: I_dialogProjectSettingsWorldColorPaletteEntry[]
     ) => void
     openSwatchIndex: I_ref<number | null>
@@ -71,8 +71,8 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
     return deps.wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength(
       params.colorPaletteEntries.value,
       entryId,
-      deps.serializeFaProjectWorldColorPalleteFromHexList,
-      deps.wouldFaProjectWorldColorPalleteExceedMaxLength,
+      deps.serializeFaProjectWorldColorPaletteFromHexList,
+      deps.wouldFaProjectWorldColorPaletteExceedMaxLength,
       deps.paletteMaxLength
     )
   }
@@ -83,7 +83,7 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
       entryId,
       hex
     )
-    params.emitColorPalleteFromEntries(nextEntries)
+    params.emitColorPaletteFromEntries(nextEntries)
   }
 
   function onSwatchDuplicate (entryId: string): void {
@@ -98,7 +98,7 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
     if (nextEntries === null) {
       return
     }
-    params.emitColorPalleteFromEntries(nextEntries)
+    params.emitColorPaletteFromEntries(nextEntries)
   }
 
   function onSwatchDelete (entryId: string): void {
@@ -109,7 +109,7 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
     if (nextEntries === null) {
       return
     }
-    params.emitColorPalleteFromEntries(nextEntries)
+    params.emitColorPaletteFromEntries(nextEntries)
     if (params.openSwatchIndex.value !== null) {
       params.setOpenSwatchIndex(null)
     }

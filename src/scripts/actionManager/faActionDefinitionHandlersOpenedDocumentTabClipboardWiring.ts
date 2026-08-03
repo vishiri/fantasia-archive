@@ -7,6 +7,8 @@ import {
 } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyAppearanceColor'
 import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 
+import { createFaActionClipboardCopyResolvedText } from './functions/createFaActionClipboardCopyResolvedText'
+
 type T_openedDocumentTabClipboardHandlerDeps = {
   S_FaOpenedDocuments: () => {
     findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
@@ -38,32 +40,12 @@ function findOpenedDocumentTab (
   return deps.S_FaOpenedDocuments().findTabByDocumentId(documentId)
 }
 
-function notifyOpenedDocumentTabClipboardCopySuccess (
-  deps: T_openedDocumentTabClipboardHandlerDeps,
-  messageKey: string
-): void {
-  deps.notifyCreate({
-    color: 'positive',
-    faSkipNotifyConsoleLog: true,
-    icon: 'mdi-clipboard-check-outline',
-    message: deps.i18n.global.t(messageKey),
-    timeout: 2500,
-    type: 'positive'
-  })
-}
-
-async function copyOpenedDocumentTabResolvedText (
-  deps: T_openedDocumentTabClipboardHandlerDeps,
-  copyText: string,
-  successMessageKey: string
-): Promise<T_faActionHandlerContinuation> {
-  await deps.copyToClipboard(copyText)
-  notifyOpenedDocumentTabClipboardCopySuccess(deps, successMessageKey)
-  return { payloadPreview: copyText }
-}
-
 function createHandleCopyOpenedDocumentTabName (
-  deps: T_openedDocumentTabClipboardHandlerDeps
+  deps: T_openedDocumentTabClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyOpenedDocumentTabName (payload: {
     documentId: string
@@ -83,8 +65,7 @@ function createHandleCopyOpenedDocumentTabName (
       return
     }
 
-    return copyOpenedDocumentTabResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyNameSuccess'
     )
@@ -92,7 +73,11 @@ function createHandleCopyOpenedDocumentTabName (
 }
 
 function createHandleCopyOpenedDocumentTabTextColor (
-  deps: T_openedDocumentTabClipboardHandlerDeps
+  deps: T_openedDocumentTabClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyOpenedDocumentTabTextColor (payload: {
     documentId: string
@@ -107,8 +92,7 @@ function createHandleCopyOpenedDocumentTabTextColor (
       return
     }
 
-    return copyOpenedDocumentTabResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyTextColorSuccess'
     )
@@ -116,7 +100,11 @@ function createHandleCopyOpenedDocumentTabTextColor (
 }
 
 function createHandleCopyOpenedDocumentTabBackgroundColor (
-  deps: T_openedDocumentTabClipboardHandlerDeps
+  deps: T_openedDocumentTabClipboardHandlerDeps,
+  copyResolvedText: (
+    copyText: string,
+    successMessageKey: string
+  ) => Promise<T_faActionHandlerContinuation>
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
   return async function handleCopyOpenedDocumentTabBackgroundColor (payload: {
     documentId: string
@@ -131,8 +119,7 @@ function createHandleCopyOpenedDocumentTabBackgroundColor (
       return
     }
 
-    return copyOpenedDocumentTabResolvedText(
-      deps,
+    return copyResolvedText(
       copyText,
       'projectUI.projectAppControlBar.copyBackgroundColorSuccess'
     )
@@ -152,10 +139,17 @@ export function createFaActionDefinitionHandlersOpenedDocumentTabClipboard (
       payload: { documentId: string }
     ) => Promise<T_faActionHandlerContinuation | void>
   } {
-  const handleCopyOpenedDocumentTabName = createHandleCopyOpenedDocumentTabName(deps)
-  const handleCopyOpenedDocumentTabTextColor = createHandleCopyOpenedDocumentTabTextColor(deps)
+  const { copyResolvedText } = createFaActionClipboardCopyResolvedText(deps)
+  const handleCopyOpenedDocumentTabName = createHandleCopyOpenedDocumentTabName(
+    deps,
+    copyResolvedText
+  )
+  const handleCopyOpenedDocumentTabTextColor = createHandleCopyOpenedDocumentTabTextColor(
+    deps,
+    copyResolvedText
+  )
   const handleCopyOpenedDocumentTabBackgroundColor =
-    createHandleCopyOpenedDocumentTabBackgroundColor(deps)
+    createHandleCopyOpenedDocumentTabBackgroundColor(deps, copyResolvedText)
 
   return {
     handleCopyOpenedDocumentTabBackgroundColor,

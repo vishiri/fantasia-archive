@@ -1,10 +1,6 @@
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-
-interface I_dialogComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
-}
 
 type T_registerDialogProjectSettingsWatchers = (params: {
   openDialog: (input: T_dialogName) => void

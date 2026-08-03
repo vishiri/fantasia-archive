@@ -1,5 +1,6 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { I_faActionHistoryEntry, T_faActionHistoryStatus, T_faActionKind } from 'app/types/I_faActionManagerDomain'
+import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type {
   T_dialogActionMonitorStatusBadge,
@@ -18,7 +19,7 @@ export type T_createDialogActionMonitorDeps = {
     kind: T_faActionKind,
     t: (key: string) => string
   ) => string
-  getDialogComponentStore: () => { dialogToOpen?: unknown; dialogUUID?: unknown } | null
+  getDialogComponentStore: () => I_dialogComponentStoreLike | null
   i18n: { global: { t: (key: string, params?: Record<string, string>) => string } }
   isDialogActionMonitorDirectInput: (input: T_dialogName | undefined) => boolean
   isDialogActionMonitorStoreTarget: (dialogToOpen: unknown) => boolean

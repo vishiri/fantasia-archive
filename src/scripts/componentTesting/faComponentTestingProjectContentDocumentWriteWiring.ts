@@ -4,6 +4,7 @@ import type {
   I_faProjectDocumentPatch
 } from 'app/types/I_faProjectDocumentDomain'
 import type { I_faProjectHierarchyTreeDocumentChild } from 'app/types/I_faProjectHierarchyTreeDomain'
+import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
 import { buildFaComponentTestingPlacementDocumentChildrenKey } from './functions/faComponentTestingPlacementDocumentChildren'
 import { getFaComponentTestingProjectContentOverrides } from './faComponentTestingProjectContentOverridesWiring'
@@ -94,7 +95,7 @@ export async function createFaProjectDocumentForRenderer (
       placementId: input.placementId ?? null,
       sortOrder: input.sortOrder ?? 0,
       templateId: input.templateId ?? null,
-      treeOrderNumber: input.treeOrderNumber ?? Number.MIN_SAFE_INTEGER,
+      treeOrderNumber: input.treeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
       updatedAtMs: nowMs,
       worldId: input.worldId
     }

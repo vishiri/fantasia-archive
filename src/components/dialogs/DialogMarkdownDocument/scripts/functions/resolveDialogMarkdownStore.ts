@@ -1,7 +1,4 @@
-interface I_dialogMarkdownStoreLike {
-  dialogUUID?: unknown
-  documentToOpen?: unknown
-}
+import type { I_dialogMarkdownStoreLike } from 'app/types/I_dialogMarkdownStoreLike'
 
 export function resolveDialogMarkdownStore (
   getStore: () => I_dialogMarkdownStoreLike

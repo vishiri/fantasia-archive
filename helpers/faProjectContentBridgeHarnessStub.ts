@@ -14,7 +14,7 @@ function stubWorld () {
   return {
     ...stubNamedEntity(),
     color: '#808080',
-    colorPallete: '',
+    colorPalette: '',
     sortOrder: 0
   }
 }

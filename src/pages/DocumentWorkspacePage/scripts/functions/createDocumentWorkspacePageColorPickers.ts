@@ -70,7 +70,7 @@ export function createDocumentWorkspacePageColorPickers (
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
-    onAppendToWorldPalette: (colorPallete: string) => void
+    onAppendToWorldPalette: (colorPalette: string) => void
     textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
@@ -84,7 +84,7 @@ export function createDocumentWorkspacePageColorPickers (
     if (world === null) {
       return []
     }
-    return deps.parseFaProjectWorldColorPalleteToHexList(world.colorPallete)
+    return deps.parseFaProjectWorldColorPaletteToHexList(world.colorPalette)
   })
 
   const worldColorPaletteAppend = deps.computed((): I_faColorPickerPaletteAppendConfig | undefined => {
@@ -94,7 +94,7 @@ export function createDocumentWorkspacePageColorPickers (
     }
     return {
       mode: 'persist',
-      worldColorPalette: world.colorPallete,
+      worldColorPalette: world.colorPalette,
       worldId: world.id
     }
   })
@@ -109,12 +109,12 @@ export function createDocumentWorkspacePageColorPickers (
 
   const colorModels = createDocumentWorkspacePageColorModels(deps)
 
-  function onAppendToWorldPalette (colorPallete: string): void {
+  function onAppendToWorldPalette (colorPalette: string): void {
     const world = documentWorld.value
     if (world === null) {
       return
     }
-    deps.patchWorldColorPalleteInLayout(world.id, colorPallete)
+    deps.patchWorldColorPaletteInLayout(world.id, colorPalette)
   }
 
   const textColorFieldDescription = deps.computed(() => {

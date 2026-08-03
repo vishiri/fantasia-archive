@@ -51,7 +51,7 @@
           :palette="worldPickerPalette"
           :palette-append="worldColorPaletteAppend"
           test-locator="dialogProjectSettings-worlds-colorInput"
-          @append-to-world-palette="emitColorPallete"
+          @append-to-world-palette="emitColorPalette"
           @update:model-value="emitColor"
         />
       </div>
@@ -99,8 +99,8 @@
       </div>
       <DialogProjectSettingsWorldColorPaletteEditor
         :key="props.world.id"
-        :color-pallete="props.world.colorPallete"
-        @update:color-pallete="emitColorPallete"
+        :color-palette="props.world.colorPalette"
+        @update:color-palette="emitColorPalette"
       />
     </div>
 
@@ -131,7 +131,7 @@ import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_d
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import { parseFaProjectWorldColorPalleteToHexList } from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+import { parseFaProjectWorldColorPaletteToHexList } from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 import { buildDialogProjectSettingsWorldColorPaletteTooltipContent } from './scripts/functions/dialogProjectSettingsWorldColorPaletteTooltip'
 
 defineOptions({
@@ -148,12 +148,12 @@ const props = defineProps<{
 }>()
 
 const worldPickerPalette = computed(() => {
-  return parseFaProjectWorldColorPalleteToHexList(props.world.colorPallete)
+  return parseFaProjectWorldColorPaletteToHexList(props.world.colorPalette)
 })
 
 const worldColorPaletteAppend = computed((): I_faColorPickerPaletteAppendConfig => ({
   mode: 'draft',
-  worldColorPalette: props.world.colorPallete
+  worldColorPalette: props.world.colorPalette
 }))
 
 const worldColorPaletteTooltipI18nPrefix = 'dialogs.projectSettings.fields.worldColorPalette'
@@ -170,7 +170,7 @@ const worldColorPaletteTooltip = computed(() => {
 const emit = defineEmits<{
   remove: []
   'update:color': [value: string]
-  'update:colorPallete': [value: string]
+  'update:colorPalette': [value: string]
   'update:displayNameTranslations': [value: I_faProjectWorldDisplayNameTranslations]
   'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
@@ -183,8 +183,8 @@ function emitColor (value: string): void {
   emit('update:color', value)
 }
 
-function emitColorPallete (value: string): void {
-  emit('update:colorPallete', value)
+function emitColorPalette (value: string): void {
+  emit('update:colorPalette', value)
 }
 
 function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutDraft): void {

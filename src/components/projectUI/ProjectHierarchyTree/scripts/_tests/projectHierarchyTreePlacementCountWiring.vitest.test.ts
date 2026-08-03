@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { expect, test } from 'vitest'
 
-import { createProjectHierarchyTreePlacementCountWiring } from '../projectHierarchyTreePlacementCountWiring'
+import { createProjectHierarchyTreePlacementCountWiring } from '../projectHierarchyTreeDisplayChromeWiring'
 
 test('Test that createProjectHierarchyTreePlacementCountWiring resolves placement count display from settings', () => {
   const settings = ref({

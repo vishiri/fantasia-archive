@@ -28,7 +28,7 @@ export const Default: StoryObj<typeof meta> = {
     removeDisabledReason: null,
     world: {
       color: '#112233',
-      colorPallete: '#112233;#445566;#AABBCC',
+      colorPalette: '#112233;#445566;#AABBCC',
       displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',
@@ -45,7 +45,7 @@ export const DuplicatePalette: StoryObj<typeof meta> = {
     ...Default.args,
     world: {
       color: '#112233',
-      colorPallete: '#112233;#AABBCC;#aabbcc',
+      colorPalette: '#112233;#AABBCC;#aabbcc',
       displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',

@@ -6,8 +6,8 @@ import {
   shouldScheduleDragLayoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from './projectHierarchyTreeDragGetDataOrderStableWiring'
-import { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } from './projectHierarchyTreeSiblingOrderPatchWiring'
+import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from './projectHierarchyTreeDnDOrderPostDropWiring'
+import { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } from './projectHierarchyTreeDnDOrderSupportWiring'
 import {
   PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS,
   PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS
@@ -18,9 +18,9 @@ import { commitProjectHierarchyTreeDraggedDocumentMove } from './projectHierarch
 import {
   prepareProjectHierarchyTreeDragCommitOrderSnapshot,
   readProjectHierarchyTreeDragSiblingOrderFromGetData
-} from './projectHierarchyTreeDragCommitOrderCaptureWiring'
+} from './projectHierarchyTreeDnDOrderCaptureWiring'
 import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../functions/projectHierarchyTreeOrderedDocumentIdsEqual'
-import { refreshProjectHierarchyTreeDragCommitTargetContainer } from './projectHierarchyTreeDnDCommitReloadWiring'
+import { refreshProjectHierarchyTreeDragCommitTargetContainer } from './projectHierarchyTreeDnDCommitWiring'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
   clearDragSessionFlags: () => void

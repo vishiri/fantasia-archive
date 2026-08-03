@@ -7,7 +7,7 @@ import {
   refreshProjectHierarchyTreeDragCommitSourceContainer,
   refreshProjectHierarchyTreeDragCommitTargetContainer,
   resolveProjectHierarchyTreeDragCommitSourceReloadNodeId
-} from '../projectHierarchyTreeDnDCommitReloadWiring'
+} from '../projectHierarchyTreeDnDCommitWiring'
 
 function buildDocumentNode (documentId: string): I_faProjectHierarchyTreeHeTreeNode {
   return {

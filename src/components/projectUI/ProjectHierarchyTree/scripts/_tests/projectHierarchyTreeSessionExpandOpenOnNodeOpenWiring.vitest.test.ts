@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler } from '../projectHierarchyTreeSessionExpandOpenOnNodeOpenWiring'
+import { createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler } from '../projectHierarchyTreeSessionExpandOpenWiring'
 
 function buildPlacementNode (): I_faProjectHierarchyTreeHeTreeNode {
   return {

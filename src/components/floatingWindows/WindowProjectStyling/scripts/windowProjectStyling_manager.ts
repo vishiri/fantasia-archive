@@ -44,12 +44,12 @@ import {
 } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingPersistEffects'
 
 import {
+  buildFaColorVarSwatchStyle,
   getMonacoKeybindHelpItems,
+  reconcileMountedMonacoWithWorkingCss,
   useMonacoMount,
-  useWindowAppStylingHelpMenu
-} from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
-import { buildFaColorVarSwatchStyle } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/functions/faColorVarSwatchStyle'
-import { reconcileMountedMonacoWithWorkingCss } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/functions/windowStylingMonacoReconcile'
+  useWindowStylingHelpMenu
+} from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/windowStylingShared_manager'
 import {
   createUseWindowProjectStylingSurface,
   createWindowProjectStylingFramePersist,
@@ -124,7 +124,7 @@ const stylingFrameApi = createWindowStylingFrame({
   computed,
   useFaFloatingWindowFrame,
   useWindowStylingFramePersist: useWindowProjectStylingFramePersist,
-  useWindowStylingHelpMenu: useWindowAppStylingHelpMenu,
+  useWindowStylingHelpMenu,
   useWindowStylingHelpPanel: colorPanelApi.useWindowStylingHelpPanel
 })
 
@@ -195,4 +195,4 @@ export {
   useWindowProjectStylingSurface
 }
 
-export { getMonacoKeybindHelpItems, useMonacoMount, useWindowAppStylingHelpMenu }
+export { getMonacoKeybindHelpItems, useMonacoMount, useWindowStylingHelpMenu }

@@ -17,7 +17,7 @@ export default meta
 const storyWorlds = [
   {
     color: '#4caf50',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'Eldoria',
     groups: [
       {

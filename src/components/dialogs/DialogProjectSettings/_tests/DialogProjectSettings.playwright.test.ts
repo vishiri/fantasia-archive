@@ -934,7 +934,7 @@ test.describe.serial('DialogProjectSettings delete guards — last world', () =>
       directWorldsSnapshot: [
         {
           color: '',
-          colorPallete: '',
+          colorPalette: '',
           displayNameTranslations: { 'en-US': 'Only world' },
           documentCount: 0,
           id: guardWorldId,
@@ -985,7 +985,7 @@ test.describe.serial('DialogProjectSettings delete guards — world with documen
       directWorldsSnapshot: [
         {
           color: '',
-          colorPallete: '',
+          colorPalette: '',
           displayNameTranslations: { 'en-US': 'Blocked world' },
           documentCount: 1,
           id: guardWorldId,
@@ -996,7 +996,7 @@ test.describe.serial('DialogProjectSettings delete guards — world with documen
         },
         {
           color: '',
-          colorPallete: '',
+          colorPalette: '',
           displayNameTranslations: { 'en-US': 'Second world' },
           documentCount: 0,
           id: guardWorldBId,
@@ -1066,7 +1066,7 @@ test.describe.serial('DialogProjectSettings delete guards — templates', () => 
       directWorldsSnapshot: [
         {
           color: '',
-          colorPallete: '',
+          colorPalette: '',
           displayNameTranslations: { 'en-US': 'Only world' },
           documentCount: 0,
           id: guardWorldId,

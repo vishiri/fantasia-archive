@@ -5,10 +5,10 @@ import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faCol
 import { FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH } from 'app/types/I_faProjectWorldDomain'
 import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
 import {
-  appendFaProjectWorldColorPalleteHex,
-  faProjectWorldColorPalleteContainsHex,
+  appendFaProjectWorldColorPaletteHex,
+  faProjectWorldColorPaletteContainsHex,
   isFaProjectWorldStorageHexColor
-} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
+} from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 import { useFaProjectWorldColorPaletteFromBridge } from 'app/src/scripts/projectWorlds/faProjectWorldColorPalette_manager'
 
 import { faColorPickerInputPaletteAppendWiring } from './faColorPickerInputPaletteAppendWiring'
@@ -34,9 +34,9 @@ export const useFaColorPickerInput = createUseFaColorPickerInput({
 })
 
 export const useFaColorPickerPaletteAppend = createUseFaColorPickerPaletteAppend({
-  appendFaProjectWorldColorPalleteHex,
+  appendFaProjectWorldColorPaletteHex,
   computed,
-  faProjectWorldColorPalleteContainsHex,
+  faProjectWorldColorPaletteContainsHex,
   isFaColorPickerPaletteAppendDisabled,
   isFaColorPickerPaletteAppendDuplicate,
   isFaProjectWorldStorageHexColor,

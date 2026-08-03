@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
+import { normalizeOpenedDocumentExtraClassesFromDb } from '../openedDocumentNullableStringFromDb'
 import {
-  normalizeOpenedDocumentExtraClassesFromDb,
   resolveDocumentWorkspacePageExtraHtmlClassList,
   resolveOpenedDocumentExtraClassesDraftForPersist
 } from '../openedDocumentExtraClasses'

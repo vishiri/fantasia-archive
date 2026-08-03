@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { resolveProjectHierarchyTreeDocumentAppearanceChrome } from '../projectHierarchyTreeDocumentAppearanceChromeWiring'
+import { resolveProjectHierarchyTreeDocumentAppearanceChrome } from '../projectHierarchyTreeDisplayChromeWiring'
 
 test('Test that resolveProjectHierarchyTreeDocumentAppearanceChrome returns undefined for non-document nodes', () => {
   expect(resolveProjectHierarchyTreeDocumentAppearanceChrome({

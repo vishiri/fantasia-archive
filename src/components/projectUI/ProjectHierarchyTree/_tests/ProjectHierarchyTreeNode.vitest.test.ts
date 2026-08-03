@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import ProjectHierarchyTreeNode from '../ProjectHierarchyTreeNode.vue'
-import { resolveProjectHierarchyTreeDocumentAppearanceChrome } from '../scripts/projectHierarchyTreeDocumentAppearanceChromeWiring'
+import { resolveProjectHierarchyTreeDocumentAppearanceChrome } from '../scripts/projectHierarchyTreeDisplayChromeWiring'
 import { expectCssColorValue } from 'app/helpers/vitestCssColorExpect'
 
 const baseNode = {

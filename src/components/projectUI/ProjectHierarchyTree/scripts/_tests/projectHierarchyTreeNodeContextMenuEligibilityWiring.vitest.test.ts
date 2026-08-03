@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { resolveProjectHierarchyTreeNodeContextMenuSectionFlags } from '../projectHierarchyTreeNodeContextMenuEligibilityWiring'
+import { resolveProjectHierarchyTreeNodeContextMenuSectionFlags } from '../projectHierarchyTreeNodeContextMenuWiring'
 
 const sampleTree: I_faProjectHierarchyTreeHeTreeNode[] = [
   {

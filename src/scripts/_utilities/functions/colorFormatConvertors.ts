@@ -16,18 +16,3 @@ export function rgbToHex (color: string) {
   }
   return false
 }
-
-/**
- * Converts a hex color string to RGB string
- * @param color - Hex color string
- * @returns RGB string
- */
-export function hexToRgb (hex: string) {
-  const normalized = hex.trim().replace(/^#/, '')
-  const bigint = parseInt(normalized, 16)
-  const r = (bigint >> 16) & 255
-  const g = (bigint >> 8) & 255
-  const b = bigint & 255
-
-  return r + ',' + g + ',' + b
-}

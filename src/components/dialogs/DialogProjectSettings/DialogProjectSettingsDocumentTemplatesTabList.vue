@@ -1,5 +1,5 @@
 <template>
-  <FaVerticalDraggableTabList
+  <DialogProjectSettingsEntityTabList
     add-button-label-key="dialogs.projectSettings.panels.documentTemplates.addTemplateButton"
     block-class-suffix="dialogProjectSettingsDocumentTemplatesTabList"
     :clone-list="cloneTemplateDraftList"
@@ -38,7 +38,7 @@
         @select="emit('select', $event)"
       />
     </template>
-  </FaVerticalDraggableTabList>
+  </DialogProjectSettingsEntityTabList>
 </template>
 
 <script setup lang="ts">
@@ -58,7 +58,7 @@ import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_PADDING_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import FaVerticalDraggableTabList from 'app/src/components/elements/FaVerticalDraggableTabList/FaVerticalDraggableTabList.vue'
+import DialogProjectSettingsEntityTabList from './DialogProjectSettingsEntityTabList.vue'
 import DialogProjectSettingsDocumentTemplatesTabItem from './DialogProjectSettingsDocumentTemplatesTabItem.vue'
 import { filterDialogProjectSettingsDocumentTemplatesByQuery } from './scripts/filterDialogProjectSettingsDocumentTemplatesByQuery'
 
@@ -116,5 +116,3 @@ function isTemplateTabValidationError (
   return isDialogProjectSettingsDocumentTemplateTabValidationError(template)
 }
 </script>
-
-<style lang="scss" src="./styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

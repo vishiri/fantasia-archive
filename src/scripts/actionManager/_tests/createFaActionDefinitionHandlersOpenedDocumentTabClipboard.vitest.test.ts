@@ -2,7 +2,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from '../faActionDefinitionHandlersOpenedDocumentTabClipboard'
+import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from '../faActionDefinitionHandlersOpenedDocumentTabClipboardWiring'
 
 const copyToClipboardMock = vi.fn(async () => undefined)
 const notifyCreateMock = vi.fn()

@@ -6,7 +6,7 @@ import { expectInlineStyleColor } from 'app/helpers/vitestCssColorExpect'
 
 const worldFixture = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
@@ -148,7 +148,7 @@ test('Test that DialogProjectSettingsWorldsTabItem marks duplicate palette error
       tabHasError: true,
       world: {
         ...worldFixture,
-        colorPallete: '#112233;#112233'
+        colorPalette: '#112233;#112233'
       }
     },
     global: {

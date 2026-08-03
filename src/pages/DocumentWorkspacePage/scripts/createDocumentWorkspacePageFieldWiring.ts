@@ -17,8 +17,8 @@ export function wireDocumentWorkspacePageColorPickers (input: {
     computed: input.deps.computed,
     documentTab: input.documentTab,
     i18n: input.deps.i18n,
-    parseFaProjectWorldColorPalleteToHexList: input.deps.parseFaProjectWorldColorPalleteToHexList,
-    patchWorldColorPalleteInLayout: input.hierarchyTreeStore.patchWorldColorPalleteInLayout.bind(
+    parseFaProjectWorldColorPaletteToHexList: input.deps.parseFaProjectWorldColorPaletteToHexList,
+    patchWorldColorPaletteInLayout: input.hierarchyTreeStore.patchWorldColorPaletteInLayout.bind(
       input.hierarchyTreeStore
     ),
     resolveOpenedDocumentTabIsInPreviewMode: input.deps.resolveOpenedDocumentTabIsInPreviewMode,

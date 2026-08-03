@@ -6,7 +6,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot normalizes display name
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': '  Realm  ' },
       documentCount: 0,
       id: 'world-1',
@@ -32,7 +32,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot keeps cleared world col
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       color: '   ',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-1',
@@ -48,7 +48,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot keeps trimmed world col
   expect(mapDialogProjectSettingsWorldsToSnapshot([
     {
       color: '  #aabbcc  ',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-1',

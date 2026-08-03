@@ -17,7 +17,7 @@ export const Default: StoryObj<typeof meta> = {
     tabHasError: false,
     world: {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
@@ -32,7 +32,7 @@ export const Selected: StoryObj<typeof meta> = {
     tabHasError: false,
     world: {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
@@ -47,7 +47,7 @@ export const MissingActiveLocaleTranslation: StoryObj<typeof meta> = {
     tabHasError: false,
     world: {
       color: '#9c27b0',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'

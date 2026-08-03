@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { expect, test } from 'vitest'
 
-import { createProjectHierarchyTreeTreeLineWiring } from '../projectHierarchyTreeTreeLineWiring'
+import { createProjectHierarchyTreeTreeLineWiring } from '../projectHierarchyTreeDisplayChromeWiring'
 
 test('createProjectHierarchyTreeTreeLineWiring reads hideTreeLines and preview overrides', () => {
   const settings = ref({

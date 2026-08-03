@@ -222,7 +222,7 @@ const sampleControlBarTemplate: I_faProjectDocumentTemplate = {
 
 const sampleControlBarWorld: I_faProjectWorld = {
   color: '#4caf50',
-  colorPallete: '',
+  colorPalette: '',
   createdAtMs: 1,
   displayName: 'Eldoria',
   displayNameTranslations: { 'en-US': 'Eldoria' },
@@ -233,7 +233,7 @@ const sampleControlBarWorld: I_faProjectWorld = {
 
 const singleWorldHierarchyWorlds: I_faProjectHierarchyTreeWorkspaceWorld[] = [{
   color: '#4caf50',
-  colorPallete: '',
+  colorPalette: '',
   displayName: 'Eldoria',
   groups: [],
   id: CONTROL_BAR_WORLD_ID,
@@ -245,7 +245,7 @@ const multiWorldHierarchyWorlds: I_faProjectHierarchyTreeWorkspaceWorld[] = [
   ...singleWorldHierarchyWorlds,
   {
     color: '#2196f3',
-    colorPallete: '',
+    colorPalette: '',
     displayName: 'Nordheim',
     groups: [],
     id: CONTROL_BAR_WORLD_ID_B,

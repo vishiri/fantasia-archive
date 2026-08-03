@@ -1,80 +1,63 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { readonly, ref, watch } from 'vue'
 
 import type { Ref } from 'vue'
 
-import type { I_faProjectWorld } from 'app/types/I_faProjectWorldDomain'
+import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { I_faProjectWorkspaceWorldListItem } from 'app/types/I_faProjectWorkspaceWorldsDomain'
-import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import { ResultAsync } from 'neverthrow'
 
-import { resolveFaProjectWorldDisplayName } from 'app/src/scripts/projectWorlds/faProjectWorldDisplayName_manager'
-import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
-import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
-import { mapFaProjectWorldsToWorkspaceListItems } from 'app/src/stores/functions/mapFaProjectWorldsToWorkspaceListItems'
+import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import { mapFaProjectHierarchyWorldsToWorkspaceListItems } from 'app/src/stores/functions/mapFaProjectHierarchyWorldsToWorkspaceListItems'
 
 /**
- * Workspace sidebar world name list (sorted by project sort_order from listWorlds IPC).
+ * Workspace sidebar world name list derived from S_FaProjectHierarchyTree worlds.
+ * Expand/scroll persistence stays on hierarchy_tree_ui_state via the hierarchy store.
  */
 export const S_FaProjectWorkspaceWorlds = defineStore('S_FaProjectWorkspaceWorlds', () => {
-  const worldsRaw: Ref<I_faProjectWorld[]> = ref([])
   const worldListItems: Ref<I_faProjectWorkspaceWorldListItem[]> = ref([])
+  const { worlds: hierarchyWorlds } = storeToRefs(S_FaProjectHierarchyTree())
 
-  function resolveLanguageCode (): T_faUserSettingsLanguageCode {
-    return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+  function applyMappedList (
+    worlds: ReadonlyArray<{
+      displayName: string
+      id: string
+    }>
+  ): void {
+    worldListItems.value = mapFaProjectHierarchyWorldsToWorkspaceListItems(worlds)
   }
 
-  function applyMappedList (): void {
-    const languageCode = resolveLanguageCode()
-    worldListItems.value = mapFaProjectWorldsToWorkspaceListItems(
-      worldsRaw.value,
-      (world) => resolveFaProjectWorldDisplayName(world.displayNameTranslations, languageCode)
-    )
+  function syncFromHierarchyTree (): void {
+    applyMappedList(hierarchyWorlds.value)
   }
 
-  function clearWorkspaceWorlds (): void {
-    worldsRaw.value = []
-    worldListItems.value = []
+  /**
+   * Component-testing only: seed hierarchy worlds then remap the sidebar list.
+   */
+  function replaceSessionForComponentTesting (
+    worlds: readonly I_faProjectHierarchyTreeWorkspaceWorld[]
+  ): void {
+    S_FaProjectHierarchyTree().replaceSessionForComponentTesting({
+      worlds: worlds.map((world) => ({ ...world }))
+    })
+    applyMappedList(worlds)
   }
 
-  function replaceSessionForComponentTesting (worlds: I_faProjectWorld[]): void {
-    worldsRaw.value = [...worlds]
-    applyMappedList()
-  }
-
+  /**
+   * Refresh hierarchy layout (single IPC source); list remaps from hierarchy worlds.
+   */
   async function refreshWorkspaceWorlds (): Promise<void> {
-    if (!S_FaActiveProject().hasActiveProject) {
-      clearWorkspaceWorlds()
-      return
-    }
-
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (typeof api?.listWorlds !== 'function') {
-      clearWorkspaceWorlds()
-      return
-    }
-
-    const readResult = await ResultAsync.fromPromise(
-      api.listWorlds(),
-      (error): unknown => error
-    )
-    if (readResult.isErr()) {
-      console.error('[S_FaProjectWorkspaceWorlds] listWorlds failed', readResult.error)
-      clearWorkspaceWorlds()
-      return
-    }
-
-    worldsRaw.value = readResult.value.items
-    applyMappedList()
+    await S_FaProjectHierarchyTree().refreshLayout()
+    syncFromHierarchyTree()
   }
 
   watch(
-    () => S_FaUserSettings().settings?.languageCode,
-    () => {
-      if (worldsRaw.value.length === 0) {
-        return
-      }
-      applyMappedList()
+    hierarchyWorlds,
+    (worlds) => {
+      applyMappedList(worlds)
+    },
+    {
+      deep: true,
+      immediate: true
     }
   )
 

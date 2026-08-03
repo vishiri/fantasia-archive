@@ -31,13 +31,13 @@ import { copyToClipboard } from 'quasar'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
 import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
-import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboard'
-import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from './faActionDefinitionHandlersHierarchyTreeDocumentClipboard'
-import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from './faActionDefinitionHandlersHierarchyTreeDocumentActions'
-import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from './faActionDefinitionHandlersHierarchyTreeSortActions'
-import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from './faActionDefinitionHandlersOpenedDocumentTabDocumentActions'
+import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboardWiring'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from './faActionDefinitionHandlersHierarchyTreeDocumentClipboardWiring'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from './faActionDefinitionHandlersHierarchyTreeDocumentActionsWiring'
+import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from './faActionDefinitionHandlersHierarchyTreeSortActionsWiring'
+import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from './faActionDefinitionHandlersOpenedDocumentTabDocumentActionsWiring'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
-import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
+import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChromeWiring'
 import { notifyCreateForFaActionDefinitionHandlers } from './faActionDefinitionHandlersNotifyWiring'
 import {
   handleCreateNewProject as handleCreateNewProjectExport,
@@ -74,7 +74,6 @@ const faActionDefinitionHandlersApi = {
     S_FaProjectStyling,
     S_FaProjectSettings,
     S_FaProjectWorkspaceWorlds,
-    S_FaProjectHierarchyTree,
     S_FaUserSettings,
     canOpenFloatingWindowWhileNoModal,
     applyFaUserSettingsLanguageSelection,

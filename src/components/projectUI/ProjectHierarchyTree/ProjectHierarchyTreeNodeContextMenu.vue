@@ -133,7 +133,7 @@ import ProjectHierarchyTreeNodeContextMenuCopyRows from './ProjectHierarchyTreeN
 import ProjectHierarchyTreeNodeContextMenuDeleteRow from './ProjectHierarchyTreeNodeContextMenuDeleteRow.vue'
 import ProjectHierarchyTreeNodeContextMenuDocumentRows from './ProjectHierarchyTreeNodeContextMenuDocumentRows.vue'
 import ProjectHierarchyTreeNodeContextMenuSortByRow from './ProjectHierarchyTreeNodeContextMenuSortByRow.vue'
-import { resolveProjectHierarchyTreeNodeContextMenuLabels } from './scripts/projectHierarchyTreeNodeContextMenuLabelsWiring'
+import { resolveProjectHierarchyTreeNodeContextMenuLabels } from './scripts/projectHierarchyTree_manager'
 
 defineOptions({
   name: 'ProjectHierarchyTreeNodeContextMenu'

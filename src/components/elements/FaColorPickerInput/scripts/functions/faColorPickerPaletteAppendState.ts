@@ -13,7 +13,7 @@ function isFaColorPickerPaletteAppendHexValid (
 export function isFaColorPickerPaletteAppendDuplicate (
   config: I_faColorPickerPaletteAppendConfig | undefined,
   hex: string,
-  faProjectWorldColorPalleteContainsHex: (colorPallete: string, paletteHex: string) => boolean,
+  faProjectWorldColorPaletteContainsHex: (colorPalette: string, paletteHex: string) => boolean,
   isFaProjectWorldStorageHexColor: (value: string) => boolean
 ): boolean {
   if (config === undefined) {
@@ -22,18 +22,18 @@ export function isFaColorPickerPaletteAppendDuplicate (
   if (!isFaColorPickerPaletteAppendHexValid(hex, isFaProjectWorldStorageHexColor)) {
     return false
   }
-  return faProjectWorldColorPalleteContainsHex(config.worldColorPalette, hex)
+  return faProjectWorldColorPaletteContainsHex(config.worldColorPalette, hex)
 }
 
 export function isFaColorPickerPaletteAppendDisabled (
   config: I_faColorPickerPaletteAppendConfig | undefined,
   hex: string,
-  appendFaProjectWorldColorPalleteHex: (
-    colorPallete: string,
+  appendFaProjectWorldColorPaletteHex: (
+    colorPalette: string,
     appendHex: string,
     maxLength: number
   ) => string | null,
-  faProjectWorldColorPalleteContainsHex: (colorPallete: string, paletteHex: string) => boolean,
+  faProjectWorldColorPaletteContainsHex: (colorPalette: string, paletteHex: string) => boolean,
   isFaProjectWorldStorageHexColor: (value: string) => boolean,
   paletteMaxLength: number,
   readFaColorPickerPaletteAppendWorldId: (worldId: string | undefined) => string
@@ -44,10 +44,10 @@ export function isFaColorPickerPaletteAppendDisabled (
   if (!isFaColorPickerPaletteAppendHexValid(hex, isFaProjectWorldStorageHexColor)) {
     return true
   }
-  if (faProjectWorldColorPalleteContainsHex(config.worldColorPalette, hex)) {
+  if (faProjectWorldColorPaletteContainsHex(config.worldColorPalette, hex)) {
     return true
   }
-  const nextPalette = appendFaProjectWorldColorPalleteHex(
+  const nextPalette = appendFaProjectWorldColorPaletteHex(
     config.worldColorPalette,
     hex,
     paletteMaxLength
@@ -67,19 +67,19 @@ export function isFaColorPickerPaletteAppendDisabled (
 export async function runFaColorPickerPaletteAppendClick (
   config: I_faColorPickerPaletteAppendConfig,
   hex: string,
-  appendFaProjectWorldColorPalleteHex: (
-    colorPallete: string,
+  appendFaProjectWorldColorPaletteHex: (
+    colorPalette: string,
     appendHex: string,
     maxLength: number
   ) => string | null,
   paletteMaxLength: number,
-  persistWorldColorPalette: (worldId: string, colorPallete: string) => Promise<boolean>,
+  persistWorldColorPalette: (worldId: string, colorPalette: string) => Promise<boolean>,
   readFaColorPickerPaletteAppendWorldId: (worldId: string | undefined) => string,
   refreshProjectWorldColorPalette: () => Promise<void>,
-  emitAppendToWorldPalette: (colorPallete: string) => void,
+  emitAppendToWorldPalette: (colorPalette: string) => void,
   refreshProjectColorPalette?: () => Promise<void>
 ): Promise<void> {
-  const nextPalette = appendFaProjectWorldColorPalleteHex(
+  const nextPalette = appendFaProjectWorldColorPaletteHex(
     config.worldColorPalette,
     hex,
     paletteMaxLength

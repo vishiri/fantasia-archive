@@ -9,7 +9,7 @@ export function createUseFaColorPickerPaletteAppend (
 ): (props: {
     modelValue: string
     paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
-  }, emitAppendToWorldPalette: (colorPallete: string) => void, resolveLiveColorString: () => string, refreshProjectColorPalette?: () => Promise<void>) => {
+  }, emitAppendToWorldPalette: (colorPalette: string) => void, resolveLiveColorString: () => string, refreshProjectColorPalette?: () => Promise<void>) => {
     isPaletteAppendDisabled: I_computedRef<boolean>
     isPaletteAppendDuplicate: I_computedRef<boolean>
     isPaletteAppendInvalidHex: I_computedRef<boolean>
@@ -21,7 +21,7 @@ export function createUseFaColorPickerPaletteAppend (
       modelValue: string
       paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
     },
-    emitAppendToWorldPalette: (colorPallete: string) => void,
+    emitAppendToWorldPalette: (colorPalette: string) => void,
     resolveLiveColorString: () => string,
     refreshProjectColorPalette?: () => Promise<void>
   ) {
@@ -33,7 +33,7 @@ export function createUseFaColorPickerPaletteAppend (
       return deps.isFaColorPickerPaletteAppendDuplicate(
         props.paletteAppend,
         appendHexCandidate.value,
-        deps.faProjectWorldColorPalleteContainsHex,
+        deps.faProjectWorldColorPaletteContainsHex,
         deps.isFaProjectWorldStorageHexColor
       )
     })
@@ -50,8 +50,8 @@ export function createUseFaColorPickerPaletteAppend (
       return deps.isFaColorPickerPaletteAppendDisabled(
         props.paletteAppend,
         appendHexCandidate.value,
-        deps.appendFaProjectWorldColorPalleteHex,
-        deps.faProjectWorldColorPalleteContainsHex,
+        deps.appendFaProjectWorldColorPaletteHex,
+        deps.faProjectWorldColorPaletteContainsHex,
         deps.isFaProjectWorldStorageHexColor,
         deps.paletteMaxLength,
         deps.readFaColorPickerPaletteAppendWorldId
@@ -66,7 +66,7 @@ export function createUseFaColorPickerPaletteAppend (
       await deps.runFaColorPickerPaletteAppendClick(
         config,
         appendHexCandidate.value,
-        deps.appendFaProjectWorldColorPalleteHex,
+        deps.appendFaProjectWorldColorPaletteHex,
         deps.paletteMaxLength,
         deps.persistWorldColorPalette,
         deps.readFaColorPickerPaletteAppendWorldId,

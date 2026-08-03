@@ -3,7 +3,7 @@ import { expect, test, vi } from 'vitest'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from '../faActionDefinitionHandlersHierarchyTreeDocumentActions'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from '../faActionDefinitionHandlersHierarchyTreeDocumentActionsWiring'
 
 const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

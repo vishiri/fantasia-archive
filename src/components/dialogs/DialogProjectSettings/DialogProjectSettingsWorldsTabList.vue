@@ -1,5 +1,5 @@
 <template>
-  <FaVerticalDraggableTabList
+  <DialogProjectSettingsEntityTabList
     add-button-label-key="dialogs.projectSettings.panels.worlds.addWorldButton"
     block-class-suffix="dialogProjectSettingsWorldsTabList"
     :clone-list="cloneWorldDraftList"
@@ -38,7 +38,7 @@
         @select="emit('select', $event)"
       />
     </template>
-  </FaVerticalDraggableTabList>
+  </DialogProjectSettingsEntityTabList>
 </template>
 
 <script setup lang="ts">
@@ -59,7 +59,7 @@ import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_PADDING_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import FaVerticalDraggableTabList from 'app/src/components/elements/FaVerticalDraggableTabList/FaVerticalDraggableTabList.vue'
+import DialogProjectSettingsEntityTabList from './DialogProjectSettingsEntityTabList.vue'
 import DialogProjectSettingsWorldsTabItem from './DialogProjectSettingsWorldsTabItem.vue'
 import { filterDialogProjectSettingsWorldsByQuery } from './scripts/filterDialogProjectSettingsWorldsByQuery'
 
@@ -116,5 +116,3 @@ function isWorldTabValidationError (world: I_dialogProjectSettingsWorldDraft): b
   return isDialogProjectSettingsWorldTabValidationError(world, props.documentTemplates)
 }
 </script>
-
-<style lang="scss" src="./styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

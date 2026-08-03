@@ -1,7 +1,7 @@
 import type { T_faFloatingWindowResizePointerSessionDeps } from 'app/types/I_faFloatingWindowResizePointerSession'
 
 import { computeFaFloatingWindowResizeFrame } from './faFloatingWindowResizeGeometry_manager'
-import { applyFaFloatingWindowResizePointerSample as applyFaFloatingWindowResizePointerSampleFn } from './faFloatingWindowResizePointerSample'
+import { applyFaFloatingWindowResizePointerSample as applyFaFloatingWindowResizePointerSampleFn } from './faFloatingWindowResizePointerSampleWiring'
 import { createFaFloatingWindowResizePointerSessionDeps } from './functions/createFaFloatingWindowResizePointerSessionDeps'
 
 export const faFloatingWindowResizePointerSessionDeps: T_faFloatingWindowResizePointerSessionDeps =

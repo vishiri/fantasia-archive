@@ -10,7 +10,7 @@ import { expectInlineStyleColor } from 'app/helpers/vitestCssColorExpect'
 
 const worldFixture = {
   color: '',
-  colorPallete: '',
+  colorPalette: '',
   displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
@@ -89,17 +89,17 @@ const deleteButtonStub = defineComponent({
 const paletteEditorStub = defineComponent({
   name: 'DialogProjectSettingsWorldColorPaletteEditor',
   props: {
-    colorPallete: {
+    colorPalette: {
       type: String,
       default: ''
     }
   },
-  emits: ['update:colorPallete'],
+  emits: ['update:colorPalette'],
   template: `
     <button
       type="button"
       data-test-locator="dialogProjectSettings-worlds-colorPaletteEditor"
-      @click="$emit('update:colorPallete', '#112233;#445566')"
+      @click="$emit('update:colorPalette', '#112233;#445566')"
     />
   `
 })
@@ -203,7 +203,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
     world: {
       ...worldFixture,
       color: '#112233',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Renamed' }
     }
   })
@@ -217,7 +217,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
   expect(w.emitted('update:color')?.slice(-1)[0]).toEqual(['#aabbcc'])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteEditor"]').trigger('click')
-  expect(w.emitted('update:colorPallete')?.[0]).toEqual(['#112233;#445566'])
+  expect(w.emitted('update:colorPalette')?.[0]).toEqual(['#112233;#445566'])
 
   const colorPicker = w.findComponent({ name: 'FaColorPickerInput' })
   expect(colorPicker.props('palette')).toEqual([])
@@ -226,7 +226,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
     world: {
       ...worldFixture,
       color: '#112233',
-      colorPallete: '#112233;#445566',
+      colorPalette: '#112233;#445566',
       displayNameTranslations: { 'en-US': 'Renamed' }
     }
   })

@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { expect, test } from 'vitest'
 
-import { createProjectHierarchyTreeOrderNumberBadgeWiring } from '../projectHierarchyTreeOrderNumberBadgeWiring'
+import { createProjectHierarchyTreeOrderNumberBadgeWiring } from '../projectHierarchyTreeDisplayChromeWiring'
 
 test('Test that createProjectHierarchyTreeOrderNumberBadgeWiring resolves visibility from settings and preview', () => {
   const settings = ref({

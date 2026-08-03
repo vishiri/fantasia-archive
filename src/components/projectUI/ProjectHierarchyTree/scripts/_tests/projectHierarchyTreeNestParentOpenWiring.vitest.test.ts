@@ -4,7 +4,9 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { openProjectHierarchyTreeNodeInHeTree } from '../projectHierarchyTreeNestParentOpenWiring'
+import {
+  openProjectHierarchyTreeNodeInHeTree
+} from '../projectHierarchyTreeExpandDomWiring'
 
 const parentNode: I_faProjectHierarchyTreeHeTreeNode = {
   children: [],

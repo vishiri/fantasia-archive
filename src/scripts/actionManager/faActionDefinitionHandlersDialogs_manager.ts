@@ -1,6 +1,6 @@
-import { buildFaActionDefinitionHandlersDialogsAppConfig } from './faActionDefinitionHandlersDialogsAppConfig'
-import { buildFaActionDefinitionHandlersDialogsOpens } from './faActionDefinitionHandlersDialogsOpens'
-import { buildFaActionDefinitionHandlersDialogsProjectFlow } from './faActionDefinitionHandlersDialogsProjectFlow'
+import { buildFaActionDefinitionHandlersDialogsAppConfig } from './faActionDefinitionHandlersDialogsAppConfigWiring'
+import { buildFaActionDefinitionHandlersDialogsOpens } from './faActionDefinitionHandlersDialogsOpensWiring'
+import { buildFaActionDefinitionHandlersDialogsProjectFlow } from './faActionDefinitionHandlersDialogsProjectFlowWiring'
 import { faActionDefinitionHandlersDialogsDeps } from './faActionDefinitionHandlersDialogsWiring'
 
 const faActionDefinitionHandlersDialogsApi = {

@@ -22,7 +22,7 @@ test('Test that registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher res
   const localWorlds = ref([
     {
       color: '',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       id: 'world-a',

@@ -1,19 +1,8 @@
 import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import type { I_faFloatingWindowFrameCssProperties } from 'app/types/I_faFloatingWindowFrameCssProperties'
 import type { T_faFloatingWindowResizeEdge } from 'app/types/I_faFloatingWindowResize'
 import type { I_UseFaFloatingWindowFrameOptions } from 'app/types/I_useFaFloatingWindowFrameOptions'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
-
-interface I_cssPropertiesLike {
-  height?: string
-  left?: string
-  minHeight?: string
-  minWidth?: string
-  overflow?: string
-  position?: string
-  top?: string
-  width?: string
-  zIndex?: number
-}
 
 type T_createUseFaFloatingWindowFrameDeps = {
   attachFaFloatingWindowResizeObserver: (params: {
@@ -61,7 +50,7 @@ type T_createUseFaFloatingWindowFrameDeps = {
     y: I_ref<number>
     z: I_ref<number>
   }) => {
-    frameStyle: I_computedRef<I_cssPropertiesLike>
+    frameStyle: I_computedRef<I_faFloatingWindowFrameCssProperties>
     onFramePointerDown: () => void
     titleShortFrameClass: I_computedRef<string | undefined>
   }
@@ -92,7 +81,7 @@ type T_createUseFaFloatingWindowFrameDeps = {
 
 type T_useFaFloatingWindowFrameReturn = {
   frameRef: I_ref<HTMLElement | null>
-  frameStyle: I_computedRef<I_cssPropertiesLike>
+  frameStyle: I_computedRef<I_faFloatingWindowFrameCssProperties>
   h: I_ref<number>
   isDragActive: I_ref<boolean>
   isResizeActive: I_ref<boolean>

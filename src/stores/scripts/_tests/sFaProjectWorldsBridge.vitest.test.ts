@@ -10,7 +10,7 @@ const {
       items: [
         {
           color: '#808080',
-          colorPallete: '',
+          colorPalette: '',
           createdAtMs: 1,
           displayNameTranslations: { 'en-US': 'Realm' },
           documentCount: 2,
@@ -41,7 +41,7 @@ beforeEach(() => {
     items: [
       {
         color: '#808080',
-        colorPallete: '',
+        colorPalette: '',
         createdAtMs: 1,
         displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 2,
@@ -83,7 +83,7 @@ test('Test that faProjectWorldsFetchFreshForDialog returns mapped draft rows', a
   await expect(faProjectWorldsFetchFreshForDialog()).resolves.toEqual([
     {
       color: '#808080',
-      colorPallete: '',
+      colorPalette: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 2,
       id: '550e8400-e29b-41d4-a716-446655440000',
@@ -104,7 +104,7 @@ test('Test that faProjectWorldsFetchFreshForDialog defaults missing templateLayo
     items: [
       {
         color: '#808080',
-        colorPallete: '',
+        colorPalette: '',
         createdAtMs: 1,
         displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
