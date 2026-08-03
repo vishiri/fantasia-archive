@@ -94,6 +94,8 @@ Full postmortem: this skill section below (**DnD + scroll preservation**). Refer
 | **`overflow: auto`** on wrapper, not he-tree root | Scroll on **`.dialogProjectSettingsWorldTemplateLayoutTree`**; host sizing only — **`resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer`** |
 | Post-drop **`scrollTop` restore** | **Do not** — fights virtualization; fix remount/rebuild instead |
 
+**Workspace hierarchy (`ProjectHierarchyTree`):** expand truth = **`openNodeIds` / he-tree stats** — never derive drag expand snapshots from mounted DOM rows (virt omits off-screen). No **`:key` remount**; soft resync only. Post-drop expand reapply can zero vtlist **`scrollTop`** — preserve/restore around commit finalize (not a substitute for remount). he-tree does **not** forward `@virtual-list/vue` **`buffer`**; hierarchy manager mutates VirtualList default (~10 row heights) before mount.
+
 **Pipeline:** `@before-drag-start` → v-model during drag → `@after-drop` → deferred **`emitLayoutFromTreeDataIfChanged`** → props watch **`resyncTreeDataFromProps`**. Append: separate count watch → **`scheduleScrollContainerToRevealLastItem`**.
 
 **Debug:** compare topology keys layout vs **`mapHeTreeNodesToWorldTemplateLayoutDraft(treeData)`** after drop; check resync rebuild vs patch; find real scroll element in DevTools.
