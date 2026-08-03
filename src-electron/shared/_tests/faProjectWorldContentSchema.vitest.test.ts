@@ -43,13 +43,13 @@ test('Test that parseFaProjectWorldIdPayload rejects invalid uuid', () => {
 
 /**
  * parseFaProjectWorldsSnapshotPayload
- * Rejects invalid color_pallete strings in snapshot items.
+ * Rejects invalid color_palette strings in snapshot items.
  */
-test('Test that parseFaProjectWorldsSnapshotPayload rejects invalid colorPallete', () => {
+test('Test that parseFaProjectWorldsSnapshotPayload rejects invalid colorPalette', () => {
   expect(() => parseFaProjectWorldsSnapshotPayload({
     items: [
       {
-        colorPallete: 'not-a-palette',
+        colorPalette: 'not-a-palette',
         displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
@@ -59,13 +59,13 @@ test('Test that parseFaProjectWorldsSnapshotPayload rejects invalid colorPallete
 
 /**
  * parseFaProjectWorldsSnapshotPayload
- * Rejects color_pallete strings with duplicate hex values (case-insensitive).
+ * Rejects color_palette strings with duplicate hex values (case-insensitive).
  */
-test('Test that parseFaProjectWorldsSnapshotPayload rejects duplicate colorPallete colors', () => {
+test('Test that parseFaProjectWorldsSnapshotPayload rejects duplicate colorPalette colors', () => {
   expect(() => parseFaProjectWorldsSnapshotPayload({
     items: [
       {
-        colorPallete: '#112233;#aabbcc;#112233',
+        colorPalette: '#112233;#aabbcc;#112233',
         displayNameTranslations: { 'en-US': 'Realm' },
         id: SAMPLE_UUID
       }
@@ -80,13 +80,13 @@ test('Test that parseFaProjectWorldsSnapshotPayload rejects duplicate colorPalle
 test('Test that parseFaProjectWorldPatch parses optional world patch fields', () => {
   const parsed = parseFaProjectWorldPatch({
     color: '#AABBCC',
-    colorPallete: '#AABBCC;#112233',
+    colorPalette: '#AABBCC;#112233',
     displayName: '  Realm  ',
     sortOrder: 2
   })
   expect(parsed).toEqual({
     color: '#AABBCC',
-    colorPallete: '#AABBCC;#112233',
+    colorPalette: '#AABBCC;#112233',
     displayName: 'Realm',
     sortOrder: 2
   })
@@ -102,14 +102,14 @@ test('Test that parseFaProjectWorldPatch omits undefined optional keys', () => {
 
 /**
  * parseFaProjectWorldsSnapshotPayload
- * Maps optional color, colorPallete, and templateLayout snapshot fields.
+ * Maps optional color, colorPalette, and templateLayout snapshot fields.
  */
 test('Test that parseFaProjectWorldsSnapshotPayload maps optional snapshot fields', () => {
   const parsed = parseFaProjectWorldsSnapshotPayload({
     items: [
       {
         color: '#AABBCC',
-        colorPallete: '#AABBCC;#112233',
+        colorPalette: '#AABBCC;#112233',
         displayNameTranslations: { 'en-US': 'Realm' },
         id: SAMPLE_UUID,
         templateLayout: {
@@ -128,17 +128,17 @@ test('Test that parseFaProjectWorldsSnapshotPayload maps optional snapshot field
     ]
   })
   expect(parsed[0]?.color).toBe('#AABBCC')
-  expect(parsed[0]?.colorPallete).toBe('#AABBCC;#112233')
+  expect(parsed[0]?.colorPalette).toBe('#AABBCC;#112233')
   expect(parsed[0]?.templateLayout?.placements).toHaveLength(1)
 })
 
 /**
  * parseFaProjectWorldPatch
- * Rejects invalid colorPallete strings in patch payloads.
+ * Rejects invalid colorPalette strings in patch payloads.
  */
-test('Test that parseFaProjectWorldPatch rejects invalid colorPallete', () => {
+test('Test that parseFaProjectWorldPatch rejects invalid colorPalette', () => {
   expect(() => parseFaProjectWorldPatch({
-    colorPallete: 'not-a-palette'
+    colorPalette: 'not-a-palette'
   })).toThrow()
 })
 
@@ -157,25 +157,25 @@ test('Test that parseFaProjectWorldsSnapshotPayload maps color-only snapshot ite
     ]
   })
   expect(parsed[0]?.color).toBe('#AABBCC')
-  expect(parsed[0]?.colorPallete).toBeUndefined()
+  expect(parsed[0]?.colorPalette).toBeUndefined()
   expect(parsed[0]?.templateLayout).toBeUndefined()
 })
 
 /**
  * parseFaProjectWorldsSnapshotPayload
- * Maps snapshot items that only include colorPallete.
+ * Maps snapshot items that only include colorPalette.
  */
 test('Test that parseFaProjectWorldsSnapshotPayload maps palette-only snapshot items', () => {
   const parsed = parseFaProjectWorldsSnapshotPayload({
     items: [
       {
-        colorPallete: '#AABBCC;#112233',
+        colorPalette: '#AABBCC;#112233',
         displayNameTranslations: { 'en-US': 'Realm' },
         id: SAMPLE_UUID
       }
     ]
   })
-  expect(parsed[0]?.colorPallete).toBe('#AABBCC;#112233')
+  expect(parsed[0]?.colorPalette).toBe('#AABBCC;#112233')
   expect(parsed[0]?.color).toBeUndefined()
 })
 
@@ -206,7 +206,7 @@ test('Test that parseFaProjectWorldsSnapshotPayload maps templateLayout-only sna
   })
   expect(parsed[0]?.templateLayout?.placements).toHaveLength(1)
   expect(parsed[0]?.color).toBeUndefined()
-  expect(parsed[0]?.colorPallete).toBeUndefined()
+  expect(parsed[0]?.colorPalette).toBeUndefined()
 })
 
 /**

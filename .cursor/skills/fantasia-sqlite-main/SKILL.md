@@ -10,7 +10,7 @@ description: >-
 
 ## Canonical schema documentation
 
-- **[docs/database/projectDB.md](../../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **5**), tables, IPC, Project Settings
+- **[docs/database/projectDB.md](../../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **6**), tables, IPC, Project Settings
 - **[docs/database/templateCustomFields.md](../../../docs/database/templateCustomFields.md)** — planned custom fields (not shipped)
 - **[docs/database/appUserDataKv.md](../../../docs/database/appUserDataKv.md)** — **`electron-store`** in **`userData`**
 - **[docs/database/README.md](../../../docs/database/README.md)** — index
@@ -22,8 +22,8 @@ Schema/IPC changes → update docs same commit ([docs-database.mdc](../../rules/
 - **`better-sqlite3`** — main process only
 - **`.faproject`** SQLite under **`src-electron/mainScripts/projectManagement/`**; renderer via **`window.faContentBridgeAPIs.projectManagement`**
 - **E2E paths**: **`e2eSetNextProjectCreatePath`** / **`e2eSetNextProjectOpenPath`** in **`playwrightE2eProjectPaths.ts`**
-- **`user_version` max 5** today (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**) — worlds, documents, templates, media, junctions, per-world template layout, per-locale translations, document category/status/tree-order/extra-classes patches; Project Settings snapshots via **`saveWorldsSnapshot`**, **`saveDocumentTemplatesSnapshot`**
-- **Pre-release flatten**: may squash ladder **to** version **1** for dev resets — [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md) (distinct from live supported max **5**)
+- **`user_version` max 6** today (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**) — worlds, documents, templates, media, junctions, per-world template layout, per-locale translations, document category/status/tree-order/extra-classes patches; **v6** **worlds.color_pallete**→**color_palette**; Project Settings snapshots via **`saveWorldsSnapshot`**, **`saveDocumentTemplatesSnapshot`**
+- **Pre-release flatten**: may squash ladder **to** version **1** for dev resets — [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md) (distinct from live supported max **6**)
 
 ## Principles
 

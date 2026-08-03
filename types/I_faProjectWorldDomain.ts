@@ -4,13 +4,13 @@ import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProj
 /** Stored worlds.color hex (#RRGGBB). */
 export type T_faProjectWorldStorageColor = `#${string}`
 
-/** Stored worlds.color_pallete: semicolon-separated #RRGGBB list (max 2000 chars). */
-export type T_faProjectWorldColorPallete = string
+/** Stored worlds.color_palette: semicolon-separated #RRGGBB list (max 2000 chars). */
+export type T_faProjectWorldColorPalette = string
 
 /** Default hex appended when the user adds a palette swatch in Project Settings. */
 export const FA_PROJECT_WORLD_COLOR_PALETTE_APPEND_DEFAULT_HEX = '#FFFFFF'
 
-/** Maximum stored length of worlds.color_pallete (semicolon-separated #RRGGBB list). */
+/** Maximum stored length of worlds.color_palette (semicolon-separated #RRGGBB list). */
 export const FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH = 2000
 
 export interface I_faProjectWorld {
@@ -19,7 +19,7 @@ export interface I_faProjectWorld {
   displayName: string
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color: string
-  colorPallete: string
+  colorPalette: string
   sortOrder: number
   createdAtMs: number
   updatedAtMs: number
@@ -31,7 +31,7 @@ export interface I_faProjectWorldCreateInput {
 
 export interface I_faProjectWorldPatch {
   color?: string | undefined
-  colorPallete?: string | undefined
+  colorPalette?: string | undefined
   displayName?: string | undefined
   displayNameTranslations?: I_faProjectWorldDisplayNameTranslations | undefined
   sortOrder?: number | undefined
@@ -44,7 +44,7 @@ export interface I_faProjectWorldSnapshotItem {
   id: string
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color?: string | undefined
-  colorPallete?: string | undefined
+  colorPalette?: string | undefined
   templateLayout?: I_faProjectWorldTemplateLayoutSnapshot | undefined
 }
 
@@ -53,7 +53,7 @@ export type I_faProjectWorldListResult = I_faProjectContentListResult<I_faProjec
 /** Fields written when inserting or updating a world row during snapshot replace. */
 export interface I_faProjectWorldRowUpsertFields {
   color: string
-  colorPallete: string
+  colorPalette: string
   displayName: string
   displayNameTranslationsJson: string
   id: string

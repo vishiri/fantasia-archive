@@ -69,7 +69,7 @@ export interface I_dialogProjectSettingsWorldDraft {
   id: string
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color: string
-  colorPallete: string
+  colorPalette: string
   documentCount: number
   templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 }
@@ -167,7 +167,7 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
     createEntryId: () => string
   ) => I_dialogProjectSettingsWorldColorPaletteEntry[]
   clearFaVerticalDraggableTabsDocumentDragCursor: () => void
-  collectFaProjectWorldColorPalleteDuplicateHexKeys: (
+  collectFaProjectWorldColorPaletteDuplicateHexKeys: (
     hexList: readonly string[]
   ) => ReadonlySet<string>
   computed: <T>(fn: () => T) => I_computedRef<T>
@@ -183,11 +183,11 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
     dragEl: HTMLElement
   ) => void
   paletteMaxLength: number
-  parseFaProjectWorldColorPalleteToHexList: (
-    colorPallete: string
+  parseFaProjectWorldColorPaletteToHexList: (
+    colorPalette: string
   ) => string[]
-  parseFaProjectWorldColorPalleteToHexListPreservingDuplicates: (
-    colorPallete: string
+  parseFaProjectWorldColorPaletteToHexListPreservingDuplicates: (
+    colorPalette: string
   ) => string[]
   readFaSortableDragItemDataAttribute: (
     item: HTMLElement,
@@ -203,7 +203,7 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
     entryId: string,
     hex: string
   ) => I_dialogProjectSettingsWorldColorPaletteEntry[]
-  serializeFaProjectWorldColorPalleteFromHexList: (
+  serializeFaProjectWorldColorPaletteFromHexList: (
     hexList: readonly string[]
   ) => string
   watch: (
@@ -214,18 +214,18 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
   wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength: (
     entries: readonly I_dialogProjectSettingsWorldColorPaletteEntry[],
     entryId: string,
-    serializeFaProjectWorldColorPalleteFromHexList: (
+    serializeFaProjectWorldColorPaletteFromHexList: (
       hexList: readonly string[]
     ) => string,
-    wouldFaProjectWorldColorPalleteExceedMaxLength: (
-      colorPallete: string,
+    wouldFaProjectWorldColorPaletteExceedMaxLength: (
+      colorPalette: string,
       appendHex: string,
       maxLength: number
     ) => boolean,
     maxLength: number
   ) => boolean
-  wouldFaProjectWorldColorPalleteExceedMaxLength: (
-    colorPallete: string,
+  wouldFaProjectWorldColorPaletteExceedMaxLength: (
+    colorPalette: string,
     appendHex: string,
     maxLength: number
   ) => boolean
@@ -236,7 +236,7 @@ export interface I_faProjectWorldForProjectSettings {
   id: string
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color: string
-  colorPallete: string
+  colorPalette: string
   sortOrder: number
   createdAtMs: number
   updatedAtMs: number

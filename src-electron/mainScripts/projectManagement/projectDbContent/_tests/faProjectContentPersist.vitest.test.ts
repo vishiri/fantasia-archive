@@ -118,7 +118,7 @@ function makeProjectContentTestDb (): {
               display_name: args[1] as string,
               display_name_translations_json: args[2] as string,
               color: args[3] as string,
-              color_pallete: args[4] as string,
+              color_palette: args[4] as string,
               sort_order: args[5] as number,
               created_at_ms: args[6] as number,
               updated_at_ms: args[7] as number
@@ -421,8 +421,8 @@ function makeProjectContentTestDb (): {
             if (normalized.includes('color = ?')) {
               patch.color = args[argIdx++] as string
             }
-            if (normalized.includes('color_pallete = ?')) {
-              patch.color_pallete = args[argIdx++] as string
+            if (normalized.includes('color_palette = ?')) {
+              patch.color_palette = args[argIdx++] as string
             }
             if (normalized.includes('sort_order = ?')) {
               patch.sort_order = args[argIdx++] as number
@@ -1249,7 +1249,7 @@ test('Test that createFaProjectWorld assigns sortOrder and default color', () =>
   const second = createFaProjectWorld(db as never, { displayName: 'Beta' })
   expect(first.sortOrder).toBe(0)
   expect(first.color).toBe(FA_PROJECT_WORLD_DEFAULT_COLOR)
-  expect(first.colorPallete).toBe('')
+  expect(first.colorPalette).toBe('')
   expect(second.sortOrder).toBe(1)
   expect(listFaProjectWorlds(db as never).items.map((world) => world.displayName)).toEqual([
     'Alpha',
@@ -1266,13 +1266,13 @@ test('Test that updateFaProjectWorld persists color and sortOrder', () => {
   const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
   const updated = updateFaProjectWorld(db as never, world.id, {
     color: '#aabbcc',
-    colorPallete: '#112233;#445566',
+    colorPalette: '#112233;#445566',
     displayNameTranslations: { 'en-US': 'Realm 2' },
     sortOrder: 4
   })
   expect(updated.displayName).toBe('Realm 2')
   expect(updated.color).toBe('#AABBCC')
-  expect(updated.colorPallete).toBe('#112233;#445566')
+  expect(updated.colorPalette).toBe('#112233;#445566')
   expect(updated.sortOrder).toBe(4)
 })
 
@@ -1328,7 +1328,7 @@ test('Test that replaceFaProjectWorldsSnapshot replaces the ordered worlds list'
   replaceFaProjectWorldsSnapshot(db as never, [
     {
       color: '#112233',
-      colorPallete: '#aabbcc;#ddeeff',
+      colorPalette: '#aabbcc;#ddeeff',
       displayNameTranslations: { 'en-US': 'Keep renamed' },
       id: first.id
     },
@@ -1344,7 +1344,7 @@ test('Test that replaceFaProjectWorldsSnapshot replaces the ordered worlds list'
   expect(listed[0]!.sortOrder).toBe(0)
   expect(listed[1]!.sortOrder).toBe(1)
   expect(listed[0]!.color).toBe('#112233')
-  expect(listed[0]!.colorPallete).toBe('#AABBCC;#DDEEFF')
+  expect(listed[0]!.colorPalette).toBe('#AABBCC;#DDEEFF')
 })
 
 /**

@@ -35,13 +35,13 @@ test('Test that mapFaProjectWorldRow maps color and sortOrder', () => {
     display_name: 'Realm',
     display_name_translations_json: '{"en-US":"Realm"}',
     color: '#808080',
-    color_pallete: '#112233;#445566',
+    color_palette: '#112233;#445566',
     sort_order: 2,
     created_at_ms: 5,
     updated_at_ms: 6
   })
   expect(mapped.color).toBe('#808080')
-  expect(mapped.colorPallete).toBe('#112233;#445566')
+  expect(mapped.colorPalette).toBe('#112233;#445566')
   expect(mapped.sortOrder).toBe(2)
   expect(mapped.displayNameTranslations).toEqual({ 'en-US': 'Realm' })
 })

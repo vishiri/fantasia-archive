@@ -52,8 +52,8 @@ CREATE TABLE ${WORLDS_REBUILD_TABLE_NAME} (
   CHECK (length(display_name_translations_json) <= ${FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH}),
   color TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR}'
   CHECK ${FA_PROJECT_WORLD_COLOR_CHECK_SQL},
-  color_pallete TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
-  CHECK (length(color_pallete) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
+  color_palette TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
+  CHECK (length(color_palette) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
@@ -63,7 +63,7 @@ INSERT INTO ${WORLDS_REBUILD_TABLE_NAME} (
   display_name,
   display_name_translations_json,
   color,
-  color_pallete,
+  color_palette,
   sort_order,
   created_at_ms,
   updated_at_ms
@@ -73,7 +73,7 @@ SELECT
   display_name,
   display_name_translations_json,
   color,
-  color_pallete,
+  color_palette,
   sort_order,
   created_at_ms,
   updated_at_ms

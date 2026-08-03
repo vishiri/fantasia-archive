@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 
 import { coerceFaProjectWorldColorForStorage } from '../functions/coerceFaProjectWorldColorForStorage'
-import { coerceFaProjectWorldColorPalleteForStorage } from '../functions/coerceFaProjectWorldColorPalleteForStorage'
+import { coerceFaProjectWorldColorPaletteForStorage } from '../functions/coerceFaProjectWorldColorPaletteForStorage'
 import {
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
   FA_PROJECT_WORLD_DEFAULT_COLOR
@@ -40,7 +40,7 @@ export function updateFaProjectWorld (
 ): I_faProjectWorld {
   const rowPatch: {
     color?: string
-    colorPallete?: string
+    colorPalette?: string
     displayName?: string
     displayNameTranslationsJson?: string
     sortOrder?: number
@@ -60,9 +60,9 @@ export function updateFaProjectWorld (
       FA_PROJECT_WORLD_DEFAULT_COLOR
     )
   }
-  if (patch.colorPallete !== undefined) {
-    rowPatch.colorPallete = coerceFaProjectWorldColorPalleteForStorage(
-      patch.colorPallete,
+  if (patch.colorPalette !== undefined) {
+    rowPatch.colorPalette = coerceFaProjectWorldColorPaletteForStorage(
+      patch.colorPalette,
       FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
     )
   }
@@ -90,7 +90,7 @@ export function listFaProjectWorldsForProjectSettings (
   const documentCounts = listFaProjectWorldDocumentCounts(db)
   const items = listFaProjectWorldRows(db).map((world) => ({
     color: world.color,
-    colorPallete: world.colorPallete,
+    colorPalette: world.colorPalette,
     createdAtMs: world.createdAtMs,
     displayNameTranslations: world.displayNameTranslations,
     documentCount: documentCounts[world.id] ?? 0,

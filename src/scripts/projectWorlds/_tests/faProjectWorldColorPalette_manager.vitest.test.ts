@@ -24,7 +24,7 @@ test('Test that useFaProjectWorldColorPaletteFromBridge loads palettes from list
     items: [
       {
         color: '',
-        colorPallete: '#112233;#445566',
+        colorPalette: '#112233;#445566',
         createdAtMs: 0,
         displayName: 'Realm',
         id: '550e8400-e29b-41d4-a716-446655440000',

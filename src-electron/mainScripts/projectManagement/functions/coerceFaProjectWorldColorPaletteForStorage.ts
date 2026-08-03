@@ -3,7 +3,7 @@ const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 /**
  * True when the palette contains the same #RRGGBB value more than once (case-insensitive).
  */
-export function hasFaProjectWorldColorPalleteCaseInsensitiveDuplicates (
+export function hasFaProjectWorldColorPaletteCaseInsensitiveDuplicates (
   value: string
 ): boolean {
   const trimmed = value.trim()
@@ -31,7 +31,7 @@ export function hasFaProjectWorldColorPalleteCaseInsensitiveDuplicates (
 /**
  * True when value is empty or a semicolon-separated list of unique #RRGGBB segments within max length.
  */
-export function isFaProjectWorldColorPalleteStorageValue (
+export function isFaProjectWorldColorPaletteStorageValue (
   value: string,
   maxLength: number
 ): boolean {
@@ -41,7 +41,7 @@ export function isFaProjectWorldColorPalleteStorageValue (
   if (value.length === 0) {
     return true
   }
-  if (hasFaProjectWorldColorPalleteCaseInsensitiveDuplicates(value)) {
+  if (hasFaProjectWorldColorPaletteCaseInsensitiveDuplicates(value)) {
     return false
   }
   const segments = value.split(';')
@@ -58,11 +58,11 @@ export function isFaProjectWorldColorPalleteStorageValue (
 }
 
 /**
- * Normalizes worlds.color_pallete for SQLite storage.
+ * Normalizes worlds.color_palette for SQLite storage.
  * Blank input maps to ''. Invalid or overlong input maps to '' without throwing.
  * Duplicate #RRGGBB segments (case-insensitive) keep the first occurrence only.
  */
-export function coerceFaProjectWorldColorPalleteForStorage (
+export function coerceFaProjectWorldColorPaletteForStorage (
   raw: string | undefined,
   maxLength: number
 ): string {

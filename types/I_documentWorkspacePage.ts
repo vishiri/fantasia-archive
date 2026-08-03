@@ -19,8 +19,8 @@ export type T_createDocumentWorkspacePageColorPickersDeps = {
       t: (key: string) => string
     }
   }
-  parseFaProjectWorldColorPalleteToHexList: (colorPallete: string) => string[]
-  patchWorldColorPalleteInLayout: (worldId: string, colorPallete: string) => void
+  parseFaProjectWorldColorPaletteToHexList: (colorPalette: string) => string[]
+  patchWorldColorPaletteInLayout: (worldId: string, colorPalette: string) => void
   resolveOpenedDocumentTabIsInPreviewMode: (editState: boolean) => boolean
   routeDocumentId: I_computedRef<string>
   updateDocumentBackgroundColorDraft: (documentId: string, value: string) => void
@@ -44,7 +44,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
     updateExtraClassesDraft: (documentId: string, value: string) => void
   }
   S_FaProjectHierarchyTree: () => StoreGeneric & {
-    patchWorldColorPalleteInLayout: (worldId: string, colorPallete: string) => void
+    patchWorldColorPaletteInLayout: (worldId: string, colorPalette: string) => void
   }
   computed: {
     <T>(getter: () => T): I_computedRef<T>
@@ -60,7 +60,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
-    onAppendToWorldPalette: (colorPallete: string) => void
+    onAppendToWorldPalette: (colorPalette: string) => void
     textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
@@ -126,7 +126,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
   }
   navigateToWorkspaceHomeRoute: () => Promise<void>
   onMounted: (hook: () => void) => void
-  parseFaProjectWorldColorPalleteToHexList: (colorPallete: string) => string[]
+  parseFaProjectWorldColorPaletteToHexList: (colorPalette: string) => string[]
   resolveOpenedDocumentDisplayNameFromTab: (
     tab: Pick<I_faOpenedDocumentTab, 'displayNameDraft' | 'tabLabel'>
   ) => string
@@ -186,7 +186,7 @@ export type T_useDocumentWorkspacePageApi = () => {
   extraHtmlClassesFieldReadOnly: I_computedRef<boolean>
   extraHtmlClassesModel: I_computedRef<string>
   workspacePageExtraHtmlClassList: I_computedRef<string[]>
-  onAppendToWorldPalette: (colorPallete: string) => void
+  onAppendToWorldPalette: (colorPalette: string) => void
   previewDisplayName: I_computedRef<string>
   textColorFieldDescription: I_computedRef<string>
   textColorFieldLabel: I_computedRef<string>

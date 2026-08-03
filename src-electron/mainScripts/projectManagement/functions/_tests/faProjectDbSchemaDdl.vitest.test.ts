@@ -43,7 +43,7 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
   expect(sql).toContain(FA_PROJECT_TABLE_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_OPENED_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_WORLDS)
-  expect(sql).toContain('color_pallete')
+  expect(sql).toContain('color_palette')
   expect(sql).toContain("color = '' OR")
   expect(sql).toContain('document_text_color')
   expect(sql).toContain("document_text_color = '' OR")

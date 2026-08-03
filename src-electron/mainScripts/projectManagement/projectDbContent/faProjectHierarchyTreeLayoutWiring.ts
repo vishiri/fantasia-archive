@@ -41,7 +41,7 @@ export function listFaProjectWorkspaceHierarchyLayout (
 ): I_faProjectHierarchyTreeWorkspaceLayoutResult {
   const worldRows = db
     .prepare(
-      'SELECT id, display_name, display_name_translations_json, color, color_pallete, ' +
+      'SELECT id, display_name, display_name_translations_json, color, color_palette, ' +
         'sort_order, created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_WORLDS} ORDER BY sort_order ASC, created_at_ms ASC, id ASC`
     )
@@ -79,7 +79,7 @@ export function listFaProjectWorkspaceHierarchyLayout (
       displayName: world.displayName,
       sortOrder: world.sortOrder,
       color: world.color,
-      colorPallete: world.colorPallete,
+      colorPalette: world.colorPalette,
       groups: groupRows.map((groupRow) => ({
         id: groupRow.id,
         worldId: groupRow.world_id,

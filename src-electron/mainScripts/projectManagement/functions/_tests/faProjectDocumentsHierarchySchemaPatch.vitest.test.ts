@@ -33,7 +33,7 @@ CREATE TABLE ${FA_PROJECT_TABLE_WORLDS} (
   display_name TEXT NOT NULL,
   display_name_translations_json TEXT NOT NULL DEFAULT '{}',
   color TEXT NOT NULL DEFAULT '#808080',
-  color_pallete TEXT NOT NULL DEFAULT '',
+  color_palette TEXT NOT NULL DEFAULT '',
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL

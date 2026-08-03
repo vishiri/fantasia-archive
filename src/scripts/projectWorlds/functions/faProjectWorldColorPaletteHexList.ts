@@ -8,10 +8,10 @@ export function isFaProjectWorldStorageHexColor (value: string): boolean {
 }
 
 /**
- * True when color_pallete already contains the hex (case-insensitive).
+ * True when color_palette already contains the hex (case-insensitive).
  */
-export function faProjectWorldColorPalleteContainsHex (
-  colorPallete: string,
+export function faProjectWorldColorPaletteContainsHex (
+  colorPalette: string,
   hex: string
 ): boolean {
   const part = hex.trim()
@@ -19,7 +19,7 @@ export function faProjectWorldColorPalleteContainsHex (
     return false
   }
   const key = part.toLowerCase()
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return false
   }
@@ -39,11 +39,11 @@ export function faProjectWorldColorPalleteContainsHex (
 }
 
 /**
- * Appends one #RRGGBB to color_pallete when valid, unique, and within max length.
+ * Appends one #RRGGBB to color_palette when valid, unique, and within max length.
  * Returns null when append is not allowed.
  */
-export function appendFaProjectWorldColorPalleteHex (
-  colorPallete: string,
+export function appendFaProjectWorldColorPaletteHex (
+  colorPalette: string,
   appendHex: string,
   maxLength: number
 ): string | null {
@@ -52,13 +52,13 @@ export function appendFaProjectWorldColorPalleteHex (
     return null
   }
   const upper = part.toUpperCase()
-  if (faProjectWorldColorPalleteContainsHex(colorPallete, upper)) {
+  if (faProjectWorldColorPaletteContainsHex(colorPalette, upper)) {
     return null
   }
-  if (wouldFaProjectWorldColorPalleteExceedMaxLength(colorPallete, upper, maxLength)) {
+  if (wouldFaProjectWorldColorPaletteExceedMaxLength(colorPalette, upper, maxLength)) {
     return null
   }
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return upper
   }
@@ -68,10 +68,10 @@ export function appendFaProjectWorldColorPalleteHex (
 /**
  * True when the palette contains the same #RRGGBB value more than once (case-insensitive).
  */
-export function hasFaProjectWorldColorPalleteCaseInsensitiveDuplicates (
-  colorPallete: string
+export function hasFaProjectWorldColorPaletteCaseInsensitiveDuplicates (
+  colorPalette: string
 ): boolean {
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return false
   }
@@ -94,11 +94,11 @@ export function hasFaProjectWorldColorPalleteCaseInsensitiveDuplicates (
 }
 
 /**
- * Parses one worlds.color_pallete string into validated unique #RRGGBB values (uppercase).
+ * Parses one worlds.color_palette string into validated unique #RRGGBB values (uppercase).
  * Invalid or empty segments are skipped. Later duplicates (case-insensitive) are skipped.
  */
-export function parseFaProjectWorldColorPalleteToHexList (colorPallete: string): string[] {
-  const trimmed = colorPallete.trim()
+export function parseFaProjectWorldColorPaletteToHexList (colorPalette: string): string[] {
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return []
   }
@@ -125,20 +125,20 @@ export function parseFaProjectWorldColorPalleteToHexList (colorPallete: string):
 }
 
 /**
- * Normalizes a color_pallete string for storage: unique #RRGGBB segments, uppercase, semicolon-separated.
+ * Normalizes a color_palette string for storage: unique #RRGGBB segments, uppercase, semicolon-separated.
  */
-export function normalizeFaProjectWorldColorPalleteString (colorPallete: string): string {
-  return parseFaProjectWorldColorPalleteToHexList(colorPallete).join(';')
+export function normalizeFaProjectWorldColorPaletteString (colorPalette: string): string {
+  return parseFaProjectWorldColorPaletteToHexList(colorPalette).join(';')
 }
 
 /**
- * Parses one worlds.color_pallete string for editor display: validated #RRGGBB values in order.
+ * Parses one worlds.color_palette string for editor display: validated #RRGGBB values in order.
  * Invalid or empty segments are skipped. Duplicates are kept so the editor can highlight them.
  */
-export function parseFaProjectWorldColorPalleteToHexListPreservingDuplicates (
-  colorPallete: string
+export function parseFaProjectWorldColorPaletteToHexListPreservingDuplicates (
+  colorPalette: string
 ): string[] {
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return []
   }
@@ -157,9 +157,9 @@ export function parseFaProjectWorldColorPalleteToHexListPreservingDuplicates (
 }
 
 /**
- * Serializes validated #RRGGBB values into a semicolon-separated color_pallete string.
+ * Serializes validated #RRGGBB values into a semicolon-separated color_palette string.
  */
-export function serializeFaProjectWorldColorPalleteFromHexList (
+export function serializeFaProjectWorldColorPaletteFromHexList (
   hexList: readonly string[]
 ): string {
   const normalized: string[] = []
@@ -179,7 +179,7 @@ export function serializeFaProjectWorldColorPalleteFromHexList (
 /**
  * Lowercase #RRGGBB keys that appear more than once in the list (case-insensitive).
  */
-export function collectFaProjectWorldColorPalleteDuplicateHexKeys (
+export function collectFaProjectWorldColorPaletteDuplicateHexKeys (
   hexList: readonly string[]
 ): ReadonlySet<string> {
   const counts = new Map<string, number>()
@@ -204,10 +204,10 @@ export function collectFaProjectWorldColorPalleteDuplicateHexKeys (
 }
 
 /**
- * True when appending one more hex segment would exceed the stored color_pallete length cap.
+ * True when appending one more hex segment would exceed the stored color_palette length cap.
  */
-export function wouldFaProjectWorldColorPalleteExceedMaxLength (
-  colorPallete: string,
+export function wouldFaProjectWorldColorPaletteExceedMaxLength (
+  colorPalette: string,
   appendHex: string,
   maxLength: number
 ): boolean {
@@ -215,7 +215,7 @@ export function wouldFaProjectWorldColorPalleteExceedMaxLength (
   if (!HEX_COLOR_SEGMENT.test(normalizedAppend)) {
     return true
   }
-  const trimmed = colorPallete.trim()
+  const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return normalizedAppend.length > maxLength
   }
@@ -224,16 +224,16 @@ export function wouldFaProjectWorldColorPalleteExceedMaxLength (
 }
 
 /**
- * Merges color_pallete strings from multiple worlds into one deduplicated #RRGGBB list.
+ * Merges color_palette strings from multiple worlds into one deduplicated #RRGGBB list.
  * Order is preserved by world order, then segment order within each palette.
  */
-export function aggregateFaProjectWorldColorPalleteHexList (
-  colorPalleteStrings: readonly string[]
+export function aggregateFaProjectWorldColorPaletteHexList (
+  colorPaletteStrings: readonly string[]
 ): string[] {
   const seen = new Set<string>()
   const merged: string[] = []
-  for (const colorPallete of colorPalleteStrings) {
-    const parsed = parseFaProjectWorldColorPalleteToHexList(colorPallete)
+  for (const colorPalette of colorPaletteStrings) {
+    const parsed = parseFaProjectWorldColorPaletteToHexList(colorPalette)
     for (const hex of parsed) {
       const key = hex.toLowerCase()
       if (seen.has(key)) {

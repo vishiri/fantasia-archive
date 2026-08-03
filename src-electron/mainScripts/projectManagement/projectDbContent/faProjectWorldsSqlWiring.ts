@@ -21,7 +21,7 @@ import type { I_faSqlWorldRow } from 'app/types/I_faProjectContentRowMap'
 const WORLD_ENTITY_LABEL = 'World'
 
 const SQL_SELECT_WORLD_COLUMNS =
-  'id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms'
+  'id, display_name, display_name_translations_json, color, color_palette, sort_order, created_at_ms, updated_at_ms'
 
 function buildDisplayNameTranslationsJsonFromDisplayName (displayName: string): string {
   const displayNameTranslations: I_faProjectWorldDisplayNameTranslations = {
@@ -84,7 +84,7 @@ export function insertFaProjectWorld (
   const sortOrder = computeNextFaProjectWorldSortOrder(readFaProjectWorldMaxSortOrder(db))
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_WORLDS} ` +
-      '(id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
+      '(id, display_name, display_name_translations_json, color, color_palette, sort_order, created_at_ms, updated_at_ms) ' +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
@@ -111,14 +111,14 @@ export function insertFaProjectWorldWithId (
   const nowMs = Date.now()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_WORLDS} ` +
-      '(id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
+      '(id, display_name, display_name_translations_json, color, color_palette, sort_order, created_at_ms, updated_at_ms) ' +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     fields.id,
     fields.displayName,
     fields.displayNameTranslationsJson,
     fields.color,
-    fields.colorPallete,
+    fields.colorPalette,
     fields.sortOrder,
     nowMs,
     nowMs
@@ -136,7 +136,7 @@ export function updateFaProjectWorldRow (
   id: string,
   patch: {
     color?: string
-    colorPallete?: string
+    colorPalette?: string
     displayName?: string
     displayNameTranslationsJson?: string
     sortOrder?: number
@@ -163,9 +163,9 @@ export function updateFaProjectWorldRow (
     sets.push('color = ?')
     values.push(patch.color)
   }
-  if (patch.colorPallete !== undefined) {
-    sets.push('color_pallete = ?')
-    values.push(patch.colorPallete)
+  if (patch.colorPalette !== undefined) {
+    sets.push('color_palette = ?')
+    values.push(patch.colorPalette)
   }
   if (patch.sortOrder !== undefined) {
     sets.push('sort_order = ?')

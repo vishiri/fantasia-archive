@@ -37,7 +37,7 @@ export type T_dialogProjectSettingsDialogActionsApi = {
     worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
   ) => void
   updateWorldColor: (id: string, color: string) => void
-  updateWorldColorPallete: (id: string, colorPallete: string) => void
+  updateWorldColorPalette: (id: string, colorPalette: string) => void
   updateWorldDisplayNameTranslations: (
     id: string,
     displayNameTranslations: I_faProjectWorldDisplayNameTranslations
@@ -85,7 +85,7 @@ export type T_dialogProjectSettingsUseHookDeps = {
   hasDialogProjectSettingsDocumentTemplateNameValidationError: (
     templates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ) => boolean
-  hasDialogProjectSettingsWorldColorPalleteValidationError: (
+  hasDialogProjectSettingsWorldColorPaletteValidationError: (
     worlds: I_dialogProjectSettingsWorldDraft[] | null
   ) => boolean
   hasDialogProjectSettingsWorldNameValidationError: (

@@ -69,7 +69,7 @@ export interface I_faProjectHierarchyTreeWorkspaceWorld {
   displayName: string
   sortOrder: number
   color: string
-  colorPallete: string
+  colorPalette: string
   groups: I_faProjectHierarchyTreeWorkspaceGroup[]
   placements: I_faProjectHierarchyTreeWorkspacePlacement[]
 }

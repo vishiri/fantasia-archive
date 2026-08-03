@@ -15,6 +15,7 @@ import {
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX,
   FA_PROJECT_TABLE_DOCUMENTS,
+  FA_PROJECT_TABLE_WORLDS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from './functions/faProjectDbSchemaDdl'
 import { createApplyFaProjectDocumentsHierarchySchemaPatch } from './functions/faProjectDocumentsHierarchySchemaPatch'
@@ -30,8 +31,8 @@ import { applyFaProjectWorldColorEmptyAllowedSchemaPatch } from './projectDbCont
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number + v5 extra_classes. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5
+/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number + v5 extra_classes + v6 worlds.color_palette rename. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6
 
 const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
   documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
@@ -137,6 +138,32 @@ function migrateFaProjectSchemaV4ToV5 (db: Database): void {
   runMigration()
 }
 
+type T_faProjectTableInfoRow = {
+  name: string
+}
+
+function renameFaProjectWorldsColorPaletteColumnIfNeeded (db: Database): void {
+  const rows = db.pragma(`table_info(${FA_PROJECT_TABLE_WORLDS})`) as T_faProjectTableInfoRow[]
+  const columnNames = new Set(rows.map((row) => row.name))
+  // Legacy misspelling color_pallete → color_palette (v5 files / pre-v6 bootstrap).
+  const hasLegacy = columnNames.has('color_pallete')
+  const hasCanonical = columnNames.has('color_palette')
+  if (!hasLegacy || hasCanonical) {
+    return
+  }
+  db.exec(
+    `ALTER TABLE ${FA_PROJECT_TABLE_WORLDS} RENAME COLUMN color_pallete TO color_palette`
+  )
+}
+
+function migrateFaProjectSchemaV5ToV6 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    renameFaProjectWorldsColorPaletteColumnIfNeeded(db)
+    db.pragma('user_version = 6')
+  })
+  runMigration()
+}
+
 /**
  * Applies schema migrations. Fresh files bootstrap to the current revision and seed the default world.
  * Files already at the supported version run idempotent patches only.
@@ -164,6 +191,9 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
       migrateFaProjectSchemaV4ToV5(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
+      migrateFaProjectSchemaV5ToV6(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
@@ -175,6 +205,9 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
       migrateFaProjectSchemaV4ToV5(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
+      migrateFaProjectSchemaV5ToV6(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
@@ -183,11 +216,22 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
       migrateFaProjectSchemaV4ToV5(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
+      migrateFaProjectSchemaV5ToV6(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 4) {
     migrateFaProjectSchemaV4ToV5(db)
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
+      migrateFaProjectSchemaV5ToV6(db)
+    }
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 5) {
+    migrateFaProjectSchemaV5ToV6(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }

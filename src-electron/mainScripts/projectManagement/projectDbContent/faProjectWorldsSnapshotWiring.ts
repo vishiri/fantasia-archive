@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 
 import { coerceFaProjectWorldColorForStorage } from '../functions/coerceFaProjectWorldColorForStorage'
-import { coerceFaProjectWorldColorPalleteForStorage } from '../functions/coerceFaProjectWorldColorPalleteForStorage'
+import { coerceFaProjectWorldColorPaletteForStorage } from '../functions/coerceFaProjectWorldColorPaletteForStorage'
 import {
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
   FA_PROJECT_WORLD_DEFAULT_COLOR
@@ -43,8 +43,8 @@ export function replaceFaProjectWorldsSnapshot (
         item.color,
         FA_PROJECT_WORLD_DEFAULT_COLOR
       )
-      const colorPallete = coerceFaProjectWorldColorPalleteForStorage(
-        item.colorPallete,
+      const colorPalette = coerceFaProjectWorldColorPaletteForStorage(
+        item.colorPalette,
         FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
       )
       const displayNameTranslationsJson = serializeFaProjectWorldDisplayNameTranslationsJson(
@@ -54,7 +54,7 @@ export function replaceFaProjectWorldsSnapshot (
       if (existingIds.has(item.id)) {
         updateFaProjectWorldRow(db, item.id, {
           color,
-          colorPallete,
+          colorPalette,
           displayName,
           displayNameTranslationsJson,
           sortOrder: index
@@ -62,7 +62,7 @@ export function replaceFaProjectWorldsSnapshot (
       } else {
         insertFaProjectWorldWithId(db, {
           color,
-          colorPallete,
+          colorPalette,
           displayName,
           displayNameTranslationsJson,
           id: item.id,

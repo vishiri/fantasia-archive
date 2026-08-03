@@ -62,7 +62,7 @@ export function createMapFaProjectWorldRow (deps: {
         row.display_name_translations_json
       ),
       color: row.color,
-      colorPallete: row.color_pallete,
+      colorPalette: row.color_palette,
       sortOrder: row.sort_order,
       createdAtMs: row.created_at_ms,
       updatedAtMs: row.updated_at_ms

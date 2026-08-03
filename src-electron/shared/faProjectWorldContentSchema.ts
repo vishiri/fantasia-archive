@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { isFaProjectWorldColorPalleteStorageValue } from 'app/src-electron/mainScripts/projectManagement/functions/coerceFaProjectWorldColorPalleteForStorage'
+import { isFaProjectWorldColorPaletteStorageValue } from 'app/src-electron/mainScripts/projectManagement/functions/coerceFaProjectWorldColorPaletteForStorage'
 import {
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
 } from 'app/src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl'
@@ -18,14 +18,14 @@ import type {
   I_faProjectWorldSnapshotItem
 } from 'app/types/I_faProjectWorldDomain'
 
-export const faProjectWorldColorPalleteSchema = z.string().max(
+export const faProjectWorldColorPaletteSchema = z.string().max(
   FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
 ).refine(
-  (value) => isFaProjectWorldColorPalleteStorageValue(
+  (value) => isFaProjectWorldColorPaletteStorageValue(
     value,
     FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
   ),
-  { message: 'Invalid color_pallete value' }
+  { message: 'Invalid color_palette value' }
 )
 
 export const faProjectWorldCreateInputSchema = z.object({
@@ -34,7 +34,7 @@ export const faProjectWorldCreateInputSchema = z.object({
 
 export const faProjectWorldPatchSchema = z.object({
   color: z.string().optional(),
-  colorPallete: faProjectWorldColorPalleteSchema.optional(),
+  colorPalette: faProjectWorldColorPaletteSchema.optional(),
   displayName: faProjectContentDisplayNameSchema.optional(),
   sortOrder: z.number().int().nonnegative().optional()
 }).strict()
@@ -75,7 +75,7 @@ export function parseFaProjectWorldUpdatePayload (
 
 export const faProjectWorldSnapshotItemSchema = z.object({
   color: z.string().optional(),
-  colorPallete: faProjectWorldColorPalleteSchema.optional(),
+  colorPalette: faProjectWorldColorPaletteSchema.optional(),
   displayNameTranslations: z.unknown(),
   id: faProjectContentIdSchema,
   templateLayout: faProjectWorldTemplateLayoutSnapshotSchema.optional()
@@ -103,8 +103,8 @@ export function parseFaProjectWorldsSnapshotPayload (
       snapshotItem.color = item.color
     }
 
-    if (item.colorPallete !== undefined) {
-      snapshotItem.colorPallete = item.colorPallete
+    if (item.colorPalette !== undefined) {
+      snapshotItem.colorPalette = item.colorPalette
     }
 
     if (item.templateLayout !== undefined) {

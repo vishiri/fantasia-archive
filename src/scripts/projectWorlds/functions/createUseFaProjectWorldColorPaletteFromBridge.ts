@@ -1,10 +1,10 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
 export function createUseFaProjectWorldColorPaletteFromBridge (deps: {
-  aggregateFaProjectWorldColorPalleteHexList: (colorPalleteStrings: readonly string[]) => string[]
+  aggregateFaProjectWorldColorPaletteHexList: (colorPaletteStrings: readonly string[]) => string[]
   computed: <T>(fn: () => T) => I_computedRef<T>
   getActiveProjectId: () => string | null
-  listWorldColorPalleteStrings: () => Promise<readonly string[]>
+  listWorldColorPaletteStrings: () => Promise<readonly string[]>
   ref: <T>(value: T) => I_ref<T>
   watch: (
     source: () => string | null,
@@ -27,8 +27,8 @@ export function createUseFaProjectWorldColorPaletteFromBridge (deps: {
         paletteHexList.value = []
         return
       }
-      const colorPalleteStrings = await deps.listWorldColorPalleteStrings()
-      paletteHexList.value = deps.aggregateFaProjectWorldColorPalleteHexList(colorPalleteStrings)
+      const colorPaletteStrings = await deps.listWorldColorPaletteStrings()
+      paletteHexList.value = deps.aggregateFaProjectWorldColorPaletteHexList(colorPaletteStrings)
     }
 
     deps.watch(

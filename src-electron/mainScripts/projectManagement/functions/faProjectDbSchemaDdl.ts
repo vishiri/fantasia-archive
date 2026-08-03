@@ -89,10 +89,10 @@ export const FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_CHECK_SQL =
   `length(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}) = 7 AND ` +
   `substr(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, 1, 1) = '#'))`
 
-/** Max stored length for worlds.color_pallete (semicolon-separated #RRGGBB list). */
+/** Max stored length for worlds.color_palette (semicolon-separated #RRGGBB list). */
 export const FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH = 2000
 
-/** Default worlds.color_pallete when inserting worlds without an override. */
+/** Default worlds.color_palette when inserting worlds without an override. */
 export const FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE = ''
 
 /** Max stored length for document_templates.world_appendix. */
@@ -177,8 +177,8 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
   CHECK (length(display_name_translations_json) <= ${FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH}),
   color TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR}'
   CHECK ${FA_PROJECT_WORLD_COLOR_CHECK_SQL},
-  color_pallete TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
-  CHECK (length(color_pallete) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
+  color_palette TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
+  CHECK (length(color_palette) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL

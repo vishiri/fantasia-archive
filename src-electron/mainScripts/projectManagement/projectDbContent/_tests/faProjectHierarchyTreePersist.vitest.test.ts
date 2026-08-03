@@ -80,7 +80,7 @@ test('Test that listFaProjectWorkspaceHierarchyLayout returns placement skeleton
   })
   const layout = listFaProjectWorkspaceHierarchyLayout(db)
   expect(layout.worlds).toHaveLength(1)
-  expect(layout.worlds[0]?.colorPallete).toBe('')
+  expect(layout.worlds[0]?.colorPalette).toBe('')
   expect(layout.worlds[0]?.placements).toHaveLength(1)
   expect(layout.worlds[0]?.placements[0]?.hasChildren).toBe(true)
 })
