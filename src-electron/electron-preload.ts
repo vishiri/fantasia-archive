@@ -16,7 +16,6 @@ import { faKeybindsAPI } from 'app/src-electron/contentBridgeAPIs/faKeybindsAPI'
 import { faAppNoteboardAPI } from 'app/src-electron/contentBridgeAPIs/faAppNoteboardAPI'
 import { faAppStylingAPI } from 'app/src-electron/contentBridgeAPIs/faAppStylingAPI'
 import { faAppConfigAPI } from 'app/src-electron/contentBridgeAPIs/faAppConfigAPI'
-import { faChromiumCtrlShiftShortcutAPI } from 'app/src-electron/contentBridgeAPIs/faChromiumCtrlShiftShortcutAPI'
 import { faProjectFailsafeAPI } from 'app/src-electron/contentBridgeAPIs/faProjectFailsafeAPI'
 import { faProjectOsOpenAPI } from 'app/src-electron/contentBridgeAPIs/faProjectOsOpenAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
@@ -39,7 +38,6 @@ const apiObject = {
   faAppStyling: { ...faAppStylingAPI },
   faUserSettings: { ...faUserSettingsAPI },
   faAppConfig: { ...faAppConfigAPI },
-  faChromiumCtrlShiftShortcut: { ...faChromiumCtrlShiftShortcutAPI },
   faProjectFailsafe: { ...faProjectFailsafeAPI },
   faProjectOsOpen: { ...faProjectOsOpenAPI },
   projectManagement: { ...projectManagementAPI },

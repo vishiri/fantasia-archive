@@ -1,14 +1,15 @@
 import type { IpcMainInvokeEvent } from 'electron'
 import type Database from 'better-sqlite3'
 
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
+import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring'
 import {
   closeFaProjectActiveDatabaseHandleOnly,
   getFaProjectActiveDatabase,
   getFaProjectLastKnownActiveProjectFilePath
 } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
-import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring'
 import { resolveHardenedFaProjectFilePath } from 'app/src-electron/mainScripts/projectManagement/faProjectFilePathHardeningWiring'
-import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring'
+import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring'
 
 function ensureActiveDatabaseAttachedSync (): boolean {
   if (getFaProjectActiveDatabase() !== null) {
@@ -84,22 +85,36 @@ export function runWithFaProjectDatabaseSync<T> (work: (db: Database) => T): { o
 }
 
 /**
- * Same as runWithFaProjectDatabaseSync, then if still no DB asks the renderer for the active path (when event is set), reconnects once, and runs work again.
+ * Same as runWithFaProjectDatabaseSync, then if still no DB may confirm the mirrored path with the
+ * renderer failsafe reply and retry reconnect once. Never adopts an arbitrary renderer-only path.
  */
 export async function runWithFaProjectDatabaseForIpcAsync<T> (
   event: IpcMainInvokeEvent,
   work: (db: Database) => T
 ): Promise<{ ok: true, value: T } | { ok: false }> {
+  if (!assertMainWindowSender(event.sender)) {
+    return { ok: false }
+  }
   const first = runWithFaProjectDatabaseSync(work)
   if (first.ok) {
     return first
   }
+  const mirrored = getFaProjectLastKnownActiveProjectFilePath()
+  if (mirrored === null) {
+    return { ok: false }
+  }
+  const hardenedMirrored = resolveHardenedFaProjectFilePath(mirrored)
+  if (hardenedMirrored === null) {
+    return { ok: false }
+  }
   const fromRenderer = await requestRendererActiveProjectPathForFailsafe(event.sender)
-  const hardened = fromRenderer === null ? null : resolveHardenedFaProjectFilePath(fromRenderer)
-  if (
-    hardened === null ||
-    !reconnectFaProjectDatabaseAtKnownPathSync(hardened)
-  ) {
+  const hardenedRenderer = fromRenderer === null
+    ? null
+    : resolveHardenedFaProjectFilePath(fromRenderer)
+  if (hardenedRenderer === null || hardenedRenderer !== hardenedMirrored) {
+    return { ok: false }
+  }
+  if (!reconnectFaProjectDatabaseAtKnownPathSync(hardenedMirrored)) {
     return { ok: false }
   }
   return runWithFaProjectDatabaseSync(work)

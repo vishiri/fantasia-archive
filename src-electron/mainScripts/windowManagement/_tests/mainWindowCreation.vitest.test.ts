@@ -48,6 +48,10 @@ const {
 
 const registerFaProjectOsOpenMainWindowMock = vi.hoisted(() => vi.fn())
 const registerFaChromiumCtrlShiftShortcutSuppressMock = vi.hoisted(() => vi.fn())
+const openExternalMock = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+const checkIfExternalUrlMock = vi.hoisted(() => vi.fn((url: string) => {
+  return url.startsWith('https://') || url.startsWith('http://')
+}))
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDeliveryWiring', () => {
   return {
@@ -67,7 +71,16 @@ vi.mock('electron', () => {
     app: appMock,
     screen: {
       getPrimaryDisplay: getPrimaryDisplayMock
+    },
+    shell: {
+      openExternal: openExternalMock
     }
+  }
+})
+
+vi.mock('app/src-electron/shared/faExternalUrlPredicate', () => {
+  return {
+    checkIfExternalUrl: checkIfExternalUrlMock
   }
 })
 
@@ -93,6 +106,12 @@ beforeEach(() => {
   registerFaChromiumCtrlShiftShortcutSuppressMock.mockReset()
   registerFaChromiumCtrlShiftShortcutSuppressMock.mockReturnValue(vi.fn())
   registerFaProjectOsOpenMainWindowMock.mockReset()
+  openExternalMock.mockReset()
+  openExternalMock.mockImplementation(() => Promise.resolve())
+  checkIfExternalUrlMock.mockReset()
+  checkIfExternalUrlMock.mockImplementation((url: string) => {
+    return url.startsWith('https://') || url.startsWith('http://')
+  })
   BrowserWindowMock.mockReset()
   appMock.requestSingleInstanceLock.mockReset()
   appMock.requestSingleInstanceLock.mockReturnValue(true)
@@ -265,9 +284,26 @@ test('Test that the main window is created successfully', async () => {
   const blockedNavEvent = { preventDefault: vi.fn() }
   willNavigateHandlers[0]!(blockedNavEvent, 'file:///etc/passwd')
   expect(blockedNavEvent.preventDefault).toHaveBeenCalledOnce()
-  const allowedNavEvent = { preventDefault: vi.fn() }
-  willNavigateHandlers[0]!(allowedNavEvent, 'https://example.com/page')
-  expect(allowedNavEvent.preventDefault).not.toHaveBeenCalled()
+  expect(openExternalMock).not.toHaveBeenCalled()
+  const foreignHttpsEvent = { preventDefault: vi.fn() }
+  willNavigateHandlers[0]!(foreignHttpsEvent, 'https://example.com/page')
+  expect(foreignHttpsEvent.preventDefault).toHaveBeenCalledOnce()
+  expect(openExternalMock).toHaveBeenCalledWith('https://example.com/page')
+  openExternalMock.mockImplementationOnce(() => Promise.reject(new Error('open failed')))
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const foreignHttpsRetryEvent = { preventDefault: vi.fn() }
+  willNavigateHandlers[0]!(foreignHttpsRetryEvent, 'https://example.com/retry')
+  expect(foreignHttpsRetryEvent.preventDefault).toHaveBeenCalledOnce()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    '[faMainWindowNavigation] openExternal failed',
+    expect.any(Error)
+  )
+  consoleErrorSpy.mockRestore()
+  const allowedDevNavEvent = { preventDefault: vi.fn() }
+  willNavigateHandlers[0]!(allowedDevNavEvent, 'http://localhost:9000/#/welcome')
+  expect(allowedDevNavEvent.preventDefault).not.toHaveBeenCalled()
 
   onceHandlers['ready-to-show']!()
   expect(browserWindowInstance.show).toHaveBeenCalledOnce()

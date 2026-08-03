@@ -4,7 +4,6 @@ import type {
   I_faDevToolsControl,
   I_faExternalLinksManagerAPI,
   I_faWindowControlAPI,
-  I_faChromiumCtrlShiftShortcutAPI,
   I_faProjectFailsafeAPI,
   I_faProjectOsOpenAPI
 } from 'app/types/I_faElectronRendererBridgeAPIs'
@@ -48,7 +47,6 @@ declare global{
       faAppStyling: I_faAppStylingAPI,
       faUserSettings: I_faUserSettingsAPI,
       faAppConfig: I_faAppConfigAPI,
-      faChromiumCtrlShiftShortcut: I_faChromiumCtrlShiftShortcutAPI,
       faProjectFailsafe: I_faProjectFailsafeAPI,
       faProjectOsOpen: I_faProjectOsOpenAPI,
       projectManagement: I_faProjectManagementAPI,

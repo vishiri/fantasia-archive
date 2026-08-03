@@ -1,6 +1,7 @@
 import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { registerFaProjectManagementLifecycleIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementLifecycleIpc'
 import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSettingsIpc'
 import { registerFaProjectManagementProjectSidebarIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSidebarIpc'
 import { registerFaProjectManagementHierarchyTreeUiStateIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementHierarchyTreeUiStateIpc'
@@ -13,18 +14,12 @@ import {
   readFaProjectNoteboardRoot,
   readFaProjectStylingRoot,
   resolveRecentProjectMruHeadForOpen,
-  runFaProjectCreateFromIpc,
-  runFaProjectOpenFromIpc,
   runWithFaProjectDatabaseForIpcAsync,
   upsertFaProjectNoteboardKv,
   upsertFaProjectStylingKv
 } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { parseFaProjectNoteboardPatch } from 'app/src-electron/shared/faProjectNoteboardPatchSchema'
 import { parseFaProjectStylingPatch } from 'app/src-electron/shared/faProjectStylingPatchSchema'
-import type {
-  I_faProjectCreateResult,
-  I_faProjectOpenResult
-} from 'app/types/I_faProjectManagementDomain'
 import type { I_faProjectNoteboardRoot } from 'app/types/I_faProjectNoteboardDomain'
 import type { I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
 import type {
@@ -81,12 +76,7 @@ export function registerFaProjectManagementIpc (): void {
   }
   registered = true
 
-  ipcMain.handle(
-    FA_PROJECT_MANAGEMENT_IPC.createProjectAsync,
-    async (event, raw: unknown): Promise<I_faProjectCreateResult> => {
-      return await runFaProjectCreateFromIpc(event, raw)
-    }
-  )
+  registerFaProjectManagementLifecycleIpc()
 
   ipcMain.handle(
     FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync,
@@ -169,13 +159,6 @@ export function registerFaProjectManagementIpc (): void {
         return false
       }
       return ran.value
-    }
-  )
-
-  ipcMain.handle(
-    FA_PROJECT_MANAGEMENT_IPC.openProjectAsync,
-    async (event, raw: unknown): Promise<I_faProjectOpenResult> => {
-      return await runFaProjectOpenFromIpc(event, raw)
     }
   )
 

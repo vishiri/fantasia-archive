@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_APP_NOTEBOARD_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
 import {
   cleanupFaAppNoteboard,
   getFaAppNoteboard
@@ -32,7 +33,10 @@ export function registerFaAppNoteboardIpc (): void {
     return noteboardSnapshot()
   })
 
-  ipcMain.handle(FA_APP_NOTEBOARD_IPC.setAsync, (_event, patch: unknown) => {
+  ipcMain.handle(FA_APP_NOTEBOARD_IPC.setAsync, (event, patch: unknown) => {
+    if (!assertMainWindowSender(event.sender)) {
+      return
+    }
     const parsed = parseFaAppNoteboardPatch(patch)
     const store = getFaAppNoteboard()
     const cur = store.store

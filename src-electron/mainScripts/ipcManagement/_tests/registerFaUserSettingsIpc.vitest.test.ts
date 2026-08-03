@@ -8,6 +8,7 @@ import { FA_USER_SETTINGS_DEFAULTS } from '../../userSettings/faUserSettingsDefa
 
 const {
   applyFaSpellCheckerLanguagesToSessionMock,
+  assertMainWindowSenderMock,
   ipcMainHandleMock,
   getFaUserSettingsMock,
   ipcSpellSessionStub,
@@ -16,6 +17,7 @@ const {
   const spellSessionStub = {}
   return {
     applyFaSpellCheckerLanguagesToSessionMock: vi.fn(),
+    assertMainWindowSenderMock: vi.fn(() => true),
     ipcMainHandleMock: vi.fn(),
     getFaUserSettingsMock: vi.fn(),
     ipcSpellSessionStub: spellSessionStub,
@@ -63,12 +65,20 @@ vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiri
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   storeSetMock.mockReset()
   getFaUserSettingsMock.mockReset()
   applyFaSpellCheckerLanguagesToSessionMock.mockReset()
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
   mainWindowExportState.appWindow = undefined
 })
 
@@ -310,4 +320,24 @@ test('Test that user settings set handler skips spellchecker sync when appWindow
   setHandler({}, { languageCode: 'de' })
 
   expect(applyFaSpellCheckerLanguagesToSessionMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler no-ops when the sender is not the main window.
+ */
+test('Test that user settings set handler ignores non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  getFaUserSettingsMock.mockReturnValue({
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { appTheme: 'lightThemeFlat' })
+
+  expect(storeSetMock).not.toHaveBeenCalled()
 })

@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_KEYBINDS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
 import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/keybinds_manager'
 import { parseFaKeybindsPatch } from 'app/src-electron/shared/faKeybindsPatchSchema'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
@@ -36,7 +37,10 @@ export function registerFaKeybindsIpc (): void {
     }
   })
 
-  ipcMain.handle(FA_KEYBINDS_IPC.setAsync, (_event, patch: unknown) => {
+  ipcMain.handle(FA_KEYBINDS_IPC.setAsync, (event, patch: unknown) => {
+    if (!assertMainWindowSender(event.sender)) {
+      return
+    }
     const parsed = parseFaKeybindsPatch(patch)
     const current = keybindsRootSnapshot()
     const store = getFaKeybinds()

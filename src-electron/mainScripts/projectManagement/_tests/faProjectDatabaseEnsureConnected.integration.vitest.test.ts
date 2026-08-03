@@ -24,6 +24,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRen
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: () => true
+  }
+})
+
 vi.mock('better-sqlite3', () => {
   return {
     default: BetterSqlite3Mock
@@ -153,23 +159,33 @@ test('getFaProjectLastKnownActiveProjectFilePath survives handle-only close for 
   ).toBe(true)
 })
 
-test('runWithFaProjectDatabaseForIpcAsync returns false when renderer-driven reconnect fails', async () => {
+test('runWithFaProjectDatabaseForIpcAsync returns false when mirrored path is cleared and does not trust renderer-only path', async () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-ipc-fail-${Date.now()}.faproject`)
   seedTestProjectFile(testPath)
   closeFaProjectActiveDatabase()
   requestPathMock.mockResolvedValueOnce(testPath)
-  applyMigrationsMock.mockImplementationOnce(() => {
-    throw new Error('migration failed for ipc path')
-  })
-  const sender = {}
-  const out = await runWithFaProjectDatabaseForIpcAsync({ sender } as never, () => {
+  const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
     return 1
   })
+  expect(requestPathMock).not.toHaveBeenCalled()
   expect(out).toEqual({ ok: false })
 })
 
-test('runWithFaProjectDatabaseForIpcAsync returns false when renderer supplies an invalid extension', async () => {
-  closeFaProjectActiveDatabase()
+test('runWithFaProjectDatabaseForIpcAsync returns false when renderer path does not match mirrored path', async () => {
+  testPath = path.join(os.tmpdir(), `fa-ensure-ipc-mismatch-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
+  expect(reconnectFaProjectDatabaseAtKnownPathSync(testPath)).toBe(true)
+  closeFaProjectActiveDatabaseHandleOnly()
+  fs.unlinkSync(testPath)
+  BetterSqlite3Mock.mockImplementation(function (filePath: string) {
+    if (!fs.existsSync(filePath)) {
+      throw new Error('unable to open database file')
+    }
+    return {
+      close: vi.fn(),
+      pragma: vi.fn()
+    }
+  })
   requestPathMock.mockResolvedValueOnce('D:\\x\\notes.txt')
   const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
     return 1

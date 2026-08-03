@@ -42,7 +42,6 @@ export default defineConfig((ctx) => {
       'q-draggable-table',
       'qmarkdown',
       'faProjectFailsafePathReply',
-      'faChromiumForwardedKeyChord',
       'faProjectOsOpen',
       'faRoutingEnv',
       'faE2eRendererProbes',

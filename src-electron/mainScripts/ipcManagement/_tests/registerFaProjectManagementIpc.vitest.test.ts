@@ -8,6 +8,7 @@ const {
   runOpenMock,
   ipcMainHandleMock,
   appOnMock,
+  assertMainWindowSenderMock,
   closeActiveMock,
   getRecentSnapshotMock,
   resolveRecentMruHeadMock,
@@ -26,6 +27,7 @@ const {
 } = vi.hoisted(() => {
   return {
     appOnMock: vi.fn(),
+    assertMainWindowSenderMock: vi.fn(() => true),
     closeActiveMock: vi.fn(),
     getFaProjectActiveDbMock: vi.fn(),
     getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
@@ -70,6 +72,12 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectCreateRunWiring
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRunWiring', () => {
   return {
     runFaProjectOpenFromIpc: runOpenMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
   }
 })
 
@@ -144,6 +152,8 @@ beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   appOnMock.mockReset()
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
   closeActiveMock.mockReset()
   runCreateMock.mockReset()
   runOpenMock.mockReset()
@@ -291,12 +301,30 @@ test('createProjectAsync handler delegates to runFaProjectCreateFromIpc', async 
   expect(runCreateMock).toHaveBeenCalledOnce()
 })
 
+test('createProjectAsync handler returns canceled for non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.createProjectAsync)
+  await expect(h({}, { projectName: 'Alpha' })).resolves.toEqual({ outcome: 'canceled' })
+  expect(runCreateMock).not.toHaveBeenCalled()
+})
+
 test('openProjectAsync handler delegates to runFaProjectOpenFromIpc', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.openProjectAsync)
   await expect(h({}, {})).resolves.toEqual({ outcome: 'canceled' })
   expect(runOpenMock).toHaveBeenCalledOnce()
+})
+
+test('openProjectAsync handler returns canceled for non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.openProjectAsync)
+  await expect(h({}, {})).resolves.toEqual({ outcome: 'canceled' })
+  expect(runOpenMock).not.toHaveBeenCalled()
 })
 
 test('getProjectNoteboardAsync returns default snapshot when active database handle is absent', async () => {

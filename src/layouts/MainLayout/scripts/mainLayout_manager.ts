@@ -18,7 +18,6 @@ import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
 } from 'app/src/scripts/keybinds/keybinds_manager'
-import { ensureFaChromiumForwardedKeyChordListener } from 'app/src/scripts/keybinds/faChromiumForwardedKeyChordInstall_manager'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/appInternals_manager'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { maybeAutoOpenFilledNoteboard } from 'app/src/scripts/floatingWindows/functions/shouldAutoOpenFilledNoteboard'
@@ -28,7 +27,6 @@ import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
-import { S_FaProjectWorkspaceWorlds } from 'app/src/stores/S_FaProjectWorkspaceWorlds'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
@@ -83,7 +81,6 @@ const mainLayoutApi = createMainLayout({
   computed,
   createMainLayoutDrawerRail,
   createFaKeybindKeydownHandler,
-  ensureFaChromiumForwardedKeyChordListener,
   getFaKeybindKeydownContext,
   hydrateFromBridgeOrReport,
   isFantasiaStorybookCanvas,
@@ -105,7 +102,6 @@ export const useMainLayoutWorkspaceSidebar = createMainLayoutWorkspaceSidebar({
   S_FaOpenedDocuments,
   S_FaProjectHierarchyTree,
   S_FaProjectSidebar,
-  S_FaProjectWorkspaceWorlds,
   attachWorkspaceSidebarLiveWidthSync: attachFaWorkspaceSidebarLiveWidthSync,
   bindWorkspaceSidebarLiveWidthSync: bindFaWorkspaceSidebarLiveWidthSync,
   debounceSidebarWidthPersist: debounce,

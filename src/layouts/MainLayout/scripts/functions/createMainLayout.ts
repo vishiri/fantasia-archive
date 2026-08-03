@@ -69,7 +69,6 @@ type T_createMainLayoutDeps = {
   createFaKeybindKeydownHandler: (
     getContext: () => T_faKeybindKeydownContext
   ) => (event: KeyboardEvent) => void
-  ensureFaChromiumForwardedKeyChordListener: () => void
   createMainLayoutDrawerRail: (
     drawerDeps: {
       computed: <T>(getter: () => T) => I_ref<T>
@@ -174,7 +173,6 @@ function useMainLayout (
     if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {
       const faKeybindsStore = deps.S_FaKeybinds()
       await deps.hydrateFromBridgeOrReport(() => faKeybindsStore.refreshKeybinds())
-      deps.ensureFaChromiumForwardedKeyChordListener()
       faKeybindKeydownHandler = deps.createFaKeybindKeydownHandler(deps.getFaKeybindKeydownContext)
       deps.attachWindowKeydownListener(faKeybindKeydownHandler)
     }

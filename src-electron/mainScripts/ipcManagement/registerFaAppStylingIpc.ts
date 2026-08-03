@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_APP_STYLING_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
 import {
   cleanupFaAppStyling,
   getFaAppStyling
@@ -32,7 +33,10 @@ export function registerFaAppStylingIpc (): void {
     return appStylingSnapshot()
   })
 
-  ipcMain.handle(FA_APP_STYLING_IPC.setAsync, (_event, patch: unknown) => {
+  ipcMain.handle(FA_APP_STYLING_IPC.setAsync, (event, patch: unknown) => {
+    if (!assertMainWindowSender(event.sender)) {
+      return
+    }
     const parsed = parseFaAppStylingPatch(patch)
     const store = getFaAppStyling()
     const cur = store.store

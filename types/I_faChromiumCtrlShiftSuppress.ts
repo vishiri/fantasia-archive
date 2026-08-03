@@ -37,13 +37,6 @@ export interface I_faChromiumBeforeInputSnapshot {
 }
 
 /**
- * Main → renderer payload after suppressing Chromium handling for a denylisted chord.
- */
-export interface I_faChromiumForwardedKeyChordPayload {
-  code: T_faChromiumCtrlShiftSuppressKeyCode
-}
-
-/**
  * Focus-gated controller for the Electron globalShortcut handlers that intercept denylisted
  * Ctrl+Shift chords. Accelerators register only while the main window is focused ('activate')
  * and are released on blur or teardown ('deactivate'), so a backgrounded Fantasia Archive never

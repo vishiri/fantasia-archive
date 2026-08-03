@@ -4,11 +4,13 @@ import { FA_APP_NOTEBOARD_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 
 const {
+  assertMainWindowSenderMock,
   cleanupFaAppNoteboardMock,
   getFaAppNoteboardMock,
   ipcMainHandleMock
 } = vi.hoisted(() => {
   return {
+    assertMainWindowSenderMock: vi.fn(() => true),
     cleanupFaAppNoteboardMock: vi.fn(),
     getFaAppNoteboardMock: vi.fn(),
     ipcMainHandleMock: vi.fn()
@@ -30,11 +32,19 @@ vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => 
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   getFaAppNoteboardMock.mockReset()
   cleanupFaAppNoteboardMock.mockReset()
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -92,7 +102,7 @@ test('Test that app noteboard set handler merges patch and runs cleanup', async 
   registerFaAppNoteboardIpc()
 
   const setHandler = handlerFor(FA_APP_NOTEBOARD_IPC.setAsync)
-  setHandler(null, { text: 'next' })
+  setHandler({ sender: { id: 1 } }, { text: 'next' })
 
   expect(setMock).toHaveBeenCalledWith({
     frame: null,
@@ -123,7 +133,7 @@ test('Test that app noteboard set handler merges frame-only patch', async () => 
   registerFaAppNoteboardIpc()
 
   const setHandler = handlerFor(FA_APP_NOTEBOARD_IPC.setAsync)
-  setHandler(null, {
+  setHandler({ sender: { id: 1 } }, {
     frame: {
       height: 200,
       width: 200,
@@ -159,7 +169,7 @@ test('Test that app noteboard set handler rejects non-plain payloads without wri
   registerFaAppNoteboardIpc()
 
   const setHandler = handlerFor(FA_APP_NOTEBOARD_IPC.setAsync)
-  expect(() => setHandler(null, null)).toThrow(TypeError)
+  expect(() => setHandler({ sender: { id: 1 } }, null)).toThrow(TypeError)
   expect(setMock).not.toHaveBeenCalled()
 })
 
@@ -178,4 +188,24 @@ test('Test that registerFaAppNoteboardIpc is safe to call twice', async () => {
   const first = ipcMainHandleMock.mock.calls.length
   registerFaAppNoteboardIpc()
   expect(ipcMainHandleMock.mock.calls.length).toBe(first)
+})
+
+/**
+ * registerFaAppNoteboardIpc
+ * Set handler no-ops when the sender is not the main window.
+ */
+test('Test that app noteboard set handler ignores non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  const setMock = vi.fn()
+  getFaAppNoteboardMock.mockReturnValue({
+    set: setMock,
+    store: { ...FA_APP_NOTEBOARD_STORE_DEFAULTS }
+  })
+
+  const { registerFaAppNoteboardIpc } = await import('../registerFaAppNoteboardIpc')
+  registerFaAppNoteboardIpc()
+
+  const setHandler = handlerFor(FA_APP_NOTEBOARD_IPC.setAsync)
+  setHandler({ sender: { id: 1 } }, { text: 'next' })
+  expect(setMock).not.toHaveBeenCalled()
 })

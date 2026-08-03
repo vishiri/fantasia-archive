@@ -165,9 +165,6 @@ export function createResetFaVitestRendererHarness (
         stageE2eNextExportPath: vi.fn(async () => false),
         stageE2eNextImportPath: vi.fn(async () => false)
       },
-      faChromiumCtrlShiftShortcut: {
-        installForwardedKeyChordListener: vi.fn()
-      },
       faProjectFailsafe: {
         installActiveProjectPathReply: vi.fn()
       },

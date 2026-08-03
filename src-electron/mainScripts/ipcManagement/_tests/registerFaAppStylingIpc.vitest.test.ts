@@ -4,11 +4,13 @@ import { FA_APP_STYLING_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 
 const {
+  assertMainWindowSenderMock,
   cleanupFaAppStylingMock,
   getFaAppStylingMock,
   ipcMainHandleMock
 } = vi.hoisted(() => {
   return {
+    assertMainWindowSenderMock: vi.fn(() => true),
     cleanupFaAppStylingMock: vi.fn(),
     getFaAppStylingMock: vi.fn(),
     ipcMainHandleMock: vi.fn()
@@ -30,11 +32,19 @@ vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   getFaAppStylingMock.mockReset()
   cleanupFaAppStylingMock.mockReset()
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -84,7 +94,7 @@ test('Test that app styling set handler writes the parsed css and runs cleanup',
   registerFaAppStylingIpc()
 
   const setHandler = handlerFor(FA_APP_STYLING_IPC.setAsync)
-  setHandler(null, { css: '.user { background: black; }' })
+  setHandler({ sender: { id: 1 } }, { css: '.user { background: black; }' })
 
   expect(setMock).toHaveBeenCalledWith({
     css: '.user { background: black; }',
@@ -111,7 +121,7 @@ test('Test that app styling set handler keeps current css when patch only update
   registerFaAppStylingIpc()
 
   const setHandler = handlerFor(FA_APP_STYLING_IPC.setAsync)
-  setHandler(null, {
+  setHandler({ sender: { id: 1 } }, {
     frame: {
       height: 400,
       width: 440,
@@ -147,9 +157,9 @@ test('Test that app styling set handler rejects non-plain payloads without writi
   registerFaAppStylingIpc()
 
   const setHandler = handlerFor(FA_APP_STYLING_IPC.setAsync)
-  expect(() => setHandler(null, null)).toThrow()
-  expect(() => setHandler(null, { css: 12 })).toThrow()
-  expect(() => setHandler(null, {})).toThrow()
+  expect(() => setHandler({ sender: { id: 1 } }, null)).toThrow()
+  expect(() => setHandler({ sender: { id: 1 } }, { css: 12 })).toThrow()
+  expect(() => setHandler({ sender: { id: 1 } }, {})).toThrow()
   expect(setMock).not.toHaveBeenCalled()
 })
 
@@ -168,4 +178,24 @@ test('Test that registerFaAppStylingIpc only registers ipc handlers once', async
   registerFaAppStylingIpc()
 
   expect(ipcMainHandleMock).toHaveBeenCalledTimes(2)
+})
+
+/**
+ * registerFaAppStylingIpc
+ * Set handler no-ops when the sender is not the main window.
+ */
+test('Test that app styling set handler ignores non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  const setMock = vi.fn()
+  getFaAppStylingMock.mockReturnValue({
+    set: setMock,
+    store: { ...FA_APP_STYLING_STORE_DEFAULTS }
+  })
+
+  const { registerFaAppStylingIpc } = await import('../registerFaAppStylingIpc')
+  registerFaAppStylingIpc()
+
+  const setHandler = handlerFor(FA_APP_STYLING_IPC.setAsync)
+  setHandler({ sender: { id: 1 } }, { css: '.x{}' })
+  expect(setMock).not.toHaveBeenCalled()
 })

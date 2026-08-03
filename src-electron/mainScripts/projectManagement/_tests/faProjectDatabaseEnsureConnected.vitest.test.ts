@@ -9,6 +9,7 @@ const getPathMock = vi.hoisted(() => vi.fn())
 const closeHandleOnlyMock = vi.hoisted(() => vi.fn())
 const reconnectMock = vi.hoisted(() => vi.fn())
 const requestPathMock = vi.hoisted(() => vi.fn(async (): Promise<string | null> => null))
+const assertMainWindowSenderMock = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring', () => {
   return {
@@ -30,6 +31,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRen
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
+  }
+})
+
 import { runWithFaProjectDatabaseForIpcAsync, readMirroredActiveProjectFilePathSync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnectedWiring'
 
 const absoluteProjectPath = path.join(os.tmpdir(), 'fa-ensure-connected-mock.faproject')
@@ -43,6 +50,8 @@ beforeEach(() => {
   requestPathMock.mockResolvedValue(null)
   getPathMock.mockReturnValue(null)
   reconnectMock.mockReturnValue(false)
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
   fs.writeFileSync(absoluteProjectPath, '')
 })
 
@@ -96,24 +105,67 @@ test('runWithFaProjectDatabaseSync reconnects from last known path when the hand
   })
 })
 
-test('runWithFaProjectDatabaseForIpcAsync uses renderer path when main path and handle are missing', async () => {
+test('runWithFaProjectDatabaseForIpcAsync rejects renderer-only path when mirrored path is missing', async () => {
+  getDbMock.mockReturnValue(null)
+  getPathMock.mockReturnValue(null)
+  requestPathMock.mockResolvedValueOnce(absoluteProjectPath)
+  reconnectMock.mockReturnValue(true)
+  const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, (_db) => {
+    return 7
+  })
+  expect(requestPathMock).not.toHaveBeenCalled()
+  expect(reconnectMock).not.toHaveBeenCalled()
+  expect(out).toEqual({ ok: false })
+})
+
+test('runWithFaProjectDatabaseForIpcAsync reconnects when renderer confirms the mirrored path', async () => {
   const fakeDb = { k: 3 }
   getDbMock
     .mockReturnValueOnce(null)
     .mockReturnValue(fakeDb as never)
-  getPathMock.mockReturnValue(null)
+  getPathMock.mockReturnValue(absoluteProjectPath)
+  reconnectMock
+    .mockReturnValueOnce(false)
+    .mockReturnValue(true)
   requestPathMock.mockResolvedValueOnce(absoluteProjectPath)
-  reconnectMock.mockReturnValue(true)
-  const sender = {}
-  const out = await runWithFaProjectDatabaseForIpcAsync({ sender } as never, (_db) => {
+  const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, (_db) => {
     return 7
   })
   expect(requestPathMock).toHaveBeenCalled()
-  expect(reconnectMock).toHaveBeenCalledWith(absoluteProjectPath)
+  expect(reconnectMock).toHaveBeenLastCalledWith(absoluteProjectPath)
   expect(out).toEqual({
     ok: true,
     value: 7
   })
+})
+
+test('runWithFaProjectDatabaseForIpcAsync rejects when renderer path differs from mirrored path', async () => {
+  getDbMock.mockReturnValue(null)
+  getPathMock.mockReturnValue(absoluteProjectPath)
+  reconnectMock.mockReturnValue(false)
+  const otherPath = path.join(os.tmpdir(), 'fa-ensure-connected-other.faproject')
+  fs.writeFileSync(otherPath, '')
+  try {
+    requestPathMock.mockResolvedValueOnce(otherPath)
+    const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
+      return 1
+    })
+    expect(out).toEqual({ ok: false })
+  } finally {
+    if (fs.existsSync(otherPath)) {
+      fs.unlinkSync(otherPath)
+    }
+  }
+})
+
+test('runWithFaProjectDatabaseForIpcAsync returns false when sender is not the main window', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  getDbMock.mockReturnValue({ k: 1 } as never)
+  const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
+    return 1
+  })
+  expect(out).toEqual({ ok: false })
+  expect(requestPathMock).not.toHaveBeenCalled()
 })
 
 test('runWithFaProjectDatabaseSync returns ok false when reconnect reports success but the handle is still missing', () => {
@@ -256,22 +308,22 @@ test('runWithFaProjectDatabaseSync throws when recoverable sqlite error fires bu
   expect(reconnectMock).not.toHaveBeenCalled()
 })
 
-test('runWithFaProjectDatabaseForIpcAsync returns false when renderer supplies no path', async () => {
+test('runWithFaProjectDatabaseForIpcAsync returns false when mirrored path exists but renderer supplies no path', async () => {
   getDbMock.mockReturnValue(null)
-  getPathMock.mockReturnValue(null)
+  getPathMock.mockReturnValue(absoluteProjectPath)
+  reconnectMock.mockReturnValue(false)
   requestPathMock.mockResolvedValueOnce(null)
   const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
     return 1
   })
   expect(out).toEqual({ ok: false })
-  expect(reconnectMock).not.toHaveBeenCalled()
 })
 
-test('runWithFaProjectDatabaseForIpcAsync returns false when renderer path reconnect fails', async () => {
+test('runWithFaProjectDatabaseForIpcAsync returns false when mirrored reconnect fails after renderer confirms', async () => {
   getDbMock.mockReturnValue(null)
-  getPathMock.mockReturnValue(null)
-  requestPathMock.mockResolvedValueOnce(absoluteProjectPath)
+  getPathMock.mockReturnValue(absoluteProjectPath)
   reconnectMock.mockReturnValue(false)
+  requestPathMock.mockResolvedValueOnce(absoluteProjectPath)
   const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
     return 1
   })

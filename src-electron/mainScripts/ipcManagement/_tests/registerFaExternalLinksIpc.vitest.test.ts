@@ -5,8 +5,10 @@ import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
 const mocks = vi.hoisted(() => {
   const ipcMainHandleMock = vi.fn()
   const openExternalMock = vi.fn(() => Promise.resolve())
+  const assertMainWindowSenderMock = vi.fn(() => true)
 
   return {
+    assertMainWindowSenderMock,
     ipcMainHandleMock,
     openExternalMock
   }
@@ -23,11 +25,19 @@ vi.mock('electron', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: mocks.assertMainWindowSenderMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   mocks.ipcMainHandleMock.mockReset()
   mocks.openExternalMock.mockReset()
   mocks.openExternalMock.mockImplementation(() => Promise.resolve())
+  mocks.assertMainWindowSenderMock.mockReset()
+  mocks.assertMainWindowSenderMock.mockReturnValue(true)
 })
 
 async function handlerFor (
@@ -150,4 +160,19 @@ test('Test that registerFaExternalLinksIpc logs openExternal failures', async ()
 
   expect(errorSpy).toHaveBeenCalledWith('[faExternalLinks] openExternal failed', expect.any(Error))
   errorSpy.mockRestore()
+})
+
+/**
+ * registerFaExternalLinksIpc
+ * Foreign sender is ignored before URL checks.
+ */
+test('Test that registerFaExternalLinksIpc ignores non-main-window sender', async () => {
+  mocks.assertMainWindowSenderMock.mockReturnValue(false)
+  const { registerFaExternalLinksIpc } = await import('../registerFaExternalLinksIpc')
+  registerFaExternalLinksIpc()
+
+  const handler = await handlerFor(FA_EXTERNAL_LINKS_IPC.openExternalAsync)
+  await handler({}, 'https://www.example.com/')
+
+  expect(mocks.openExternalMock).not.toHaveBeenCalled()
 })

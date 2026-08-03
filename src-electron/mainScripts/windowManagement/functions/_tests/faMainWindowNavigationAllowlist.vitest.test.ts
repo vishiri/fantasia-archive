@@ -35,10 +35,10 @@ test('Test that isFaMainWindowNavigationAllowed allows app protocol URLs', () =>
 
 /**
  * isFaMainWindowNavigationAllowed
- * Allows https navigation.
+ * Blocks foreign https (externals open via openExternal, not in-frame).
  */
-test('Test that isFaMainWindowNavigationAllowed allows https URLs', () => {
-  expect(isFaMainWindowNavigationAllowed('https://example.com/page')).toBe(true)
+test('Test that isFaMainWindowNavigationAllowed blocks foreign https URLs', () => {
+  expect(isFaMainWindowNavigationAllowed('https://example.com/page')).toBe(false)
 })
 
 /**
@@ -59,5 +59,7 @@ test('Test that isFaMainWindowNavigationAllowed allows dev APP_URL origin', () =
   vi.stubEnv('APP_URL', 'http://localhost:9000/')
 
   expect(isFaMainWindowNavigationAllowed('http://localhost:9000/#/welcome')).toBe(true)
+  expect(isFaMainWindowNavigationAllowed('http://localhost:9000/home')).toBe(true)
   expect(isFaMainWindowNavigationAllowed('http://localhost:9001/')).toBe(false)
+  expect(isFaMainWindowNavigationAllowed('https://localhost:9000/')).toBe(false)
 })

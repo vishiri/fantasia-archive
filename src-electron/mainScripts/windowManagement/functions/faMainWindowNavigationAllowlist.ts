@@ -1,5 +1,6 @@
 /**
- * True when main-window navigation to 'rawUrl' is allowed (app packaged origin, https, or dev APP_URL).
+ * True when main-window navigation to 'rawUrl' is allowed (packaged 'app:' origin, or DEV APP_URL origin).
+ * Foreign http(s) are denied here so 'will-navigate' can open them via 'shell.openExternal' instead.
  */
 export function isFaMainWindowNavigationAllowed (rawUrl: string): boolean {
   let parsed: URL
@@ -11,10 +12,6 @@ export function isFaMainWindowNavigationAllowed (rawUrl: string): boolean {
   }
 
   if (parsed.protocol === 'app:') {
-    return true
-  }
-
-  if (parsed.protocol === 'https:') {
     return true
   }
 

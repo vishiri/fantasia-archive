@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
@@ -30,7 +31,10 @@ export function registerFaUserSettingsIpc (): void {
   })
 
   // Set the user settings
-  ipcMain.handle(FA_USER_SETTINGS_IPC.setAsync, (_event, patch: unknown) => {
+  ipcMain.handle(FA_USER_SETTINGS_IPC.setAsync, (event, patch: unknown) => {
+    if (!assertMainWindowSender(event.sender)) {
+      return
+    }
     const parsedPatch = parseFaUserSettingsPatch(patch)
     getFaUserSettings().set({
       ...userSettingsSnapshot(),

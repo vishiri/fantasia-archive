@@ -304,9 +304,6 @@ const baseBridge = () => {
       stageE2eNextExportPath: async () => false,
       stageE2eNextImportPath: async () => false
     },
-    faChromiumCtrlShiftShortcut: {
-      installForwardedKeyChordListener: () => undefined
-    },
     faProjectFailsafe: {
       installActiveProjectPathReply: () => undefined
     },
@@ -404,10 +401,6 @@ export const setContentBridgeScenario = (
     faAppConfig: {
       ...nextBridge.faAppConfig,
       ...(overrides.faAppConfig ?? {})
-    },
-    faChromiumCtrlShiftShortcut: {
-      ...nextBridge.faChromiumCtrlShiftShortcut,
-      ...(overrides.faChromiumCtrlShiftShortcut ?? {})
     },
     faProjectFailsafe: {
       ...nextBridge.faProjectFailsafe,

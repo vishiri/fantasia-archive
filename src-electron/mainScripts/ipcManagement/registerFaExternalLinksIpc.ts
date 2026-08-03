@@ -1,6 +1,7 @@
 import { ipcMain, shell } from 'electron'
 
 import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
 import { checkIfExternalUrl } from 'app/src-electron/shared/faExternalUrlPredicate'
 
 let registered = false
@@ -18,7 +19,11 @@ export function registerFaExternalLinksIpc (): void {
 
   ipcMain.handle(
     FA_EXTERNAL_LINKS_IPC.openExternalAsync,
-    async (_event, url: unknown) => {
+    async (event, url: unknown) => {
+      if (!assertMainWindowSender(event.sender)) {
+        return
+      }
+
       if (typeof url !== 'string') {
         return
       }

@@ -61,10 +61,10 @@ description: >-
 ## Security hardening (main)
 
 - **`app://`** — **`registerFaAppProtocolWiring`**: host allowlist + **`path.relative`** guard against traversal outside app root.
-- **IPC sender** — invoke handlers validate **`event.sender.id`** matches registered main window (failsafe path reply, OS-open). **Do not** pair sender checks with packaged DevTools disable — see **Packaged DevTools** above.
-- **Navigation** — **`will-navigate`** + **`setWindowOpenHandler`** allowlist on main **`BrowserWindow`** (**`mainWindowCreationWiring.ts`**).
+- **IPC sender** — privileged mutate / project DB handlers validate **`event.sender`** via **`assertMainWindowSender`** (main window **`webContents.id`**). Failsafe path reply + OS-open keep dedicated checks. **Do not** pair sender checks with packaged DevTools disable — see **Packaged DevTools** above.
+- **Navigation** — **`will-navigate`** allowlist: **`app:`** + DEV **`APP_URL`** origin only; foreign http(s) **`preventDefault`** then **`shell.openExternal`** when **`checkIfExternalUrl`**. **`setWindowOpenHandler`** deny. (**`mainWindowCreationWiring.ts`**).
 - **`openExternal`** — **`faExternalUrlPredicate`**: block RFC1918 + link-local targets.
-- **Project paths** — **`createResolveHardenedFaProjectFilePath`** (**`functions/`**) + **`faProjectFilePathHardeningWiring.ts`** before open/reconnect; packaged builds omit dev **`ELECTRON_MAIN_FILEPATH`** leak.
+- **Project paths** — **`createResolveHardenedFaProjectFilePath`** (**`functions/`**) + **`faProjectFilePathHardeningWiring.ts`** before open/reconnect; failsafe reconnect prefers last-known mirrored path and only accepts a renderer reply that hardens to the same path; packaged builds omit dev **`ELECTRON_MAIN_FILEPATH`** leak.
 
 ## Keybind persistence
 

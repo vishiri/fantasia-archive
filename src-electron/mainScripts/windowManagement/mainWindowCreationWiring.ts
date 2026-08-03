@@ -1,4 +1,4 @@
-import { BrowserWindow, app, screen } from 'electron'
+import { BrowserWindow, app, screen, shell } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
@@ -8,6 +8,7 @@ import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/ma
 import { isFaMainWindowNavigationAllowed } from 'app/src-electron/mainScripts/windowManagement/functions/faMainWindowNavigationAllowlist'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellCheckerWiring'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
+import { checkIfExternalUrl } from 'app/src-electron/shared/faExternalUrlPredicate'
 
 export let appWindow: BrowserWindow | undefined
 
@@ -66,9 +67,16 @@ function resolvePreloadPath (): string {
 
 async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   win.webContents.on('will-navigate', (event, url) => {
-    if (!isFaMainWindowNavigationAllowed(url)) {
-      event.preventDefault()
+    if (isFaMainWindowNavigationAllowed(url)) {
+      return
     }
+    event.preventDefault()
+    if (!checkIfExternalUrl(url)) {
+      return
+    }
+    void shell.openExternal(url).catch((error: unknown) => {
+      console.error('[faMainWindowNavigation] openExternal failed', error)
+    })
   })
   if (typeof win.webContents.setWindowOpenHandler === 'function') {
     win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))

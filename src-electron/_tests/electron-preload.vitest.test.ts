@@ -41,7 +41,6 @@ test('Test that electron preload exposes faContentBridgeAPIs with expected API k
       'faAppConfig',
       'faAppNoteboard',
       'faAppStyling',
-      'faChromiumCtrlShiftShortcut',
       'faUserSettings',
       'faWindowControl',
       'projectContent',

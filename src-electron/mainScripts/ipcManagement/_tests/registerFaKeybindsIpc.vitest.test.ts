@@ -4,11 +4,13 @@ import { FA_KEYBINDS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 
 const {
+  assertMainWindowSenderMock,
   cleanupFaKeybindsMock,
   getFaKeybindsMock,
   ipcMainHandleMock
 } = vi.hoisted(() => {
   return {
+    assertMainWindowSenderMock: vi.fn(() => true),
     cleanupFaKeybindsMock: vi.fn(),
     getFaKeybindsMock: vi.fn(),
     ipcMainHandleMock: vi.fn()
@@ -30,11 +32,19 @@ vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring', () => {
+  return {
+    assertMainWindowSender: assertMainWindowSenderMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   getFaKeybindsMock.mockReset()
   cleanupFaKeybindsMock.mockReset()
+  assertMainWindowSenderMock.mockReset()
+  assertMainWindowSenderMock.mockReturnValue(true)
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -92,7 +102,7 @@ test('Test that keybinds set handler replaces overrides when replaceAllOverrides
 
   const setHandler = handlerFor(FA_KEYBINDS_IPC.setAsync)
   setHandler(
-    null,
+    { sender: { id: 1 } },
     {
       overrides: {
         toggleDeveloperTools: {
@@ -144,7 +154,7 @@ test('Test that keybinds set handler merges overrides by default', async () => {
 
   const setHandler = handlerFor(FA_KEYBINDS_IPC.setAsync)
   setHandler(
-    null,
+    { sender: { id: 1 } },
     {
       overrides: {
         openAppSettings: {
@@ -187,7 +197,7 @@ test('Test that keybinds set handler merges when patch omits overrides', async (
   registerFaKeybindsIpc()
 
   const setHandler = handlerFor(FA_KEYBINDS_IPC.setAsync)
-  setHandler(null, {})
+  setHandler({ sender: { id: 1 } }, {})
 
   expect(setMock).toHaveBeenCalledWith({
     overrides: {
@@ -212,4 +222,25 @@ test('Test that registerFaKeybindsIpc only registers ipc handlers once', async (
   registerFaKeybindsIpc()
 
   expect(ipcMainHandleMock).toHaveBeenCalledTimes(2)
+})
+
+/**
+ * registerFaKeybindsIpc
+ * Set handler no-ops when the sender is not the main window.
+ */
+test('Test that keybinds set handler ignores non-main-window sender', async () => {
+  assertMainWindowSenderMock.mockReturnValue(false)
+  const setMock = vi.fn()
+  getFaKeybindsMock.mockReturnValue({
+    set: setMock,
+    store: { ...FA_KEYBINDS_STORE_DEFAULTS }
+  })
+
+  const { registerFaKeybindsIpc } = await import('../registerFaKeybindsIpc')
+  registerFaKeybindsIpc()
+
+  const setHandler = handlerFor(FA_KEYBINDS_IPC.setAsync)
+  setHandler({ sender: { id: 1 } }, { overrides: { openAppSettings: null } })
+
+  expect(setMock).not.toHaveBeenCalled()
 })
