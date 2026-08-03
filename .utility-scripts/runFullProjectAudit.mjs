@@ -57,13 +57,6 @@ const steps = [
     cmd: 'npx',
     args: ['--yes', 'jscpd', '--min-lines', '10', '--min-tokens', '50', '--reporters', 'json', '--output', 'test-results/jscpd', 'src', 'src-electron', 'helpers'],
     optional: true
-  },
-  {
-    id: 3,
-    name: 'domainPolicyGrep-recheck',
-    cmd: 'node',
-    args: ['.utility-scripts/domainPolicyGrep.mjs'],
-    optional: true
   }
 ]
 

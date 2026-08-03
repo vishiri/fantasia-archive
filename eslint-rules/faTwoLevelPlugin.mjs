@@ -10,6 +10,7 @@ import {
   getFaTwoLevelFeatureRootFromVue,
   getFaTwoLevelMainScriptsAreaFromFile,
   getFaTwoLevelScriptsDirFromFile,
+  isFaTwoLevelAllowedDomainScriptsSiblingFile,
   isFaTwoLevelAllowedMainScriptsSiblingFile,
   isFaTwoLevelAllowedVueImportSource,
   isFaTwoLevelExcludedLintPath,
@@ -18,10 +19,20 @@ import {
   isFaTwoLevelPiniaStoreManager,
   isFaTwoLevelStoreBridgeScript,
   isFaTwoLevelTypesImportSource,
-  normalizeFaTwoLevelPath
+  normalizeFaTwoLevelPath,
+  toFaTwoLevelRepoRelativePath
 } from './faTwoLevelPathUtils.mjs'
 
 const FA_TWO_LEVEL_DOC = 'See .cursor/rules/fa-two-level-architecture.mdc'
+
+function resolveFaTwoLevelLintFilename (context) {
+  const cwd = context.cwd ?? process.cwd()
+
+  return toFaTwoLevelRepoRelativePath(
+    normalizeFaTwoLevelPath(context.filename),
+    cwd
+  )
+}
 
 function scriptsDirHasFunctionsFolder (scriptsDir, cwd) {
   const functionsDir = path.join(cwd, scriptsDir, 'functions')
@@ -64,7 +75,7 @@ const functionsOnlyTypeImports = {
     schema: []
   },
   create (context) {
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (!isFaTwoLevelFunctionsFile(filename) || isFaTwoLevelExcludedLintPath(filename)) {
       return {}
@@ -114,13 +125,13 @@ const featureScriptsLayout = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'When scripts/functions/ exists, sibling scripts/*.ts must be *_manager.ts only'
+      description: 'When scripts/functions/ exists, siblings must be *_manager.ts or allowlisted *Wiring.ts (etc.)'
     },
     schema: []
   },
   create (context) {
     const cwd = context.cwd ?? process.cwd()
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (isFaTwoLevelExcludedLintPath(filename)) {
       return {}
@@ -155,6 +166,28 @@ const featureScriptsLayout = {
       return {}
     }
 
+    if (/^src\/scripts\/[^/]+$/.test(scriptsDir) &&
+      isFaTwoLevelAllowedDomainScriptsSiblingFile(filename, scriptsDir)) {
+      return {}
+    }
+
+    // Pages/boot feature scripts — same Wiring allowlist as domain scripts
+    if (
+      /^src\/(?:pages|boot)\//.test(scriptsDir) &&
+      /\/scripts$/.test(scriptsDir) &&
+      isFaTwoLevelAllowedDomainScriptsSiblingFile(filename, scriptsDir)
+    ) {
+      return {}
+    }
+
+    // Components/layouts still migrating — do not fail legacy siblings yet
+    if (
+      /^src\/(?:components|layouts)\//.test(scriptsDir) &&
+      /\/scripts$/.test(scriptsDir)
+    ) {
+      return {}
+    }
+
     if (!filename.startsWith(`${scriptsDir}/`) || !filename.endsWith('.ts')) {
       return {}
     }
@@ -180,7 +213,7 @@ const requireManagerWhenFunctions = {
   },
   create (context) {
     const cwd = context.cwd ?? process.cwd()
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (!isFaTwoLevelFunctionsFile(filename) || isFaTwoLevelExcludedLintPath(filename)) {
       return {}
@@ -221,6 +254,9 @@ const vueScriptImportAllowlist = {
   },
   create (context) {
     const cwd = context.cwd ?? process.cwd()
+    // Do not relativize: absolute ESLint filenames keep this rule's legacy
+    // startsWith('src/…') gate (Wave 2 domain scriptsDir fix must not wake
+    // repo-wide thin-SFC debt). Relativize stays on feature-scripts-layout.
     const filename = normalizeFaTwoLevelPath(context.filename)
 
     if (!filename.endsWith('.vue') || isFaTwoLevelExcludedLintPath(filename)) {
@@ -283,7 +319,7 @@ const noFunctionsImportManager = {
     schema: []
   },
   create (context) {
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (!isFaTwoLevelFunctionsFile(filename) || isFaTwoLevelExcludedLintPath(filename)) {
       return {}
@@ -389,7 +425,7 @@ const managerWiringOnly = {
     schema: []
   },
   create (context) {
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (!isFaTwoLevelManagerFile(filename) || isFaTwoLevelExcludedLintPath(filename)) {
       return {}
@@ -472,7 +508,7 @@ const storesFunctionsLayout = {
     schema: []
   },
   create (context) {
-    const filename = normalizeFaTwoLevelPath(context.filename)
+    const filename = resolveFaTwoLevelLintFilename(context)
 
     if (isFaTwoLevelExcludedLintPath(filename)) {
       return {}

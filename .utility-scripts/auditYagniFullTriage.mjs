@@ -43,9 +43,6 @@ const DEFER_EXACT = new Set([
   'src/boot/axios.ts',
   'src/boot/scripts/axiosBoot_manager.ts',
   'src/boot/scripts/functions/faRoutingEnvBridgePoll.ts',
-  'src/boot/scripts/faChromiumForwardedKeyChord_manager.ts',
-  'src/boot/faChromiumForwardedKeyChord.ts',
-  'src/boot/scripts/faChromiumForwardedKeyChordInstall_manager.ts',
   'src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc.ts',
   'src-electron/contentBridgeAPIs/faWindowControlAPI.ts',
   'src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc.ts',
@@ -75,7 +72,7 @@ const DEFER_EXACT = new Set([
 /** @type {{ pattern: RegExp, reason: string }[]} */
 const DEFER_PATTERNS = [
   {
-    pattern: /^\.utility-scripts\/(bulk-|fix-singular|mirror-|batchTranslate|wireFaLocale|apply-|cleanup-corrupt|i18n-missing-sync|addColorPallete)/,
+    pattern: /^\.utility-scripts\/(bulk-|fix-singular|mirror-|batchTranslate|wireFaLocale|apply-|cleanup-corrupt|i18n-missing-sync|addColorPalette)/,
     reason: 'one_shot_migration_script_deferred'
   }
 ]

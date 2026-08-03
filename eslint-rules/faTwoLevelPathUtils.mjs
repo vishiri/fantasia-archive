@@ -6,6 +6,35 @@ export function normalizeFaTwoLevelPath (filePath) {
   return filePath.replace(/\\/g, '/')
 }
 
+/**
+ * Strip cwd so path utils match repo-relative prefixes (src/, src-electron/).
+ * ESLint context.filename is often absolute; Windows path.join then breaks functions/ probes.
+ */
+export function toFaTwoLevelRepoRelativePath (normalizedPath, cwd) {
+  if (normalizedPath === undefined || normalizedPath === '') {
+    return normalizedPath
+  }
+
+  if (
+    normalizedPath.startsWith('src/') ||
+    normalizedPath.startsWith('src-electron/') ||
+    normalizedPath === 'src/App.vue'
+  ) {
+    return normalizedPath
+  }
+
+  const normalizedCwd = normalizeFaTwoLevelPath(cwd ?? '')
+  const cwdPrefix = normalizedCwd.endsWith('/')
+    ? normalizedCwd
+    : `${normalizedCwd}/`
+
+  if (cwdPrefix.length > 1 && normalizedPath.startsWith(cwdPrefix)) {
+    return normalizedPath.slice(cwdPrefix.length)
+  }
+
+  return normalizedPath
+}
+
 export function isFaTwoLevelFunctionsFile (normalizedPath) {
   return /\/functions\/[^/]+\.ts$/.test(normalizedPath)
 }
@@ -15,7 +44,7 @@ export function isFaTwoLevelManagerFile (normalizedPath) {
 }
 
 export function isFaTwoLevelPiniaStoreManager (normalizedPath) {
-  return /\/src\/stores\/S_[^/]+\.ts$/.test(normalizedPath)
+  return /(^|\/)src\/stores\/S_[^/]+\.ts$/.test(normalizedPath)
 }
 
 export function isFaTwoLevelTypesImportSource (importSource) {
@@ -83,6 +112,15 @@ export function isFaTwoLevelAllowedMainScriptsSiblingFile (normalizedPath, areaD
       return true
     }
 
+    // Nested area packages (e.g. projectDbContent/*Wiring.ts)
+    if (
+      !baseName.includes('/', baseName.indexOf('/') + 1) &&
+      (/(Wiring|Surface|Session|Runtime|Api|Bound)\.ts$/.test(baseName) ||
+        baseName.startsWith('projectDbContent/'))
+    ) {
+      return true
+    }
+
     return false
   }
 
@@ -90,11 +128,16 @@ export function isFaTwoLevelAllowedMainScriptsSiblingFile (normalizedPath, areaD
     return true
   }
 
-  if (/_managerDefaults\.ts$/.test(baseName)) {
+  if (/_managerDefaults\.ts$/.test(baseName) || /Defaults\.ts$/.test(baseName)) {
     return true
   }
 
   if (/(Wiring|Surface|Session|Runtime|Api|Bound)\.ts$/.test(baseName)) {
+    return true
+  }
+
+  // Optional path helpers colocated at area root (not managers)
+  if (/Optional\.ts$/.test(baseName)) {
     return true
   }
 
@@ -117,17 +160,51 @@ export function isFaTwoLevelAllowedMainScriptsSiblingFile (normalizedPath, areaD
   return false
 }
 
-export function getFaTwoLevelScriptsDirFromFile (normalizedPath) {
-  const scriptsMatch = normalizedPath.match(/^(.*\/scripts)\//)
-
-  if (scriptsMatch !== null) {
-    return scriptsMatch[1]
+/**
+ * Same sibling allowlist as mainScripts areas (no ipc/appProtocol specials).
+ * Used for src/scripts/<domain>/ and feature scripts/ under components/layouts/pages.
+ */
+export function isFaTwoLevelAllowedDomainScriptsSiblingFile (normalizedPath, scriptsDir) {
+  if (!normalizedPath.startsWith(`${scriptsDir}/`) || !normalizedPath.endsWith('.ts')) {
+    return false
   }
 
+  const baseName = normalizedPath.slice(scriptsDir.length + 1)
+
+  if (baseName.includes('/')) {
+    if (baseName.startsWith('_tests/') || baseName.startsWith('functions/')) {
+      return true
+    }
+
+    return false
+  }
+
+  if (isFaTwoLevelManagerFile(normalizedPath)) {
+    return true
+  }
+
+  if (/_managerDefaults\.ts$/.test(baseName)) {
+    return true
+  }
+
+  if (/(Wiring|Surface|Session|Runtime|Api|Bound)\.ts$/.test(baseName)) {
+    return true
+  }
+
+  return false
+}
+
+export function getFaTwoLevelScriptsDirFromFile (normalizedPath) {
   const domainMatch = normalizedPath.match(/^(src\/scripts\/[^/]+)\//)
 
   if (domainMatch !== null) {
     return domainMatch[1]
+  }
+
+  const scriptsMatch = normalizedPath.match(/^(.*\/scripts)\//)
+
+  if (scriptsMatch !== null) {
+    return scriptsMatch[1]
   }
 
   const mainScriptsArea = getFaTwoLevelMainScriptsAreaFromFile(normalizedPath)
