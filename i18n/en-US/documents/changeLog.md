@@ -5,6 +5,8 @@
 
 ### Bugfixes & Optimizations
 - **Help / keybinds**: **Toggle developer tools** works again in installed (packaged) builds. A security guard had been blocking DevTools IPC after packaging so the menu item and shortcut did nothing.
+- **Links**: Foreign http and https addresses no longer open inside the Fantasia Archive window. The app keeps only its own in-app routes; other web URLs open in your default browser.
+- **Projects**: Opening an older **`.faproject`** upgrades the world color-palette column name automatically so saved world swatch lists keep working.
 
 ## 2.4.15
 
