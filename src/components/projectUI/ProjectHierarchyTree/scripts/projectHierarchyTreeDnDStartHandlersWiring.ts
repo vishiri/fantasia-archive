@@ -6,14 +6,10 @@ import {
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
-import {
-  applyExpandedNodeIdsToTree,
-  collectExpandedNodeIdsFromTree,
-  collectProjectHierarchyTreeDescendantIds,
-  findProjectHierarchyTreeNodeById,
-  pruneProjectHierarchyTreeExpandedNodeIdsToAncestors
-} from '../functions/projectHierarchyTreeExpandState'
+import { collectExpandedNodeIdsFromTree } from '../functions/projectHierarchyTreeExpandState'
 import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
+import { readProjectHierarchyTreeScrollTopPx } from '../functions/projectHierarchyTreeScrollPreserve'
 import { resolveProjectHierarchyTreeDragSiblingOrderSnapshot } from './projectHierarchyTreeDnDOrderSupportWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderAtDragStart } from './projectHierarchyTreeDnDOrderResolveWiring'
 import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDnDSessionStateWiring'
@@ -21,71 +17,23 @@ import type {
   createProjectHierarchyTreeDocumentRowDragHoldWiring,
   createProjectHierarchyTreeDocumentRowExpandClickGestureWiring
 } from './projectHierarchyTreeDocumentRowDragHoldWiring'
-import {
-  collectProjectHierarchyTreeLiveExpandStateFromDom
-} from './projectHierarchyTreeExpandDomWiring'
-
-function pruneOpenNodeIdsByCollapsedVisibleRows (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  openNodeIds: ReadonlySet<string>,
-  collapsedVisibleNodeIds: string[]
-): Set<string> {
-  const next = new Set(openNodeIds)
-  for (const collapsedNodeId of collapsedVisibleNodeIds) {
-    next.delete(collapsedNodeId)
-    const node = findProjectHierarchyTreeNodeById(treeNodes, collapsedNodeId)
-    if (node === null) {
-      continue
-    }
-    for (const descendantId of collectProjectHierarchyTreeDescendantIds(node)) {
-      next.delete(descendantId)
-    }
-  }
-  return next
-}
 
 /**
- * Builds drag expand snapshot from live DOM plus persisted open set.
- * Live rows win for visible collapse; persisted ids fill gaps when drag hides nested rows.
+ * Drag expand freeze snapshot from the open-node model only.
+ * Do not read viewport DOM — under he-tree virtualization off-screen rows are missing.
  */
 export function resolveProjectHierarchyTreeDragExpandedSnapshot (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  liveExpandedNodeIds: string[],
-  collapsedVisibleNodeIds: string[],
-  openNodeIds: ReadonlySet<string>,
-  scrollHostPresent: boolean
+  openNodeIds: ReadonlySet<string>
 ): string[] {
-  if (liveExpandedNodeIds.length > 0) {
-    const prunedOpenNodeIds = pruneOpenNodeIdsByCollapsedVisibleRows(
-      treeNodes,
-      openNodeIds,
-      collapsedVisibleNodeIds
-    )
-    const mergedExpandedNodeIds = applyExpandedNodeIdsToTree(
-      treeNodes,
-      [...new Set([...liveExpandedNodeIds, ...prunedOpenNodeIds])]
-    )
-    return pruneProjectHierarchyTreeExpandedNodeIdsToAncestors(
-      treeNodes,
-      mergedExpandedNodeIds
-    )
-  }
-  if (scrollHostPresent) {
-    const prunedOpenNodeIds = pruneOpenNodeIdsByCollapsedVisibleRows(
-      treeNodes,
-      openNodeIds,
-      collapsedVisibleNodeIds
-    )
-    return collectExpandedNodeIdsFromTree(treeNodes, prunedOpenNodeIds)
-  }
   return collectExpandedNodeIdsFromTree(treeNodes, openNodeIds)
 }
 
+/**
+ * Builds persisted + UI-freeze expand snapshots for drag start from model state.
+ */
 export function captureProjectHierarchyTreeDragExpandSnapshots (input: {
-  collapsedVisibleNodeIds: string[]
-  liveExpandedNodeIds: string[]
   openNodeIds: ReadonlySet<string>
-  scrollHostPresent: boolean
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[]
 }): {
     persistedExpandSnapshot: string[]
@@ -97,10 +45,7 @@ export function captureProjectHierarchyTreeDragExpandSnapshots (input: {
   )
   const uiFreezeSnapshot = resolveProjectHierarchyTreeDragExpandedSnapshot(
     input.treeNodes,
-    input.liveExpandedNodeIds,
-    input.collapsedVisibleNodeIds,
-    input.openNodeIds,
-    input.scrollHostPresent
+    input.openNodeIds
   )
   return {
     persistedExpandSnapshot,
@@ -155,6 +100,7 @@ export function applyProjectHierarchyTreeHeTreeModelValueUpdate (
 
 export function runProjectHierarchyTreeBeforeDragStart (deps: {
   captureDragParentDocumentIdAtDragStart: (parentDocumentId: string | null) => void
+  captureDragScrollTopPxAtDragStart: (scrollTopPx: number) => void
   captureDragSiblingOrderAtDragStart: (orderedDocumentIds: string[] | null) => void
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
@@ -189,6 +135,11 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
   deps.documentRowExpandClickGesture.markDragStartedForGesture()
   deps.draggedDocumentId.set(stat.data.documentId)
   deps.resetDragModelValueRevisionForDragStart()
+  deps.captureDragScrollTopPxAtDragStart(
+    readProjectHierarchyTreeScrollTopPx(
+      resolveProjectHierarchyTreeScrollContainer(deps.getTreeScrollHost())
+    )
+  )
   const dragStartOrder = resolveProjectHierarchyTreeDragSiblingOrderAtDragStart({
     documentId: stat.data.documentId,
     getTreeRef: deps.getTreeRef,
@@ -203,14 +154,8 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
   deps.captureDragParentDocumentIdAtDragStart(
     dragStartParentSnapshot?.parentDocumentId ?? null
   )
-  const liveExpandState = collectProjectHierarchyTreeLiveExpandStateFromDom(
-    deps.getTreeScrollHost()
-  )
   const { persistedExpandSnapshot, uiFreezeSnapshot } = captureProjectHierarchyTreeDragExpandSnapshots({
-    collapsedVisibleNodeIds: liveExpandState.collapsedVisibleNodeIds,
-    liveExpandedNodeIds: liveExpandState.expandedNodeIds,
     openNodeIds: deps.openNodeIds.value,
-    scrollHostPresent: liveExpandState.scrollHostPresent,
     treeNodes: deps.treeData.value
   })
   deps.dragExpandedSnapshot.set([...persistedExpandSnapshot])

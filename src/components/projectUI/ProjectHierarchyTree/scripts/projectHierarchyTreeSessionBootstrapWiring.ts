@@ -18,7 +18,6 @@ export function createProjectHierarchyTreeSessionRefs (deps: {
   const dragExpandPostCommitGuard = deps.ref(false)
   const openNodeIds = deps.ref<Set<string>>(new Set())
   const treeComponentRef = deps.ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
-  const treeMountKey = deps.ref(0)
   const treeScrollHostRef = deps.ref<HTMLElement | null>(null)
 
   return {
@@ -32,7 +31,6 @@ export function createProjectHierarchyTreeSessionRefs (deps: {
     openNodeIds,
     suppressTreeEmit,
     treeComponentRef,
-    treeMountKey,
     treeScrollHostRef
   }
 }

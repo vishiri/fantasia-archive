@@ -1,6 +1,9 @@
 import type { Ref } from 'vue'
 
-import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeHeTreeInstance,
+  I_faProjectHierarchyTreeHeTreeNode
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { isProjectHierarchyTreeDragExpandUiFrozen } from '../functions/projectHierarchyTreeDragExpandFreeze'
 import {
@@ -10,7 +13,8 @@ import {
 } from '../functions/projectHierarchyTreeBulkExpandCollapse'
 import {
   evictProjectHierarchyTreeCollapsedSubtreeChildren,
-  findProjectHierarchyTreeNodeById
+  findProjectHierarchyTreeNodeById,
+  publishProjectHierarchyTreeRootRevision
 } from '../functions/projectHierarchyTreeExpandState'
 import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
 
@@ -49,6 +53,7 @@ function evictCollapsedSubtreeChildren (deps: {
 
 async function runBulkExpandDeepPasses (deps: {
   anchorId: string
+  isExpandGenerationCurrent: () => boolean
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   reapplyLatentDescendantExpandState: (options?: {
@@ -66,6 +71,9 @@ async function runBulkExpandDeepPasses (deps: {
   for (let pass = 0; pass < maxPasses; pass++) {
     const openCountBeforePass = deps.openNodeIds.value.size
     await deps.reapplyLatentDescendantExpandState({ deferHeTreeOpen: true })
+    if (!deps.isExpandGenerationCurrent()) {
+      return
+    }
     mergeBulkExpandTargetIds({
       anchorId: deps.anchorId,
       openNodeIds: deps.openNodeIds,
@@ -78,8 +86,47 @@ async function runBulkExpandDeepPasses (deps: {
   }
 }
 
+async function runCollapseAllUnderNode (deps: {
+  anchorId: string
+  getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
+  nextTick: () => Promise<void>
+  openNodeIds: Ref<Set<string>>
+  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  reapplyHeTreeOpenState: () => void
+  suppressTreeEmit: Ref<boolean>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}): Promise<void> {
+  const pruneSet = collectProjectHierarchyTreeBulkCollapseOpenIdPruneSet(
+    deps.treeData.value,
+    deps.openNodeIds.value,
+    deps.anchorId
+  )
+  const next = new Set(deps.openNodeIds.value)
+  for (const pruneId of pruneSet) {
+    next.delete(pruneId)
+  }
+  deps.openNodeIds.value = next
+  evictCollapsedSubtreeChildren({
+    anchorId: deps.anchorId,
+    treeData: deps.treeData
+  })
+  deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
+  syncProjectHierarchyTreeOpenSetToPersist({
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    treeData: deps.treeData
+  })
+  deps.suppressTreeEmit.value = true
+  await deps.nextTick()
+  // closeAll then reopen remaining — reapply alone only opens, so virt rows stay visible.
+  deps.getTreeRef()?.closeAll()
+  deps.reapplyHeTreeOpenState()
+  deps.suppressTreeEmit.value = false
+}
+
 export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
+  getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
@@ -90,22 +137,26 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
 }) {
   let bulkExpandCollapseInFlight = false
+  let bulkExpandCollapseGeneration = 0
 
-  function shouldIgnoreBulkExpandCollapse (): boolean {
-    return bulkExpandCollapseInFlight ||
-      isProjectHierarchyTreeDragExpandUiFrozen({
-        dragExpandUiFrozen: deps.dragExpandUiFrozen.value
-      })
+  function isDragExpandFrozen (): boolean {
+    return isProjectHierarchyTreeDragExpandUiFrozen({
+      dragExpandUiFrozen: deps.dragExpandUiFrozen.value
+    })
+  }
+
+  function shouldIgnoreBulkExpand (): boolean {
+    return bulkExpandCollapseInFlight || isDragExpandFrozen()
   }
 
   function expandAllUnderNode (anchorId: string): void {
-    if (shouldIgnoreBulkExpandCollapse()) {
+    if (shouldIgnoreBulkExpand()) {
       return
     }
     bulkExpandCollapseInFlight = true
+    const expandGeneration = ++bulkExpandCollapseGeneration
     mergeBulkExpandTargetIds({
       anchorId,
       openNodeIds: deps.openNodeIds,
@@ -115,8 +166,12 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
     void (async () => {
       try {
         await deps.runDeferredLazyLoadBatch(async () => {
+          if (expandGeneration !== bulkExpandCollapseGeneration) {
+            return
+          }
           await runBulkExpandDeepPasses({
             anchorId,
+            isExpandGenerationCurrent: () => expandGeneration === bulkExpandCollapseGeneration,
             openNodeIds: deps.openNodeIds,
             queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
             reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
@@ -124,41 +179,31 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
           })
         })
       } finally {
-        bulkExpandCollapseInFlight = false
+        if (expandGeneration === bulkExpandCollapseGeneration) {
+          bulkExpandCollapseInFlight = false
+        }
       }
     })()
   }
 
   async function collapseAllUnderNode (anchorId: string): Promise<void> {
-    if (shouldIgnoreBulkExpandCollapse()) {
+    if (isDragExpandFrozen()) {
       return
     }
+    // Preempt in-flight expand so context Collapse all is never a silent no-op.
+    bulkExpandCollapseGeneration += 1
     bulkExpandCollapseInFlight = true
     try {
-      const pruneSet = collectProjectHierarchyTreeBulkCollapseOpenIdPruneSet(
-        deps.treeData.value,
-        deps.openNodeIds.value,
-        anchorId
-      )
-      const next = new Set(deps.openNodeIds.value)
-      for (const pruneId of pruneSet) {
-        next.delete(pruneId)
-      }
-      deps.openNodeIds.value = next
-      evictCollapsedSubtreeChildren({
+      await runCollapseAllUnderNode({
         anchorId,
-        treeData: deps.treeData
-      })
-      syncProjectHierarchyTreeOpenSetToPersist({
+        getTreeRef: deps.getTreeRef,
+        nextTick: deps.nextTick,
         openNodeIds: deps.openNodeIds,
         queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+        reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
+        suppressTreeEmit: deps.suppressTreeEmit,
         treeData: deps.treeData
       })
-      deps.suppressTreeEmit.value = true
-      deps.treeMountKey.value += 1
-      await deps.nextTick()
-      deps.reapplyHeTreeOpenState()
-      deps.suppressTreeEmit.value = false
     } finally {
       bulkExpandCollapseInFlight = false
     }

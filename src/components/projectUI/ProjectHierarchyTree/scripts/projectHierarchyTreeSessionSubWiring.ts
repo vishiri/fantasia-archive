@@ -36,7 +36,6 @@ type T_sessionSubWiringDeps = {
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
   treeScrollHostRef: Ref<HTMLElement | null>
   uiState: Ref<I_faProjectHierarchyTreeUiState>
   watch: typeof WatchFn
@@ -53,6 +52,7 @@ function createProjectHierarchyTreeSessionLoadAndOpenIconWiring (deps: T_session
   })
   const loadSessionWiring = createProjectHierarchyTreeLazyLoadSessionWiring({
     deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
+    dragCommitPending: deps.dragCommitPending,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getExpandedNodeIds: () => deps.uiState.value.expandedNodeIds,
@@ -64,13 +64,13 @@ function createProjectHierarchyTreeSessionLoadAndOpenIconWiring (deps: T_session
     getTreeScrollHost: () => deps.treeScrollHostRef.value,
     getWorlds: () => deps.worlds.value,
     hierarchyStore: deps.hierarchyStore,
+    isTreeDragActive: deps.isTreeDragActive,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
     pendingRevealPath: deps.pendingRevealPath,
     requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey,
     watch: deps.watch
   })
   const { lazyLoadWiring, runDeferredLazyLoadBatch, uiStateWiring } = loadSessionWiring
@@ -115,6 +115,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: T_sessionSubWi
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
+    getPersistedScrollTopPx: () => deps.uiState.value.scrollTopPx,
     getTreeRef: () => deps.treeComponentRef.value,
     getTreeScrollHost: () => deps.treeScrollHostRef.value,
     hierarchyStore: deps.hierarchyStore,
@@ -159,6 +160,7 @@ type T_sessionDnDSubDeps = {
   dragExpandUiFrozen: Ref<boolean>
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
+  getPersistedScrollTopPx: () => number
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   hierarchyStore: {
@@ -195,6 +197,7 @@ export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDn
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
     isTreeDragActive: deps.isTreeDragActive,

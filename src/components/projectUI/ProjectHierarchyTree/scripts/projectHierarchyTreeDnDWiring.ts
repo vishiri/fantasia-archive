@@ -6,7 +6,37 @@ import { createProjectHierarchyTreeDnDHandlers } from './projectHierarchyTreeDnD
 import { isProjectHierarchyTreeNodeDroppable, isProjectHierarchyTreeRootDroppable } from '../functions/projectHierarchyTreeDnD'
 import { collectProjectHierarchyTreeAncestorIds } from '../functions/projectHierarchyTreeExpandState'
 
-export function createProjectHierarchyTreeDnDWiring (deps: {
+function createProjectHierarchyTreeDnDCancelFromSession (deps: {
+  clearDragSessionFlags: () => void
+  dragCommitPending: Ref<boolean>
+  dragDropCommitted: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
+  dragExpandUiFrozen: Ref<boolean>
+  dragExpandedSnapshotGet: () => string[] | null
+  getTreeScrollHost: () => HTMLElement | null
+  nextTick: () => Promise<void>
+  resyncTreeDataFromLayout: () => void
+  restoreExpandedSnapshot: (
+    expandedNodeIds: string[],
+    restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ) => Promise<void>
+}) {
+  return createProjectHierarchyTreeDragCancelWiring({
+    clearDragSessionFlags: deps.clearDragSessionFlags,
+    dragCommitPending: deps.dragCommitPending,
+    dragDropCommitted: deps.dragDropCommitted,
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    dragExpandedSnapshot: deps.dragExpandedSnapshotGet,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    nextTick: deps.nextTick,
+    requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+    restoreExpandedSnapshot: deps.restoreExpandedSnapshot
+  })
+}
+
+type T_projectHierarchyTreeDnDWiringDeps = {
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragCommitPending: Ref<boolean>
@@ -17,6 +47,7 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   isTreeDragActive: Ref<boolean>
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
+  getPersistedScrollTopPx: () => number
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
@@ -42,28 +73,40 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   ) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}) {
+}
+
+export function createProjectHierarchyTreeDnDWiring (
+  deps: T_projectHierarchyTreeDnDWiringDeps
+) {
   const dragSessionState = createProjectHierarchyTreeDragSessionState({
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragDropCommitted: deps.dragDropCommitted,
     isTreeDragActive: deps.isTreeDragActive
   })
-
-  const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring({
+  const dragCancelWiring = createProjectHierarchyTreeDnDCancelFromSession({
     clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot.get,
+    dragExpandedSnapshotGet: dragSessionState.dragExpandedSnapshot.get,
+    getTreeScrollHost: deps.getTreeScrollHost,
     nextTick: deps.nextTick,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot
   })
-  const removeDragCancelListeners = dragCancelWiring.removeDragCancelListeners
+  return createProjectHierarchyTreeDnDHandlers(
+    buildProjectHierarchyTreeDnDHandlerDeps(deps, dragSessionState, dragCancelWiring)
+  )
+}
 
-  return createProjectHierarchyTreeDnDHandlers({
+function buildProjectHierarchyTreeDnDHandlerDeps (
+  deps: T_projectHierarchyTreeDnDWiringDeps,
+  dragSessionState: ReturnType<typeof createProjectHierarchyTreeDragSessionState>,
+  dragCancelWiring: ReturnType<typeof createProjectHierarchyTreeDragCancelWiring>
+) {
+  return {
     clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
     documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
@@ -78,14 +121,17 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     dragSiblingOrderSnapshot: dragSessionState.dragSiblingOrderSnapshot,
     captureDragModelValueRevisionAtDrop: dragSessionState.captureDragModelValueRevisionAtDrop,
     captureDragParentDocumentIdAtDragStart: dragSessionState.captureDragParentDocumentIdAtDragStart,
+    captureDragScrollTopPxAtDragStart: dragSessionState.captureDragScrollTopPxAtDragStart,
     captureDragSiblingOrderAtDragStart: dragSessionState.captureDragSiblingOrderAtDragStart,
     incrementDragModelValueRevision: dragSessionState.incrementDragModelValueRevision,
     readDragSiblingOrderAtDragStart: dragSessionState.readDragSiblingOrderAtDragStart,
     readDragParentDocumentIdAtDragStart: dragSessionState.readDragParentDocumentIdAtDragStart,
+    readDragScrollTopPxAtDragStart: dragSessionState.readDragScrollTopPxAtDragStart,
     readDragModelValueSettledForCommit: dragSessionState.readDragModelValueSettledForCommit,
     resetDragModelValueRevisionForDragStart: dragSessionState.resetDragModelValueRevisionForDragStart,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
     isTreeDragActive: deps.isTreeDragActive,
@@ -100,12 +146,12 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     refreshLayout: deps.refreshLayout,
-    removeDragCancelListeners,
+    removeDragCancelListeners: dragCancelWiring.removeDragCancelListeners,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
-  })
+  }
 }
 
 export function createProjectHierarchyTreeBeforeDragOpenWiring (deps: {

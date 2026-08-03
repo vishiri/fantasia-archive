@@ -118,6 +118,7 @@ type T_earlyWiring = ReturnType<typeof createProjectHierarchyTreeSessionEarlyWir
 
 type T_hierarchyStore = {
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  uiState: { scrollTopPx: number }
 }
 
 export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
@@ -153,6 +154,8 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     dragExpandPostCommitGuard: deps.earlyWiring.bootstrap.sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: deps.earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
+    getPersistedScrollTopPx: () => deps.hierarchyStore.uiState.scrollTopPx,
+    getTreeScrollHost: () => deps.earlyWiring.bootstrap.sessionRefs.treeScrollHostRef.value,
     lazyLoadWiring: deps.earlyWiring.subWiring.lazyLoadWiring,
     nextTick: deps.nextTick,
     onDocumentOpenRequest: deps.onDocumentOpenRequest,
@@ -162,12 +165,12 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     runDeferredLazyLoadBatch: deps.earlyWiring.subWiring.runDeferredLazyLoadBatch,
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
     treeComponentRef: deps.earlyWiring.bootstrap.sessionRefs.treeComponentRef,
     treeData: deps.treeData,
-    treeMountKey: deps.earlyWiring.bootstrap.sessionRefs.treeMountKey,
     treeScrollHostRef: deps.earlyWiring.bootstrap.sessionRefs.treeScrollHostRef,
     uiStateWiring: deps.earlyWiring.subWiring.uiStateWiring
   })

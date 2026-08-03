@@ -1,4 +1,3 @@
-import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 import type { Ref } from 'vue'
 import type {
   I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions,
@@ -24,35 +23,6 @@ import { createProjectHierarchyTreeHeTreeResyncController } from './projectHiera
 import {
   reapplyProjectHierarchyTreeLatentDescendantExpandState
 } from './projectHierarchyTreeLatentExpandReapplyWiring'
-
-export function attachProjectHierarchyTreeUiStateScrollListeners (deps: {
-  getTreeScrollHost: () => HTMLElement | null
-  queuePersistScrollTopPx: (scrollTopPx: number) => void
-}): () => void {
-  return attachProjectHierarchyTreeScrollPersist({
-    getTreeScrollHost: deps.getTreeScrollHost,
-    queuePersistScrollTopPx: deps.queuePersistScrollTopPx
-  })
-}
-
-export function attachProjectHierarchyTreeScrollPersist (deps: {
-  getTreeScrollHost: () => HTMLElement | null
-  queuePersistScrollTopPx: (scrollTopPx: number) => void
-}): () => void {
-  const scrollContainer = resolveProjectHierarchyTreeScrollContainer(deps.getTreeScrollHost())
-  if (scrollContainer === null) {
-    return () => undefined
-  }
-  const onScroll = (): void => {
-    deps.queuePersistScrollTopPx(scrollContainer.scrollTop)
-  }
-  scrollContainer.addEventListener('scroll', onScroll, {
-    passive: true
-  })
-  return () => {
-    scrollContainer.removeEventListener('scroll', onScroll)
-  }
-}
 
 export function createProjectHierarchyTreeUiStateSessionRestoreWiring (deps: {
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -171,7 +141,6 @@ export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {
   requestAnimationFrame: (callback: () => void) => number
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
 }) {
   function markNodeOpen (nodeId: string): void {
     markProjectHierarchyTreeNodeOpen({
@@ -192,10 +161,7 @@ export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {
 
   const heTreeResyncController = createProjectHierarchyTreeHeTreeResyncController({
     nextTick: deps.nextTick,
-    reapplyHeTreeOpenState,
-    requestAnimationFrame: deps.requestAnimationFrame,
-    suppressTreeEmit: deps.suppressTreeEmit,
-    treeMountKey: deps.treeMountKey
+    suppressTreeEmit: deps.suppressTreeEmit
   })
 
   async function resyncHeTreeAfterExpandPublish (_nodeId: string): Promise<void> {

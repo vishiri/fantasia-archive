@@ -39,6 +39,8 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   getDragExpandedSnapshotNodeIds: () => string[] | null
+  getPersistedScrollTopPx: () => number
+  getTreeScrollHost: () => HTMLElement | null
   lazyLoadWiring: {
     commitStagedLoadedChildren?: () => boolean
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -56,12 +58,12 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   }
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  requestAnimationFrame: (callback: () => void) => number
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
   treeScrollHostRef: Ref<HTMLElement | null>
   uiStateWiring: {
     awaitHeTreeResyncIdle: () => Promise<void>
@@ -139,10 +141,13 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds,
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
+    getTreeScrollHost: deps.getTreeScrollHost,
     lazyLoadWiring: deps.lazyLoadWiring,
     openIconExpandAnimationWiring: deps.openIconExpandAnimationWiring,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
+    requestAnimationFrame: deps.requestAnimationFrame,
     runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeComponentRef: deps.treeComponentRef,
@@ -166,6 +171,7 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
   })
   const bulkContextMenuWiring = createProjectHierarchyTreeSessionBulkContextMenuWiring({
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getTreeRef: () => deps.treeComponentRef.value,
     lazyLoadWiring: deps.lazyLoadWiring,
     nextTick: deps.nextTick,
     onAddNewDocumentRowClick: addNewDocumentClickHandlers.onAddNewDocumentRowClick,
@@ -176,7 +182,6 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey,
     uiStateWiring: deps.uiStateWiring
   })
 

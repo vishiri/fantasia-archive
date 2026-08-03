@@ -178,35 +178,22 @@ export function waitForNextAnimationFrame (
 
 export function createProjectHierarchyTreeHeTreeResyncController (deps: {
   nextTick: () => Promise<void>
-  reapplyHeTreeOpenState: () => void
-  requestAnimationFrame: (callback: () => void) => number
   suppressTreeEmit: Ref<boolean>
-  treeMountKey: Ref<number>
 }) {
   let heTreeResyncInFlight: Promise<void> | null = null
   let programmaticHeTreeResyncActive = false
 
-  async function resyncHeTreeFromPublishedTreeData (options?: {
-    remount?: boolean
-  }): Promise<void> {
+  async function resyncHeTreeFromPublishedTreeData (): Promise<void> {
     if (heTreeResyncInFlight !== null) {
       await heTreeResyncInFlight
     }
-    const remount = options?.remount === true
     const resyncWork = (async () => {
       deps.suppressTreeEmit.value = true
       programmaticHeTreeResyncActive = true
-      if (remount) {
-        deps.treeMountKey.value += 1
-        await deps.nextTick()
-        await deps.nextTick()
-        await waitForNextAnimationFrame(deps.requestAnimationFrame)
-        deps.reapplyHeTreeOpenState()
-      } else {
-        // Soft path: no remount. Full reapplyHeTreeOpenState after a root slice
-        // caused whole-tree blink. Finish opens the expand target instead.
-        await deps.nextTick()
-      }
+      // Soft path only — remount via :key tears down vtlist under virtualization.
+      // Full reapplyHeTreeOpenState after a root slice caused whole-tree blink;
+      // callers open the expand target instead.
+      await deps.nextTick()
       programmaticHeTreeResyncActive = false
       deps.suppressTreeEmit.value = false
     })()

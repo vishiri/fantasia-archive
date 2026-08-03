@@ -17,6 +17,12 @@ import { runProjectHierarchyTreeBeforeDragStart } from './projectHierarchyTreeDn
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
 import { applyProjectHierarchyTreeHeTreeModelValueUpdate } from './projectHierarchyTreeDnDStartHandlersWiring'
 import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from './projectHierarchyTreeDnDOrderResolveWiring'
+import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
+import {
+  readProjectHierarchyTreeScrollTopPx,
+  writeProjectHierarchyTreeScrollTopPx
+} from '../functions/projectHierarchyTreeScrollPreserve'
+import { resolveProjectHierarchyTreePreservedScrollTopPx } from '../functions/projectHierarchyTreeScrollPreserveResolve'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   clearDragSessionFlags: () => void
@@ -44,9 +50,11 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   }
   captureDragModelValueRevisionAtDrop: () => void
   captureDragParentDocumentIdAtDragStart: (parentDocumentId: string | null) => void
+  captureDragScrollTopPxAtDragStart: (scrollTopPx: number) => void
   captureDragSiblingOrderAtDragStart: (orderedDocumentIds: string[] | null) => void
   incrementDragModelValueRevision: () => void
   readDragParentDocumentIdAtDragStart: () => string | null
+  readDragScrollTopPxAtDragStart: () => number
   readDragSiblingOrderAtDragStart: () => string[] | null
   readDragModelValueSettledForCommit: () => boolean
   resetDragModelValueRevisionForDragStart: () => void
@@ -55,6 +63,7 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   getTreeScrollHost: () => HTMLElement | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
+  getPersistedScrollTopPx: () => number
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
@@ -84,6 +93,13 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
 function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.dragDropCommitted.value = true
   deps.captureDragModelValueRevisionAtDrop()
+  const scrollContainer = resolveProjectHierarchyTreeScrollContainer(deps.getTreeScrollHost())
+  const scrollTopPx = resolveProjectHierarchyTreePreservedScrollTopPx({
+    dragSessionScrollTopPx: deps.readDragScrollTopPxAtDragStart(),
+    liveScrollTopPx: readProjectHierarchyTreeScrollTopPx(scrollContainer),
+    persistedScrollTopPx: deps.getPersistedScrollTopPx()
+  })
+  writeProjectHierarchyTreeScrollTopPx(scrollContainer, scrollTopPx)
   syncProjectHierarchyTreeSiblingOrderAfterDrop({
     dragStartOrderedDocumentIds: deps.readDragSiblingOrderAtDragStart(),
     draggedDocumentId: deps.draggedDocumentId.get(),
@@ -101,7 +117,9 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     draggedDocumentId: deps.draggedDocumentId.get,
     dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     dragSiblingOrderAtDragStart: deps.readDragSiblingOrderAtDragStart,
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
     readDragParentDocumentIdAtDragStart: deps.readDragParentDocumentIdAtDragStart,
+    readDragScrollTopPxAtDragStart: deps.readDragScrollTopPxAtDragStart,
     readDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.get,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
@@ -121,6 +139,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
+    scrollTopPx,
     setDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.set,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData

@@ -693,7 +693,7 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist merges nest p
     ['world-1', 'placement-1', 'doc-parent'],
     expect.any(Object)
   )
-  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(2)
+  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(1)
   expect(queuePersistExpandedNodeIds).toHaveBeenCalled()
   expect(flushUiStatePersist).toHaveBeenCalled()
 })
@@ -1053,6 +1053,8 @@ test('Test that createProjectHierarchyTreeSessionExpandHandlersWiring ignores cl
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(true),
     getDragExpandedSnapshotNodeIds: () => null,
+    getPersistedScrollTopPx: () => 0,
+    getTreeScrollHost: () => null,
     lazyLoadWiring: {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
@@ -1062,6 +1064,10 @@ test('Test that createProjectHierarchyTreeSessionExpandHandlersWiring ignores cl
     },
     nextTick: async () => undefined,
     openNodeIds: ref(new Set()),
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
       await runBatch()
     }),

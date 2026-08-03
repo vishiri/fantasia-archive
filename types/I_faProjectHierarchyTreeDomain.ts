@@ -169,6 +169,11 @@ export interface I_faProjectHierarchyTreeDragCommitResult {
 
 /** Minimal he-tree Draggable instance API used by workspace hierarchy tree wiring. */
 export interface I_faProjectHierarchyTreeHeTreeInstance {
+  $refs?: {
+    vtlist?: {
+      update?: () => void
+    }
+  }
   closeAll: () => void
   getData?: () => I_faProjectHierarchyTreeHeTreeNode[]
   openNodeAndParents: (nodeOrStat: I_faProjectHierarchyTreeHeTreeNode) => void

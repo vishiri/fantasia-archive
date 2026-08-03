@@ -366,7 +366,8 @@ test('Test that bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring ope
           treeComponentRef: ref({
             closeAll: vi.fn(),
             openNodeAndParents
-          })
+          }),
+          treeScrollHostRef: ref(null)
         }
       },
       subWiring: {
@@ -389,6 +390,7 @@ test('Test that bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring ope
     watch
   })
   pendingHierarchyNodeRefreshIds.value = ['doc-parent']
+  await Promise.resolve()
   await Promise.resolve()
   await Promise.resolve()
   expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledWith('doc-parent')

@@ -1,9 +1,14 @@
 /**
  * True when scroll position is at (or past) the virtual list tail.
+ * Skip when content is not taller than the viewport — common during virt remount
+ * when scrollHeight collapses and clamping would yank scrollTop to 0.
  */
 export function shouldClampProjectHierarchyTreeVirtualScrollTail (
   scrollContainer: HTMLElement
 ): boolean {
+  if (scrollContainer.scrollHeight <= scrollContainer.clientHeight + 2) {
+    return false
+  }
   return scrollContainer.scrollTop + scrollContainer.clientHeight >=
     scrollContainer.scrollHeight - 2
 }
@@ -60,12 +65,33 @@ export function readProjectHierarchyTreeVtlistInnerMetrics (
   }
 }
 
+/**
+ * True when the gap below the last mounted row is too large to trust as a real
+ * overscroll tail (incomplete virt window after expand/remount).
+ */
+export function isProjectHierarchyTreeVirtualScrollGapUnreliable (
+  gapBelowLastRowPx: number,
+  clientHeightPx: number
+): boolean {
+  return gapBelowLastRowPx > clientHeightPx * 0.5
+}
+
 export function clampProjectHierarchyTreeScrollTopToLastDomRow (
   scrollContainer: HTMLElement
 ): { adjusted: boolean, gapBelowLastRowPx: number | null, nextScrollTopPx: number } {
   const gapBelowLastRowPx = readProjectHierarchyTreeLastDomRowViewportGapPx(scrollContainer)
   const currentScrollTopPx = scrollContainer.scrollTop
   if (gapBelowLastRowPx === null || gapBelowLastRowPx <= 1) {
+    return {
+      adjusted: false,
+      gapBelowLastRowPx,
+      nextScrollTopPx: currentScrollTopPx
+    }
+  }
+  if (isProjectHierarchyTreeVirtualScrollGapUnreliable(
+    gapBelowLastRowPx,
+    scrollContainer.clientHeight
+  )) {
     return {
       adjusted: false,
       gapBelowLastRowPx,

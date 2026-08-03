@@ -19,8 +19,9 @@ import {
   prepareProjectHierarchyTreeDragCommitOrderSnapshot,
   readProjectHierarchyTreeDragSiblingOrderFromGetData
 } from './projectHierarchyTreeDnDOrderCaptureWiring'
-import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../functions/projectHierarchyTreeOrderedDocumentIdsEqual'
 import { refreshProjectHierarchyTreeDragCommitTargetContainer } from './projectHierarchyTreeDnDCommitWiring'
+import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
+import { resolveProjectHierarchyTreeDragCommitGate } from './projectHierarchyTreeDnDCommitGateWiring'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
   clearDragSessionFlags: () => void
@@ -30,7 +31,9 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   dragSiblingOrderAtDragStart: () => string[] | null
+  getPersistedScrollTopPx: () => number
   readDragParentDocumentIdAtDragStart: () => string | null
+  readDragScrollTopPxAtDragStart: () => number
   readDragSiblingOrderSnapshot: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   draggedDocumentId: () => string | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -59,6 +62,7 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
     expandedNodeIds: string[],
     restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   ) => Promise<void>
+  scrollTopPx?: number
   setDragSiblingOrderSnapshot: (
     value: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   ) => void
@@ -105,30 +109,13 @@ async function runProjectHierarchyTreeDragCommitPersistPhase (deps: {
   return commitResult
 }
 
-function resolveProjectHierarchyTreeDragCommitGate (input: {
-  dragParentDocumentIdAtDragStart: string | null
-  dragSiblingOrderSnapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
-  dragStartOrder: string[] | null
-}): {
-    orderChangedFromDragStart: boolean
-    parentChangedFromDragStart: boolean
-  } {
-  const parentChangedFromDragStart = input.dragSiblingOrderSnapshot !== null &&
-    input.dragParentDocumentIdAtDragStart !== input.dragSiblingOrderSnapshot.parentDocumentId
-  const orderChangedFromDragStart = input.dragSiblingOrderSnapshot !== null &&
-    (input.dragStartOrder === null ||
-      parentChangedFromDragStart ||
-      !areProjectHierarchyTreeOrderedDocumentIdsEqual(
-        input.dragSiblingOrderSnapshot.orderedDocumentIds,
-        input.dragStartOrder
-      ))
-  return {
-    orderChangedFromDragStart,
-    parentChangedFromDragStart
-  }
+async function finishProjectHierarchyTreeDragCommit (
+  deps: T_projectHierarchyTreeDragCommitScheduleDeps
+): Promise<void> {
+  await finishProjectHierarchyTreeDragCommitBody(deps)
 }
 
-async function finishProjectHierarchyTreeDragCommit (
+async function finishProjectHierarchyTreeDragCommitBody (
   deps: T_projectHierarchyTreeDragCommitScheduleDeps
 ): Promise<void> {
   deps.dragCommitScheduled.value = false
@@ -234,9 +221,17 @@ export function scheduleProjectHierarchyTreeDragCommit (
   const logNextTickFailure = (err: unknown): void => {
     console.error('[ProjectHierarchyTree] drag commit nextTick chain failed', err)
   }
-  window.requestAnimationFrame(() => {
-    void deps.nextTick().then(() => {
-      return deps.nextTick()
-    }).then(() => finishProjectHierarchyTreeDragCommit(deps)).catch(logNextTickFailure)
-  })
+  void runWithPreservedProjectHierarchyTreeScrollTop({
+    dragSessionScrollTopPx: deps.readDragScrollTopPxAtDragStart(),
+    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    nextTick: deps.nextTick,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    ...(deps.scrollTopPx === undefined ? {} : { scrollTopPx: deps.scrollTopPx }),
+    run: async () => {
+      await deps.nextTick()
+      await deps.nextTick()
+      await finishProjectHierarchyTreeDragCommit(deps)
+    }
+  }).catch(logNextTickFailure)
 }

@@ -7,6 +7,7 @@ import { wireProjectHierarchyTreeSessionLifecycle } from './projectHierarchyTree
 import type { createProjectHierarchyTreeSessionHandlersWiring } from './projectHierarchyTreeSessionHandlersWiring'
 import type { createProjectHierarchyTreeSessionSubWiring } from './projectHierarchyTreeSessionSubWiring'
 import { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
+import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
 
 type T_sessionHierarchyStore = {
   clearPendingRevealPath: () => void
@@ -24,6 +25,7 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
   earlyWiring: ReturnType<typeof createProjectHierarchyTreeSessionEarlyWiring>
   getStoreExpandedNodeIds: () => readonly string[]
   hierarchyStore: T_sessionHierarchyStore
+  nextTick: () => Promise<void>
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
   pendingRevealPath: Ref<string[]>
@@ -57,7 +59,16 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
     pendingRevealPath: deps.pendingRevealPath,
     resetOnProjectClose: () => deps.hierarchyStore.resetOnProjectClose(),
     resyncTreeDataFromLayout: deps.earlyWiring.subWiring.syncWiring.resyncTreeDataFromLayout,
-    restoreExpandedSnapshot: deps.earlyWiring.subWiring.uiStateWiring.restoreExpandedSnapshot,
+    restoreExpandedSnapshot: async (expandedNodeIds) => {
+      await runWithPreservedProjectHierarchyTreeScrollTop({
+        getTreeScrollHost: () => deps.earlyWiring.bootstrap.sessionRefs.treeScrollHostRef.value,
+        nextTick: deps.nextTick,
+        requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+        run: async () => {
+          await deps.earlyWiring.subWiring.uiStateWiring.restoreExpandedSnapshot(expandedNodeIds)
+        }
+      })
+    },
     revealPendingPath: deps.earlyWiring.subWiring.uiStateWiring.revealPendingPath,
     teardown: hydrateWiring.teardown,
     treeData: deps.treeData,
@@ -137,7 +148,6 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
   }
   subWiring: T_subWiring
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
 }) {
   return {
     contextMenuAddNewRowIcon: deps.handlersWiring.contextMenuAddNewRowIcon,
@@ -189,7 +199,6 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
     setTreeComponentRef: deps.handlersWiring.setTreeComponentRef,
     setTreeScrollHostRef: deps.handlersWiring.setTreeScrollHostRef,
     treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey,
     treeRootClassList: deps.subWiring.treeRootClassList,
     treeStyle: deps.subWiring.treeStyle
   }

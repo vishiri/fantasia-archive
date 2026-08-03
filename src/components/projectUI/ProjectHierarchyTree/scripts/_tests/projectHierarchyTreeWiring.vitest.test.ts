@@ -71,7 +71,7 @@ import {
 import {
   restoreProjectHierarchyTreeExpandedSnapshot
 } from '../projectHierarchyTreeExpandSnapshotWiring'
-import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeUiStateSessionPartsWiring'
+import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeScrollPersistListenersWiring'
 import { finalizeProjectHierarchyTreeDragCommitExpandState } from '../projectHierarchyTreeDnDCommitAfterPersistWiring'
 import { runProjectHierarchyTreePostDragExpandCloseGuard } from '../projectHierarchyTreeDnDWiring'
 import {
@@ -196,6 +196,7 @@ function buildProjectHierarchyTreeDnDWiringTestDeps (
     dragExpandUiFrozen: ref(false),
     flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     flushUiStatePersist: vi.fn(),
+    getPersistedScrollTopPx: () => 0,
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
     isTreeDragActive,
@@ -228,7 +229,12 @@ function buildProjectHierarchyTreeDragCancelTestDeps (
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(true),
     dragExpandedSnapshot: () => ['world-1'],
+    getTreeScrollHost: () => null,
     nextTick: async () => undefined,
+    requestAnimationFrame: (callback: () => void) => {
+      callback()
+      return 0
+    },
     resyncTreeDataFromLayout: vi.fn(),
     restoreExpandedSnapshot: vi.fn(async () => undefined),
     ...overrides
@@ -247,11 +253,13 @@ function buildScheduleDragCommitTestDeps (
     dragExpandedSnapshot: () => ['world-1'],
     dragSiblingOrderAtDragStart: () => null,
     readDragParentDocumentIdAtDragStart: () => null,
+    readDragScrollTopPxAtDragStart: () => 0,
     readDragSiblingOrderSnapshot: () => null,
     setDragSiblingOrderSnapshot: () => {},
     draggedDocumentId: () => null,
     flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     flushUiStatePersist: vi.fn(),
+    getPersistedScrollTopPx: () => 0,
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
     loadChildrenForNode: vi.fn(async () => undefined),
@@ -350,6 +358,27 @@ test('Test that collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom reads open
   closedRow.append(closedIcon, closedNode)
   host.append(openRow, closedRow)
   expect(collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom(host)).toEqual(['world-1'])
+})
+
+/**
+ * Phase 0 / E1: DOM expand readers only see mounted rows — under virtualization
+ * off-screen opens are invisible, so drag snapshots must not use this reader.
+ */
+test('Test that live expand DOM reader omits open nodes not present as mounted rows', () => {
+  const host = document.createElement('div')
+  const openRow = document.createElement('div')
+  openRow.className = 'projectHierarchyTree__nodeRow'
+  const openIcon = document.createElement('span')
+  openIcon.className = 'projectHierarchyTree__openIcon projectHierarchyTree__openIcon--open'
+  openIcon.setAttribute('data-test-locator', 'projectHierarchyTree-openIcon')
+  const node = document.createElement('div')
+  node.setAttribute('data-test-hierarchy-node-id', 'world-1')
+  openRow.append(openIcon, node)
+  host.append(openRow)
+  const liveIds = collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom(host)
+  const modelOpenIds = ['world-1', 'group-1', 'placement-1', 'placement-2']
+  expect(liveIds).toEqual(['world-1'])
+  expect(liveIds.length).toBeLessThan(modelOpenIds.length)
 })
 
 test('Test that expand state helpers prune and collect open ids', () => {
@@ -1074,6 +1103,8 @@ test('Test that session handlers wiring emits document open requests', async () 
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
+    getPersistedScrollTopPx: () => 0,
+    getTreeScrollHost: () => null,
     lazyLoadWiring: {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: async () => undefined
@@ -1086,6 +1117,10 @@ test('Test that session handlers wiring emits document open requests', async () 
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
       await runBatch()
     }),
@@ -1093,7 +1128,6 @@ test('Test that session handlers wiring emits document open requests', async () 
     suppressTreeEmit: ref(false),
     treeComponentRef,
     treeData: ref([]),
-    treeMountKey: ref(0),
     treeScrollHostRef,
     uiStateWiring: {
       awaitHeTreeResyncIdle: async () => undefined,
@@ -1433,6 +1467,35 @@ test('Test that createProjectHierarchyTreeDnDWiring dragend skips cancel cleanup
   removeSpy.mockRestore()
 })
 
+test('Test that createProjectHierarchyTreeDnDWiring Escape cancel uses session requestAnimationFrame', async () => {
+  vi.useFakeTimers()
+  const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+    callback(performance.now())
+    return 0
+  })
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  const wiring = createProjectHierarchyTreeDnDWiring(buildProjectHierarchyTreeDnDWiringTestDeps({
+    nextTick: async () => undefined,
+    resyncTreeDataFromLayout,
+    restoreExpandedSnapshot
+  }))
+  wiring.onBeforeDragStart({
+    data: buildDocumentNode()
+  })
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+  await vi.advanceTimersByTimeAsync(500)
+  for (let tick = 0; tick < 8; tick += 1) {
+    await Promise.resolve()
+  }
+  expect(resyncTreeDataFromLayout).toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).toHaveBeenCalled()
+  expect(rafSpy).toHaveBeenCalled()
+  wiring.onUnmountedCleanup()
+  rafSpy.mockRestore()
+  vi.useRealTimers()
+})
+
 test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branches', () => {
   const dragCommitPending = ref(false)
   const dragCommitScheduled = ref(false)
@@ -1486,14 +1549,17 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
     },
     captureDragModelValueRevisionAtDrop: vi.fn(),
     captureDragParentDocumentIdAtDragStart: vi.fn(),
+    captureDragScrollTopPxAtDragStart: vi.fn(),
     captureDragSiblingOrderAtDragStart: vi.fn(),
     incrementDragModelValueRevision: vi.fn(),
     readDragParentDocumentIdAtDragStart: () => null,
+    readDragScrollTopPxAtDragStart: () => 0,
     readDragSiblingOrderAtDragStart: () => null,
     readDragModelValueSettledForCommit: () => true,
     resetDragModelValueRevisionForDragStart: vi.fn(),
     flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     flushUiStatePersist: vi.fn(),
+    getPersistedScrollTopPx: () => 0,
     isTreeDragActive,
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
@@ -1554,7 +1620,7 @@ test('Test that scheduleProjectHierarchyTreeDragCommit runs commit chain', async
     ['world-1'],
     PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
   )
-  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(2)
+  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(1)
   expect(dragExpandUiFrozen.value).toBe(false)
   expect(clearDragSessionFlags).toHaveBeenCalled()
 })
@@ -1653,7 +1719,11 @@ test('Test that projectHierarchyTree UI state wiring restores and reveals paths'
   })
   const detach = attachProjectHierarchyTreeScrollPersist({
     getTreeScrollHost: () => host,
-    queuePersistScrollTopPx
+    queuePersistScrollTopPx,
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    }
   })
   tree.scrollTop = 44
   tree.dispatchEvent(new Event('scroll'))
@@ -1746,6 +1816,8 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: () => null,
+    getPersistedScrollTopPx: () => 0,
+    getTreeScrollHost: () => null,
     lazyLoadWiring: {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
@@ -1758,6 +1830,10 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
       await runBatch()
     }),
@@ -1765,7 +1841,6 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
     treeData: ref([]),
-    treeMountKey: ref(0),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
       awaitHeTreeResyncIdle: async () => undefined,
@@ -2143,7 +2218,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -2197,7 +2271,6 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
     }),
     suppressTreeEmit: ref(false),
     treeData,
-    treeMountKey: ref(0),
     watch
   })
   wiring.markNodeOpen('world-1')
@@ -2267,7 +2340,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring calls bridge APIs for
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -2318,7 +2390,7 @@ test('Test that scheduleProjectHierarchyTreeDragCommit uses empty snapshot when 
     [],
     PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
   )
-  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(2)
+  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(1)
 })
 
 test('Test that scheduleProjectHierarchyTreeDragCommit skips when already scheduled', () => {
@@ -3002,7 +3074,8 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
       queuePersistScrollTopPx: vi.fn(),
       refreshLayout: vi.fn(async () => undefined),
       refreshUiState: vi.fn(async () => undefined),
-      resetOnProjectClose: vi.fn()
+      resetOnProjectClose: vi.fn(),
+      uiState: { scrollTopPx: 0 }
     },
     nextTick: async () => undefined,
     onDocumentOpenRequest: vi.fn(),
@@ -3061,7 +3134,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing bridg
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -3502,7 +3574,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state st
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: ['world-1'],
@@ -3519,11 +3590,16 @@ test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state st
   tree.className = 'projectHierarchyTree'
   host.appendChild(tree)
   sessionRefs.treeScrollHostRef.value = host
+  const rafSpy = vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((callback) => {
+    callback(performance.now())
+    return 0
+  })
   const detach = subWiring.uiStateWiring.attachScrollPersist()
   tree.scrollTop = 10
   tree.dispatchEvent(new Event('scroll'))
   expect(queuePersistScrollTopPx).toHaveBeenCalledWith(10)
   detach()
+  rafSpy.mockRestore()
   subWiring.uiStateWiring.onUnmountedCleanup()
   expect(flushUiStatePersist).toHaveBeenCalled()
 })
@@ -3576,7 +3652,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring propagates move failu
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -3874,7 +3949,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring reflects drag state i
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -3965,7 +4039,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restores UI state via
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: ['world-1'],
@@ -3992,7 +4065,8 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
     queuePersistScrollTopPx: vi.fn(),
     refreshLayout: vi.fn(async () => undefined),
     refreshUiState: vi.fn(async () => undefined),
-    resetOnProjectClose: vi.fn()
+    resetOnProjectClose: vi.fn(),
+    uiState: { scrollTopPx: 0 }
   }
   createProjectHierarchyTreeSessionWiring({
     S_FaActiveProject: () => ({
@@ -4076,7 +4150,8 @@ test('Test that createProjectHierarchyTreeSessionWiring reads store expand ids o
       queuePersistScrollTopPx: vi.fn(),
       refreshLayout: vi.fn(async () => undefined),
       refreshUiState: vi.fn(async () => undefined),
-      resetOnProjectClose: vi.fn()
+      resetOnProjectClose: vi.fn(),
+      uiState: { scrollTopPx: 0 }
     },
     nextTick: async () => undefined,
     onDocumentOpenRequest: vi.fn(),
@@ -4134,7 +4209,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing prelo
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -4442,14 +4516,17 @@ test('Test that createProjectHierarchyTreeDnDHandlers commitAllowedDocumentRowDr
     },
     captureDragModelValueRevisionAtDrop: vi.fn(),
     captureDragParentDocumentIdAtDragStart: vi.fn(),
+    captureDragScrollTopPxAtDragStart: vi.fn(),
     captureDragSiblingOrderAtDragStart: vi.fn(),
     incrementDragModelValueRevision: vi.fn(),
     readDragParentDocumentIdAtDragStart: () => null,
+    readDragScrollTopPxAtDragStart: () => 0,
     readDragSiblingOrderAtDragStart: () => null,
     readDragModelValueSettledForCommit: () => true,
     resetDragModelValueRevisionForDragStart: vi.fn(),
     flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     flushUiStatePersist: vi.fn(),
+    getPersistedScrollTopPx: () => 0,
     isTreeDragActive,
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
@@ -4521,7 +4598,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreUiStateFromSto
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -4569,7 +4645,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreExpandedSnapsh
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: ['world-1'],
@@ -4633,7 +4708,6 @@ test('Test that createProjectHierarchyTreeSessionSubWiring refreshNodeChildrenFr
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -4690,13 +4764,19 @@ test('Test that bindProjectHierarchyTreeSessionPendingRefresh delegates store cl
     pendingHierarchyNodeRefreshIds.value = []
   })
   bindProjectHierarchyTreeSessionPendingRefresh({
+    getTreeScrollHost: () => null,
     hierarchyStore: {
       clearPendingDocumentRefreshIds,
       clearPendingHierarchyNodeRefreshIds
     },
+    nextTick: async () => undefined,
     pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     treeData,
     watch
   })
@@ -4812,14 +4892,17 @@ test('Test that createProjectHierarchyTreeDnDHandlers ignores null drag nodes an
     },
     captureDragModelValueRevisionAtDrop: vi.fn(),
     captureDragParentDocumentIdAtDragStart: vi.fn(),
+    captureDragScrollTopPxAtDragStart: vi.fn(),
     captureDragSiblingOrderAtDragStart: vi.fn(),
     incrementDragModelValueRevision: vi.fn(),
     readDragParentDocumentIdAtDragStart: () => null,
+    readDragScrollTopPxAtDragStart: () => 0,
     readDragSiblingOrderAtDragStart: () => null,
     readDragModelValueSettledForCommit: () => true,
     resetDragModelValueRevisionForDragStart: vi.fn(),
     flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     flushUiStatePersist: vi.fn(),
+    getPersistedScrollTopPx: () => 0,
     isTreeDragActive: ref(false),
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
@@ -5119,7 +5202,6 @@ test('Test that createProjectHierarchyTreeSessionDnDSubWiring throws when reinde
     suppressTreeEmit: sessionRefs.suppressTreeEmit,
     treeComponentRef: sessionRefs.treeComponentRef,
     treeData,
-    treeMountKey: sessionRefs.treeMountKey,
     treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: ref({
       expandedNodeIds: [],
@@ -5288,9 +5370,15 @@ test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard blurs focused tr
   row.tabIndex = 0
   tree.appendChild(row)
   host.appendChild(tree)
+  document.body.appendChild(host)
   row.focus()
+  expect(document.activeElement).toBe(row)
+  const blurSpy = vi.spyOn(row, 'blur')
   clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
   expect(row.tabIndex).toBe(-1)
+  expect(blurSpy).toHaveBeenCalled()
+  blurSpy.mockRestore()
+  host.remove()
 })
 
 test('Test that runProjectHierarchyTreePostDragExpandCloseGuard suppresses snapshot node closes', () => {

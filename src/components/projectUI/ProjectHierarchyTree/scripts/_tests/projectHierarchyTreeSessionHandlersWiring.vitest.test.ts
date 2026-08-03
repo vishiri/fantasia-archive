@@ -66,18 +66,30 @@ function createTestBulkExpandDeps (options: {
   reapplyHeTreeOpenState?: () => void
 } = {}): Pick<
   Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0],
-  'nextTick' | 'openIconExpandAnimationWiring' | 'openNodeIds' | 'queuePersistExpandedNodeIds' | 'runDeferredLazyLoadBatch' | 'treeMountKey'
+  | 'getPersistedScrollTopPx'
+  | 'getTreeScrollHost'
+  | 'nextTick'
+  | 'openIconExpandAnimationWiring'
+  | 'openNodeIds'
+  | 'queuePersistExpandedNodeIds'
+  | 'requestAnimationFrame'
+  | 'runDeferredLazyLoadBatch'
 > {
   const reapplyHeTreeOpenState = options.reapplyHeTreeOpenState ?? vi.fn()
   return {
+    getPersistedScrollTopPx: () => 0,
+    getTreeScrollHost: () => null,
     nextTick: async () => {},
     openIconExpandAnimationWiring: {
       scheduleOpenIconExpandAnimation: vi.fn()
     },
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
     runDeferredLazyLoadBatch: createTestRunDeferredLazyLoadBatch(reapplyHeTreeOpenState),
-    treeMountKey: ref(0)
   }
 }
 
@@ -1202,4 +1214,51 @@ test('Test that session handlers create temporary document when add-new row is c
     templateId: 'template-1',
     worldId: 'world-1'
   })
+})
+
+test('Test that session handlers collapse-all closes he-tree via treeComponentRef', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  const closeAll = vi.fn()
+  const treeComponentRef = ref({
+    closeAll,
+    openNodeAndParents: vi.fn()
+  } as unknown as I_faProjectHierarchyTreeHeTreeInstance)
+  const openNodeIds = ref(new Set(['world-1', 'placement-1']))
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
+    lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    ...createTestBulkExpandDeps(),
+    openNodeIds,
+    resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef,
+    treeData: ref(tree),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: createTestUiStateWiring()
+  })
+  wiring.onNodeRowContextMenu(placement, {
+    clientX: 10,
+    clientY: 20,
+    currentTarget: document.createElement('div'),
+    preventDefault: vi.fn()
+  } as unknown as MouseEvent)
+  wiring.onCollapseAllUnderNodeClick()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(closeAll).toHaveBeenCalled()
+  expect(openNodeIds.value.has('placement-1')).toBe(false)
 })

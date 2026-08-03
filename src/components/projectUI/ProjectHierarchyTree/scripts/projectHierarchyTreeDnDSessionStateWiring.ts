@@ -3,6 +3,7 @@ import type { I_faProjectHierarchyTreeDragSiblingOrderSnapshot, I_faProjectHiera
 import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import { shouldClearDragSessionWithoutCommit } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import { PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS } from '../functions/projectHierarchyTreeConstants'
+import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
 
 export function createProjectHierarchyTreeDragCancelWiring (deps: {
   clearDragSessionFlags: () => void
@@ -11,7 +12,9 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
+  getTreeScrollHost: () => HTMLElement | null
   nextTick: () => Promise<void>
+  requestAnimationFrame: (callback: () => void) => number
   resyncTreeDataFromLayout: () => void
   restoreExpandedSnapshot: (
     expandedNodeIds: string[],
@@ -37,10 +40,17 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
     clearFaVerticalDraggableTabsDocumentDragCursor()
     deps.resyncTreeDataFromLayout()
     const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
-    void remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-      expandedNodeIds: expandedSnapshot,
+    void runWithPreservedProjectHierarchyTreeScrollTop({
+      getTreeScrollHost: deps.getTreeScrollHost,
       nextTick: deps.nextTick,
-      restoreExpandedSnapshot: deps.restoreExpandedSnapshot
+      requestAnimationFrame: deps.requestAnimationFrame,
+      run: async () => {
+        await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
+          expandedNodeIds: expandedSnapshot,
+          nextTick: deps.nextTick,
+          restoreExpandedSnapshot: deps.restoreExpandedSnapshot
+        })
+      }
     }).finally(() => {
       deps.dragExpandPostCommitGuard.value = false
       deps.dragExpandUiFrozen.value = false
@@ -75,17 +85,39 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
   }
 }
 
+function createProjectHierarchyTreeDragSessionNullableBinding<T> (initial: T): {
+  get: () => T
+  set: (value: T) => void
+  read: () => T
+  write: (value: T) => void
+} {
+  let current = initial
+  const get = (): T => current
+  const set = (value: T): void => {
+    current = value
+  }
+  return {
+    get,
+    set,
+    read: get,
+    write: set
+  }
+}
+
 export function createProjectHierarchyTreeDragSessionState (deps: {
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
   dragDropCommitted: Ref<boolean>
   isTreeDragActive: Ref<boolean>
 }) {
-  let draggedDocumentId: string | null = null
-  let dragExpandedSnapshot: string[] | null = null
-  let dragSiblingOrderSnapshot: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = null
+  const draggedDocumentId = createProjectHierarchyTreeDragSessionNullableBinding<string | null>(null)
+  const dragExpandedSnapshot = createProjectHierarchyTreeDragSessionNullableBinding<string[] | null>(null)
+  const dragSiblingOrderSnapshot = createProjectHierarchyTreeDragSessionNullableBinding<
+    I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  >(null)
   let dragSiblingOrderAtDragStart: string[] | null = null
   let dragParentDocumentIdAtDragStart: string | null = null
+  let dragScrollTopPxAtDragStart = 0
   let dragModelValueRevision = 0
   let dragModelValueRevisionAtDragStart = 0
   let dragModelValueRevisionAtDrop = 0
@@ -95,11 +127,12 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     deps.dragCommitPending.value = false
     deps.dragCommitScheduled.value = false
     deps.dragDropCommitted.value = false
-    draggedDocumentId = null
-    dragExpandedSnapshot = null
-    dragSiblingOrderSnapshot = null
+    draggedDocumentId.write(null)
+    dragExpandedSnapshot.write(null)
+    dragSiblingOrderSnapshot.write(null)
     dragSiblingOrderAtDragStart = null
     dragParentDocumentIdAtDragStart = null
+    dragScrollTopPxAtDragStart = 0
     dragModelValueRevision = 0
     dragModelValueRevisionAtDragStart = 0
     dragModelValueRevisionAtDrop = 0
@@ -119,67 +152,51 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     dragModelValueRevision += 1
   }
 
-  function readDragModelValueRevision (): number {
-    return dragModelValueRevision
-  }
-
-  function readDragModelValueRevisionAtDragStart (): number {
-    return dragModelValueRevisionAtDragStart
-  }
-
-  function readDragModelValueRevisionAtDrop (): number {
-    return dragModelValueRevisionAtDrop
-  }
-
   function captureDragParentDocumentIdAtDragStart (parentDocumentId: string | null): void {
     dragParentDocumentIdAtDragStart = parentDocumentId
   }
 
-  function readDragParentDocumentIdAtDragStart (): string | null {
-    return dragParentDocumentIdAtDragStart
+  function captureDragScrollTopPxAtDragStart (scrollTopPx: number): void {
+    dragScrollTopPxAtDragStart = scrollTopPx
   }
 
   function captureDragSiblingOrderAtDragStart (orderedDocumentIds: string[] | null): void {
     dragSiblingOrderAtDragStart = orderedDocumentIds === null ? null : [...orderedDocumentIds]
   }
 
-  function readDragSiblingOrderAtDragStart (): string[] | null {
-    return dragSiblingOrderAtDragStart
+  const readDragParentDocumentIdAtDragStart = (): string | null => dragParentDocumentIdAtDragStart
+  const readDragScrollTopPxAtDragStart = (): number => dragScrollTopPxAtDragStart
+  const readDragSiblingOrderAtDragStart = (): string[] | null => dragSiblingOrderAtDragStart
+  const readDragModelValueRevision = (): number => dragModelValueRevision
+  const readDragModelValueRevisionAtDragStart = (): number => dragModelValueRevisionAtDragStart
+  const readDragModelValueRevisionAtDrop = (): number => dragModelValueRevisionAtDrop
+  const readDragModelValueSettledForCommit = (): boolean =>
+    dragModelValueRevision > dragModelValueRevisionAtDrop
+  const draggedDocumentIdApi = {
+    get: draggedDocumentId.get,
+    set: draggedDocumentId.set
   }
-
-  function readDragModelValueSettledForCommit (): boolean {
-    return dragModelValueRevision > dragModelValueRevisionAtDrop
+  const dragExpandedSnapshotApi = {
+    get: dragExpandedSnapshot.get,
+    set: dragExpandedSnapshot.set
   }
-
-  const draggedDocumentIdBinding = {
-    get: () => draggedDocumentId,
-    set: (value: string | null) => {
-      draggedDocumentId = value
-    }
-  }
-  const dragExpandedSnapshotBinding = {
-    get: () => dragExpandedSnapshot,
-    set: (value: string[] | null) => {
-      dragExpandedSnapshot = value
-    }
-  }
-  const dragSiblingOrderSnapshotBinding = {
-    get: () => dragSiblingOrderSnapshot,
-    set: (value: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null) => {
-      dragSiblingOrderSnapshot = value
-    }
+  const dragSiblingOrderSnapshotApi = {
+    get: dragSiblingOrderSnapshot.get,
+    set: dragSiblingOrderSnapshot.set
   }
 
   return {
     captureDragParentDocumentIdAtDragStart,
+    captureDragScrollTopPxAtDragStart,
     captureDragSiblingOrderAtDragStart,
     captureDragModelValueRevisionAtDrop,
     clearDragSessionFlags,
-    dragExpandedSnapshot: dragExpandedSnapshotBinding,
-    draggedDocumentId: draggedDocumentIdBinding,
-    dragSiblingOrderSnapshot: dragSiblingOrderSnapshotBinding,
+    dragExpandedSnapshot: dragExpandedSnapshotApi,
+    draggedDocumentId: draggedDocumentIdApi,
+    dragSiblingOrderSnapshot: dragSiblingOrderSnapshotApi,
     incrementDragModelValueRevision,
     readDragParentDocumentIdAtDragStart,
+    readDragScrollTopPxAtDragStart,
     readDragSiblingOrderAtDragStart,
     readDragModelValueRevision,
     readDragModelValueRevisionAtDragStart,
@@ -190,10 +207,9 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
 }
 
 /**
- * Restores he-tree expand snapshot after drag quiet period so drag-open timers
- * cannot call beforeDragOpen on a torn-down Draggable instance.
+ * Restores expand snapshot after drag settle so drag-open cannot race restore.
  */
-function waitForProjectHierarchyTreeDragOpenRemountQuietPeriod (): Promise<void> {
+function waitForProjectHierarchyTreeDragOpenRestoreSettle (): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS)
   })
@@ -209,7 +225,7 @@ export async function remountProjectHierarchyTreeAndRestoreExpandedSnapshot (dep
   restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   waitBeforeRemount?: () => Promise<void>
 }): Promise<void> {
-  const waitBeforeRemount = deps.waitBeforeRemount ?? waitForProjectHierarchyTreeDragOpenRemountQuietPeriod
+  const waitBeforeRemount = deps.waitBeforeRemount ?? waitForProjectHierarchyTreeDragOpenRestoreSettle
   await waitBeforeRemount()
   await deps.restoreExpandedSnapshot(deps.expandedNodeIds, deps.restoreOptions)
   await deps.nextTick()

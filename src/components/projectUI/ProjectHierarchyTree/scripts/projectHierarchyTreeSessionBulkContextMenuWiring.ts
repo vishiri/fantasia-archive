@@ -12,6 +12,7 @@ import {
 import { createProjectHierarchyTreeNodeContextMenuWiring } from './projectHierarchyTreeNodeContextMenuWiring'
 export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
+  getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   lazyLoadWiring: {
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
@@ -25,7 +26,6 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-  treeMountKey: Ref<number>
   uiStateWiring: {
     reapplyHeTreeOpenState: () => void
     reapplyLatentDescendantExpandState: (options?: {
@@ -35,6 +35,7 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
 }) {
   const bulkExpandCollapseWiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getTreeRef: deps.getTreeRef,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
@@ -42,8 +43,7 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     reapplyLatentDescendantExpandState: deps.uiStateWiring.reapplyLatentDescendantExpandState,
     runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
-    treeData: deps.treeData,
-    treeMountKey: deps.treeMountKey
+    treeData: deps.treeData
   })
   const nodeContextMenuWiring = createProjectHierarchyTreeNodeContextMenuWiring({
     bulkExpandCollapseWiring,
