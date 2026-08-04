@@ -132,6 +132,7 @@
   "resolutions": {
     "builder-util-runtime": "9.7.0",
     "dompurify": "3.4.11",
+    "jsdom/undici": "7.29.0",
     "linkify-it": "5.0.2",
     "markdown-it": "14.2.0",
     "shell-quote": "1.9.0",
