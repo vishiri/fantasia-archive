@@ -432,6 +432,8 @@ test.describe.serial('App settings dialog', () => {
 const developerSettingsCategoryKey = 'developerSettings'
 const logFullActivityPayloadSettingKey = 'logFullActivityPayload'
 const showDocumentIDSettingKey = 'showDocumentID'
+const visualAccessibilityCategoryKey = 'visualAccessibility'
+const disableSpellCheckSettingKey = 'disableSpellCheck'
 const postSaveSettingsWaitMs = 500
 const tabSwitchSettleMs = 550
 
@@ -633,5 +635,87 @@ test.describe.serial('App settings logFullActivityPayload persists after Save', 
       return await window.faContentBridgeAPIs.faUserSettings.getSettings()
     })
     expect(settings.logFullActivityPayload).toBe(true)
+  })
+})
+
+/**
+ * disableSpellCheck
+ * - Visuals & app-wide functionality lists the toggle defaulting off; Save persists enabled state through faUserSettings.
+ */
+test.describe.serial('App settings disableSpellCheck persists after Save', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: appSettingsDirectInput })
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
+    })
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
+  })
+
+  test('disableSpellCheck defaults off then persists true after Save', async () => {
+    const visualsTab = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.tab(visualAccessibilityCategoryKey)}"]`
+    )
+    await expect(visualsTab).toHaveCount(1)
+    await visualsTab.click()
+    await appWindow.waitForTimeout(tabSwitchSettleMs)
+
+    const subcategoryTitle = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.subcategory(visualAccessibilityCategoryKey, 'visualsAppwideFunctionality')}"] [data-test-locator="${selectorList.subcategoryTitle}"]`
+    )
+    await expect(subcategoryTitle).toHaveText(
+      appSettingsMessages.appOptionsCategories.visualAccessibility.visualsAppwideFunctionality
+        .subtitle
+    )
+
+    const settingRoot = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.setting(disableSpellCheckSettingKey)}"]`
+    )
+    await expect(settingRoot).toHaveCount(1)
+    await expect(settingRoot).toHaveAttribute(
+      selectorList.settingIdAttribute,
+      disableSpellCheckSettingKey
+    )
+    await expect(
+      settingRoot.locator(`[data-test-locator="${selectorList.settingLabel}"]`)
+    ).toHaveText(appSettingsMessages.appOptions.disableSpellCheck.title)
+    await expect(
+      settingRoot.locator(`[data-test-locator="${selectorList.settingNote}"]`)
+    ).toHaveCount(0)
+
+    const toggle = settingRoot.getByRole('switch')
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+
+    const saveButton = appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`)
+    await saveButton.click()
+    await appWindow.waitForTimeout(postSaveSettingsWaitMs)
+
+    const settings = await appWindow.evaluate(async () => {
+      return await window.faContentBridgeAPIs.faUserSettings.getSettings()
+    })
+    expect(settings.disableSpellCheck).toBe(true)
   })
 })
