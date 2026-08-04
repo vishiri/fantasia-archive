@@ -72,6 +72,10 @@ import {
   restoreProjectHierarchyTreeExpandedSnapshot
 } from '../projectHierarchyTreeExpandSnapshotWiring'
 import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeScrollPersistListenersWiring'
+import {
+  isProjectHierarchyTreeScrollPreserveActive,
+  resetProjectHierarchyTreeScrollPreserveForTests
+} from '../projectHierarchyTreeScrollPreserveWiring'
 import { finalizeProjectHierarchyTreeDragCommitExpandState } from '../projectHierarchyTreeDnDCommitAfterPersistWiring'
 import { runProjectHierarchyTreePostDragExpandCloseGuard } from '../projectHierarchyTreeDnDWiring'
 import {
@@ -1468,6 +1472,7 @@ test('Test that createProjectHierarchyTreeDnDWiring dragend skips cancel cleanup
 })
 
 test('Test that createProjectHierarchyTreeDnDWiring Escape cancel uses session requestAnimationFrame', async () => {
+  resetProjectHierarchyTreeScrollPreserveForTests()
   vi.useFakeTimers()
   const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
     callback(performance.now())
@@ -1475,25 +1480,32 @@ test('Test that createProjectHierarchyTreeDnDWiring Escape cancel uses session r
   })
   const restoreExpandedSnapshot = vi.fn(async () => undefined)
   const resyncTreeDataFromLayout = vi.fn()
-  const wiring = createProjectHierarchyTreeDnDWiring(buildProjectHierarchyTreeDnDWiringTestDeps({
-    nextTick: async () => undefined,
-    resyncTreeDataFromLayout,
-    restoreExpandedSnapshot
-  }))
-  wiring.onBeforeDragStart({
-    data: buildDocumentNode()
-  })
-  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
-  await vi.advanceTimersByTimeAsync(500)
-  for (let tick = 0; tick < 8; tick += 1) {
-    await Promise.resolve()
+  try {
+    const wiring = createProjectHierarchyTreeDnDWiring(buildProjectHierarchyTreeDnDWiringTestDeps({
+      nextTick: async () => undefined,
+      resyncTreeDataFromLayout,
+      restoreExpandedSnapshot
+    }))
+    wiring.onBeforeDragStart({
+      data: buildDocumentNode()
+    })
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await vi.advanceTimersByTimeAsync(500)
+    for (let tick = 0; tick < 8; tick += 1) {
+      await Promise.resolve()
+    }
+    expect(resyncTreeDataFromLayout).toHaveBeenCalled()
+    expect(restoreExpandedSnapshot).toHaveBeenCalled()
+    expect(rafSpy).toHaveBeenCalled()
+    await vi.waitFor(() => {
+      expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(false)
+    })
+    wiring.onUnmountedCleanup()
+  } finally {
+    rafSpy.mockRestore()
+    vi.useRealTimers()
+    resetProjectHierarchyTreeScrollPreserveForTests()
   }
-  expect(resyncTreeDataFromLayout).toHaveBeenCalled()
-  expect(restoreExpandedSnapshot).toHaveBeenCalled()
-  expect(rafSpy).toHaveBeenCalled()
-  wiring.onUnmountedCleanup()
-  rafSpy.mockRestore()
-  vi.useRealTimers()
 })
 
 test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branches', () => {

@@ -1,7 +1,11 @@
 /** @vitest-environment jsdom */
 import { expect, test, vi } from 'vitest'
 
-import { runWithPreservedProjectHierarchyTreeScrollTop } from '../projectHierarchyTreeScrollPreserveWiring'
+import {
+  isProjectHierarchyTreeScrollPreserveActive,
+  resetProjectHierarchyTreeScrollPreserveForTests,
+  runWithPreservedProjectHierarchyTreeScrollTop
+} from '../projectHierarchyTreeScrollPreserveWiring'
 import { applyProjectHierarchyTreeVirtualListDefaults } from '../projectHierarchyTreeVirtualListBufferWiring'
 import {
   PROJECT_HIERARCHY_TREE_VIRTUAL_LIST_BUFFER_PX,
@@ -9,6 +13,35 @@ import {
 } from '../../functions/projectHierarchyTreeConstants'
 import { requestProjectHierarchyTreeVirtualListUpdate } from '../../functions/projectHierarchyTreeVirtualListUpdate'
 import VirtualList from '@virtual-list/vue'
+
+test('Test that resetProjectHierarchyTreeScrollPreserveForTests clears active preserve depth', async () => {
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  host.appendChild(tree)
+  let releaseNested!: () => void
+  const nestedGate = new Promise<void>((resolve) => {
+    releaseNested = resolve
+  })
+  const preservePromise = runWithPreservedProjectHierarchyTreeScrollTop({
+    getTreeScrollHost: () => host,
+    nextTick: async () => undefined,
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 0
+    },
+    run: async () => {
+      expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(true)
+      await nestedGate
+    }
+  })
+  expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(true)
+  resetProjectHierarchyTreeScrollPreserveForTests()
+  expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(false)
+  releaseNested()
+  await preservePromise
+  resetProjectHierarchyTreeScrollPreserveForTests()
+})
 
 test('Test that runWithPreservedProjectHierarchyTreeScrollTop restores scroll after work', async () => {
   const host = document.createElement('div')

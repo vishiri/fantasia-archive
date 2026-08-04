@@ -18,6 +18,14 @@ export function isProjectHierarchyTreeScrollPreserveActive (): boolean {
   return projectHierarchyTreeScrollPreserveDepth > 0
 }
 
+/**
+ * Clears module scroll-preserve session state between Vitest cases (nested depth can leak under fake timers).
+ */
+export function resetProjectHierarchyTreeScrollPreserveForTests (): void {
+  projectHierarchyTreeScrollPreserveDepth = 0
+  projectHierarchyTreeScrollPreserveTouch = null
+}
+
 function waitProjectHierarchyTreeAnimationFrame (
   requestAnimationFrameFn: (callback: () => void) => number
 ): Promise<void> {
