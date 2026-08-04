@@ -790,6 +790,15 @@ body.fa-appTheme--fantasy {
   }
 }
 
+/*
+ * Fantasy parchment pins position:relative on toasts (higher specificity than Quasar
+ * leave-*). Leave must be absolute or Quasar's inline left jumps the toast horizontally
+ * and the bottom-right slide-down never runs cleanly.
+ */
+.q-notification[class*='leave-active'] {
+  position: absolute !important;
+}
+
 body.fa-appTheme--fantasy .q-notification {
   @include notificationParchment.fa-notification-parchment-chrome;
 
@@ -960,6 +969,49 @@ body.fa-appTheme--fantasy .q-notification {
 
 div + .q-notification__caption {
   margin-top: $qNotification-captionSibling-marginTop;
+}
+
+/* Sticky update-available toast: caption Download CTA + absolute dismiss.
+ * Do not set position on .q-notification — that blocks Quasar leave absolute
+ * (bottom-right slide down) and turns inline left into a horizontal jump. */
+.q-notification.fa-notifyAppUpdateAvailable {
+  .fa-notifyAppUpdateAvailable__version {
+    color: $qNotification-appUpdateAvailable-version-color;
+    font-weight: $qNotification-appUpdateAvailable-version-fontWeight;
+  }
+
+  .q-notification__message {
+    padding-bottom: $qNotification-appUpdateAvailable-message-paddingBottom;
+    padding-top: $qNotification-appUpdateAvailable-message-paddingTop;
+  }
+
+  .fa-notifyAppUpdateAvailable__cta {
+    margin-top: $qNotification-appUpdateAvailable-cta-marginTop;
+    text-align: center;
+  }
+
+  /* Keep success fill on the faux QBtn inside the light info toast. */
+  .fa-notifyAppUpdateAvailable__download.bg-positive {
+    background-color: var(--fa-color-positive, #{$positive}) !important;
+    color: var(--fa-color-white, #{$white}) !important;
+  }
+
+  /* Close only — collapse the actions column so CTA stays under copy. */
+  .q-notification__actions {
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+    width: 0;
+  }
+
+  /* Position against Quasar __wrapper (already relative-position), not the toast root. */
+  .q-notification__actions .q-btn:has(.q-icon) {
+    padding: 0;
+    position: absolute;
+    right: $qNotification-appUpdateAvailable-close-right;
+    top: $qNotification-appUpdateAvailable-close-top;
+    z-index: 2;
+  }
 }
 
 .q-page {

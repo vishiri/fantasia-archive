@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Tallenna mukautettu projekti CSS',
     showProjectDashboard: 'Näytä projektin hallintapaneeli',
     showStartupTipsNotification: 'Näytä käynnistysvihjeilmoitus',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboardWindow: 'Ota App Noteboard -ikkuna käyttöön',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

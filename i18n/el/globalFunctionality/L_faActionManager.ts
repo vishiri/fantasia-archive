@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Αποθήκευση προσαρμοσμένου έργου CSS',
     showProjectDashboard: 'Εμφάνιση πίνακα ελέγχου έργου',
     showStartupTipsNotification: 'Εμφάνιση ειδοποίησης συμβουλής εκκίνησης',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboardWindow: 'Εναλλαγή του παραθύρου σημειωματάριου εφαρμογής',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

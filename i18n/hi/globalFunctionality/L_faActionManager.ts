@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'कस्टम प्रोजेक्ट सहेजें CSS',
     showProjectDashboard: 'प्रोजेक्ट डैशबोर्ड दिखाएँ',
     showStartupTipsNotification: 'स्टार्टअप टिप अधिसूचना दिखाएँ',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboardWindow: 'ऐप नोटबोर्ड विंडो टॉगल करें',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

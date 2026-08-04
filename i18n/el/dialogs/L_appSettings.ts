@@ -184,6 +184,11 @@ export default {
       tags: 'ορθογραφία, γραμματική, διόρθωση, κόκκινη υπογράμμιση, γραφή, λεξικό'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'Προφέρεται διαιρέτης αρίθμησης',
       description: 'Αυτή η ρύθμιση προσθέτει έναν άλλο χαρακτήρα \\\\| μεταξύ της κατηγορίας και του αριθμού εγγράφων στο ιεραρχικό δέντρο.',

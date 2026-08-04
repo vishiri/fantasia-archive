@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'حفظ المشروع المخصص CSS',
     showProjectDashboard: 'إظهار لوحة تحكم المشروع',
     showStartupTipsNotification: 'إظهار إشعار تلميح بدء التشغيل',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboardWindow: 'تبديل نافذة المفكرة التطبيق',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

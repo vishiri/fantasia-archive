@@ -3,6 +3,7 @@ export default {
   items: {
     advancedSearchGuide: 'Οδηγός σύνθετης αναζήτησης',
     tipsTricksTrivia: 'Συμβουλές, κόλπα & Trivia',
+    checkForUpdates: 'Check for updates',
     changelog: 'Καταγραφή αλλαγών',
     aboutFantasiaArchive: 'Σχετικά με Fantasia Archive',
     license: 'Αδεια',

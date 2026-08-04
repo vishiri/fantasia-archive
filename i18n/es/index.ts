@@ -35,6 +35,7 @@ import L_appStylingFloating from './floatingWindows/L_appStyling'
 import L_projectStylingFloating from './floatingWindows/L_projectStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
+import L_appUpdateCheck from './globalFunctionality/L_appUpdateCheck'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from './globalFunctionality/L_faAppNoteboard'
 import L_faProjectNoteboard from './globalFunctionality/L_faProjectNoteboard'
@@ -140,6 +141,7 @@ export default {
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
     faActionManager: L_faActionManager,
+    appUpdateCheck: L_appUpdateCheck,
     faKeybinds: L_faKeybinds,
     faAppNoteboard: L_faAppNoteboard,
     faProjectNoteboard: L_faProjectNoteboard,

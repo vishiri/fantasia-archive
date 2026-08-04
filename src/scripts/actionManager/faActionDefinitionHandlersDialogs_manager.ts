@@ -68,3 +68,6 @@ export const handleLoadExistingProject =
 
 export const handleShowStartupTipsNotification =
   faActionDefinitionHandlersDialogsApi.handleShowStartupTipsNotification
+
+export const handleCheckForAppUpdates =
+  faActionDefinitionHandlersDialogsApi.handleCheckForAppUpdates

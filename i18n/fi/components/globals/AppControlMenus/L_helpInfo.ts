@@ -3,6 +3,7 @@ export default {
   items: {
     advancedSearchGuide: 'Tarkennettu hakuopas',
     tipsTricksTrivia: 'Vinkkejä, temppuja ja triviaa',
+    checkForUpdates: 'Check for updates',
     changelog: 'Muutosloki',
     aboutFantasiaArchive: 'Tietoja Fantasia Archive',
     license: 'Lisenssi',

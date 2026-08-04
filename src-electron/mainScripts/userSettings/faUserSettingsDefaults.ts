@@ -16,6 +16,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   disableDocumentToolTips: false,
   disableQuickSearchCategoryPrecheck: false,
   disableSpellCheck: false,
+  disableStartUpdateCheckMessage: false,
   doubleDashDocCount: false,
   forceSublevelCollapseInTree: false,
   hideAdvSearchCheatsheetButton: false,

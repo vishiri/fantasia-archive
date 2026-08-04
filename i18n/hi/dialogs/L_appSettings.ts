@@ -184,6 +184,11 @@ export default {
       tags: 'वर्तनी, व्याकरण, प्रमाणन, लाल रेखांकन, लेखन, शब्दकोश'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'उच्चारण विभक्त',
       description: 'यह सेटिंग पदानुक्रमित वृक्ष में श्रेणी और दस्तावेज़ गणना के बीच एक और \\\\| वर्ण जोड़ती है।',

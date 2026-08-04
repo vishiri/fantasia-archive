@@ -11,6 +11,7 @@ import {
   openDialogComponent,
   openDialogMarkdownDocument,
   tipsTricksTriviaNotification,
+  checkForAppUpdates,
   tryDismissFaComponentDialogIfOpen,
   tryDismissFaMarkdownDocumentIfOpen
 } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
@@ -54,5 +55,6 @@ export const faActionDefinitionHandlersDialogsDeps = {
   notifyFaProjectCreatedPositive,
   notifyFaProjectLoadedPositive,
   tipsTricksTriviaNotification,
+  checkForAppUpdates,
   i18n
 } satisfies I_createFaActionDefinitionHandlersDialogsDeps

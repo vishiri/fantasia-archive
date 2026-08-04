@@ -37,7 +37,10 @@ vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
 vi.mock('app/src/stores/S_FaUserSettings', () => {
   return {
     S_FaUserSettings: () => ({
-      refreshSettings: vi.fn(async () => undefined)
+      refreshSettings: vi.fn(async () => undefined),
+      settings: {
+        disableStartUpdateCheckMessage: false
+      }
     })
   }
 })
@@ -108,7 +111,8 @@ test('Test that runAppStartupRouting pushes component testing route when request
 
 /**
  * runAppStartupRouting
- * Pushes welcome first, then skips tips when skipWelcomeScreen launch succeeds.
+ * Pushes welcome first, then skips tips when skipWelcomeScreen launch succeeds,
+ * but still runs the startup update check.
  */
 test('Test that runAppStartupRouting pushes welcome before skip welcome screen succeeds', async () => {
   const routerPushMock = vi.fn()
@@ -125,7 +129,10 @@ test('Test that runAppStartupRouting pushes welcome before skip welcome screen s
 
   expect(markWelcomeScreenAutoLoadBootAttemptedMock).toHaveBeenCalled()
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
-  expect(runFaActionMock).not.toHaveBeenCalled()
+  expect(runFaActionMock).not.toHaveBeenCalledWith('showStartupTipsNotification', undefined)
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('checkForAppUpdates', { source: 'startup' })
+  })
   await vi.waitFor(() => {
     expect(markWelcomeScreenAutoLoadBootCompletionMock).toHaveBeenCalled()
   })
@@ -146,6 +153,9 @@ test('Test that runAppStartupRouting defaults to welcome route and triggers triv
   await vi.waitFor(() => {
     expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
   })
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('checkForAppUpdates', { source: 'startup' })
+  })
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
 })
@@ -164,6 +174,9 @@ test('Test that runAppStartupRouting uses home route when component mode has no 
   )
   await vi.waitFor(() => {
     expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
+  })
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('checkForAppUpdates', { source: 'startup' })
   })
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })

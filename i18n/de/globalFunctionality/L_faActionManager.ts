@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Benutzerdefiniertes Projekt CSS speichern',
     showProjectDashboard: 'Projekt-Dashboard anzeigen',
     showStartupTipsNotification: 'Benachrichtigung zum Starttipp anzeigen',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Entwicklertools umschalten',
     toggleAppNoteboardWindow: 'App-Noteboard-Fenster umschalten',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

@@ -184,6 +184,11 @@ export default {
       tags: '拼写、语法、校对、红色下划线、写作、词典'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: '明显的计数分隔符',
       description: '此设置在分层树中的类别和文档计数之间添加另一个 \\\\| 字符。',

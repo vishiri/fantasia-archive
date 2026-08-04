@@ -45,6 +45,7 @@ export interface I_faUserSettings {
   disableDocumentToolTips: boolean
   disableQuickSearchCategoryPrecheck: boolean
   disableSpellCheck: boolean
+  disableStartUpdateCheckMessage: boolean
   doubleDashDocCount: boolean
   forceSublevelCollapseInTree: boolean
   hideAdvSearchCheatsheetButton: boolean

@@ -3,6 +3,7 @@ export default {
   items: {
     advancedSearchGuide: 'Guía de búsqueda avanzada',
     tipsTricksTrivia: 'Consejos, trucos y curiosidades',
+    checkForUpdates: 'Check for updates',
     changelog: 'Registro de cambios',
     aboutFantasiaArchive: 'Acerca de Fantasia Archive',
     license: 'Licencia',

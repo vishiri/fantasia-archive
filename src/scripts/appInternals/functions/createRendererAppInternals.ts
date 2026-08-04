@@ -31,7 +31,12 @@ export function createRendererAppInternals (deps: {
   ) => Promise<void>
   isFantasiaStorybookCanvas: () => boolean
   markWelcomeScreenAutoLoadBootAttempted: () => void
-  runFaAction: (id: 'showStartupTipsNotification', payload: undefined) => void
+  getPlaywrightTestEnv: () => Promise<string | undefined>
+  runFaAction: (
+    id: 'showStartupTipsNotification' | 'checkForAppUpdates',
+    payload: undefined | { source: 'startup' }
+  ) => void
+  shouldRunStartupUpdateCheck: () => boolean
   setFantasiaStorybookCanvasFlag: (value: boolean) => void
   tryRunSkipWelcomeScreenOnLaunch: () => Promise<boolean>
   waitForSkipWelcomeScreenBridgeWhenElectron: () => Promise<void>
@@ -81,10 +86,17 @@ export function createRendererAppInternals (deps: {
         await deps.waitForSkipWelcomeScreenBridgeWhenElectron()
         await deps.refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch()
         const skippedWelcomeScreen = await deps.tryRunSkipWelcomeScreenOnLaunch()
-        if (skippedWelcomeScreen) {
-          return
+        if (!skippedWelcomeScreen) {
+          deps.runFaAction('showStartupTipsNotification', undefined)
         }
-        deps.runFaAction('showStartupTipsNotification', undefined)
+        const testEnv = await deps.getPlaywrightTestEnv()
+        if (
+          testEnv !== 'components' &&
+          testEnv !== 'e2e' &&
+          deps.shouldRunStartupUpdateCheck()
+        ) {
+          deps.runFaAction('checkForAppUpdates', { source: 'startup' })
+        }
       })
       .finally(() => {
         deps.markWelcomeScreenAutoLoadBootCompletion()

@@ -3,6 +3,7 @@ export default {
   items: {
     advancedSearchGuide: '高级搜索指南',
     tipsTricksTrivia: '提示、技巧和琐事',
+    checkForUpdates: 'Check for updates',
     changelog: '变更日志',
     aboutFantasiaArchive: '关于Fantasia Archive',
     license: '执照',

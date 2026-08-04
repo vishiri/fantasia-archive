@@ -2,6 +2,13 @@
 @use '../../app.palette.scss' as *;
 
 /* QUASAR COMPONENT - Q-NOTIFICATION */
+$qNotification-appUpdateAvailable-close-right: -5px;
+$qNotification-appUpdateAvailable-close-top: 5px;
+$qNotification-appUpdateAvailable-cta-marginTop: 25px;
+$qNotification-appUpdateAvailable-message-paddingBottom: 40px;
+$qNotification-appUpdateAvailable-message-paddingTop: 40px;
+$qNotification-appUpdateAvailable-version-color: fa-v('positive', $positive);
+$qNotification-appUpdateAvailable-version-fontWeight: 700;
 $qNotification-avatar-height: 135px;
 $qNotification-avatar-marginBottom: 15px;
 $qNotification-avatar-marginRight: 30px;

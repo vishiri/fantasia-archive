@@ -184,6 +184,11 @@ export default {
       tags: 'スペル、文法、校正、赤い下線、ライティング、辞書'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: '発音されたカウントディバイダ',
       description: 'この設定により、階層ツリー内のカテゴリとドキュメント数の間に \\\\| 文字が追加されます。',

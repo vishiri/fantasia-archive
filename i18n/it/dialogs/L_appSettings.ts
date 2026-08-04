@@ -184,6 +184,11 @@ export default {
       tags: 'ortografia, grammatica, correzione, sottolineatura rossa, scrittura, dizionario'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'Divisore di conteggio pronunciato',
       description: 'Questa impostazione aggiunge un altro carattere \\\\| tra la categoria e il conteggio dei documenti nell\'albero gerarchico.',

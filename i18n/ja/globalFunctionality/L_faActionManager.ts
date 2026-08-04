@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'カスタム プロジェクト CSS を保存',
     showProjectDashboard: 'プロジェクトダッシュボードを表示',
     showStartupTipsNotification: '起動ヒント通知を表示',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: '開発者ツールの切り替え',
     toggleAppNoteboardWindow: 'アプリのノートボードウィンドウの切り替え',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

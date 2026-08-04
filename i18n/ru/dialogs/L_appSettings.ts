@@ -184,6 +184,11 @@ export default {
       tags: 'орфография, грамматика, корректура, красное подчеркивание, письмо, словарь'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'Выраженный делитель счета',
       description: 'Этот параметр добавляет еще один символ \\\\| между категорией и количеством документов в иерархическом дереве.',

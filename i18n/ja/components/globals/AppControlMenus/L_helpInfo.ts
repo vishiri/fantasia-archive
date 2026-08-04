@@ -3,6 +3,7 @@ export default {
   items: {
     advancedSearchGuide: '高度な検索ガイド',
     tipsTricksTrivia: 'ヒント、トリック、雑学',
+    checkForUpdates: 'Check for updates',
     changelog: '変更履歴',
     aboutFantasiaArchive: 'Fantasia Archiveについて',
     license: 'ライセンス',

@@ -62,5 +62,8 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   notifyFaProjectCreatedPositive: () => void
   notifyFaProjectLoadedPositive: () => void
   tipsTricksTriviaNotification: (force: boolean) => void
+  checkForAppUpdates: (
+    source: import('app/types/I_faAppUpdateCheck').T_faAppUpdateCheckSource
+  ) => Promise<void>
   i18n: { global: { t: (key: string) => string } }
 }

@@ -36,12 +36,41 @@ const refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch =
 const rendererAppInternalsApi = createRendererAppInternals({
   applyFaI18nLocaleFromLanguageCode,
   applyFaUserSettingsLanguageSelection,
+  getPlaywrightTestEnv: async () => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+    const bridge = window.faContentBridgeAPIs?.extraEnvVariables
+    if (bridge === undefined) {
+      return undefined
+    }
+    const cached = bridge.getCachedSnapshot?.()
+    if (cached !== undefined && cached !== null) {
+      const testEnv = cached.TEST_ENV
+      return typeof testEnv === 'string' ? testEnv : undefined
+    }
+    if (bridge.getSnapshot === undefined) {
+      return undefined
+    }
+    const snapshot = await bridge.getSnapshot()
+    const testEnv = snapshot.TEST_ENV
+    return typeof testEnv === 'string' ? testEnv : undefined
+  },
   isFantasiaStorybookCanvas,
   markWelcomeScreenAutoLoadBootAttempted,
   markWelcomeScreenAutoLoadBootCompletion,
   refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch,
-  runFaAction,
+  runFaAction: (id, payload) => {
+    if (id === 'showStartupTipsNotification') {
+      runFaAction('showStartupTipsNotification', undefined)
+      return
+    }
+    runFaAction('checkForAppUpdates', payload as { source: 'startup' })
+  },
   setFantasiaStorybookCanvasFlag,
+  shouldRunStartupUpdateCheck: () => {
+    return S_FaUserSettings().settings?.disableStartUpdateCheckMessage !== true
+  },
   tryRunSkipWelcomeScreenOnLaunch,
   waitForSkipWelcomeScreenBridgeWhenElectron
 })

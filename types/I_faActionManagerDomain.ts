@@ -41,6 +41,7 @@ export const FA_ACTION_IDS = [
   'reportBridgeLoadFailure',
   'openActionMonitorDialog',
   'showStartupTipsNotification',
+  'checkForAppUpdates',
   'openImportExportAppConfigDialog',
   'exportAppConfigPackage',
   'exportAppConfigSaveResult',
@@ -134,6 +135,7 @@ export interface I_faActionPayloadMap {
   reportBridgeLoadFailure: { message: string }
   openActionMonitorDialog: void
   showStartupTipsNotification: void
+  checkForAppUpdates: import('app/types/I_faAppUpdateCheck').I_faAppUpdateCheckPayload
   openImportExportAppConfigDialog: void
   openNewProjectDialog: void
   loadExistingProject: I_faLoadExistingProjectPayload

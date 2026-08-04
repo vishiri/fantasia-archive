@@ -31,6 +31,7 @@ import L_faProjectSettings from 'app/i18n/en-US/globalFunctionality/L_faProjectS
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
+import L_appUpdateCheck from 'app/i18n/en-US/globalFunctionality/L_appUpdateCheck'
 import L_mainLayout from 'app/i18n/en-US/layouts/L_mainLayout'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 import L_projectOverview from 'app/i18n/en-US/components/projectUI/ProjectOverview/L_projectOverview'
@@ -116,7 +117,8 @@ const defaultMessages: Record<string, unknown> = {
     faProjectSettings: L_faProjectSettings,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
-    unsortedAppTexts: L_unsortedAppTexts
+    unsortedAppTexts: L_unsortedAppTexts,
+    appUpdateCheck: L_appUpdateCheck
   },
   documents: {
     advancedSearchCheatSheet: '# Advanced search cheat sheet\n\nIn the moonlit stacks beneath **Aurelion Citadel**, archivists index stories by sigil, era, and oath. Queries can chain together concepts like *kingdom*, *bloodline*, and *artifact* to narrow thousands of records into a single credible trail. Use precise terms first, then broaden with synonyms when the trail goes cold.\n\n> Lore note: most "missing" entries are filed under their pre-coronation names.\n\n## Quick patterns\n\n- `type:character AND faction:"Sunforged Court"`\n- `region:"North Reach" AND status:active`\n- `artifact:"Glass Compass" OR artifact:"Mirror Needle"`\n\n```text\ntitle:"Ashen Treaty" AND NOT status:archived\n```\n\n| Field | Use |\n| --- | --- |\n| `type` | Entity category |\n| `region` | Geographic filter |\n| `status` | Active/archived state |',

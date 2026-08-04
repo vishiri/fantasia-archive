@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Сохранить индивидуальный проект CSS',
     showProjectDashboard: 'Показать панель управления проектом',
     showStartupTipsNotification: 'Показать уведомление о подсказке при запуске',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Переключить инструменты разработчика',
     toggleAppNoteboardWindow: 'Переключить окно «Блокнот приложения»',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

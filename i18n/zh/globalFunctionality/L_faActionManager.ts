@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: '保存自定义项目 CSS',
     showProjectDashboard: '显示项目仪表板',
     showStartupTipsNotification: '显示启动提示通知',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboardWindow: '切换应用程序记事板窗口',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

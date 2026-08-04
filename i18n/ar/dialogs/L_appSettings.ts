@@ -184,6 +184,11 @@ export default {
       tags: 'التدقيق الإملائي، النحوي، التدقيق، التسطير الأحمر، الكتابة، القاموس'
     },
 
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'مقسم العد الواضح',
       description: 'يضيف هذا الإعداد حرف \\\\| آخر بين الفئة وعدد المستندات في الشجرة الهرمية.',

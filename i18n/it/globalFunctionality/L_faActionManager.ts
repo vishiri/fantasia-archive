@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Salva progetto personalizzato CSS',
     showProjectDashboard: 'Mostra dashboard del progetto',
     showStartupTipsNotification: 'Mostra notifica suggerimento di avvio',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Attiva/disattiva gli Strumenti per sviluppatori',
     toggleAppNoteboardWindow: 'Attiva/disattiva la finestra degli appunti dell\'app',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

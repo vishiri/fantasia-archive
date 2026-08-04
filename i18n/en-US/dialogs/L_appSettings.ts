@@ -183,6 +183,11 @@ export default {
       description: 'Disables spell-, grammar-, and word-checking in document edit mode.',
       tags: 'spelling, grammar, proofing, red underline, writing, dictionary'
     },
+    disableStartUpdateCheckMessage: {
+      title: 'Disable start update check message',
+      description: 'Disables the app version check message at the start of the app. You will still be able to trigger it manually from the menu should you want to check for updates.',
+      tags: 'update, version check, startup, github releases, notify, toast, check for updates'
+    },
     doubleDashDocCount: {
       title: 'Pronounced count divider',
       description: 'This setting adds another \\| character between the category and document count in the hierarchical tree.',

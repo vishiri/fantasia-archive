@@ -20,7 +20,8 @@ import {
   handleOpenActionMonitorDialog,
   handleOpenImportExportAppConfigDialog,
   handleOpenNewProjectDialog,
-  handleShowStartupTipsNotification
+  handleShowStartupTipsNotification,
+  handleCheckForAppUpdates
 } from './faActionDefinitionHandlersDialogs_manager'
 
 export const FA_ACTION_DEFINITIONS_TAIL: ReadonlyArray<I_faActionDefinition<T_faActionId>> = [
@@ -60,6 +61,11 @@ export const FA_ACTION_DEFINITIONS_TAIL: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleShowStartupTipsNotification as I_faActionDefinition<T_faActionId>['handler'],
     id: 'showStartupTipsNotification',
+    kind: 'async'
+  },
+  {
+    handler: handleCheckForAppUpdates as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'checkForAppUpdates',
     kind: 'async'
   },
   {

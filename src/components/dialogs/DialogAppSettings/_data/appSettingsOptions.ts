@@ -65,6 +65,10 @@ I_appSettingsStaticOption
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
   },
+  disableStartUpdateCheckMessage: {
+    category: 'visualAccessibility',
+    subcategory: 'visualsAppwideFunctionality'
+  },
   doubleDashDocCount: {
     category: 'accessibility',
     subcategory: 'accessibility'

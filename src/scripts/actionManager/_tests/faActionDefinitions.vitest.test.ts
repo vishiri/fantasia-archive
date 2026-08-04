@@ -52,6 +52,7 @@ const {
   savePersistedCssFromEditorMock,
   setProjectNoteboardWindowOpenMock,
   tipsNotificationMock,
+  checkForAppUpdatesMock,
   toggleDevToolsMock,
   tryDismissFaComponentDialogIfOpenMock,
   tryDismissFaMarkdownDocumentIfOpenMock,
@@ -86,6 +87,7 @@ const {
   savePersistedCssFromEditorMock: vi.fn(async (): Promise<boolean> => true),
   setProjectNoteboardWindowOpenMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
+  checkForAppUpdatesMock: vi.fn(async () => undefined),
   toggleDevToolsMock: vi.fn(),
   tryDismissFaComponentDialogIfOpenMock: vi.fn((): boolean => false),
   tryDismissFaMarkdownDocumentIfOpenMock: vi.fn((): boolean => false),
@@ -201,7 +203,8 @@ vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', (
   tryDismissFaComponentDialogIfOpen: tryDismissFaComponentDialogIfOpenMock,
   tryDismissFaMarkdownDocumentIfOpen: tryDismissFaMarkdownDocumentIfOpenMock,
   toggleDevTools: toggleDevToolsMock,
-  tipsTricksTriviaNotification: tipsNotificationMock
+  tipsTricksTriviaNotification: tipsNotificationMock,
+  checkForAppUpdates: checkForAppUpdatesMock
 }))
 
 vi.mock('app/src/scripts/appInternals/faAppInternalsLocale_manager', () => ({
@@ -938,6 +941,12 @@ test('Test that reportBridgeLoadFailure handler throws the payload message', asy
 test('Test that showStartupTipsNotification handler invokes the notification helper', async () => {
   await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
   expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+})
+
+test('Test that checkForAppUpdates handler forwards the source to checkForAppUpdates', async () => {
+  checkForAppUpdatesMock.mockClear()
+  await (definitionFor('checkForAppUpdates').handler({ source: 'menu' }) as Promise<unknown>)
+  expect(checkForAppUpdatesMock).toHaveBeenCalledWith('menu')
 })
 
 test('Test that showStartupTipsNotification handler shows notify when hideTooltipsStart is false in persisted settings', async () => {

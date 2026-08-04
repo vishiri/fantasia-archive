@@ -46,6 +46,7 @@ import L_faOpenedDocuments from './globalFunctionality/L_faOpenedDocuments'
 import L_faProjectSettings from './globalFunctionality/L_faProjectSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
+import L_appUpdateCheck from './globalFunctionality/L_appUpdateCheck'
 
 import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
@@ -150,7 +151,8 @@ export default {
     faProjectSettings: L_faProjectSettings,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,
-    unsortedAppTexts: L_unsortedAppTexts
+    unsortedAppTexts: L_unsortedAppTexts,
+    appUpdateCheck: L_appUpdateCheck
   }
 
 }

@@ -18,6 +18,10 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
       trigger: () => runFaAction('openTipsTricksTriviaDialog', undefined)
     }),
     faMenuSeparator('helpInfo-sep-after-tips'),
+    faMenuItem('appControlMenus.helpInfo.items.checkForUpdates', 'mdi-update', {
+      trigger: () => runFaAction('checkForAppUpdates', { source: 'menu' })
+    }),
+    faMenuSeparator('helpInfo-sep-after-check-for-updates'),
     faMenuItem('appControlMenus.helpInfo.items.aboutFantasiaArchive', 'mdi-information-variant', {
       trigger: () => runFaAction('openAboutFantasiaArchiveDialog', undefined)
     }),

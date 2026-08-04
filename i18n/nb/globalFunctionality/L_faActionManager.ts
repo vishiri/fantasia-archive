@@ -47,6 +47,7 @@ export default {
     saveProjectStyling: 'Lagre tilpasset prosjekt CSS',
     showProjectDashboard: 'Vis prosjektdashbord',
     showStartupTipsNotification: 'Vis oppstartstipsvarsel',
+    checkForAppUpdates: 'Check for App Updates',
     toggleDeveloperTools: 'Slå av/på utviklerverktøy',
     toggleAppNoteboardWindow: 'Slå av/på App Noteboard-vinduet',
     toggleHierarchicalTree: 'Toggle Hierarchical Tree',

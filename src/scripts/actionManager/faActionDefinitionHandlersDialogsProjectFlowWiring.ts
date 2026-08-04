@@ -24,6 +24,9 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       payload: I_faActionPayloadMap['loadExistingProject']
     ) => Promise<{ payloadPreview: string } | void>
     handleShowStartupTipsNotification: () => Promise<void>
+    handleCheckForAppUpdates: (
+      payload: I_faActionPayloadMap['checkForAppUpdates']
+    ) => Promise<void>
   } {
   async function handleCreateNewProject (
     payload: I_faActionPayloadMap['createNewProject']
@@ -101,9 +104,16 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
     deps.tipsTricksTriviaNotification(hideMascot)
   }
 
+  async function handleCheckForAppUpdates (
+    payload: I_faActionPayloadMap['checkForAppUpdates']
+  ): Promise<void> {
+    await deps.checkForAppUpdates(payload.source)
+  }
+
   return {
     handleCreateNewProject,
     handleLoadExistingProject,
-    handleShowStartupTipsNotification
+    handleShowStartupTipsNotification,
+    handleCheckForAppUpdates
   }
 }
