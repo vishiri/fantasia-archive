@@ -179,10 +179,9 @@ export default {
       tags: 'category filter, search scope, include categories, default filter'
     },
     disableSpellCheck: {
-      title: 'TODO - Disable spellcheck',
+      title: 'Disable spellcheck',
       description: 'Disables spell-, grammar-, and word-checking in document edit mode.',
-      tags: 'spelling, grammar, proofing, red underline, writing, dictionary',
-      note: 'Needs a full app restart to take effect!'
+      tags: 'spelling, grammar, proofing, red underline, writing, dictionary'
     },
     doubleDashDocCount: {
       title: 'Pronounced count divider',

@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: '禁用拼写检查',
       description: '在文档编辑模式下禁用拼写、语法和单词检查。',
-      tags: '拼写、语法、校对、红色下划线、写作、词典',
-      note: '需要完全重启应用程序才能生效！',
+      tags: '拼写、语法、校对、红色下划线、写作、词典'
     },
 
     doubleDashDocCount: {

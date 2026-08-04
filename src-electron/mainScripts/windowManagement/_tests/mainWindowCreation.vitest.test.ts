@@ -275,7 +275,7 @@ test('Test that the main window is created successfully', async () => {
   expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('http://localhost:9000')
   expect(browserWindowInstance.webContents.openDevTools).toHaveBeenCalledOnce()
   expect(setupSpellCheckerMock).toHaveBeenCalledWith(expect.anything())
-  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(spellSession, 'en-US')
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(spellSession, 'en-US', true)
   expect(registerFaChromiumCtrlShiftShortcutSuppressMock).toHaveBeenCalledWith(
     browserWindowInstance
   )

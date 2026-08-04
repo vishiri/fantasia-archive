@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Inaktivera stavningskontroll',
       description: 'Inaktiverar stavnings-, grammatik- och ordkontroll i dokumentredigeringsläge.',
-      tags: 'stavning, grammatik, korrektur, röd understrykning, skrift, ordbok',
-      note: 'Behöver en fullständig omstart av appen för att träda i kraft!',
+      tags: 'stavning, grammatik, korrektur, röd understrykning, skrift, ordbok'
     },
 
     doubleDashDocCount: {

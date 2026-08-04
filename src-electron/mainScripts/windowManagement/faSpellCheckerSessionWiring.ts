@@ -16,12 +16,31 @@ function applyResolvedSpellCheckerLanguage (session: Session, tag: string): void
 }
 
 /**
+ * Turns Chromium spellcheck off and clears dictionaries without resolving a language tag.
+ */
+function disableSpellCheckerOnSession (session: Session): void {
+  session.setSpellCheckerEnabled(false)
+  session.setSpellCheckerLanguages([])
+}
+
+/**
  * Aligns Chromium hunspell languages with the persisted UI language code.
+ * When spellCheckEnabled is false, leaves spellcheck off (live App Settings toggle).
  */
 export function applyFaSpellCheckerLanguagesToSession (
   session: Session,
-  languageCode: T_faUserSettingsLanguageCode
+  languageCode: T_faUserSettingsLanguageCode,
+  spellCheckEnabled = true
 ): void {
+  if (!spellCheckEnabled) {
+    void Result.fromThrowable(
+      (): void => {
+        disableSpellCheckerOnSession(session)
+      },
+      (): undefined => undefined
+    )()
+    return
+  }
   const available = session.availableSpellCheckerLanguages
   if (available.length === 0) {
     return

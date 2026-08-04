@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'スペルチェックを無効にする',
       description: '文書編集モードでのスペルチェック、文法チェック、単語チェックを無効にします。',
-      tags: 'スペル、文法、校正、赤い下線、ライティング、辞書',
-      note: '有効にするにはアプリを完全に再起動する必要があります。',
+      tags: 'スペル、文法、校正、赤い下線、ライティング、辞書'
     },
 
     doubleDashDocCount: {

@@ -132,11 +132,13 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   // Check if we are on the primary or secondary instance of the app
   preventSecondaryAppInstance(win)
 
-  // Hook up spellchecker
+  // Hook up spellchecker (webPreferences.spellcheck stays true so enable can toggle live)
   setupSpellChecker(win)
+  const userSettings = getFaUserSettings().store
   applyFaSpellCheckerLanguagesToSession(
     win.webContents.session,
-    getFaUserSettings().store.languageCode
+    userSettings.languageCode,
+    !userSettings.disableSpellCheck
   )
 }
 

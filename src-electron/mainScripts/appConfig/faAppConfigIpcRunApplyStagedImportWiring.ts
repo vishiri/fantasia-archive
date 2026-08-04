@@ -55,7 +55,8 @@ export function runApplyStagedAppConfigImport (p: I_faAppConfigApplyInput): I_fa
     if (appWindow !== undefined) {
       applyFaSpellCheckerLanguagesToSession(
         appWindow.webContents.session,
-        s.store.languageCode
+        s.store.languageCode,
+        !s.store.disableSpellCheck
       )
     }
     applied.push('appSettings')

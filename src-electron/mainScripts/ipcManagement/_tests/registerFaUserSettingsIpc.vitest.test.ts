@@ -221,7 +221,7 @@ test('Test that user settings set handler syncs spellchecker when languageCode c
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
   setHandler({}, { languageCode: 'fr' })
 
-  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'fr')
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'fr', true)
 })
 
 /**
@@ -248,7 +248,7 @@ test('Test that user settings set handler syncs spellchecker when saving en-US a
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
   setHandler({}, { languageCode: 'en-US' })
 
-  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'en-US')
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'en-US', true)
 })
 
 /**
@@ -277,6 +277,38 @@ test('Test that user settings set handler does not sync spellchecker when langua
 
 /**
  * registerFaUserSettingsIpc
+ * Set handler syncs spellchecker enablement when disableSpellCheck is patched.
+ */
+test('Test that user settings set handler syncs spellchecker when disableSpellCheck changes', async () => {
+  mainWindowExportState.appWindow = {
+    webContents: {
+      session: ipcSpellSessionStub
+    }
+  }
+  getFaUserSettingsMock.mockReturnValue({
+    store: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'de',
+      disableSpellCheck: false
+    },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { disableSpellCheck: true })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(
+    ipcSpellSessionStub,
+    'de',
+    false
+  )
+})
+
+/**
+ * registerFaUserSettingsIpc
  * Set handler syncs spellchecker when switching between fr and de.
  */
 test('Test that user settings set handler syncs spellchecker when leaving fr for de', async () => {
@@ -299,7 +331,7 @@ test('Test that user settings set handler syncs spellchecker when leaving fr for
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
   setHandler({}, { languageCode: 'de' })
 
-  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'de')
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'de', true)
 })
 
 /**

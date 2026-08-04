@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Poista oikeinkirjoituksen tarkistus käytöstä',
       description: 'Poistaa käytöstä oikeinkirjoituksen, kieliopin ja sanan tarkistuksen asiakirjan muokkaustilassa.',
-      tags: 'oikeinkirjoitus, kielioppi, oikoluku, punainen alleviivaus, kirjoitus, sanakirja',
-      note: 'Tarvitsee täyden sovelluksen uudelleenkäynnistyksen, jotta se tulee voimaan!',
+      tags: 'oikeinkirjoitus, kielioppi, oikoluku, punainen alleviivaus, kirjoitus, sanakirja'
     },
 
     doubleDashDocCount: {

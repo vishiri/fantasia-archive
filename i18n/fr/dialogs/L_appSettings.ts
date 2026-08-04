@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Désactiver la vérification orthographique',
       description: 'Désactive la vérification orthographique, grammaticale et des mots en mode édition de document.',
-      tags: 'orthographe, grammaire, vérification, soulignement rouge, écriture, dictionnaire',
-      note: 'Nécessite un redémarrage complet de l\'application pour prendre effet !',
+      tags: 'orthographe, grammaire, vérification, soulignement rouge, écriture, dictionnaire'
     },
 
     doubleDashDocCount: {

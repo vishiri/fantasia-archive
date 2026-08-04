@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Rechtschreibprüfung deaktivieren',
       description: 'Deaktiviert die Rechtschreib-, Grammatik- und Wortprüfung im Dokumentbearbeitungsmodus.',
-      tags: 'Rechtschreibung, Grammatik, Korrekturlesen, rote Unterstreichung, Schreiben, Wörterbuch',
-      note: 'Erfordert einen vollständigen Neustart der App, um wirksam zu werden!',
+      tags: 'Rechtschreibung, Grammatik, Korrekturlesen, rote Unterstreichung, Schreiben, Wörterbuch'
     },
 
     doubleDashDocCount: {

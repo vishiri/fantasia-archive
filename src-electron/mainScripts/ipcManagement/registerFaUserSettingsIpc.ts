@@ -36,14 +36,18 @@ export function registerFaUserSettingsIpc (): void {
       return
     }
     const parsedPatch = parseFaUserSettingsPatch(patch)
-    getFaUserSettings().set({
+    const nextSettings: I_faUserSettings = {
       ...userSettingsSnapshot(),
       ...parsedPatch
-    })
-    if (parsedPatch.languageCode !== undefined && appWindow !== undefined) {
+    }
+    getFaUserSettings().set(nextSettings)
+    const shouldSyncSpellChecker = parsedPatch.languageCode !== undefined ||
+      parsedPatch.disableSpellCheck !== undefined
+    if (shouldSyncSpellChecker && appWindow !== undefined) {
       applyFaSpellCheckerLanguagesToSession(
         appWindow.webContents.session,
-        parsedPatch.languageCode
+        nextSettings.languageCode,
+        !nextSettings.disableSpellCheck
       )
     }
   })

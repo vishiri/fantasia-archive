@@ -3,6 +3,9 @@
 
 ## 2.4.16
 
+### New features
+- **App Settings**: **Disable spellcheck** under **Visuals & app-wide functionality** turns Chromium spellcheck on or off immediately for the current interface language (no app restart). The former restart-required note is gone.
+
 ### Bugfixes & Optimizations
 - **Help / keybinds**: **Toggle developer tools** works again in installed (packaged) builds. A security guard had been blocking DevTools IPC after packaging so the menu item and shortcut did nothing.
 - **Links**: Foreign http and https addresses no longer open inside the Fantasia Archive window. The app keeps only its own in-app routes; other web URLs open in your default browser.

@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Disabilita il controllo ortografico',
       description: 'Disabilita il controllo ortografico, grammaticale e delle parole nella modalità di modifica del documento.',
-      tags: 'ortografia, grammatica, correzione, sottolineatura rossa, scrittura, dizionario',
-      note: 'Per avere effetto è necessario il riavvio completo dell\'app!',
+      tags: 'ortografia, grammatica, correzione, sottolineatura rossa, scrittura, dizionario'
     },
 
     doubleDashDocCount: {

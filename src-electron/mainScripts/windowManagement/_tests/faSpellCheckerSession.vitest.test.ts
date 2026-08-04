@@ -23,6 +23,61 @@ test('Test that applyFaSpellCheckerLanguagesToSession clears languages then appl
 
 /**
  * applyFaSpellCheckerLanguagesToSession
+ * When spellCheckEnabled is false, turns spellcheck off without resolving languages.
+ */
+test('Test that applyFaSpellCheckerLanguagesToSession disables spellcheck when spellCheckEnabled is false', () => {
+  const setSpellCheckerEnabled = vi.fn()
+  const setSpellCheckerLanguages = vi.fn()
+  const session = {
+    availableSpellCheckerLanguages: ['en-US', 'fr'],
+    setSpellCheckerEnabled,
+    setSpellCheckerLanguages
+  }
+  applyFaSpellCheckerLanguagesToSession(session as never, 'fr', false)
+  expect(setSpellCheckerEnabled).toHaveBeenCalledOnce()
+  expect(setSpellCheckerEnabled).toHaveBeenCalledWith(false)
+  expect(setSpellCheckerLanguages).toHaveBeenCalledOnce()
+  expect(setSpellCheckerLanguages).toHaveBeenCalledWith([])
+})
+
+/**
+ * applyFaSpellCheckerLanguagesToSession
+ * Disable path still clears dictionaries when available list is empty.
+ */
+test('Test that applyFaSpellCheckerLanguagesToSession disables when spellCheckEnabled is false even with empty dictionaries', () => {
+  const setSpellCheckerEnabled = vi.fn()
+  const setSpellCheckerLanguages = vi.fn()
+  const session = {
+    availableSpellCheckerLanguages: [] as string[],
+    setSpellCheckerEnabled,
+    setSpellCheckerLanguages
+  }
+  applyFaSpellCheckerLanguagesToSession(session as never, 'de', false)
+  expect(setSpellCheckerEnabled).toHaveBeenCalledWith(false)
+  expect(setSpellCheckerLanguages).toHaveBeenCalledWith([])
+})
+
+/**
+ * applyFaSpellCheckerLanguagesToSession
+ * Swallows Chromium errors on the disable path.
+ */
+test('Test that applyFaSpellCheckerLanguagesToSession does not throw when disable path fails', () => {
+  const setSpellCheckerEnabled = vi.fn(() => {
+    throw new Error('spellcheck unavailable')
+  })
+  const setSpellCheckerLanguages = vi.fn()
+  const session = {
+    availableSpellCheckerLanguages: ['en-US'],
+    setSpellCheckerEnabled,
+    setSpellCheckerLanguages
+  }
+  expect(() => {
+    applyFaSpellCheckerLanguagesToSession(session as never, 'fr', false)
+  }).not.toThrow()
+})
+
+/**
+ * applyFaSpellCheckerLanguagesToSession
  * Skips setSpellCheckerLanguages when available list is empty.
  */
 test('Test that applyFaSpellCheckerLanguagesToSession no-ops when no dictionaries are available', () => {

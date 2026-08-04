@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Desactivar el corrector ortográfico',
       description: 'Desactiva la revisión ortográfica, gramatical y de palabras en el modo de edición de documentos.',
-      tags: 'ortografía, gramática, revisiones, subrayado rojo, escritura, diccionario',
-      note: '¡Necesita reiniciar completamente la aplicación para que surta efecto!',
+      tags: 'ortografía, gramática, revisiones, subrayado rojo, escritura, diccionario'
     },
 
     doubleDashDocCount: {

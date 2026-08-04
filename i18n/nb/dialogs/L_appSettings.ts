@@ -181,8 +181,7 @@ export default {
     disableSpellCheck: {
       title: 'Deaktiver stavekontroll',
       description: 'Deaktiverer stave-, grammatikk- og ordkontroll i dokumentredigeringsmodus.',
-      tags: 'rettskrivning, grammatikk, korrektur, rød understreking, skriving, ordbok',
-      note: 'Trenger en fullstendig omstart av appen for å tre i kraft!',
+      tags: 'rettskrivning, grammatikk, korrektur, rød understreking, skriving, ordbok'
     },
 
     doubleDashDocCount: {
