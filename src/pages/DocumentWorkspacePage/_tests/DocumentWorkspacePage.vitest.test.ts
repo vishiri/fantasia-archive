@@ -346,6 +346,7 @@ test('Test that DocumentWorkspacePage renders preview title when edit fields are
           emits: ['update:modelValue'],
           template: '<div :data-test-locator="testLocator" :data-disabled="disabled" />'
         },
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'label'],
           template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :value="modelValue" />'
@@ -376,6 +377,7 @@ test('Test that DocumentWorkspacePage binds extra HTML classes on main and rende
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'label', 'disable', 'readonly'],
           template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :value="modelValue" :data-readonly="readonly" />'
@@ -417,6 +419,7 @@ test('Test that DocumentWorkspacePage renders name input when edit fields are sh
           emits: ['update:modelValue'],
           template: '<div :data-test-locator="testLocator" :data-disabled="disabled" />'
         },
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'label'],
           emits: ['update:modelValue'],
@@ -456,6 +459,7 @@ test('Test that DocumentWorkspacePage renders editable color fields and forwards
           emits: ['update:modelValue', 'append-to-world-palette'],
           template: '<div :data-test-locator="testLocator" :data-read-only="readOnly" @click="$emit(\'append-to-world-palette\', modelValue); $emit(\'update:modelValue\', modelValue)" />'
         },
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'label'],
           template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :value="modelValue" />'
@@ -493,6 +497,7 @@ test('Test that DocumentWorkspacePage renders belongs under field chrome and rea
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'readonly', 'disable'],
           template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :data-readonly="readonly" :data-disabled="disable" :value="modelValue" />'
@@ -526,6 +531,7 @@ test('Test that DocumentWorkspacePage renders editable belongs under input in ed
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'readonly', 'disable'],
           emits: ['update:modelValue'],
@@ -557,6 +563,7 @@ test('Test that DocumentWorkspacePage renders order number field readonly in pre
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'readonly', 'disable', 'type'],
           template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :data-readonly="readonly" :data-type="type" :value="modelValue" />'
@@ -590,6 +597,7 @@ test('Test that DocumentWorkspacePage renders editable order number input in edi
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: {
           props: ['modelValue', 'readonly', 'disable', 'type'],
           emits: ['update:modelValue'],
@@ -616,6 +624,7 @@ test('Test that DocumentWorkspacePage renders disabled category toggle in previe
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: false,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: true,
         QToggle: {
           props: ['disable', 'modelValue'],
@@ -648,6 +657,7 @@ test('Test that DocumentWorkspacePage renders editable category toggle in edit m
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: false,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: true,
         QToggle: {
           props: ['disable', 'modelValue'],
@@ -687,6 +697,7 @@ test('Test that DocumentWorkspacePage renders editable status flag toggles in ed
           emits: ['update:modelValue'],
           template: '<button type="button" :data-test-locator="testLocator" :data-disabled="disabled" :data-icon="icon" @click="$emit(\'update:modelValue\', true)" />'
         },
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: true
       }
     }
@@ -716,6 +727,7 @@ test('Test that DocumentWorkspacePage hides color fields when no document tab is
       stubs: {
         FaColorPickerInput: true,
         FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
         QInput: true
       }
     }

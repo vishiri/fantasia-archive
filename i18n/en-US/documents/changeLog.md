@@ -6,6 +6,7 @@
 ### New features
 - **App Settings**: **Disable spellcheck** under **Visuals & app-wide functionality** turns Chromium spellcheck on or off immediately for the current interface language (no app restart). The former restart-required note is gone.
 - **Help**: **Check for updates** (between **Tips, Tricks & Trivia** and **About Fantasia Archive**) compares the installed version to the latest GitHub release. When a newer release exists, an info notification shows the version, Fantasia reading mascot, and a **Download** button that opens the releases page. The same check also runs once at app start. If you are already on the newest version, only a manual Help check shows a success notification. **Fantasia Archive Settings** → **Visuals & app-wide functionality** includes **Disable start update check message** to turn off the automatic start check while keeping the Help menu action.
+- **Controls**: Reusable **FaSelectInput** select fields support chips, filter highlighting of whole matching words, optional create-new, and document / template / simple modes. Dropdown menus use a fixed **600px** width, center under the field when space allows, and match app-menu separator styling between options.
 
 ### Bugfixes & Optimizations
 - **Help / keybinds**: **Toggle developer tools** works again in installed (packaged) builds. A security guard had been blocking DevTools IPC after packaging so the menu item and shortcut did nothing.

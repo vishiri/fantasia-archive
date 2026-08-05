@@ -1,0 +1,101 @@
+/* FA1-aligned chips + dropdown active chrome for FaSelectInput.
+ * Filter needle match spans use .faSelectInput__optionMatch (primary-bright).
+ */
+
+@use '../../../globals/AppControlMenus/styles/contextMenuSeparators.mixin' as contextMenuSeparators;
+
+.faSelectInput {
+  width: $faSelectInput-width;
+
+  .q-chip {
+    height: inherit;
+
+    &--dense {
+      padding-block: $faSelectInput-chip-dense-paddingBlock;
+      padding-inline: $faSelectInput-chip-dense-paddingInline;
+    }
+
+    .q-chip__content {
+      flex-wrap: wrap;
+      min-height: $faSelectInput-chip-content-minHeight;
+      white-space: normal;
+    }
+
+    .q-chip__icon--remove {
+      color: $faSelectInput-chip-removeIcon-color !important;
+      margin-inline: $faSelectInput-chip-removeIcon-marginInline;
+    }
+  }
+}
+
+/* Beat fantasy menu edge-glow (body.fa-appTheme--fantasy .q-menu .q-item). */
+body .faSelectInput__menu.q-menu {
+  background-color: $faSelectInput-menu-backgroundColor;
+  color: $faSelectInput-menu-item-color;
+  max-width: $faSelectInput-menu-maxWidth !important;
+  min-width: $faSelectInput-menu-minWidth !important;
+  width: $faSelectInput-menu-width !important;
+
+  .faSelectInput__optionMatch {
+    color: $faSelectInput-optionMatch-color;
+    font-weight: $faSelectInput-optionMatch-fontWeight;
+  }
+
+  .faSelectInput__separatorAlt {
+    @include contextMenuSeparators.fa-context-menu-separator-alt;
+  }
+
+  .q-item {
+    font-weight: $faSelectInput-menu-item-fontWeight;
+    overflow: visible;
+    position: relative;
+    transition: none !important;
+
+    &::after {
+      content: none;
+    }
+  }
+
+  /* Selected: bars only — no Quasar active fill. */
+  .q-item--active:not(.noHigh) {
+    background: $faSelectInput-menu-activeItem-backgroundColor !important;
+  }
+
+  .q-item--active:not(.noHigh),
+  .q-item.q-manual-focusable--focused:not(.disabled, [disabled], [aria-disabled='true']) {
+    color: inherit;
+
+    &::before,
+    &::after {
+      background-color: $faSelectInput-menu-activeBar-color;
+      border-radius: $faSelectInput-menu-activeBar-radius;
+      bottom: $faSelectInput-menu-activeBar-verticalInset;
+      content: '';
+      position: absolute;
+      top: $faSelectInput-menu-activeBar-verticalInset;
+      width: $faSelectInput-menu-activeBar-width;
+    }
+
+    &::before {
+      right: $faSelectInput-menu-activeBar-inset;
+    }
+
+    &::after {
+      left: $faSelectInput-menu-activeBar-inset;
+    }
+  }
+}
+
+/* Selected: kill hover/focus wash (beats body.desktop .q-hoverable:hover). */
+body.desktop .faSelectInput__menu.q-menu {
+  .q-item--active.q-focusable:focus > .q-focus-helper,
+  .q-item--active.q-hoverable:hover > .q-focus-helper,
+  .q-item--active.q-manual-focusable--focused > .q-focus-helper {
+    opacity: $faSelectInput-menu-activeItem-focusHelper-opacity !important;
+
+    &::after,
+    &::before {
+      opacity: $faSelectInput-menu-activeItem-focusHelper-opacity !important;
+    }
+  }
+}

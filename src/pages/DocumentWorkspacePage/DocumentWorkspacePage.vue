@@ -149,6 +149,11 @@
       test-locator="documentWorkspacePage-isDeadToggle"
       :title="isDeadTitle"
     />
+
+    <DocumentWorkspacePageSelectSmoke
+      :disable="!documentShowsEditFields"
+      :document-tab="documentTab"
+    />
   </main>
 </template>
 
@@ -160,6 +165,7 @@ import FaLabeledBooleanToggle from 'app/src/components/elements/FaLabeledBoolean
 import DocumentWorkspacePageBelongsUnderField from './DocumentWorkspacePageBelongsUnderField.vue'
 import DocumentWorkspacePageExtraHtmlClassesField from './DocumentWorkspacePageExtraHtmlClassesField.vue'
 import DocumentWorkspacePageOrderNumberField from './DocumentWorkspacePageOrderNumberField.vue'
+import DocumentWorkspacePageSelectSmoke from './DocumentWorkspacePageSelectSmoke.vue'
 import { useDocumentWorkspacePage } from './scripts/documentWorkspacePage_manager'
 
 defineOptions({

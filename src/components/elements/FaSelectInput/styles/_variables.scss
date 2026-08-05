@@ -1,0 +1,24 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FA SELECT INPUT */
+$faSelectInput-chip-content-minHeight: 24px;
+$faSelectInput-chip-dense-paddingBlock: 0.2em;
+$faSelectInput-chip-dense-paddingInline: 0.5em;
+$faSelectInput-chip-removeIcon-color: fa-v('dark', $dark);
+$faSelectInput-chip-removeIcon-marginInline: 0.2em -0.2em;
+$faSelectInput-menu-activeBar-color: fa-v('primary', $primary);
+$faSelectInput-menu-activeBar-inset: 5px;
+$faSelectInput-menu-activeBar-radius: 3px;
+$faSelectInput-menu-activeBar-verticalInset: 10px;
+$faSelectInput-menu-activeBar-width: 3px;
+$faSelectInput-menu-activeItem-backgroundColor: transparent;
+$faSelectInput-menu-activeItem-focusHelper-opacity: 0;
+$faSelectInput-menu-backgroundColor: fa-v('dark', $dark);
+$faSelectInput-menu-item-color: fa-v('accent', $accent);
+$faSelectInput-menu-item-fontWeight: 400;
+$faSelectInput-menu-maxWidth: 600px;
+$faSelectInput-menu-minWidth: 600px;
+$faSelectInput-menu-width: 600px;
+$faSelectInput-optionMatch-color: fa-v('primary-bright', $primary-bright);
+$faSelectInput-optionMatch-fontWeight: 500;
+$faSelectInput-width: 100%;
