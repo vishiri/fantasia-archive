@@ -105,6 +105,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Component-testing seed | **`I_faComponentTestingStoreSeed`** + **`faComponentTestingStoreSeedPatchWiring`**; optional **`projectContentOverrides`** (entity maps / placement children / search) — Playwright **`TEST_ENV=components`** |
 | Packaged DevTools | **Help / keybind Toggle developer tools** must work when **`app.isPackaged`** — [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) **Packaged DevTools**; never no-op **`registerFaDevToolsIpc`** for packaging |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
+| **`FaSelectInput`** | **`src/components/elements/FaSelectInput/`** + **`src/scripts/faSelectInput/`** + **`types/I_faSelectInput.ts`** — QSelect chips wrapper; modes **`simple`** / **`document`** / **`otherType`** / **`tags`** (**`media`** stub); whole-word filter highlight; menu **600px** centered; separatorAlt between options |
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md), [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers](.cursor/skills/fantasia-context-menu-dividers/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
@@ -116,7 +117,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 
 ## Renderer components (`src/components/`)
 
-Buckets: **`dialogs/`**, **`floatingWindows/`** (incl. **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**), **`globals/`**, **`elements/`** (e.g. **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, **`FaCornerContentDot`**), **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
+Buckets: **`dialogs/`**, **`floatingWindows/`** (incl. **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**), **`globals/`**, **`elements/`** (e.g. **`FaSelectInput`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, **`FaCornerContentDot`**), **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
 
 ## Code comments
 
