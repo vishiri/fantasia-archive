@@ -11,7 +11,7 @@ description: >-
 ## Components
 
 - **`DialogMarkdownDocument.vue`**: **`QMarkdown`** + package CSS
-- Flow: **`S_Dialog.ts`**, **`dialogManagement.ts`** — **`openDialogMarkdownDocument`**, **`registerMarkdownDialogStackGuard`**
+- Flow: **`S_Dialog.ts`**, **`dialogManagement_manager.ts`** — **`openDialogMarkdownDocument`**, **`registerMarkdownDialogStackGuard`**
 - User opens (Changelog, License, guides, Tips): action manager ids (**`openChangelogDialog`**, …) via **`runFaAction`** — [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
 
 ## Content source

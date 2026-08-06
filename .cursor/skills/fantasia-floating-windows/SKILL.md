@@ -55,5 +55,5 @@ description: >-
 
 ## Related docs
 
-- [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**
+- [AGENTS.md](../../../AGENTS.md) Floating **`Window*`**
 - [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md)

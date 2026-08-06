@@ -10,7 +10,7 @@ description: >-
 
 ## Canonical documentation
 
-- **Design (not yet in shipped schema; max v5):** [docs/database/templateCustomFields.md](../../../docs/database/templateCustomFields.md)
+- **Design (not yet in shipped schema; live max v6; next custom-fields migration v7+):** [docs/database/templateCustomFields.md](../../../docs/database/templateCustomFields.md)
 - **Shipped schema:** [docs/database/projectDB.md](../../../docs/database/projectDB.md) — same commit when migrations/IPC land
 - **Index:** [docs/database/README.md](../../../docs/database/README.md)
 
@@ -36,7 +36,7 @@ description: >-
 
 ## Implementation phases (short)
 
-1. Schema v5+ — DDL + migrate wiring → **projectDB.md**
+1. Schema **v7+** — DDL + migrate wiring → **projectDB.md**
 2. Main persist — **`projectDbContent/*`**
 3. Zod — **`src-electron/shared/faProjectTemplateField*`**, **`faProjectDocumentField*`**
 4. IPC + preload — bridge + **`projectContentAPI.ts`**

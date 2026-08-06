@@ -17,11 +17,11 @@ description: >-
 
 ## Component folders (`src/components/`)
 
-- **Helper / wrapper SFCs** — three infrastructure features use **`_<PascalCase>`** folder + file — see [AGENTS.md](../../../AGENTS.md) **Helper / wrapper SFC naming**. Not for dialog sub-panels.
-- **`dialogs/`** — `Dialog*` modals. Root **`q-dialog`** refs in global open coordination → **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`dialogManagement.ts`**.
+- **Helper / wrapper SFCs** — five infrastructure features use **`_<PascalCase>`** folder + file — see [AGENTS.md](../../../AGENTS.md) **Renderer components**. Not for dialog sub-panels.
+- **`dialogs/`** — `Dialog*` modals. Root **`q-dialog`** refs in global open coordination → **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`dialogManagement_manager.ts`**.
 - **`floatingWindows/`** — `Window*` movable/resizable surfaces. **`_FaFloatingWindowBodyTeleport`**; **`useFaFloatingWindowFrame`**; **no** dialog stack guard. Z-index **`5000`–`5999`**. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md).
 - **`globals/`** — chrome (`GlobalWindowButtons`, `AppControlMenus`, **`_FaUserCssInjector`**, …)
-- **`elements/`** — reusable widgets (`FaColorPickerInput`, **`FaIconPickerInput`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, …)
+- **`elements/`** — reusable widgets (`FaSelectInput`, `FaColorPickerInput`, **`FaIconPickerInput`**, **`FaLocaleTranslationsInput`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, …)
 - **`other/`** — composites (`SocialContactButtons`)
 - **`foundation/`** — Storybook-only catalogues; no product routes, no Playwright
 - **Hierarchical trees** — **`@he-tree/vue`** only; **`QTree` forbidden** — [fantasia-he-tree](../fantasia-he-tree/SKILL.md)
@@ -78,6 +78,8 @@ Large production data objects → **`src/components/<Feature>/_data/`** (several
 | Trees | [`fa-he-tree.mdc`](../../rules/fa-he-tree.mdc) |
 | DnD | [`fa-drag-drop-lists.mdc`](../../rules/fa-drag-drop-lists.mdc) |
 | Icon picker | [`fa-icon-picker.mdc`](../../rules/fa-icon-picker.mdc) |
+| Select / chips | [`fa-select-input.mdc`](../../rules/fa-select-input.mdc) |
+| Locale translations input | [`fa-locale-translations-input.mdc`](../../rules/fa-locale-translations-input.mdc) |
 | Global SCSS | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
 ## Quality gates
@@ -91,7 +93,7 @@ Large production data objects → **`src/components/<Feature>/_data/`** (several
 
 ## Related
 
-- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md), [fantasia-he-tree](../fantasia-he-tree/SKILL.md), [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md), [fantasia-icon-picker](../fantasia-icon-picker/SKILL.md), [fantasia-i18n](../fantasia-i18n/SKILL.md), [fantasia-testing](../fantasia-testing/SKILL.md), [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
+- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md), [fantasia-he-tree](../fantasia-he-tree/SKILL.md), [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md), [fantasia-icon-picker](../fantasia-icon-picker/SKILL.md), [fantasia-select-input](../fantasia-select-input/SKILL.md), [fantasia-locale-translations-input](../fantasia-locale-translations-input/SKILL.md), [fantasia-i18n](../fantasia-i18n/SKILL.md), [fantasia-testing](../fantasia-testing/SKILL.md), [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
 
 ## Storybook i18n caution
 

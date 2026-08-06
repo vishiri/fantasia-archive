@@ -17,11 +17,11 @@ Per-locale **single-line** (or multiline) string on a draft/snapshot → **`FaLo
 
 | UI field | Draft / snapshot property | SQL |
 | --- | --- | --- |
-| **World name** | **`displayNameTranslations`** | **`worlds.display_name_translations_json`** (**v9**) |
-| **Document template name** | **`titleTranslations`** | **`document_templates.title_translations_json`** (**v8**) |
-| **World appendix** | **`worldAppendixTranslations`** | **`document_templates.world_appendix_translations_json`** (**v9**) |
-| **Layout group name** | **`displayNameTranslations`** | **`world_template_groups.display_name_translations_json`** (**v10**) |
-| **Placement nickname** | **`nicknameTranslations`** | **`world_template_placements.nickname_translations_json`** (**v10**) |
+| **World name** | **`displayNameTranslations`** | **`worlds.display_name_translations_json`** |
+| **Document template name** | **`titleTranslations`** | **`document_templates.title_translations_json`** (+ optional singular **`title_singular_translations_json`**) |
+| **World appendix** | **`worldAppendixTranslations`** | **`document_templates.world_appendix_translations_json`** |
+| **Layout group name** | **`displayNameTranslations`** | **`world_template_groups.display_name_translations_json`** |
+| **Placement nickname** | **`nicknameTranslations`** | **`world_template_placements.nickname_translations_json`** (+ optional singular **`nickname_singular_translations_json`**) |
 
 Placement **`worldAppendix: string`** stays resolved copy at place time (not a translation map). CRUD **`createWorld` / `updateWorld`** still take **`displayName: string`** at IPC boundary.
 
@@ -68,10 +68,10 @@ Same as [fa-locale-translations-input.mdc](../../rules/fa-locale-translations-in
 ## Tests
 
 - Element + **`src/scripts/localeTranslations/functions/_tests/`**
-- Layout tree rename menu + migration **v9→v10**
+- Layout tree rename menu
 
 ## Related
 
 - [fa-locale-translations-input.mdc](../../rules/fa-locale-translations-input.mdc)
 - [fantasia-i18n](../fantasia-i18n/SKILL.md)
-- [projectDB.md](../../../docs/database/projectDB.md) — schema **v9**–**v11**
+- [projectDB.md](../../../docs/database/projectDB.md) — translation JSON columns (bootstrap **v1**; live **`user_version` max 6**)

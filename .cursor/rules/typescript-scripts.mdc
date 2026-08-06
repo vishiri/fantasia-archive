@@ -13,8 +13,8 @@ Vue SFCs import **pure helpers** from here; [vue-quasar.mdc](vue-quasar.mdc), [c
 - **`_utilities/`** — small pure helpers (format, parsing); **JSDoc** each export (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](../../src/scripts/_utilities/functions/colorFormatConvertors.ts).
 - **`appInternals/`** — cross-cutting renderer helpers in **`rendererAppInternals_manager.ts`**, **`appInternals_manager.ts`** (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing) — not feature-dialog/keybind-specific.
 - **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; one area per file group.
-- **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, user-visible chord labels in **`faKeybindsChordUiFormatting.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired **`MainLayout.vue`** + **`S_FaKeybinds`**. New app-wide shortcuts: [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
-- **`floatingWindows/`** — **`useFaFloatingWindowFrame`**, **`useFaFloatingWindowResize`**, **`useFaFloatingWindowTitleDrag`**, **`faFloatingWindowFrameLayout.ts`**, **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**, Quasar transition ref **`faQuasarDialogStandardTransition.ts`**, custom pop **Transition** **`faFloatingWindowPopTransition.ts`**. [AGENTS.md](../../AGENTS.md) **In-renderer floating windows**, [fantasia-floating-windows](../skills/fantasia-floating-windows/SKILL.md).
+- **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, user-visible chord labels in **`faKeybindsChordUiFormatting_manager.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired **`MainLayout.vue`** + **`S_FaKeybinds`**. New app-wide shortcuts: [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
+- **`floatingWindows/`** — **`useFaFloatingWindowFrame`**, **`useFaFloatingWindowResize`**, **`useFaFloatingWindowTitleDrag`**, **`faFloatingWindowFrameLayout.ts`**, **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**, Quasar transition ref **`faQuasarDialogStandardTransition.ts`**, custom pop **Transition** **`faFloatingWindowPopTransition.ts`**. [AGENTS.md](../../AGENTS.md) Floating **`Window*`** row, [fantasia-floating-windows](../skills/fantasia-floating-windows/SKILL.md).
 - **`faDragDrop/`** — shared **`vue-draggable-plus`** for vertical tab strips/palette rows; public API **`faDragDrop_manager.ts`** (pure **`functions/`** + **`faDragDropDocumentDragCursorWiring.ts`**). Types: **`types/I_faVerticalDraggableTabs.ts`**. Styles: **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Element: **`FaVerticalDraggableTabList`**. Ref TabLists: **`DialogProjectSettingsWorldsTabList`**, **`DialogProjectSettingsDocumentTemplatesTabList`**. [fantasia-drag-drop](../skills/fantasia-drag-drop/SKILL.md).
 - **`dom/`** — renderer DOM helpers; public API **`dom_manager.ts`** (e.g. **`createToggleDevTools`** via **`faToggleDevTools_manager.ts`** wiring).
 - **`faColorContrast/`** — hex luminance + glyph CSS custom-property API; public **`faColorContrast_manager.ts`**. **`FaColorPickerInput`**, **Project Settings** palette swatches, fantasy **`fa-color-glyph`** chrome.
@@ -23,6 +23,8 @@ Vue SFCs import **pure helpers** from here; [vue-quasar.mdc](vue-quasar.mdc), [c
 - **`openedDocuments/`** — editState, appearance, temp tabs, reorder, parent/extra-classes helpers; public **`openedDocuments_manager.ts`** (functions + status-flag Wiring).
 - **`app/functions/`** — app shell helpers e.g. **`appMountUserCssInjector.ts`** (wired via **`app_manager.ts`**); no loose **`src/scripts/functions/`**.
 - **`faIcons/`** — committed q-icon catalogs (**`catalogs/*.catalog.json`**), lazy load + merge, level-1 filter/chunk/merge for **`FaIconPickerInput`**. Regenerate: **`yarn generate:icon-catalogs`**. [fantasia-icon-picker](../skills/fantasia-icon-picker/SKILL.md).
+- **`faSelectInput/`** — mode normalize, filter, whole-word label highlight, create-new, **`isNew`** clear, change payloads for **`FaSelectInput`**. Public **`faSelectInput_manager.ts`**. [fantasia-select-input](../skills/fantasia-select-input/SKILL.md).
+- **`localeTranslations/`** — resolve per-locale string maps + singular/plural helpers for Project Settings. [fantasia-locale-translations-input](../skills/fantasia-locale-translations-input/SKILL.md).
 - Leading `_` on folders (e.g. `_utilities`) = shared non-feature helpers.
 
 ## When to split a file
@@ -44,7 +46,7 @@ Hard to scan or near caps:
 ## Style
 
 - Match import style (`app/...` alias where repo uses it).
-- Name exports for **observable behavior** (what callers achieve, store/UI consistency), not metaphor-only labels (**lease** for coordination). Prefer invariant names (**stack**, exclusivity between dialog families) or concrete entry point; short JSDoc when behavior spans stores/open paths (see **`dialogManagement.ts`** under **`appGlobalManagementUI/`**).
+- Name exports for **observable behavior** (what callers achieve, store/UI consistency), not metaphor-only labels (**lease** for coordination). Prefer invariant names (**stack**, exclusivity between dialog families) or concrete entry point; short JSDoc when behavior spans stores/open paths (see **`dialogManagement_manager.ts`** under **`appGlobalManagementUI/`**).
 - Explicit return types on public exports when surrounding code does.
 - No `any` in signatures/shapes/casts; precise types (`unknown` + narrow).
 - Unit tests encouraged for `src/scripts/**` in neighboring `_tests/` (`src/scripts/_utilities/_tests/`, etc.) via `*.vitest.test.ts`.

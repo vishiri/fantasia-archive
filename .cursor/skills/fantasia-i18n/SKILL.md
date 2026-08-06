@@ -10,9 +10,9 @@ description: >-
 
 ## Setup
 
-- **Plugin**: `vue-i18n` v9
+- **Plugin**: `vue-i18n` v11 (`package.json` **`^11`**)
 - **Registry**: **`i18n/index.ts`** at repo root — import **`app/i18n`**
-- **Types**: augmentation in **`src/boot/i18n.ts`**; may need **`@ts-expect-error`** (TS2665) — [eslint-typescript.mdc](../../rules/eslint-typescript.mdc)
+- **Types**: schema/augmentation in **`types/vueI18nModuleAugmentation.ts`**; **`src/boot/i18n.ts`** side-effect-imports (may keep **`@ts-expect-error`** for TS2665) — [eslint-typescript.mdc](../../rules/eslint-typescript.mdc)
 
 ## Folder structure (`i18n/en-US/`)
 

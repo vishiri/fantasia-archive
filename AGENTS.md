@@ -65,8 +65,11 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [fa-document-workspace-edit-state.mdc](.cursor/rules/fa-document-workspace-edit-state.mdc) | **`DocumentWorkspacePage`**, tab **`editState`** preview vs edit |
 | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc) | List/table DnD policy |
 | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc) | **`FaIconPickerInput`**, **`yarn generate:icon-catalogs`** |
-| [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name + world appendix |
+| [fa-select-input.mdc](.cursor/rules/fa-select-input.mdc) | **`FaSelectInput`**, **`src/scripts/faSelectInput/`**, modes **`simple`** / **`document`** / **`otherType`** / **`tags`** (**`media`** stub) |
+| [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name / template titles / world appendix / layout groups / placement nicknames |
 | [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc) | **`q-menu`** / dropdown action rows — group separator vs **separatorAlt** |
+| [caveman-default.mdc](.cursor/rules/caveman-default.mdc) | Always — agent reply caveman style |
+| [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) | **`en-US`** UI copy capitalization |
 
 ## Stack (short)
 
@@ -90,7 +93,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Neverthrow | [neverthrow.mdc](.cursor/rules/neverthrow.mdc), [fantasia-neverthrow](.cursor/skills/fantasia-neverthrow/SKILL.md) |
 | YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) — orthogonal to [caveman-default.mdc](.cursor/rules/caveman-default.mdc) |
 | Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) — **`app://`**, IPC sender, navigation allowlist, path hardening; **packaged DevTools required** (not a security disable target) |
-| Domain script barrels | **`faDragDrop_manager`**, **`dom_manager`**, **`faColorContrast_manager`**, **`documentAppearance_manager`**, **`faColorPicker_manager`**, **`openedDocuments_manager`** — [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc), [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc) |
+| Domain script barrels | **`faDragDrop_manager`**, **`dom_manager`**, **`faColorContrast_manager`**, **`documentAppearance_manager`**, **`faColorPicker_manager`**, **`faSelectInput_manager`**, **`openedDocuments_manager`** — [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc), [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc) |
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
@@ -105,7 +108,8 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Component-testing seed | **`I_faComponentTestingStoreSeed`** + **`faComponentTestingStoreSeedPatchWiring`**; optional **`projectContentOverrides`** (entity maps / placement children / search) — Playwright **`TEST_ENV=components`** |
 | Packaged DevTools | **Help / keybind Toggle developer tools** must work when **`app.isPackaged`** — [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) **Packaged DevTools**; never no-op **`registerFaDevToolsIpc`** for packaging |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
-| **`FaSelectInput`** | **`src/components/elements/FaSelectInput/`** + **`src/scripts/faSelectInput/`** + **`types/I_faSelectInput.ts`** — QSelect chips wrapper; modes **`simple`** / **`document`** / **`otherType`** / **`tags`** (**`media`** stub); whole-word filter highlight; menu **600px** centered; separatorAlt between options |
+| **`FaSelectInput`** | [fa-select-input.mdc](.cursor/rules/fa-select-input.mdc), [fantasia-select-input](.cursor/skills/fantasia-select-input/SKILL.md) — QSelect chips; modes **`simple`** / **`document`** / **`otherType`** / **`tags`** (**`media`** stub); whole-word filter highlight; menu **600px** centered; separatorAlt between options |
+| **`FaColorPickerInput`** | **`src/components/elements/FaColorPickerInput/`** + **`src/scripts/faColorPicker/`** + **`faColorContrast_manager`** + **`types/I_faColorPickerInput.ts`** — hex color field + popover (no dedicated rule/skill yet) |
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md), [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers](.cursor/skills/fantasia-context-menu-dividers/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
@@ -117,7 +121,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 
 ## Renderer components (`src/components/`)
 
-Buckets: **`dialogs/`**, **`floatingWindows/`** (incl. **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**), **`globals/`**, **`elements/`** (e.g. **`FaSelectInput`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, **`FaCornerContentDot`**), **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
+Buckets: **`dialogs/`**, **`floatingWindows/`** (incl. **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**), **`globals/`**, **`elements/`** (e.g. **`FaSelectInput`**, **`FaIconPickerInput`**, **`FaLocaleTranslationsInput`**, **`FaColorPickerInput`**, **`FaLabeledBooleanToggle`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, **`FaCornerContentDot`**), **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Five infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**, **`_FaProjectUserCssInjector`**, **`_FaModalAndFloatingWindowHost`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
 
 ## Code comments
 
@@ -157,11 +161,12 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-he-tree` | **`@he-tree/vue`**; DnD scroll playbook **`.cursor/plans/he-tree-dnd-scroll-playbook_*.plan.md`** |
 | `fantasia-drag-drop` | List/table DnD |
 | `fantasia-icon-picker` | **`FaIconPickerInput`** |
+| `fantasia-select-input` | **`FaSelectInput`**, multi-mode QSelect chips |
 | `fantasia-locale-translations-input` | **`FaLocaleTranslationsInput`**, per-locale strings in Project Settings |
 | `fantasia-i18n` | Locale trees |
 | `fantasia-sqlite-main` | Main-process SQLite |
 | `fantasia-flatten-database-schemas` | Schema squash |
-| `fantasia-template-custom-fields` | Template fields (design) |
+| `fantasia-template-custom-fields` | Template fields (design; next schema **v7+**) |
 | `fantasia-worldbuilding-domain` | Product vocabulary |
 | `fantasia-document-workspace-edit-state` | Opened tab **`editState`**, preview vs edit fields on **`DocumentWorkspacePage`** |
 | `fantasia-markdown-dialogs` | QMarkdown dialogs |

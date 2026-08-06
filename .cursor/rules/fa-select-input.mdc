@@ -1,0 +1,76 @@
+---
+description: FaSelectInput reusable QSelect chips element and faSelectInput domain helpers
+globs: "src/components/elements/FaSelectInput/**/*,src/scripts/faSelectInput/**/*,types/I_faSelectInput.ts"
+alwaysApply: false
+---
+
+# FaSelectInput and select modes
+
+## Reuse the shared element
+
+Multi-mode select / chips field → **`FaSelectInput`** from **`src/components/elements/FaSelectInput/`** with required **`mode`**, **`v-model`**, **`options`**, **`test-locator`**. **No** duplicate chip + filter + 600px menu + separatorAlt **`q-select`** wrappers in feature folders when this contract fits.
+
+Playbook: [fantasia-select-input skill](../skills/fantasia-select-input/SKILL.md).
+
+**Not** a drop-in for App Settings simple enum **`q-select`** (**`DialogAppSettingsSettingBlock`**) unless product wants chips / create-new / highlight UX.
+
+## Stored value contract
+
+| Mode | Options | Model (single / multi) |
+| --- | --- | --- |
+| **`simple`** | strings | **`string`** / **`string[]`** |
+| **`document`**, **`otherType`**, **`tags`** | **`I_faSelectInputObjectItem`** (`id`, `name`; optional `icon`, `documentType`, `otherType`, `isNew`) | item \| **`null`** / item[] |
+| **`media`** | stub — always normalize to **`[]`** | typed only; do not ship UI on this mode yet |
+
+Types + chip color consts: **`types/I_faSelectInput.ts`** (**`FA_SELECT_INPUT_*`**).
+
+Create-new object items set **`isNew: true`** (teal chip). Parent calls expose **`clearIsNewFlags(ids)`** after persist succeeds.
+
+## Mode / options pipeline
+
+| Piece | Role |
+| --- | --- |
+| **`normalizeFaSelectInputOptions`** | Mode-filter option list; media → empty |
+| **`filterFaSelectInputOptionsByQuery`** | Default filter (string / name / id substring) |
+| **`splitFaSelectInputLabelForFilterHighlight`** | Whole-word match spans for option label |
+| **`createFaSelectInputNewItem`** | Create-new payload (media → null) |
+| **`appendFaSelectInputCreatedValue`** / **`createFaSelectInputChangePayload`** | Model append + **`change`** action |
+| **`shouldShowFaSelectInputSelectedChip`** | Hide empty single selection chip |
+| **`clearFaSelectInputIsNewFlags`** | Strip **`isNew`** by id |
+
+Domain barrel: **`src/scripts/faSelectInput/faSelectInput_manager.ts`**.
+
+## Layout constants (SCSS)
+
+Menu width **600px** — **`$faSelectInput-menu-width`** / **`minWidth`** / **`maxWidth`** in **`styles/_variables.scss`** (forwarded via **`src/css/quasar.variables.scss`**). Keep in sync with **`FaSelectInput.unscoped.scss`**.
+
+Hardcoded on SFC: **`menu-anchor="bottom middle"`**, **`menu-self="top middle"`**, **`popup-content-class="faSelectInput__menu"`**, **`use-chips`**, **`use-input`**, **`input-debounce="0"`**.
+
+## Menu / option styling
+
+- Active row: side bars only (no Quasar active wash) — unscoped menu sheet
+- Between options: **`q-separator.faSelectInput__separatorAlt`** + **`fa-context-menu-separator-alt`** mixin ([fa-context-menu-dividers.mdc](fa-context-menu-dividers.mdc))
+- Filter matches: **`faSelectInput__optionMatch`** (primary-bright, weight **500**)
+
+## i18n and Storybook
+
+- **No** element **`L_FaSelectInput`** tree today — parent supplies **`label`**; smoke labels may be hardcoded
+- Storybook: **`_tests/FaSelectInput.stories.ts`** — **`Components/elements/FaSelectInput`**
+
+## Two-level architecture
+
+- **`src/scripts/faSelectInput/functions/`** — level-1 pure helpers only
+- **`FaSelectInput/scripts/functions/createUseFaSelectInput.ts`** — level-1 composable factory
+- **`faSelectInput_manager.ts`** (element) — wiring-only **`useFaSelectInput`**
+
+## Tests
+
+- Element: **`FaSelectInput/_tests/FaSelectInput.vitest.test.ts`**
+- Composable: **`scripts/_tests/createUseFaSelectInput.vitest.test.ts`**
+- Domain: **`src/scripts/faSelectInput/functions/_tests/faSelectInputDomain.vitest.test.ts`**
+- Smoke: **`DocumentWorkspacePageSelectSmoke`** + colocated Vitest (not Playwright yet)
+
+## Related
+
+- [fantasia-select-input](../skills/fantasia-select-input/SKILL.md)
+- [fa-context-menu-dividers.mdc](fa-context-menu-dividers.mdc)

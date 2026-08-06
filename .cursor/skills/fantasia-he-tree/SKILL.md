@@ -106,7 +106,7 @@ Full postmortem: this skill section below (**DnD + scroll preservation**). Refer
 | --- | --- |
 | Node row UI, locators | Feature **`.vue`** (thin script) |
 | DB → nodes, filter, selection | Feature **`scripts/`** or **`src/scripts/<domain>/`** |
-| Shared walk/flatten/id-index | **`src/scripts/faHeTree/`** when reused |
+| Shared walk/flatten/id-index | Colocate with feature until ≥2 consumers need same helpers (no **`src/scripts/faHeTree/`** yet) |
 | Shared interfaces | **`types/I_*.ts`** (`app/types/...`) |
 
 Two-level: pure transforms in **`functions/`** (`import type` only); managers wire stores + IPC.
@@ -142,5 +142,5 @@ Use **`walkTreeData`** for search, bulk expand, validation — not ad hoc recurs
 ## Related docs
 
 - [fa-he-tree.mdc](../../rules/fa-he-tree.mdc)
-- [AGENTS.md](../../../AGENTS.md) **Hierarchical trees (he-tree)**
+- [AGENTS.md](../../../AGENTS.md) Trees / DnD
 - [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md)

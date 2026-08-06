@@ -46,18 +46,19 @@ Restart Cursor. Details: [AGENTS.md](AGENTS.md).
 
 | Topic | Where |
 | --- | --- |
-| Two-level **`functions/`** + **`*_manager.ts`**; **`*Wiring.ts`** for DOM/`window`/`fs`; domain barrels (**`faDragDrop_manager`**, **`dom_manager`**) | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc), [fantasia-two-level-architecture](.cursor/skills/fantasia-two-level-architecture/SKILL.md) |
+| Two-level **`functions/`** + **`*_manager.ts`**; **`*Wiring.ts`** for DOM/`window`/`fs`; domain barrels — see [AGENTS.md](AGENTS.md) Domain script barrels | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc), [fantasia-two-level-architecture](.cursor/skills/fantasia-two-level-architecture/SKILL.md) |
 | TypeScript strict (**`quasar.config.ts`**) | [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
 | YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) |
 | Trees (**`@he-tree/vue` only**; **`QTree` forbidden**) | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fantasia-he-tree](.cursor/skills/fantasia-he-tree/SKILL.md) |
 | Floating **`Window*`** shared families | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) (**`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**) |
 | List/table DnD | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), [fantasia-drag-drop](.cursor/skills/fantasia-drag-drop/SKILL.md) |
+| Reusable **`elements/`** inputs | [AGENTS.md](AGENTS.md) subsystems — **`FaSelectInput`**, **`FaIconPickerInput`**, **`FaLocaleTranslationsInput`**, **`FaColorPickerInput`** |
 | Electron / IPC / preload; main security hardening | [AGENTS.md](AGENTS.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md) |
 | Keybinds, actions, Project Settings | [AGENTS.md](AGENTS.md) subsystem table |
 | SCSS / theme tokens | [project-scss.mdc](.cursor/rules/project-scss.mdc) |
 | **`types/`** shared interfaces | [types-folder.mdc](.cursor/rules/types-folder.mdc) only |
 
-**Component buckets** under **`src/components/`**: **`dialogs/`**, **`floatingWindows/`**, **`globals/`**, **`elements/`**, **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infra helpers use **`_` prefix** — see [AGENTS.md](AGENTS.md).
+**Component buckets** under **`src/components/`**: **`dialogs/`**, **`floatingWindows/`**, **`globals/`**, **`elements/`**, **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Five infra helpers use **`_` prefix** — see [AGENTS.md](AGENTS.md) **Renderer components**.
 
 ## Dev and build
 
@@ -183,7 +184,7 @@ yarn test:e2e:list
 | `yarn testbatch:ensure:change` | Same; update VRT snapshots. |
 | `yarn test:unit` | Vitest (no coverage). |
 | `yarn test:coverage:verify` | Coverage tiers (same as verify Vitest step). |
-| `yarn test:coverage:electron` / `helpers` / `src` | Single coverage slice. |
+| `yarn test:coverage:electron` / `helpers` / `i18n` / `src` | Single coverage slice. |
 | `yarn test:components` / `test:e2e` | Playwright suites. |
 | `yarn test:storybook:smoke` / `visual*` | Storybook checks. |
 | `yarn storybook:run` / `storybook:build` | Storybook dev/static. |

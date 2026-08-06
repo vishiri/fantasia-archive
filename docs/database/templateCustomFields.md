@@ -28,9 +28,9 @@ Documents do **not** store a full copy of the template schema.
 
 ## Relationship to shipped schema
 
-Today through **v5** ([projectDB.md](projectDB.md)):
+Today through **v6** ([projectDB.md](projectDB.md)):
 
-- **`document_templates`** — id, `display_name`, timestamps (name-only shell).
+- **`document_templates`** — id, **`display_name`** + translation/icon/appendix/**`sort_order`** columns (shell for **custom fields** still; not name-only).
 - **`documents.template_id`** — optional N:1 FK to a template shell.
 - **`document_media`** — M:N junction pattern to mirror for relationship-type custom fields.
 

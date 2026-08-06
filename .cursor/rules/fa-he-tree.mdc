@@ -49,7 +49,7 @@ Playbook: [fantasia-he-tree](../skills/fantasia-he-tree/SKILL.md) **DnD + scroll
 
 - **Thin Vue SFC** — template slots, `data-test-locator`, i18n **`$t`**, Quasar icons/buttons in **`#default`** node slots.
 - **Feature `scripts/`** — tree data mapping, expand state, filter/search, DnD handlers → Pinia/IPC.
-- **`src/scripts/faHeTree/`** — shared pure helpers (flatten, walk, id maps) when ≥2 features need same utilities.
+- Shared walk/flatten/id-index helpers live with the consuming feature until ≥2 features need the same utilities (no dedicated **`src/scripts/faHeTree/`** folder yet).
 - Types: repo-root **`types/`** (`app/types/...`); no colocated `*.types.ts` under **`src/`**. See [types-folder.mdc](types-folder.mdc).
 
 ## Styling and Quasar
@@ -62,4 +62,4 @@ Playbook: [fantasia-he-tree](../skills/fantasia-he-tree/SKILL.md) **DnD + scroll
 
 - [fantasia-he-tree skill](../skills/fantasia-he-tree/SKILL.md)
 - [vue-quasar.mdc](vue-quasar.mdc)
-- [AGENTS.md](../../AGENTS.md) **Hierarchical trees (he-tree)**
+- [AGENTS.md](../../AGENTS.md) Trees / DnD

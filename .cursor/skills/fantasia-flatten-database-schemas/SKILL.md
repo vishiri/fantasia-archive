@@ -1,9 +1,9 @@
 ---
 name: fantasia-flatten-database-schemas
 description: >-
-  Collapses .faproject SQLite PRAGMA user_version ladders into a single
-  bootstrap schema (currently version 1) during pre-release dev resets. Use when
-  the user asks to flatten database schemas, reset migrations, or squash schema
+  Collapses .faproject SQLite PRAGMA user_version ladders into a single bootstrap
+  schema (procedure sets max to 1) during pre-release dev resets. Use when the
+  user asks to flatten database schemas, reset migrations, or squash schema
   versions before wider release.
 ---
 
@@ -15,12 +15,17 @@ description: >-
 - User explicitly asks to **flatten** or **squash** migrations
 - **Do not** flatten after public release without migration strategy for user data
 
-## Current baseline (after flatten)
+## Live repo today
+
+- Supported max **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`** — [projectDB.md](../../../docs/database/projectDB.md)
+- Flatten = **dev procedure** that resets ladder to bootstrap **1** (below), not current shipped state
+
+## Target after flatten (procedure outcome)
 
 - **`PRAGMA user_version` 1** only shipped revision
 - **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**
 - Fresh: **0** → bootstrap → **1** + default world seed
-- At **1**: **`applyFaProjectMigrations`** no-op
+- At **1**: **`applyFaProjectMigrations`** no-op (or idempotent patches only)
 - Other versions: unsupported (throws)
 
 ## Flatten procedure (checklist)

@@ -12,7 +12,7 @@ User asks to **flatten** (squash, reset) **`.faproject`** schema versions/migrat
 
 1. Invoke [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md); follow checklist end to end.
 2. Merge all table DDL into **`applyFaProjectProjectDataSchemaV1`** + **`applyFaProjectContentSchemaV1`** in **`faProjectDbSchemaDdl.ts`**; remove superseded **`applyFaProjectContentSchemaV*`** / incremental migration helpers.
-3. Set **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`** to new single version (**1** today); simplify **`applyFaProjectMigrations`** to bootstrap-from-zero + no-op at max only.
+3. Set **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`** to flatten target **1** (live max may be higher — see [projectDB.md](../../docs/database/projectDB.md)); simplify **`applyFaProjectMigrations`** to bootstrap-from-zero + no-op at max only.
 4. Update **`docs/database/projectDB.md`**, migration tests, user-facing changelog when flatten ships product-visible behavior (e.g. dev files must be recreated).
 5. Resume normal **vN→vN+1** migration steps only when adding **next** schema change after flatten — do not restore obsolete historical ladders.
 

@@ -50,7 +50,10 @@ Feature BEM block keeps local class names; tokens stay shared.
 
 **`q-color`**, icon grid pickers, locale translation field panels, confirm-only **`q-menu`** shells without action **`q-item`** rows.
 
+**In scope (option lists):** **`FaSelectInput`** option rows use **separatorAlt** between consecutive options ([fa-select-input.mdc](fa-select-input.mdc)).
+
 ## Related
 
 - [vue-quasar.mdc](vue-quasar.mdc) — **`AppControlSingleMenu`** / **`_data/`** menus
 - [vue-bem-scss.mdc](vue-bem-scss.mdc), [component-styles-folder.mdc](component-styles-folder.mdc)
+- [fa-select-input.mdc](fa-select-input.mdc) — select dropdown option separators

@@ -12,7 +12,7 @@ description: >-
 
 - **Fantasia Archive** — worldbuilding database manager (GPL-3.0)
 - Users organize fictional worlds as **projects** and **documents** (+ search, tree, noteboard, settings — **`AppControlMenus/_data/`**)
-- **Floating `Window*`** (e.g. **App styling**) = app chrome for theme/CSS — not in-universe lore. See [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**
+- **Floating `Window*`** (e.g. **App styling**) = app chrome for theme/CSS — not in-universe lore. See [AGENTS.md](../../../AGENTS.md) Floating **`Window*`**
 
 ## Vocabulary (prefer in UI and models)
 

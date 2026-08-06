@@ -57,6 +57,7 @@ Tokens: **`AppControlMenus/styles/_variables.scss`** — **`$appControlMenus-sep
 | **`ProjectHierarchyTreeNodeContextMenu`** | Hand-built |
 | **`GlobalLanguageSelector`** | Light theme; separatorAlt between locales |
 | **`SplashControlsResumeDropdown`** | separatorAlt between recent projects |
+| **`FaSelectInput`** | separatorAlt between dropdown options |
 | Color palette swatch context menu | Group separator duplicate → delete only |
 
 ## Tests

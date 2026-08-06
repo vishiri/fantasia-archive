@@ -2,7 +2,7 @@
 
 Use **Node.js 22.22.0 or newer** and **Yarn 1.x** (CI **Verify** uses **`yarn@1.22.19`** — see [README.md](README.md) and **`.github/workflows/verify.yml`**). Install dependencies with `yarn` from the repository root and, for Storybook or ESLint scopes that touch `.storybook-workspace`, run `yarn --cwd .storybook-workspace install` when that tree changes.
 
-Commit messages are enforced by **Husky** and **commitlint** (see [commitlint.config.mjs](commitlint.config.mjs) and the **Git commits** section in [AGENTS.md](AGENTS.md)).
+Commit messages are enforced by **Husky** and **commitlint** (see [commitlint.config.mjs](commitlint.config.mjs), [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc), [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md)).
 
 ## Quality checks before you push
 
@@ -47,7 +47,7 @@ If your change requires new or updated PNGs under `.storybook-workspace/visual-t
 yarn testbatch:ensure:change
 ```
 
-If you only need to refresh Storybook captures without the rest of the chain, use the scripts described in [README.md](README.md) under Storybook visual tests. Read [README.md](README.md) (Storybook visual baseline policy) and [AGENTS.md](AGENTS.md) for how **`maxDiffPixels`** works so you do not confuse it with viewport width.
+If you only need to refresh Storybook captures without the rest of the chain, use the scripts described in [README.md](README.md) under Storybook visual tests. Read [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) (**Storybook visual baseline policy**) and [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) for how **`maxDiffPixels`** works so you do not confuse it with viewport width.
 
 ### Full suite and `GITHUB_TOKEN`
 
