@@ -59,6 +59,28 @@ test('Test that document open handlers emit left navigate for leaf document rows
 
 /**
  * createProjectHierarchyTreeDocumentOpenHandlers
+ * Falls back to node.children when he-tree children stat is omitted.
+ */
+test('Test that document open handlers open leaf rows when children stat is omitted', () => {
+  const onDocumentOpenRequest = vi.fn()
+  const handlers = createProjectHierarchyTreeDocumentOpenHandlers({
+    onDocumentOpenRequest
+  })
+  handlers.onNodeClick({
+    data: leafDocument
+  })
+  expect(onDocumentOpenRequest).toHaveBeenCalledWith(
+    'doc-leaf',
+    'leftNavigate',
+    {
+      tabLabel: 'Leaf doc',
+      templateIcon: 'mdi-feather'
+    }
+  )
+})
+
+/**
+ * createProjectHierarchyTreeDocumentOpenHandlers
  * Left click on parent document rows is ignored.
  */
 test('Test that document open handlers ignore left click on parent document rows', () => {

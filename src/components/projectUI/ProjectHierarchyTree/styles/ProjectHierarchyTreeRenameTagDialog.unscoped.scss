@@ -1,0 +1,77 @@
+@use '../../../dialogs/DialogProjectSettings/styles/variables' as projectSettings;
+
+$projectHierarchyTreeRenameTagDialog-maxWidth: 700px;
+$projectHierarchyTreeRenameTagDialog-minWidth: 320px;
+$projectHierarchyTreeRenameTagDialog-viewportInlineSubtractPx: 48px;
+$projectHierarchyTreeRenameTagDialog-inputWidth: 400px;
+$projectHierarchyTreeRenameTagDialog-description-fontWeight: 500;
+$projectHierarchyTreeRenameTagDialog-descriptionToField-gap: 32px;
+
+/*
+ * Beat global `.q-dialog > .q-dialog__inner > .q-card { max-width: 1400px }`
+ * (see quasarComponentsAdjustments) — bare BEM class loses that specificity.
+ */
+.q-dialog > .q-dialog__inner > .q-card.projectHierarchyTreeRenameTagDialog {
+  max-width: $projectHierarchyTreeRenameTagDialog-maxWidth;
+  min-width: $projectHierarchyTreeRenameTagDialog-minWidth;
+  width:
+    min(
+      #{$projectHierarchyTreeRenameTagDialog-maxWidth},
+      calc(100vw - #{$projectHierarchyTreeRenameTagDialog-viewportInlineSubtractPx})
+    );
+}
+
+/* Confirm inset: beat Quasar .q-card__section--vert (16px) so only shared tokens apply. */
+.q-dialog > .q-dialog__inner > .q-card.faConfirmationDialog.projectHierarchyTreeRenameTagDialog > .faConfirmationDialog__content {
+  padding: $faConfirmationDialog-content-padding;
+
+  > .q-card__section:not(.faConfirmationDialog__body),
+  > .q-card__section--vert:not(.faConfirmationDialog__body) {
+    padding: 0;
+  }
+
+  > .faConfirmationDialog__body {
+    padding: $faConfirmationDialog-body-padding;
+    text-align: center;
+  }
+}
+
+.projectHierarchyTreeRenameTagDialog__title {
+  width: 100%;
+  word-break: break-word;
+}
+
+.projectHierarchyTreeRenameTagDialog__currentName {
+  font-size: projectSettings.$dialogProjectSettings-generalPanelTitle-fontSize;
+  font-weight: 700;
+  width: 100%;
+  word-break: break-word;
+}
+
+.projectHierarchyTreeRenameTagDialog__body {
+  margin: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.projectHierarchyTreeRenameTagDialog__description {
+  font-weight: $projectHierarchyTreeRenameTagDialog-description-fontWeight;
+  margin: 0 0 $projectHierarchyTreeRenameTagDialog-descriptionToField-gap;
+}
+
+.projectHierarchyTreeRenameTagDialog__field {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  width: $projectHierarchyTreeRenameTagDialog-inputWidth;
+}
+
+.projectHierarchyTreeRenameTagDialog__input {
+  width: 100%;
+
+  .q-field__input,
+  .q-field__native {
+    font-size: projectSettings.$dialogProjectSettings-generalPanelProjectNameInput-fontSize;
+  }
+}

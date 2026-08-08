@@ -55,6 +55,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import type { T_faProjectHierarchyTreeSortByMenuItemId } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS } from './scripts/projectHierarchyTreeSortByMenuItems'
@@ -63,7 +65,7 @@ defineOptions({
   name: 'ProjectHierarchyTreeNodeContextMenuSortBySubmenu'
 })
 
-defineProps<{
+const props = defineProps<{
   isSortBySubmenuOpen: boolean
   onSortByItemClick: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => void
   onSortBySubmenuModelUpdate: (shown: boolean) => void
@@ -72,7 +74,15 @@ defineProps<{
   resolveSortByItemDetailDirection: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
   resolveSortByItemDetailScope: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
   resolveSortByItemTitle: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
+  sortByDirectScopeOnly: boolean
 }>()
 
-const sortByMenuItems = PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS
+const sortByMenuItems = computed(() => {
+  if (!props.sortByDirectScopeOnly) {
+    return PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS
+  }
+  return PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS.filter((item) => {
+    return item.scope === 'direct'
+  })
+})
 </script>

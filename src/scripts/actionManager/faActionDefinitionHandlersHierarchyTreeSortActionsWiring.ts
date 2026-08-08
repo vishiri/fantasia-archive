@@ -5,14 +5,20 @@ import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeDocumentSortBucket } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
+  getFaComponentTestingProjectContentOverrides,
   hasFaProjectHierarchySortBridge,
   listFaProjectPlacementDocumentChildrenForRenderer,
   reindexFaProjectDocumentSiblingsForRenderer
 } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
 import {
+  listFaProjectDocumentsUnderTagForRenderer,
+  reorderFaProjectDocumentsUnderTagForRenderer
+} from 'app/src/scripts/componentTesting/faComponentTestingProjectContentTagsOverridesWiring'
+import {
   resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId,
   runProjectHierarchyTreeDocumentSort
 } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentSortRun'
+import { sortProjectHierarchyTreeTagDocumentChildren } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeTagDocumentSort'
 
 type T_sortHierarchyTreeDocumentsHandlerDeps = {
   S_FaProjectHierarchyTree: () => {
@@ -56,6 +62,51 @@ function resolveSortRootBucket (
   }
 }
 
+async function runSortHierarchyTreeDocumentsUnderTag (
+  payload: I_faActionPayloadMap['sortHierarchyTreeDocuments'],
+  refreshHierarchyTreeNodes: (nodeIds: string[]) => void
+): Promise<T_faActionHandlerContinuation | void> {
+  const tagId = payload.tagId
+  if (
+    typeof tagId !== 'string' ||
+    tagId.trim().length === 0 ||
+    payload.scope !== 'direct'
+  ) {
+    return
+  }
+  const overrides = getFaComponentTestingProjectContentOverrides()
+  const api = window.faContentBridgeAPIs?.projectContent
+  if (
+    overrides?.documentsUnderTagByTagId === undefined &&
+    (
+      typeof api?.listDocumentsUnderTag !== 'function' ||
+      typeof api?.reorderDocumentsUnderTag !== 'function'
+    )
+  ) {
+    throw new Error('Project hierarchy under-tag sort bridge is unavailable')
+  }
+  const listed = await listFaProjectDocumentsUnderTagForRenderer({ tagId })
+  if (listed.items.length === 0) {
+    return {
+      payloadPreview: `${payload.scope}:${payload.key}:${payload.direction}:tag`
+    }
+  }
+  const ordered = sortProjectHierarchyTreeTagDocumentChildren(
+    listed.items,
+    payload.key,
+    payload.direction
+  )
+  const orderedDocumentIds = ordered.map((item) => item.documentId)
+  await reorderFaProjectDocumentsUnderTagForRenderer({
+    orderedDocumentIds,
+    tagId
+  })
+  refreshHierarchyTreeNodes([tagId])
+  return {
+    payloadPreview: `${payload.scope}:${payload.key}:${payload.direction}:tag`
+  }
+}
+
 export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
   deps: T_sortHierarchyTreeDocumentsHandlerDeps
 ): {
@@ -66,6 +117,14 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
   async function handleSortHierarchyTreeDocuments (
     payload: I_faActionPayloadMap['sortHierarchyTreeDocuments']
   ): Promise<T_faActionHandlerContinuation | void> {
+    if (payload.nodeKind === 'tag') {
+      return await runSortHierarchyTreeDocumentsUnderTag(
+        payload,
+        (nodeIds) => {
+          deps.S_FaProjectHierarchyTree().refreshHierarchyTreeNodes(nodeIds)
+        }
+      )
+    }
     const root = resolveSortRootBucket(payload)
     if (root === null) {
       return

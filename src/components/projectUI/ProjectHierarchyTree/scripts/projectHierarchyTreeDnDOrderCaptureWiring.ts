@@ -11,14 +11,15 @@ import {
 } from './projectHierarchyTreeDnDOrderPostDropWiring'
 import {
   applyProjectHierarchyTreeSiblingOrderToTreeData,
-  readProjectHierarchyTreeDragSiblingOrderFromDom,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
 } from './projectHierarchyTreeDnDOrderSupportWiring'
+import { readProjectHierarchyTreeDragSiblingOrderFromDom } from './projectHierarchyTreeDnDOrderDomWiring'
 import { readProjectHierarchyTreeHeTreeLiveData } from './projectHierarchyTreeHeTreeHelpersWiring'
 
 export function readProjectHierarchyTreeDragSiblingOrderFromGetData (input: {
   documentId: string | null
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
+  preferredNodeId?: string | null | undefined
 }): string[] | null {
   if (input.documentId === null) {
     return null
@@ -27,7 +28,11 @@ export function readProjectHierarchyTreeDragSiblingOrderFromGetData (input: {
   if (liveData === null) {
     return null
   }
-  const snapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(liveData, input.documentId)
+  const snapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
+    liveData,
+    input.documentId,
+    input.preferredNodeId ?? null
+  )
   return snapshot?.orderedDocumentIds ?? null
 }
 

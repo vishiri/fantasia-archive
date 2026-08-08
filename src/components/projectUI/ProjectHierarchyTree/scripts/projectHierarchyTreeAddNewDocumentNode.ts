@@ -37,6 +37,7 @@ export function createProjectHierarchyTreeAddNewDocumentNode (input: {
     label: input.label,
     nodeKind: 'addNewDocument',
     placementId,
+    tagId: null,
     titlePluralTranslations: input.placement.titlePluralTranslations,
     titleSingularTranslations: input.placement.titleSingularTranslations,
     worldColor: input.placement.worldColor,

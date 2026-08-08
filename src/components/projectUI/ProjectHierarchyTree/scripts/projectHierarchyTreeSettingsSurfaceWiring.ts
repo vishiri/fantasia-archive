@@ -16,6 +16,7 @@ import { resolveFaDocumentTreeOrderNumberBadgeLabel } from 'app/src/scripts/open
 import { resolveProjectHierarchyTreeDocumentButtonVisibility } from '../functions/projectHierarchyTreeDocumentButtonVisibility'
 import { resolveProjectHierarchyTreePlacementCountSegments } from '../functions/projectHierarchyTreePlacementCountSegments'
 import {
+  createProjectHierarchyTreeExtraTreePaddingWiring,
   createProjectHierarchyTreeOrderNumberBadgeWiring,
   createProjectHierarchyTreePlacementCountWiring,
   createProjectHierarchyTreeProjectNameTitleWiring,
@@ -154,7 +155,7 @@ export function createProjectHierarchyTreeNodeDisplayBindings (deps: {
     display: ReturnType<typeof resolveProjectHierarchyTreePlacementCountSegments>
     documentCount: number
   } | null {
-    if (node.nodeKind !== 'templatePlacement') {
+    if (node.nodeKind !== 'templatePlacement' && node.nodeKind !== 'tag') {
       return null
     }
     const documentCount = node.documentCount ?? 0
@@ -194,6 +195,11 @@ export function createProjectHierarchyTreeSettingsSurfaceWiring (deps: {
     computed: deps.computed,
     storeToRefs: deps.storeToRefs
   })
+  const extraTreePaddingWiring = createProjectHierarchyTreeExtraTreePaddingWiring({
+    S_FaUserSettings: deps.S_FaUserSettings,
+    computed: deps.computed,
+    storeToRefs: deps.storeToRefs
+  })
   const placementCountWiring = createProjectHierarchyTreePlacementCountWiring({
     S_FaUserSettings: deps.S_FaUserSettings,
     computed: deps.computed,
@@ -220,6 +226,7 @@ export function createProjectHierarchyTreeSettingsSurfaceWiring (deps: {
   })
   return {
     documentButtonGroupWiring,
+    extraTreePaddingWiring,
     nodeDisplayBindings,
     orderNumberBadgeWiring,
     placementCountWiring,

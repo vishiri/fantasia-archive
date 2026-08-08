@@ -8,7 +8,7 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 
 ## Schema version (`PRAGMA user_version`)
 
-Fresh files bootstrap to **v6**. Live upgrade ladder **v1→v6** ships. Pre-release flatten (squash to single bootstrap) separate — [fantasia-flatten-database-schemas](../../.cursor/skills/fantasia-flatten-database-schemas/SKILL.md).
+Fresh files bootstrap to **v7**. Live upgrade ladder **v1→v7** ships. Pre-release flatten (squash to single bootstrap) separate — [fantasia-flatten-database-schemas](../../.cursor/skills/fantasia-flatten-database-schemas/SKILL.md).
 
 | Version | Contents |
 |---------|----------|
@@ -19,10 +19,11 @@ Fresh files bootstrap to **v6**. Live upgrade ladder **v1→v6** ships. Pre-rele
 | **4** | Adds **`documents.tree_order_number`** (`INTEGER NOT NULL DEFAULT -9007199254740991`, empty sentinel = **`Number.MIN_SAFE_INTEGER`**). Display-only hierarchy badge value; **does not** change sibling sort (**`tree_custom_sort_order`** only). Idempotent **`applyFaProjectDocumentTreeOrderNumberSchemaPatch`** runs on every open at version **4** for legacy files missing the column. |
 | **5** | Adds **`documents.extra_classes`** (`TEXT NOT NULL DEFAULT ''`, max length **512**). Space-separated HTML class list for **Custom Project CSS** targeting on the document workspace page. Idempotent **`applyFaProjectDocumentExtraClassesSchemaPatch`** runs on every open at version **5** for legacy files missing the column. |
 | **6** | Renames **worlds.color_pallete** → **worlds.color_palette** (ALTER TABLE … RENAME COLUMN). Idempotent when **color_palette** already present or **color_pallete** absent. Fresh bootstrap DDL uses **color_palette** directly. |
+| **7** | Adds per-world **`tags`** (`id`, `world_id`, `name`, timestamps) + **`document_tags`** M:N (`document_id`, `tag_id`, `sort_order`) with case-insensitive unique tag names per world. Idempotent **`applyFaProjectTagsSchemaPatch`** runs on every open at version **7**. Fresh bootstrap DDL includes both tables. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **pplyFaProjectMigrations(db, displayProjectName)** — fresh files start at **0**, bootstrap to **v6** + seed a default **world** when empty; files at **v6** run idempotent patches only; files at **v5** migrate to **v6** then run patches; files at **v4** migrate **v4→v5→v6** then run patches; files at **v3** migrate **v3→v4→v5→v6** then run patches; files at **v2** migrate **v2→v3→v4→v5→v6** then run patches; files at **v1** migrate **v1→v2→v3→v4→v5→v6** then run patches. Any other version is unsupported and throws. Older pre-release dev **.faproject** files must be recreated after a flatten.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v7** + seed a default **world** when empty; files at **v7** run idempotent patches only; files at **v6** migrate to **v7** then run patches; earlier versions climb **vN→…→v7** then run patches. Any other version is unsupported and throws. Older pre-release dev **.faproject** files must be recreated after a flatten.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after bootstrap and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -126,6 +127,28 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `media_id` | FK → `media.id` **ON DELETE CASCADE** |
 | PRIMARY KEY (`document_id`, `media_id`) | |
 
+### `tags` (per-world labels)
+
+| Column | Notes |
+|--------|--------|
+| `id` | TEXT PK (UUID) |
+| `world_id` | FK → **`worlds.id`** **ON DELETE CASCADE** |
+| `name` | Non-empty trimmed display name; **UNIQUE (`world_id`, `name` COLLATE NOCASE)** |
+| `created_at_ms`, `updated_at_ms` | INTEGER |
+
+Empty tags are not kept: after document save/delete (or explicit tag delete), tags with zero **`document_tags`** rows are removed.
+
+### `document_tags` (M:N + per-tag order)
+
+| Column | Notes |
+|--------|--------|
+| `document_id` | FK → `documents.id` **ON DELETE CASCADE** |
+| `tag_id` | FK → `tags.id` **ON DELETE CASCADE** |
+| `sort_order` | INTEGER — document order under that tag (DnD within one tag only) |
+| PRIMARY KEY (`document_id`, `tag_id`) | |
+
+Index: **`idx_document_tags_tag_id_sort`**.
+
 ### `world_template_groups`
 
 | Column | Notes |
@@ -160,7 +183,7 @@ Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_templ
 
 **Pre-release history:** A legacy **`world_document_templates`** M:N junction existed in flattened-away schema revisions; it is gone and existing links are not migrated.
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_tree_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_tree_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_tags_world_id_name_nocase`**, **`idx_tags_world_id`**, **`idx_document_tags_tag_id_sort`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
 ### `opened_documents`
 
@@ -181,6 +204,8 @@ Singleton workspace tab snapshot (one row, **`id = 1`**).
 | World → documents | `documents.world_id` |
 | Document → template | `documents.template_id` (nullable) |
 | Document ↔ media | `document_media` |
+| World → tags | `tags.world_id` |
+| Document ↔ tags | `document_tags` (+ per-tag `sort_order`) |
 | World template layout | **`world_template_groups`** + **`world_template_placements`** (one placement per template per world) |
 | Template → field definitions (planned) | `template_fields` — see [templateCustomFields.md](templateCustomFields.md) |
 | Document → custom field values (planned) | `document_field_values`, link tables — see [templateCustomFields.md](templateCustomFields.md) |
@@ -225,6 +250,10 @@ src-electron/mainScripts/projectManagement/
     faProjectWorldTemplateLayoutSnapshotWiring.ts
     faProjectWorldTemplateLayoutSqlWiring.ts
     faProjectDocumentMediaLinksWiring.ts
+    faProjectTagsSchemaPatchWiring.ts
+    faProjectTagsSqlHelpersWiring.ts
+    faProjectTagsQueryWiring.ts
+    faProjectTagsPersistWiring.ts
 ```
 
 **Barrel:** **`projectManagement_manager.ts`** re-exports lifecycle + **`runWithFaProjectDatabase*`**; content persist modules imported from IPC registration.
@@ -272,6 +301,14 @@ All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 | `link-document-media-async` | `linkFaProjectDocumentMedia` |
 | `unlink-document-media-async` | `unlinkFaProjectDocumentMedia` |
 | `list-document-media-async` | `listFaProjectMediaForDocument` |
+| `list-tags-for-world-async` | `listFaProjectTagsForWorld` |
+| `list-tags-with-document-counts-for-world-async` | `listFaProjectTagsWithDocumentCountsForWorld` |
+| `list-document-tags-async` | `listFaProjectDocumentTags` |
+| `list-documents-under-tag-async` | `listFaProjectDocumentsUnderTag` |
+| `set-document-tags-async` | `setFaProjectDocumentTags` (create/resolve names, replace memberships, GC empty tags) |
+| `reorder-documents-under-tag-async` | `reorderFaProjectDocumentsUnderTag` |
+| `rename-tag-async` | `renameFaProjectTag` (may merge into existing case-insensitive name) |
+| `delete-tag-async` | `deleteFaProjectTag` |
 | `list-workspace-hierarchy-layout-async` | `listFaProjectWorkspaceHierarchyLayout` |
 | `list-placement-document-children-async` | `listFaProjectPlacementDocumentChildren` |
 | `move-document-in-hierarchy-async` | `moveFaProjectDocumentInHierarchy` |

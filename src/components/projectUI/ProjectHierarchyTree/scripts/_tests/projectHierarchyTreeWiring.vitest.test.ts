@@ -304,6 +304,10 @@ function buildRestoreExpandedSnapshotTestDeps (
       callback()
       return 1
     },
+    runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
+      await runBatch()
+    }),
+    commitStagedLoadedChildren: vi.fn(() => false),
     treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
     ...overrides
   }
@@ -416,6 +420,66 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
   })
   expect([...openNodeIds.value].sort()).toEqual(['group-1', 'placement-1'])
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
+})
+
+test('Test that markProjectHierarchyTreeNodeClosed keeps tagWrapper children and descendant open ids', () => {
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'tag-a',
+    label: 'A',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-a',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tagWrapper: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagNode],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1__tagWrapper',
+    label: 'Tags',
+    nodeKind: 'tagWrapper',
+    placementId: null,
+    tagId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tree = ref<I_faProjectHierarchyTreeHeTreeNode[]>([{
+    children: [tagWrapper],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    tagId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }])
+  const openNodeIds = ref(new Set(['world-1', 'world-1__tagWrapper', 'tag-a']))
+  const queuePersistExpandedNodeIds = vi.fn()
+  markProjectHierarchyTreeNodeClosed({
+    node: tagWrapper,
+    nodeId: tagWrapper.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds,
+    treeData: tree
+  })
+  expect(tagWrapper.children).toHaveLength(1)
+  expect(tagWrapper.childrenLoaded).toBe(true)
+  expect([...openNodeIds.value].sort()).toEqual(['tag-a', 'world-1'])
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids when force sublevel collapse is on', () => {
@@ -1549,6 +1613,10 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
         draggedDocumentId.current = value
       }
     },
+    draggedTreeNodeId: {
+      get: () => null,
+      set: () => undefined
+    },
     dragExpandedSnapshot: {
       get: () => dragExpandedSnapshot.current,
       set: (value) => {
@@ -2554,7 +2622,7 @@ test('Test that remountProjectHierarchyTreeAndRestoreExpandedSnapshot restores s
   expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1'], undefined)
 })
 
-test('Test that restoreProjectHierarchyTreeExpandedSnapshot reapplies he-tree open state twice without closeAll', async () => {
+test('Test that restoreProjectHierarchyTreeExpandedSnapshot reapplies he-tree open state without closeAll', async () => {
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const openNodeIds = ref(new Set<string>())
   const queuePersistExpandedNodeIds = vi.fn()
@@ -2575,7 +2643,7 @@ test('Test that restoreProjectHierarchyTreeExpandedSnapshot reapplies he-tree op
   }))
   expect(flushDeferredTreeRevisionPublish).toHaveBeenCalledTimes(1)
   expect(treeRef.closeAll).not.toHaveBeenCalled()
-  expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(3)
+  expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(1)
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
 })
 
@@ -3012,9 +3080,6 @@ test('Test that restoreProjectHierarchyTreeExpandedSnapshot tolerates missing tr
     getTreeRef: () => {
       getTreeRefCalls += 1
       if (getTreeRefCalls === 1) {
-        return treeRef
-      }
-      if (getTreeRefCalls === 2) {
         return null
       }
       return treeRef
@@ -3022,7 +3087,7 @@ test('Test that restoreProjectHierarchyTreeExpandedSnapshot tolerates missing tr
     treeData
   }))
   expect(treeRef.closeAll).not.toHaveBeenCalled()
-  expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(1)
+  expect(treeRef.openNodeAndParents).not.toHaveBeenCalled()
 })
 
 test('Test that reapplyProjectHierarchyTreeHeTreeOpenState reopens persisted rows on he-tree', () => {
@@ -3343,6 +3408,7 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     dragContext: {
       dragNode: null
     } as never,
+    i18nT: (key) => key,
     nextTick: async () => undefined,
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
@@ -3440,6 +3506,7 @@ test('Test that createUseProjectHierarchyTree treats missing route path as non-d
     dragContext: {
       dragNode: null
     } as never,
+    i18nT: (key) => key,
     nextTick: async () => undefined,
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
@@ -3502,6 +3569,7 @@ test('Test that createUseProjectHierarchyTree falls back to en-US when user sett
     dragContext: {
       dragNode: null
     } as never,
+    i18nT: (key) => key,
     nextTick: async () => undefined,
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
@@ -4371,7 +4439,7 @@ test('Test that readProjectHierarchyTreeHeTreeLiveData reads getData from he-tre
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling order from he-tree rows', async () => {
   const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import(
-    '../projectHierarchyTreeDnDOrderSupportWiring'
+    '../projectHierarchyTreeDnDOrderDomWiring'
   )
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = treeData[0]?.children[0]
@@ -4515,6 +4583,10 @@ test('Test that createProjectHierarchyTreeDnDHandlers commitAllowedDocumentRowDr
       set: (value) => {
         draggedDocumentId.current = value
       }
+    },
+    draggedTreeNodeId: {
+      get: () => null,
+      set: () => undefined
     },
     dragExpandedSnapshot: {
       get: () => dragExpandedSnapshot.current,
@@ -4894,6 +4966,10 @@ test('Test that createProjectHierarchyTreeDnDHandlers ignores null drag nodes an
         draggedDocumentId.current = value
       }
     },
+    draggedTreeNodeId: {
+      get: () => null,
+      set: () => undefined
+    },
     dragExpandedSnapshot: {
       get: () => null,
       set: () => undefined
@@ -4959,6 +5035,9 @@ test('Test that applyProjectHierarchyTreeHeTreeModelValueUpdate rejects escaped 
     dragDropCommitted: ref(false),
     draggedDocumentId: {
       get: () => 'doc-escaped'
+    },
+    draggedTreeNodeId: {
+      get: () => null
     },
     dragSiblingOrderSnapshot: {
       get: () => null,
@@ -5336,6 +5415,57 @@ test('Test that createProjectHierarchyTreeExpandRowClickRouting routes group and
     stopPropagation
   } as unknown as PointerEvent)
   expect(stopPropagation).toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting routes tag and tagWrapper row clicks', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeSessionExpandHandlersWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const onNodeOpenIconPointerDown = vi.fn()
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown
+  })
+  const tagNode = buildDocumentNode({
+    documentId: null,
+    hasChildren: true,
+    id: 'tag-1',
+    nodeKind: 'tag',
+    tagId: 'tag-1'
+  })
+  const tagWrapperNode = buildDocumentNode({
+    documentId: null,
+    hasChildren: true,
+    id: 'world-1__tagWrapper',
+    nodeKind: 'tagWrapper',
+    tagId: null
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  await routing.onWorldNodeRowClick(tagNode, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).toHaveBeenCalledWith(tagNode, stat)
+  expect(stopPropagation).toHaveBeenCalled()
+  onNodeOpenIconClick.mockClear()
+  stopPropagation.mockClear()
+  routing.onWorldNodeRowPointerDown(tagWrapperNode, stat, {
+    stopPropagation
+  } as unknown as PointerEvent)
+  expect(onNodeOpenIconPointerDown).toHaveBeenCalledWith(stat)
+  expect(stopPropagation).toHaveBeenCalled()
+  await routing.onWorldNodeRowClick(tagWrapperNode, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).toHaveBeenCalledWith(tagWrapperNode, stat)
 })
 
 test('Test that createProjectHierarchyTreeExpandRowClickRouting skips leaf document row clicks', async () => {

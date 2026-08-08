@@ -26,6 +26,7 @@ import {
   PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST,
   resolveProjectHierarchyTreeTreeNodeKindClass
 } from '../functions/projectHierarchyTreeTreeNodeKindClass'
+import { resolveProjectHierarchyTreeUsesExtraTreePadding } from '../functions/projectHierarchyTreeExtraTreePadding'
 import { resolveProjectHierarchyTreeShowsTreeLines } from '../functions/projectHierarchyTreeTreeLineVisibility'
 
 export function resolveProjectHierarchyTreeDocumentAppearanceChrome (
@@ -112,6 +113,30 @@ export function createProjectHierarchyTreeTreeLineWiring (deps: {
 
   return {
     showsTreeLines
+  }
+}
+
+export function createProjectHierarchyTreeExtraTreePaddingWiring (deps: {
+  S_FaUserSettings: typeof S_FaUserSettings
+  computed: <T>(getter: () => T) => I_computedRef<T>
+  storeToRefs: T_piniaStoreToRefs
+}): {
+    usesExtraTreePadding: I_computedRef<boolean>
+  } {
+  const { appSettingsDialogPreview, settings } = deps.storeToRefs(deps.S_FaUserSettings())!
+
+  const usesExtraTreePadding = deps.computed(() => {
+    return resolveProjectHierarchyTreeUsesExtraTreePadding(
+      settings!.value,
+      appSettingsDialogPreview!.value,
+      {
+        extraTreePadding: FA_USER_SETTINGS_DEFAULTS.extraTreePadding
+      }
+    )
+  })
+
+  return {
+    usesExtraTreePadding
   }
 }
 

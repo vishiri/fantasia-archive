@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 
 import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createProjectHierarchyTreeBulkExpandCollapseWiring } from './projectHierarchyTreeBulkExpandCollapseWiring'
@@ -9,9 +10,22 @@ import {
   buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers,
   buildProjectHierarchyTreeNodeContextMenuSortHandlers
 } from './projectHierarchyTreeNodeContextMenuHandlersWiring'
-import { createProjectHierarchyTreeNodeContextMenuWiring } from './projectHierarchyTreeNodeContextMenuWiring'
-export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
+import { createProjectHierarchyTreeNodeContextMenuWiring } from './projectHierarchyTreeNodeContextMenuSessionWiring'
+import { buildProjectHierarchyTreeSessionBulkContextMenuApi } from './projectHierarchyTreeSessionBulkContextMenuReturnWiring'
+import { createProjectHierarchyTreeTagDialogsWiring } from './projectHierarchyTreeTagDialogsWiring'
+
+type T_projectHierarchyTreeSessionBulkContextMenuWiringDeps = {
+  applyOpenedDocumentTabs: (tabs: I_faOpenedDocumentTab[]) => void
+  createTemporaryDocument: (input: {
+    displayName: string
+    initialTagsDraft?: Array<{ id: string, name: string }> | undefined
+    openMode: 'leftNavigate' | 'middleBackground'
+    parentDocumentId: null
+    templateId: string
+    worldId: string
+  }) => Promise<string>
   dragExpandUiFrozen: Ref<boolean>
+  getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   lazyLoadWiring: {
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -21,7 +35,10 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   onAddNewDocumentRowClick: (node: I_faProjectHierarchyTreeHeTreeNode) => void
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  refreshHierarchyTreeNodes: (nodeIds: string[]) => void
+  refreshLayout: () => Promise<void>
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  resyncTreeDataFromLayout: () => void
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
@@ -32,7 +49,11 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
       deferHeTreeOpen?: boolean
     }) => Promise<void>
   }
-}) {
+}
+
+export function createProjectHierarchyTreeSessionBulkContextMenuWiring (
+  deps: T_projectHierarchyTreeSessionBulkContextMenuWiringDeps
+) {
   const bulkExpandCollapseWiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     getTreeRef: deps.getTreeRef,
@@ -67,30 +88,35 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     runFaAction: deps.runFaAction,
     treeData: deps.treeData
   })
+  const tagDialogsWiring = createProjectHierarchyTreeTagDialogsWiring({
+    applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs,
+    createTemporaryDocument: deps.createTemporaryDocument,
+    getOpenedDocumentTabs: deps.getOpenedDocumentTabs,
+    refreshHierarchyTreeNodes: deps.refreshHierarchyTreeNodes,
+    refreshLayout: deps.refreshLayout,
+    resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+    treeData: deps.treeData
+  })
 
-  return {
-    contextMenuAddNewRowIcon: nodeContextMenuWiring.contextMenuAddNewRowIcon,
-    contextMenuAddNewRowLabel: nodeContextMenuWiring.contextMenuAddNewRowLabel,
-    contextMenuAnchorNodeId: nodeContextMenuWiring.contextMenuAnchorNodeId,
-    contextMenuShowsBulkExpandRows: nodeContextMenuWiring.contextMenuShowsBulkExpandRows,
-    contextMenuShowsCopyRows: nodeContextMenuWiring.contextMenuShowsCopyRows,
-    contextMenuShowsSortByRows: nodeContextMenuWiring.contextMenuShowsSortByRows,
-    isNodeContextMenuOpen: nodeContextMenuWiring.isNodeContextMenuOpen,
-    nodeMenuPointerPosition: nodeContextMenuWiring.nodeMenuPointerPosition,
-    onAddNewDocumentFromContextMenuClick: nodeContextMenuWiring.onAddNewDocumentFromContextMenuClick,
-    onAddNewDocumentUnderThisFromContextMenuClick:
-      documentActionHandlers.onAddNewDocumentUnderThisClick,
-    onCollapseAllUnderNodeClick: nodeContextMenuWiring.onCollapseAllUnderNodeClick,
-    onCopyBackgroundColorFromContextMenuClick: copyHandlers.onCopyBackgroundColorClick,
-    onCopyDocumentFromContextMenuClick: documentActionHandlers.onCopyDocumentClick,
-    onCopyNameFromContextMenuClick: copyHandlers.onCopyNameClick,
-    onCopyTextColorFromContextMenuClick: copyHandlers.onCopyTextColorClick,
-    onDeleteDocumentFromContextMenuClick: documentActionHandlers.onDeleteDocumentClick,
-    onEditDocumentFromContextMenuClick: documentActionHandlers.onEditDocumentClick,
-    onExpandAllUnderNodeClick: nodeContextMenuWiring.onExpandAllUnderNodeClick,
-    onNodeContextMenuHide: nodeContextMenuWiring.onNodeContextMenuHide,
-    onNodeRowContextMenu: nodeContextMenuWiring.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: documentActionHandlers.onOpenDocumentClick,
-    onSortByItemFromContextMenuClick: sortHandlers.onSortByItemClick
+  function onNodeRowContextMenu (
+    node: I_faProjectHierarchyTreeHeTreeNode,
+    event: MouseEvent
+  ): void {
+    tagDialogsWiring.setTagContextMenuAnchorNodeId(node.nodeKind === 'tag' ? node.id : null)
+    nodeContextMenuWiring.onNodeRowContextMenu(node, event)
   }
+  function onNodeContextMenuHide (): void {
+    tagDialogsWiring.setTagContextMenuAnchorNodeId(null)
+    nodeContextMenuWiring.onNodeContextMenuHide()
+  }
+  return buildProjectHierarchyTreeSessionBulkContextMenuApi({
+    copyHandlers,
+    documentActionHandlers,
+    nodeContextMenuWiring,
+    onNodeContextMenuHide,
+    onNodeRowContextMenu,
+    sortHandlers,
+    tagDialogsWiring
+  })
 }

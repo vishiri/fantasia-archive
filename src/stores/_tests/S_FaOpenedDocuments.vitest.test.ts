@@ -49,6 +49,13 @@ const createDocumentMock = vi.fn()
 const moveDocumentInHierarchyMock = vi.fn()
 const listPlacementDocumentChildrenMock = vi.fn()
 
+const listDocumentTagsMock = vi.fn(async (): Promise<{
+  items: Array<{ id: string, name: string }>
+}> => ({ items: [] }))
+const setDocumentTagsMock = vi.fn(async (): Promise<{
+  items: Array<{ id: string, name: string }>
+}> => ({ items: [] }))
+
 const baseTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
   persistenceState: 'persisted',
@@ -97,6 +104,10 @@ beforeEach(() => {
   createDocumentMock.mockReset()
   moveDocumentInHierarchyMock.mockReset()
   listPlacementDocumentChildrenMock.mockReset()
+  listDocumentTagsMock.mockReset()
+  listDocumentTagsMock.mockResolvedValue({ items: [] })
+  setDocumentTagsMock.mockReset()
+  setDocumentTagsMock.mockResolvedValue({ items: [] })
   deleteDocumentMock.mockReset()
   notifyCreateMock.mockClear()
   getDocumentByIdMock.mockResolvedValue({
@@ -1264,6 +1275,55 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
   expect(savedTab?.extraClassesDraft).toBe('foo bar')
   expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
   expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
+})
+
+/**
+ * saveDocumentDisplayName
+ * Temporary promote persists Tags draft via setDocumentTags after create.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName temporary promotes with tags draft', async () => {
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Tagged Temp',
+    initialTagsDraft: [{
+      id: 'tag-temp',
+      isNew: true,
+      name: 'TempTag'
+    }],
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Tagged Temp',
+    id: documentId,
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER,
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: ''
+  })
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-saved',
+      name: 'TempTag'
+    }]
+  })
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  await vi.runAllTimersAsync()
+  expect(setDocumentTagsMock).toHaveBeenCalled()
+  expect(store.findTabByDocumentId(documentId)?.savedTags).toEqual([{
+    id: 'tag-saved',
+    name: 'TempTag'
+  }])
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName remaps tab id when create substitutes', async () => {
@@ -2810,4 +2870,221 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource return
   const documentId = await store.createTemporaryDocumentCopyFromSource('missing-source')
 
   expect(documentId).toBeNull()
+})
+
+/**
+ * updateTagsDraft
+ * Updates tagsDraft and marks the tab dirty when draft differs from saved.
+ */
+test('Test that S_FaOpenedDocuments updateTagsDraft updates draft membership', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-1',
+    name: 'Heroes',
+    isNew: true
+  }])
+  expect(store.findTabByDocumentId('doc-1')?.tagsDraft).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes',
+    isNew: true
+  }])
+  expect(store.findTabByDocumentId('doc-1')?.hasUnsavedChanges).toBe(true)
+  store.updateTagsDraft('missing-doc', [])
+})
+
+/**
+ * openFromTree
+ * Seeds tagsDraft/savedTags from listDocumentTags when opening a new tab.
+ */
+test('Test that S_FaOpenedDocuments openFromTree seeds tags from listDocumentTags', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    listDocumentTags: listDocumentTagsMock
+  })
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Tagged',
+    id: 'doc-tagged',
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  listDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  })
+  await store.openFromTree('doc-tagged', 'leftNavigate', {
+    tabLabel: 'Tagged',
+    templateIcon: 'mdi-tag'
+  })
+  const tab = store.findTabByDocumentId('doc-tagged')
+  expect(tab?.savedTags).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+  expect(tab?.tagsDraft).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+})
+
+/**
+ * openFromTree
+ * Continues with empty tags when listDocumentTags rejects.
+ */
+test('Test that S_FaOpenedDocuments openFromTree tolerates listDocumentTags failures', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    listDocumentTags: listDocumentTagsMock
+  })
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Tagged',
+    id: 'doc-tagged-fail',
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  listDocumentTagsMock.mockRejectedValueOnce(new Error('tags failed'))
+  await store.openFromTree('doc-tagged-fail', 'leftNavigate', {
+    tabLabel: 'Tagged',
+    templateIcon: 'mdi-tag'
+  })
+  const tab = store.findTabByDocumentId('doc-tagged-fail')
+  expect(tab?.savedTags).toEqual([])
+  expect(tab?.tagsDraft).toEqual([])
+})
+
+/**
+ * saveDocumentDisplayName
+ * Persists tags via setDocumentTags after a successful display-name save.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshLayout when tags change', async () => {
+  const refreshLayoutMock = vi.fn(async () => undefined)
+  const refreshDocumentsInTreeMock = vi.fn()
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: '',
+    id: 'doc-1',
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = refreshLayoutMock
+  hierarchyStore.refreshDocumentsInTree = refreshDocumentsInTreeMock
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  await store.hydrateFromProjectDatabase()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-new',
+    isNew: true,
+    name: 'Places'
+  }])
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-saved',
+      name: 'Places'
+    }]
+  })
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(refreshLayoutMock).toHaveBeenCalled()
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalled()
+  expect(refreshDocumentsInTreeMock).toHaveBeenCalledWith(['doc-1'])
+  expect(store.findTabByDocumentId('doc-1')?.savedTags).toEqual([{
+    id: 'tag-saved',
+    name: 'Places'
+  }])
+})
+
+/**
+ * saveDocumentDisplayName
+ * Walks previousSavedTagIds when the tab already has saved tags.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshes when clearing existing tags', async () => {
+  const refreshLayoutMock = vi.fn(async () => undefined)
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: '',
+    id: 'doc-1',
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  getOpenedDocumentsSnapshotMock.mockResolvedValueOnce({
+    ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      savedTags: [{
+        id: 'tag-old',
+        name: 'Old'
+      }],
+      tagsDraft: [{
+        id: 'tag-old',
+        name: 'Old'
+      }]
+    }]
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = refreshLayoutMock
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  await store.hydrateFromProjectDatabase()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  store.updateTagsDraft('doc-1', [])
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: []
+  })
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+  expect(refreshLayoutMock).toHaveBeenCalled()
+  expect(store.findTabByDocumentId('doc-1')?.savedTags).toEqual([])
+})
+
+/**
+ * replaceOpenedDocumentTabs
+ * Replaces the session tab list without changing activeDocumentId.
+ */
+test('Test that S_FaOpenedDocuments replaceOpenedDocumentTabs replaces tabs array', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceOpenedDocumentTabs([{
+    ...baseTab,
+    documentId: 'doc-replaced',
+    displayNameDraft: 'Replaced',
+    savedDisplayName: 'Replaced',
+    tabLabel: 'Replaced'
+  }])
+  expect(store.tabs).toHaveLength(1)
+  expect(store.tabs[0]?.documentId).toBe('doc-replaced')
 })

@@ -38,6 +38,10 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
     get: () => string | null
     set: (value: string | null) => void
   }
+  draggedTreeNodeId: {
+    get: () => string | null
+    set: (value: string | null) => void
+  }
   dragExpandedSnapshot: {
     get: () => string[] | null
     set: (value: string[] | null) => void
@@ -105,6 +109,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     draggedDocumentId: deps.draggedDocumentId.get(),
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
+    preferredNodeId: deps.draggedTreeNodeId.get(),
     setDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.set,
     treeData: deps.treeData.value
   })
@@ -157,6 +162,7 @@ function onTreeDragEndCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): 
     deps.dragCommitPending.value = false
     deps.dragCommitScheduled.value = false
     deps.draggedDocumentId.set(null)
+    deps.draggedTreeNodeId.set(null)
     deps.dragExpandedSnapshot.set(null)
     deps.dragSiblingOrderSnapshot.set(null)
   }

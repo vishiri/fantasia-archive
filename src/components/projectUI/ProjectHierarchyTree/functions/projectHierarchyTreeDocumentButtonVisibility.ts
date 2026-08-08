@@ -44,8 +44,28 @@ export function resolveProjectHierarchyTreeDocumentButtonVisibility (
   }
 }
 
+export function resolveProjectHierarchyTreeDocumentButtonVisibilityForNode (
+  node: Pick<I_faProjectHierarchyTreeHeTreeNode, 'documentId' | 'nodeKind' | 'tagId'>,
+  visibility: {
+    showsAddUnder: boolean
+    showsEdit: boolean
+    showsOpen: boolean
+  }
+): {
+    showsAddUnder: boolean
+    showsEdit: boolean
+    showsOpen: boolean
+  } {
+  const underTag = typeof node.tagId === 'string' && node.tagId.length > 0
+  return {
+    showsAddUnder: underTag ? false : visibility.showsAddUnder,
+    showsEdit: visibility.showsEdit,
+    showsOpen: visibility.showsOpen
+  }
+}
+
 export function projectHierarchyTreeNodeShowsDocumentButtonGroup (
-  node: Pick<I_faProjectHierarchyTreeHeTreeNode, 'documentId' | 'nodeKind'>,
+  node: Pick<I_faProjectHierarchyTreeHeTreeNode, 'documentId' | 'nodeKind' | 'tagId'>,
   visibility: {
     showsAddUnder: boolean
     showsEdit: boolean
@@ -55,6 +75,6 @@ export function projectHierarchyTreeNodeShowsDocumentButtonGroup (
   if (node.nodeKind !== 'document' || node.documentId === null) {
     return false
   }
-
-  return visibility.showsAddUnder || visibility.showsEdit || visibility.showsOpen
+  const resolved = resolveProjectHierarchyTreeDocumentButtonVisibilityForNode(node, visibility)
+  return resolved.showsAddUnder || resolved.showsEdit || resolved.showsOpen
 }

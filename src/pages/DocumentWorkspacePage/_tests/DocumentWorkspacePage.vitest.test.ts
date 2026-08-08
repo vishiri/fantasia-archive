@@ -212,6 +212,27 @@ const workspacePageExtraHtmlClassListRef = vi.hoisted(() => {
   return ref<string[]>([])
 })
 const onAppendToWorldPaletteMock = vi.hoisted(() => vi.fn())
+const onTagsRequestOptionsMock = vi.hoisted(() => vi.fn())
+const tagsFieldDescriptionRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Tags help')
+})
+const tagsFieldLabelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Tags')
+})
+const tagsFieldReadOnlyRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref(true)
+})
+const tagsModelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref<Array<{ id: string, name: string }>>([])
+})
+const tagsOptionsRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref<Array<{ id: string, name: string }>>([])
+})
 
 vi.mock('../scripts/documentWorkspacePage_manager', () => {
   return {
@@ -253,11 +274,17 @@ vi.mock('../scripts/documentWorkspacePage_manager', () => {
         nameFieldLabel: nameFieldLabelRef,
         oneWayRelationshipTooltip: oneWayRelationshipTooltipRef,
         onAppendToWorldPalette: onAppendToWorldPaletteMock,
+        onTagsRequestOptions: onTagsRequestOptionsMock,
         orderNumberFieldDescription: orderNumberFieldDescriptionRef,
         orderNumberFieldLabel: orderNumberFieldLabelRef,
         orderNumberFieldReadOnly: orderNumberFieldReadOnlyRef,
         orderNumberModel: orderNumberModelRef,
         previewDisplayName: previewDisplayNameRef,
+        tagsFieldDescription: tagsFieldDescriptionRef,
+        tagsFieldLabel: tagsFieldLabelRef,
+        tagsFieldReadOnly: tagsFieldReadOnlyRef,
+        tagsModel: tagsModelRef,
+        tagsOptions: tagsOptionsRef,
         textColorFieldDescription: textColorFieldDescriptionRef,
         textColorFieldLabel: textColorFieldLabelRef,
         textColorModel: textColorModelRef,
@@ -285,6 +312,12 @@ beforeEach(() => {
   isDeadModelRef.value = false
   isDeadToggleReadOnlyRef.value = true
   onAppendToWorldPaletteMock.mockClear()
+  onTagsRequestOptionsMock.mockClear()
+  tagsFieldDescriptionRef.value = 'Tags help'
+  tagsFieldLabelRef.value = 'Tags'
+  tagsFieldReadOnlyRef.value = true
+  tagsModelRef.value = []
+  tagsOptionsRef.value = []
   documentTabRef.value = {
     documentId: 'doc-1',
     displayNameDraft: 'Hero',
@@ -548,6 +581,52 @@ test('Test that DocumentWorkspacePage renders editable belongs under input in ed
   expect(input.attributes('data-readonly')).toBe('false')
   await input.setValue('parent-2')
   expect(belongsUnderModelRef.value).toBe('parent-2')
+
+  wrapper.unmount()
+})
+
+test('Test that DocumentWorkspacePage renders tags field and forwards request-options', async () => {
+  tagsModelRef.value = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  tagsOptionsRef.value = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  tagsFieldReadOnlyRef.value = false
+
+  const wrapper = mount(DocumentWorkspacePage, {
+    global: {
+      stubs: {
+        FaColorPickerInput: true,
+        FaLabeledBooleanToggle: true,
+        DocumentWorkspacePageSelectSmoke: true,
+        FaSelectInput: {
+          name: 'FaSelectInput',
+          props: ['modelValue', 'disable', 'options', 'testLocator'],
+          emits: ['update:modelValue', 'request-options'],
+          template: '<div :data-test-locator="testLocator" @click="$emit(\'request-options\')" @dblclick="$emit(\'update:modelValue\', [{ id: \'tag-2\', name: \'Places\' }])" />'
+        },
+        FaHelpTooltipIcon: {
+          template: '<span :data-test-tooltip-text="$attrs[\'data-test-tooltip-text\']"><slot /></span>'
+        },
+        QIcon: true,
+        QTooltip: true,
+        QInput: true
+      }
+    }
+  })
+  await flushPromises()
+
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-tagsLabel"]').text()).toBe('Tags')
+  await wrapper.get('[data-test-locator="documentWorkspacePage-tagsInput"]').trigger('click')
+  expect(onTagsRequestOptionsMock).toHaveBeenCalled()
+  await wrapper.get('[data-test-locator="documentWorkspacePage-tagsInput"]').trigger('dblclick')
+  expect(tagsModelRef.value).toEqual([{
+    id: 'tag-2',
+    name: 'Places'
+  }])
 
   wrapper.unmount()
 })

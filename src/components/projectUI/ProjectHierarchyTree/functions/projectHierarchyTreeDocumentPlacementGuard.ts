@@ -12,7 +12,9 @@ function isPersistedProjectHierarchyTreeDocumentRow (
 function isValidProjectHierarchyTreeDocumentParentKind (
   nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'] | 'none'
 ): boolean {
-  return nodeKind === 'templatePlacement' || nodeKind === 'document'
+  return nodeKind === 'templatePlacement' ||
+    nodeKind === 'document' ||
+    nodeKind === 'tag'
 }
 
 function collectProjectHierarchyTreeDocumentsWithInvalidPlacementParentFromNodes (
@@ -45,7 +47,8 @@ function collectProjectHierarchyTreeDocumentsWithInvalidPlacementParentFromNodes
 }
 
 /**
- * Documents must live under templatePlacement or document parents only.
+ * Documents must live under templatePlacement, document, or tag parents only.
+ * Tag parents are valid for mirrored documents-under-tag rows.
  */
 export function findProjectHierarchyTreeDocumentsWithInvalidPlacementParent (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[]

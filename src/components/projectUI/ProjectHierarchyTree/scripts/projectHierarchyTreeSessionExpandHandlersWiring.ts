@@ -22,7 +22,9 @@ function shouldRouteHierarchyTreeRowExpandClick (
   if (
     node.nodeKind === 'world' ||
     node.nodeKind === 'group' ||
-    node.nodeKind === 'templatePlacement'
+    node.nodeKind === 'templatePlacement' ||
+    node.nodeKind === 'tag' ||
+    node.nodeKind === 'tagWrapper'
   ) {
     return true
   }

@@ -15,7 +15,9 @@ export const FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS = {
   savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
   treeOrderNumberDraft: '',
   extraClassesDraft: '',
-  savedExtraClasses: ''
+  savedExtraClasses: '',
+  tagsDraft: [] as Array<{ id: string, name: string, isNew?: boolean }>,
+  savedTags: [] as Array<{ id: string, name: string }>
 } as const
 
 /** Default opened-document tab tree order fields for tests and harness stubs. */

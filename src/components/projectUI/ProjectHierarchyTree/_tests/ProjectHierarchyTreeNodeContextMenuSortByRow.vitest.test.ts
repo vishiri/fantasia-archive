@@ -25,6 +25,7 @@ test('Test that ProjectHierarchyTreeNodeContextMenuSortByRow wires activator ent
       resolveSortByItemDetailDirection: () => 'A -> Z',
       resolveSortByItemDetailScope: () => 'direct children',
       resolveSortByItemTitle: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => `Title ${itemId}`,
+      sortByDirectScopeOnly: false,
       sortByLabel: 'Sort by'
     },
     global: {

@@ -29,6 +29,7 @@ function buildPlacementNode (input: {
     label: 'Buildings',
     nodeKind: 'templatePlacement',
     placementId: 'placement-1',
+    tagId: null,
     worldColor: '#ff0000',
     worldId: 'world-1'
   }
@@ -38,6 +39,7 @@ function buildDocumentNode (input: {
   documentId: string
   id: string
   label?: string
+  tagId?: string | null
 }): I_faProjectHierarchyTreeHeTreeNode {
   return {
     children: [],
@@ -50,6 +52,7 @@ function buildDocumentNode (input: {
     label: input.label ?? input.id,
     nodeKind: 'document',
     placementId: 'placement-1',
+    tagId: input.tagId ?? null,
     worldColor: '#ff0000',
     worldId: 'world-1'
   }
@@ -85,6 +88,66 @@ test('Test that findProjectHierarchyTreeDocumentParentBucket matches persisted d
   const treeData = [placement]
   const bucket = findProjectHierarchyTreeDocumentParentBucket(treeData, 'doc-a')
   expect(bucket?.parentNode?.id).toBe('placement-1')
+})
+
+test('Test that findProjectHierarchyTreeDocumentParentBucket prefers under-tag twin via preferredNodeId', () => {
+  const mainDoc = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'doc-a'
+  })
+  const underTagDoc = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'tag-1__doc__doc-a',
+    tagId: 'tag-1'
+  })
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [underTagDoc],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const placement = buildPlacementNode({
+    children: [mainDoc],
+    childrenLoaded: true
+  })
+  const world: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [placement, tagNode],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-earth',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    tagId: null,
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const firstMatch = findProjectHierarchyTreeDocumentParentBucket([world], 'doc-a')
+  expect(firstMatch?.parentNode?.id).toBe('placement-1')
+  const underTagMatch = findProjectHierarchyTreeDocumentParentBucket(
+    [world],
+    'doc-a',
+    {
+      parentDocumentId: null,
+      parentNode: null
+    },
+    {
+      preferredNodeId: 'tag-1__doc__doc-a'
+    }
+  )
+  expect(underTagMatch?.parentNode?.id).toBe('tag-1')
 })
 
 test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh dedupes parent buckets', () => {

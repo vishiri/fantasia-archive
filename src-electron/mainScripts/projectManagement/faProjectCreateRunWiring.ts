@@ -15,11 +15,11 @@ import {
   replaceFaProjectActiveDatabase,
   unlinkFaProjectFileIfExists
 } from './faProjectActiveDatabaseWiring'
+import { applyFaProjectMigrations } from './faProjectDbMigrateWiring'
 import {
-  applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrateWiring'
+} from './faProjectDbMigrateMetaWiring'
 import { getFaProjectSaveDefaultPath } from './faProjectFileDialogDefaultPathsWiring'
 import { takeNextE2eProjectCreatePath } from './projectManagementSharedE2ePathWiring'
 import {

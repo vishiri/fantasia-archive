@@ -648,6 +648,39 @@ test('Test that ProjectHierarchyTreeNode applies active tab highlight only for m
 })
 
 /**
+ * Tag rows use document label color class chrome; icons stay primary-bright via SCSS.
+ */
+test('Test that ProjectHierarchyTreeNode applies tag row kind classes', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        icon: 'mdi-tag',
+        id: 'tag-1',
+        label: 'Heroes',
+        nodeKind: 'tag',
+        placementId: null,
+        tagId: 'tag-1'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.projectHierarchyTreeNode--tag').exists()).toBe(true)
+  expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
+  expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(true)
+})
+
+/**
  * ProjectHierarchyTreeNode syncs a kind class onto the parent he-tree tree-node wrapper.
  */
 test('Test that ProjectHierarchyTreeNode syncs tree-node kind class', () => {

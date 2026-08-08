@@ -111,7 +111,7 @@ test('Test that resolveProjectHierarchyTreeDragCommitSourceReloadNodeId resolves
   expect(nodeId).toBe('doc-parent')
 })
 
-test('Test that refreshProjectHierarchyTreeDragCommitTargetContainer skips uncommitted moves', async () => {
+test('Test that refreshProjectHierarchyTreeDragCommitTargetContainer reloads on failed commit when reload id set', async () => {
   const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   await refreshProjectHierarchyTreeDragCommitTargetContainer({
     commitResult: {
@@ -119,6 +119,21 @@ test('Test that refreshProjectHierarchyTreeDragCommitTargetContainer skips uncom
       emptiedParentDocumentIds: [],
       nestParentDocumentId: null,
       reloadChildrenNodeId: 'doc-parent'
+    },
+    refreshNodeChildrenFromDatabase
+  })
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledTimes(1)
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledWith('doc-parent')
+})
+
+test('Test that refreshProjectHierarchyTreeDragCommitTargetContainer skips when reload id is null', async () => {
+  const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
+  await refreshProjectHierarchyTreeDragCommitTargetContainer({
+    commitResult: {
+      committed: false,
+      emptiedParentDocumentIds: [],
+      nestParentDocumentId: null,
+      reloadChildrenNodeId: null
     },
     refreshNodeChildrenFromDatabase
   })

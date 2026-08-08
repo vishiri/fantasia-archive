@@ -8,6 +8,8 @@ export type T_faProjectHierarchyTreeNodeKind =
   | 'templatePlacement'
   | 'document'
   | 'addNewDocument'
+  | 'tag'
+  | 'tagWrapper'
 
 /** Persisted expand/collapse and scroll offset in project_data KV hierarchy_tree_ui_state. */
 export interface I_faProjectHierarchyTreeUiState {
@@ -63,6 +65,14 @@ export interface I_faProjectHierarchyTreeWorkspacePlacement {
   titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
 }
 
+/** One per-world tag row for hierarchy tree skeleton (counts from listTagsWithDocumentCountsForWorld). */
+export interface I_faProjectHierarchyTreeWorkspaceTag {
+  id: string
+  name: string
+  documentCount: number
+  categoryCount: number
+}
+
 /** One world row with nested layout metadata for the workspace hierarchy skeleton. */
 export interface I_faProjectHierarchyTreeWorkspaceWorld {
   id: string
@@ -72,6 +82,8 @@ export interface I_faProjectHierarchyTreeWorkspaceWorld {
   colorPalette: string
   groups: I_faProjectHierarchyTreeWorkspaceGroup[]
   placements: I_faProjectHierarchyTreeWorkspacePlacement[]
+  /** Tags for this world; omit or empty when none. */
+  tags?: I_faProjectHierarchyTreeWorkspaceTag[] | undefined
 }
 
 export interface I_faProjectHierarchyTreeWorkspaceLayoutResult {
@@ -150,6 +162,10 @@ export interface I_faProjectHierarchyTreeDragSiblingOrderSnapshot {
   orderedDocumentIds: string[]
   parentDocumentId: string | null
   placementId: string
+  /** Set when reordering mirrored docs under a tag. */
+  tagId?: string | null | undefined
+  /** He-tree node id of the dragged row (disambiguates tag twins). */
+  treeNodeId?: string | null | undefined
 }
 
 export interface I_faProjectHierarchyTreeDocumentParentBucket {
@@ -191,7 +207,23 @@ export interface I_faProjectHierarchyTreeDocumentInvalidPlacementParent {
 export interface I_faProjectHierarchyTreeNodeContextMenuSectionFlags {
   showsBulkExpandRows: boolean
   showsCopyRows: boolean
+  /** Open + edit only (mirrored docs under a tag). */
+  showsDocumentOpenEditRows: boolean
   showsSortByRows: boolean
+  /**
+   * When true with showsSortByRows, Sort by submenu lists only non-recursive
+   * (direct) modes — used for individual tag rows.
+   */
+  sortByDirectScopeOnly: boolean
+  /** Tag row: add-to-tag / rename / delete. */
+  showsTagMenuRows: boolean
+}
+
+/** User settings that control tag branch chrome in the hierarchy tree. */
+export interface I_faProjectHierarchyTreeTagSettings {
+  compactTags: boolean
+  noTags: boolean
+  tagsAtTop: boolean
 }
 
 /** Sort by submenu row id for hierarchy tree context menu. */
@@ -248,6 +280,11 @@ export interface I_faProjectHierarchyTreeHeTreeNode {
   label: string
   nodeKind: T_faProjectHierarchyTreeNodeKind
   placementId: string | null
+  /**
+   * Tag id when this row is a tag, a doc mirrored under a tag, or a tagWrapper child.
+   * Null/omitted for main hierarchy rows (treat omit as null).
+   */
+  tagId?: string | null | undefined
   worldColor: string
   worldId: string
   /** Set on templatePlacement and addNewDocument rows. */
@@ -277,3 +314,17 @@ export type I_faProjectHierarchyTreePlacementAddNewSource = Pick<
   | 'worldColor'
   | 'worldId'
 >
+
+/** Placement option for Add new document to this tag submenu. */
+export interface I_faProjectHierarchyTreeTagAddDocumentPlacementOption {
+  icon: string
+  label: string
+  nodeId: string
+  templateId: string
+  worldId: string
+}
+
+/** Optional preferred he-tree node id when resolving a document parent bucket. */
+export interface I_faProjectHierarchyTreeDocumentParentBucketLookupOptions {
+  preferredNodeId?: string | null | undefined
+}

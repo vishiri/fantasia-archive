@@ -179,9 +179,10 @@ export interface I_faActionPayloadMap {
     direction: 'asc' | 'desc'
     documentId?: string | null | undefined
     key: 'name' | 'customOrder'
-    nodeKind: 'document' | 'templatePlacement'
+    nodeKind: 'document' | 'templatePlacement' | 'tag'
     placementId: string
     scope: 'direct' | 'recursive'
+    tagId?: string | null | undefined
   }
   focusPreviousOpenedDocumentTab: void
   focusNextOpenedDocumentTab: void

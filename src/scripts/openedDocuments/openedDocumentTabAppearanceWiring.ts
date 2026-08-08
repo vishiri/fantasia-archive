@@ -1,6 +1,7 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import { computeOpenedDocumentHasUnsavedChanges } from './functions/openedDocumentTabAppearance'
+import { resolveOpenedDocumentTagsFingerprint } from './functions/openedDocumentTagsDomain'
 import { resolveOpenedDocumentTreeOrderNumberDraftForPersist } from './functions/openedDocumentTreeOrderNumber'
 
 export {
@@ -47,6 +48,8 @@ export function recomputeOpenedDocumentTabHasUnsavedChanges (
     ),
     savedTreeOrderNumber: tab.savedTreeOrderNumber,
     extraClassesDraft: tab.extraClassesDraft,
-    savedExtraClasses: tab.savedExtraClasses
+    savedExtraClasses: tab.savedExtraClasses,
+    tagsDraftFingerprint: resolveOpenedDocumentTagsFingerprint(tab.tagsDraft ?? []),
+    savedTagsFingerprint: resolveOpenedDocumentTagsFingerprint(tab.savedTags ?? [])
   })
 }

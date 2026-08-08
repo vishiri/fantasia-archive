@@ -36,6 +36,8 @@ const selectorList = {
   previewTitle: 'documentWorkspacePage-previewTitle',
   saveDocumentButton: 'projectAppControlBar-saveDocumentButton',
   saveDocumentKeepEditModeButton: 'projectAppControlBar-saveDocumentKeepEditModeButton',
+  tagsInput: 'documentWorkspacePage-tagsInput',
+  tagsLabel: 'documentWorkspacePage-tagsLabel',
   textColorInput: 'documentWorkspacePage-textColorInput'
 } as const
 
@@ -123,7 +125,8 @@ const sampleTabBase = {
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   extraClassesDraft: 'hero-extra',
   savedExtraClasses: 'hero-extra',
-  hasUnsavedChanges: false
+  hasUnsavedChanges: false,
+  worldId: DWP_WORLD_ID
 }
 
 function buildTab (
@@ -604,5 +607,105 @@ test.describe.serial('Document workspace page preview vs edit', () => {
     await expect(
       appWindow.locator('[data-test-locator="projectAppControlBar-tab-doc-hero"]')
     ).not.toHaveClass(/projectAppControlBarTabs__tab--withUnsavedAlert/)
+  })
+})
+
+test.describe.serial('Document workspace page Tags field', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.describe.configure({
+    timeout: 120_000
+  })
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
+    })
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
+  })
+
+  test('Check if preview mode shows Tags label with disabled tags input', async () => {
+    await openDocumentWorkspacePage(appWindow, false, {
+      savedTags: [{
+        id: 'tag-places',
+        name: 'Places'
+      }],
+      tagsDraft: [{
+        id: 'tag-places',
+        name: 'Places'
+      }]
+    })
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.tagsLabel}"]`)
+    ).toBeVisible()
+    const tagsInput = appWindow.locator(`[data-test-locator="${selectorList.tagsInput}"]`)
+    await expect(tagsInput).toBeVisible()
+    // Quasar puts data-test-locator on the native input; disable → HTML disabled (not aria-disabled).
+    await expect(tagsInput).toBeDisabled()
+  })
+
+  test('Check if edit mode shows seeded Tags chips and world tag options', async () => {
+    await openDocumentWorkspacePage(appWindow, true, {
+      savedTags: [{
+        id: 'tag-places',
+        name: 'Places'
+      }],
+      tagsDraft: [{
+        id: 'tag-places',
+        name: 'Places'
+      }]
+    }, {
+      projectContentOverrides: {
+        documentsById: documentContentOverrides.documentsById,
+        tagsByWorldId: {
+          [DWP_WORLD_ID]: [{
+            createdAtMs: 1,
+            id: 'tag-places',
+            name: 'Places',
+            updatedAtMs: 1,
+            worldId: DWP_WORLD_ID
+          }, {
+            createdAtMs: 1,
+            id: 'tag-people',
+            name: 'People',
+            updatedAtMs: 1,
+            worldId: DWP_WORLD_ID
+          }]
+        },
+        templatesById: documentContentOverrides.templatesById,
+        worldsById: documentContentOverrides.worldsById
+      }
+    })
+
+    const tagsInput = appWindow.locator(`[data-test-locator="${selectorList.tagsInput}"]`)
+    await expect(tagsInput).toBeVisible({ timeout: 15_000 })
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.tagsInput}-chip"]`).filter({ hasText: 'Places' })
+    ).toBeVisible()
+
+    await tagsInput.click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.tagsInput}-option-0"]`)
+    ).toBeVisible({ timeout: 15_000 })
   })
 })

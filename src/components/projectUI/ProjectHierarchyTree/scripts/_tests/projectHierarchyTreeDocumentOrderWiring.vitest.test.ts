@@ -1547,7 +1547,7 @@ test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop clears snapshot wh
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom handles missing host and row metadata', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
@@ -1778,7 +1778,7 @@ test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop keeps null snapsho
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling bucket order from DOM', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')
@@ -1939,7 +1939,7 @@ test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData skips non-siblin
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null for missing moved row and empty sibling ids', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
@@ -2004,7 +2004,7 @@ test('Test that document row drag hold timer no-ops when pointer already ended',
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips invalid rows and non-sibling DOM nodes', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')
@@ -2039,7 +2039,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips invalid ro
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when sibling bucket has no document ids', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const invalidDoc = buildDocumentNode({
     documentId: null,
@@ -2055,7 +2055,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null whe
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when moved row is absent from DOM bucket', async () => {
-  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderSupportWiring')
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDnDOrderDomWiring')
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
   const host = document.createElement('div')

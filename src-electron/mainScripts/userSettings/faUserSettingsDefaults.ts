@@ -18,6 +18,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   disableSpellCheck: false,
   disableStartUpdateCheckMessage: false,
   doubleDashDocCount: false,
+  extraTreePadding: false,
   forceSublevelCollapseInTree: false,
   hideAdvSearchCheatsheetButton: false,
   hideDeadCrossThrough: false,

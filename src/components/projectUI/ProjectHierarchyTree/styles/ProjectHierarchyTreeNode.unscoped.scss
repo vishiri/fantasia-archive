@@ -61,6 +61,21 @@
   }
 }
 
+.projectHierarchyTreeNode--tag,
+.projectHierarchyTreeNode--tagWrapper {
+  color: $projectHierarchyTree-documentRow-color;
+
+  .projectHierarchyTreeNode__icon {
+    --fa-color-glyph-base: #{$projectHierarchyTree-groupRow-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  .projectHierarchyTreeNode__label {
+    color: $projectHierarchyTree-documentRow-color;
+  }
+}
+
 .projectHierarchyTreeNode--world .projectHierarchyTreeNode__icon {
   margin-right: $projectHierarchyTree-nodeIcon-marginRight;
 }

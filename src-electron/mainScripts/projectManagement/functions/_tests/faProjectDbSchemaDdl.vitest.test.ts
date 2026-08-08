@@ -38,8 +38,8 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
     exec,
     pragma: vi.fn()
   })
-  expect(exec).toHaveBeenCalledTimes(3)
-  const sql = `${exec.mock.calls[0]![0] as string}${exec.mock.calls[1]![0] as string}${exec.mock.calls[2]![0] as string}`
+  expect(exec).toHaveBeenCalledTimes(4)
+  const sql = `${exec.mock.calls[0]![0] as string}${exec.mock.calls[1]![0] as string}${exec.mock.calls[2]![0] as string}${exec.mock.calls[3]![0] as string}`
   expect(sql).toContain(FA_PROJECT_TABLE_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_OPENED_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_WORLDS)
@@ -51,6 +51,9 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
   expect(sql).toContain('sort_order')
   expect(sql).toContain(FA_PROJECT_TABLE_DOCUMENT_TEMPLATES)
   expect(sql).toContain('document_media')
+  expect(sql).toContain('tags')
+  expect(sql).toContain('document_tags')
+  expect(sql).toContain('idx_tags_world_id_name_nocase')
   expect(sql).toContain('idx_worlds_sort_order')
   expect(sql).toContain('world_template_groups')
   expect(sql).toContain('world_template_placements')

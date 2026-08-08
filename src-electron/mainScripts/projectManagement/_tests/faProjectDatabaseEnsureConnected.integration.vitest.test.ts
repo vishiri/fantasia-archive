@@ -40,7 +40,12 @@ vi.mock('../faProjectDbMigrateWiring', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../faProjectDbMigrateWiring')>()
   return {
     ...mod,
-    applyFaProjectMigrations: applyMigrationsMock,
+    applyFaProjectMigrations: applyMigrationsMock
+  }
+})
+
+vi.mock('../faProjectDbMigrateMetaWiring', () => {
+  return {
     assertFaProjectDatabaseQuickCheck: quickCheckMock
   }
 })

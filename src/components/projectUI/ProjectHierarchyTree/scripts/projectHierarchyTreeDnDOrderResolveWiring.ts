@@ -4,6 +4,7 @@ import type {
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../functions/projectHierarchyTreeOrderedDocumentIdsEqual'
+import { pickFirstProjectHierarchyTreeSiblingOrder } from '../functions/projectHierarchyTreePickFirstSiblingOrder'
 import { readProjectHierarchyTreeDragSiblingOrderFromGetData } from './projectHierarchyTreeDnDOrderCaptureWiring'
 import {
   computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext,
@@ -12,29 +13,11 @@ import {
 } from './projectHierarchyTreeDnDOrderPostDropWiring'
 import {
   applyProjectHierarchyTreeSiblingOrderToTreeData,
-  readProjectHierarchyTreeDragSiblingOrderFromDom,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
 } from './projectHierarchyTreeDnDOrderSupportWiring'
+import { readProjectHierarchyTreeDragSiblingOrderFromDom } from './projectHierarchyTreeDnDOrderDomWiring'
 
 type T_dragSiblingOrderSource = 'computed' | 'dom' | 'getData' | 'parentStats' | 'treeData'
-
-function pickFirstSiblingOrder (candidates: Array<{
-  orderSource: T_dragSiblingOrderSource
-  orderedDocumentIds: string[] | null
-}>): {
-    orderSource: T_dragSiblingOrderSource | null
-    orderedDocumentIds: string[] | null
-  } {
-  for (const candidate of candidates) {
-    if (candidate.orderedDocumentIds !== null && candidate.orderedDocumentIds.length > 0) {
-      return candidate
-    }
-  }
-  return {
-    orderSource: null,
-    orderedDocumentIds: null
-  }
-}
 
 /**
  * Resolves sibling order at drag start from he-tree live data (stats) before capture.
@@ -43,6 +26,7 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAtDragStart (input: {
   documentId: string
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  preferredNodeId?: string | null | undefined
   treeData: I_faProjectHierarchyTreeHeTreeNode[]
 }): {
     domOrderedDocumentIds: string[] | null
@@ -51,21 +35,25 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAtDragStart (input: {
     orderedDocumentIds: string[] | null
     treeDataOrderedDocumentIds: string[] | null
   } {
+  const preferredNodeId = input.preferredNodeId ?? null
   const treeDataSnapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
     input.treeData,
-    input.documentId
+    input.documentId,
+    preferredNodeId
   )
   const treeDataOrderedDocumentIds = treeDataSnapshot?.orderedDocumentIds ?? null
   const getDataOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromGetData({
     documentId: input.documentId,
-    getTreeRef: input.getTreeRef
+    getTreeRef: input.getTreeRef,
+    preferredNodeId
   })
   const domOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromDom({
     getTreeScrollHost: input.getTreeScrollHost,
     movedDocumentId: input.documentId,
+    preferredNodeId,
     treeData: input.treeData
   })
-  const picked = pickFirstSiblingOrder([
+  const picked = pickFirstProjectHierarchyTreeSiblingOrder([
     {
       orderSource: 'getData',
       orderedDocumentIds: getDataOrderedDocumentIds
@@ -91,7 +79,8 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAtDragStart (input: {
     applyProjectHierarchyTreeSiblingOrderToTreeData(
       input.treeData,
       input.documentId,
-      picked.orderedDocumentIds
+      picked.orderedDocumentIds,
+      preferredNodeId
     )
   }
   return {
@@ -104,13 +93,15 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAtDragStart (input: {
 }
 
 /**
- * Resolves post-drop sibling order; prefers visible DOM and he-tree stats over treeData/compute.
+ * Resolves post-drop sibling order; prefers he-tree drop stats/compute over DOM.
+ * DOM can still show the pre-drop placement duplicate for under-tag rows.
  */
 export function resolveProjectHierarchyTreeDragSiblingOrderAfterDrop (input: {
   dragStartOrderedDocumentIds: string[] | null
   documentId: string
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  preferredNodeId?: string | null | undefined
   treeData: I_faProjectHierarchyTreeHeTreeNode[]
 }): {
     computedOrderedDocumentIds: string[] | null
@@ -119,36 +110,39 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAfterDrop (input: {
     orderedDocumentIds: string[] | null
     parentStatsOrderedDocumentIds: string[] | null
   } {
+  const preferredNodeId = input.preferredNodeId ?? null
   const domOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromDom({
     getTreeScrollHost: input.getTreeScrollHost,
     movedDocumentId: input.documentId,
+    preferredNodeId,
     treeData: input.treeData
   })
   const parentStatsOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats()
   const getDataOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromGetData({
     documentId: input.documentId,
-    getTreeRef: input.getTreeRef
+    getTreeRef: input.getTreeRef,
+    preferredNodeId
   })
   const computedOrderedDocumentIds = computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext({
     dragStartOrderedDocumentIds: input.dragStartOrderedDocumentIds,
     movedDocumentId: input.documentId
   })
-  const picked = pickFirstSiblingOrder([
-    {
-      orderSource: 'dom',
-      orderedDocumentIds: domOrderedDocumentIds
-    },
+  const picked = pickFirstProjectHierarchyTreeSiblingOrder([
     {
       orderSource: 'parentStats',
       orderedDocumentIds: parentStatsOrderedDocumentIds
     },
     {
-      orderSource: 'getData',
-      orderedDocumentIds: getDataOrderedDocumentIds
-    },
-    {
       orderSource: 'computed',
       orderedDocumentIds: computedOrderedDocumentIds
+    },
+    {
+      orderSource: 'dom',
+      orderedDocumentIds: domOrderedDocumentIds
+    },
+    {
+      orderSource: 'getData',
+      orderedDocumentIds: getDataOrderedDocumentIds
     }
   ])
   return {
@@ -162,12 +156,15 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAfterDrop (input: {
 
 function buildDragSiblingOrderSnapshot (input: {
   orderedDocumentIds: string[]
+  preferredNodeId?: string | null | undefined
   treeData: I_faProjectHierarchyTreeHeTreeNode[]
   movedDocumentId: string
 }): I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null {
+  const preferredNodeId = input.preferredNodeId ?? null
   const treeDataSnapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
     input.treeData,
-    input.movedDocumentId
+    input.movedDocumentId,
+    preferredNodeId
   )
   if (treeDataSnapshot === null) {
     return null
@@ -178,7 +175,9 @@ function buildDragSiblingOrderSnapshot (input: {
   return {
     orderedDocumentIds: input.orderedDocumentIds,
     parentDocumentId,
-    placementId: treeDataSnapshot.placementId
+    placementId: treeDataSnapshot.placementId,
+    tagId: treeDataSnapshot.tagId ?? null,
+    treeNodeId: treeDataSnapshot.treeNodeId ?? preferredNodeId
   }
 }
 
@@ -190,6 +189,7 @@ export function syncProjectHierarchyTreeSiblingOrderAfterDrop (input: {
   draggedDocumentId: string | null
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  preferredNodeId?: string | null | undefined
   setDragSiblingOrderSnapshot: (
     value: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   ) => void
@@ -213,11 +213,13 @@ export function syncProjectHierarchyTreeSiblingOrderAfterDrop (input: {
       snapshot: null
     }
   }
+  const preferredNodeId = input.preferredNodeId ?? null
   const resolved = resolveProjectHierarchyTreeDragSiblingOrderAfterDrop({
     documentId: input.draggedDocumentId,
     dragStartOrderedDocumentIds: input.dragStartOrderedDocumentIds,
     getTreeRef: input.getTreeRef,
     getTreeScrollHost: input.getTreeScrollHost,
+    preferredNodeId,
     treeData: input.treeData
   })
   const orderedDocumentIds = resolved.orderedDocumentIds
@@ -226,7 +228,8 @@ export function syncProjectHierarchyTreeSiblingOrderAfterDrop (input: {
     patched = applyProjectHierarchyTreeSiblingOrderToTreeData(
       input.treeData,
       input.draggedDocumentId,
-      orderedDocumentIds
+      orderedDocumentIds,
+      preferredNodeId
     )
   }
   const snapshot = orderedDocumentIds === null
@@ -234,6 +237,7 @@ export function syncProjectHierarchyTreeSiblingOrderAfterDrop (input: {
     : buildDragSiblingOrderSnapshot({
       movedDocumentId: input.draggedDocumentId,
       orderedDocumentIds,
+      preferredNodeId,
       treeData: input.treeData
     })
   input.setDragSiblingOrderSnapshot(snapshot)

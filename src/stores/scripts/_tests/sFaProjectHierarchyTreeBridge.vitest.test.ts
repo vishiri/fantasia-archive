@@ -196,19 +196,68 @@ test('Test that faProjectHierarchyTreeRefreshLayoutFromBridge returns layout fro
         groups: [],
         id: 'world-1',
         placements: [],
-        sortOrder: 0
+        sortOrder: 0,
+        tags: []
       }
     ]
   })
 })
 
 /**
- * faProjectHierarchyTreeRefreshLayoutFromBridge returns null when API is missing.
+ * faProjectHierarchyTreeRefreshLayoutFromBridge attaches tags when the bridge API exists.
+ */
+test('Test that faProjectHierarchyTreeRefreshLayoutFromBridge attaches world tags', async () => {
+  const listTagsWithDocumentCountsForWorld = vi.fn(async () => ({
+    items: [{
+      categoryCount: 0,
+      documentCount: 2,
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  }))
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    listTagsWithDocumentCountsForWorld
+  })
+  const { faProjectHierarchyTreeRefreshLayoutFromBridge } = await import('../sFaProjectHierarchyTreeBridge')
+  const layout = await faProjectHierarchyTreeRefreshLayoutFromBridge()
+  expect(listTagsWithDocumentCountsForWorld).toHaveBeenCalledWith({ worldId: 'world-1' })
+  expect(layout?.worlds[0]?.tags).toEqual([{
+    categoryCount: 0,
+    documentCount: 2,
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+})
+
+/**
+ * faProjectHierarchyTreeRefreshLayoutFromBridge keeps empty tags when tag list fails.
+ */
+test('Test that faProjectHierarchyTreeRefreshLayoutFromBridge handles tag list failures', async () => {
+  const listTagsWithDocumentCountsForWorld = vi.fn(async () => {
+    throw new Error('tags failed')
+  })
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    listTagsWithDocumentCountsForWorld
+  })
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const { faProjectHierarchyTreeRefreshLayoutFromBridge } = await import('../sFaProjectHierarchyTreeBridge')
+  const layout = await faProjectHierarchyTreeRefreshLayoutFromBridge()
+  expect(layout?.worlds[0]?.tags).toEqual([])
+  expect(errorSpy).toHaveBeenCalled()
+  errorSpy.mockRestore()
+})
+
+/**
+ * faProjectHierarchyTreeRefreshLayoutFromBridge returns null when layout API is missing.
+ * Keeps prior store worlds/tree instead of applying an empty wipe.
  */
 test('Test that faProjectHierarchyTreeRefreshLayoutFromBridge returns null when API is missing', async () => {
   Object.assign(window.faContentBridgeAPIs, { projectContent: {} })
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const { faProjectHierarchyTreeRefreshLayoutFromBridge } = await import('../sFaProjectHierarchyTreeBridge')
   await expect(faProjectHierarchyTreeRefreshLayoutFromBridge()).resolves.toBeNull()
+  expect(errorSpy).toHaveBeenCalled()
+  errorSpy.mockRestore()
 })
 
 /**

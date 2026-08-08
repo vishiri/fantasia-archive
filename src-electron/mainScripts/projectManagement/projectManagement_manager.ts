@@ -41,12 +41,12 @@ export {
   FaProjectOpenRejectedAlreadyActiveError
 } from './faProjectOpenAlreadyActiveWiring'
 
+export { applyFaProjectMigrations } from './faProjectDbMigrateWiring'
 export {
-  applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrateWiring'
+} from './faProjectDbMigrateMetaWiring'
 
 export {
   deleteFaProjectNoteboardFrameKv,

@@ -82,6 +82,27 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   })
   await projectContentAPI.listDocumentMedia(SAMPLE_UUID)
 
+  await projectContentAPI.listTagsForWorld({ worldId: SAMPLE_UUID })
+  await projectContentAPI.listTagsWithDocumentCountsForWorld({ worldId: SAMPLE_UUID })
+  await projectContentAPI.listDocumentTags({ documentId: SAMPLE_UUID })
+  await projectContentAPI.listDocumentsUnderTag({ tagId: SAMPLE_UUID })
+  await projectContentAPI.setDocumentTags({
+    documentId: SAMPLE_UUID,
+    tags: [{
+      id: SAMPLE_UUID,
+      name: 'Heroes'
+    }]
+  })
+  await projectContentAPI.reorderDocumentsUnderTag({
+    tagId: SAMPLE_UUID,
+    orderedDocumentIds: [SAMPLE_UUID]
+  })
+  await projectContentAPI.renameTag({
+    tagId: SAMPLE_UUID,
+    newName: 'Villains'
+  })
+  await projectContentAPI.deleteTag({ tagId: SAMPLE_UUID })
+
   await projectContentAPI.listWorkspaceHierarchyLayout()
   await projectContentAPI.listPlacementDocumentChildren({
     placementId: SAMPLE_UUID
@@ -144,6 +165,50 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync,
     { documentId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listTagsForWorldAsync,
+    { worldId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listTagsWithDocumentCountsForWorldAsync,
+    { worldId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listDocumentTagsAsync,
+    { documentId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listDocumentsUnderTagAsync,
+    { tagId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.setDocumentTagsAsync,
+    {
+      documentId: SAMPLE_UUID,
+      tags: [{
+        id: SAMPLE_UUID,
+        name: 'Heroes'
+      }]
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.reorderDocumentsUnderTagAsync,
+    {
+      tagId: SAMPLE_UUID,
+      orderedDocumentIds: [SAMPLE_UUID]
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.renameTagAsync,
+    {
+      tagId: SAMPLE_UUID,
+      newName: 'Villains'
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.deleteTagAsync,
+    { tagId: SAMPLE_UUID }
   )
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync,

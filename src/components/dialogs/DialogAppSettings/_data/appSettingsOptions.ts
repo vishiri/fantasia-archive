@@ -73,6 +73,10 @@ I_appSettingsStaticOption
     category: 'accessibility',
     subcategory: 'accessibility'
   },
+  extraTreePadding: {
+    category: 'hierarchicalTree',
+    subcategory: 'treeBehavior'
+  },
   forceSublevelCollapseInTree: {
     category: 'hierarchicalTree',
     subcategory: 'treeBehavior'

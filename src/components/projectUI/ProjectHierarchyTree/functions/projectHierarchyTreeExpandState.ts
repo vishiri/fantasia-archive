@@ -14,7 +14,8 @@ export function shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse (
   return nodeKind === 'world' ||
     nodeKind === 'group' ||
     nodeKind === 'templatePlacement' ||
-    nodeKind === 'document'
+    nodeKind === 'document' ||
+    nodeKind === 'tagWrapper'
 }
 
 /**
@@ -160,11 +161,16 @@ export function expandProjectHierarchyTreeExpandedNodeIdsWithAncestors (
 
 /**
  * Clears loaded document subtrees when a node collapses.
+ * Structural rows (world, group, tagWrapper) keep children — no IPC reload path for those.
  */
 export function evictCollapsedNodeChildren (
   node: I_faProjectHierarchyTreeHeTreeNode
 ): void {
-  if (node.nodeKind === 'world' || node.nodeKind === 'group') {
+  if (
+    node.nodeKind === 'world' ||
+    node.nodeKind === 'group' ||
+    node.nodeKind === 'tagWrapper'
+  ) {
     return
   }
   node.children = []

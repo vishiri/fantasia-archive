@@ -4,117 +4,69 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { isProjectHierarchyTreeDocumentSiblingRow } from '../functions/projectHierarchyTreeDnD'
 import { findProjectHierarchyTreeDocumentParentBucket } from '../functions/projectHierarchyTreeDocumentParentBucket'
-import {
-  resolveProjectHierarchyTreeScrollHostForDomRead
-} from './projectHierarchyTreeExpandDomWiring'
 import { ensureProjectHierarchyTreeAddNewNodePinnedToBottom } from './projectHierarchyTreeAddNewDocumentNode'
-
-function readProjectHierarchyTreeNodeIdFromDocumentRow (row: Element): string | null {
-  const nodeElement = row.querySelector('[data-test-hierarchy-node-id]')
-  if (!(nodeElement instanceof HTMLElement)) {
-    return null
-  }
-  const nodeId = nodeElement.getAttribute('data-test-hierarchy-node-id')
-  if (nodeId === null || nodeId.length === 0) {
-    return null
-  }
-  return nodeId
-}
-
-/**
- * Reads post-drop document sibling order from visible he-tree DOM rows.
- * he-tree modify mode may not emit update:model-value and getData may be absent on the ref.
- */
-export function readProjectHierarchyTreeDragSiblingOrderFromDom (input: {
-  getTreeScrollHost: () => HTMLElement | null
-  movedDocumentId: string
-  treeData: I_faProjectHierarchyTreeHeTreeNode[]
-}): string[] | null {
-  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(
-    input.treeData,
-    input.movedDocumentId
-  )
-  if (parentBucket === null) {
-    return null
-  }
-  const siblingDocumentIds = new Set<string>()
-  for (const row of parentBucket.children) {
-    if (!isProjectHierarchyTreeDocumentSiblingRow(row) || row.documentId === null) {
-      continue
-    }
-    siblingDocumentIds.add(row.documentId)
-  }
-  if (siblingDocumentIds.size === 0) {
-    return null
-  }
-  const host = resolveProjectHierarchyTreeScrollHostForDomRead(input.getTreeScrollHost())
-  if (host === null) {
-    return null
-  }
-  const searchRoot = host.querySelector('.projectHierarchyTree') ?? host
-  const documentRows = searchRoot.querySelectorAll(
-    '.projectHierarchyTree__nodeRow.projectHierarchyTree__nodeRow--document'
-  )
-  let movedTreeNode: Element | null = null
-  for (const row of documentRows) {
-    const nodeId = readProjectHierarchyTreeNodeIdFromDocumentRow(row)
-    if (nodeId === input.movedDocumentId) {
-      movedTreeNode = row.closest('.tree-node')
-      break
-    }
-  }
-  if (movedTreeNode === null || movedTreeNode.parentElement === null) {
-    return null
-  }
-  const orderedDocumentIds: string[] = []
-  for (const child of movedTreeNode.parentElement.children) {
-    if (!child.classList.contains('tree-node')) {
-      continue
-    }
-    const documentRow = child.querySelector('.projectHierarchyTree__nodeRow--document')
-    if (documentRow === null) {
-      continue
-    }
-    const nodeId = readProjectHierarchyTreeNodeIdFromDocumentRow(documentRow)
-    if (nodeId === null || !siblingDocumentIds.has(nodeId)) {
-      continue
-    }
-    orderedDocumentIds.push(nodeId)
-  }
-  if (orderedDocumentIds.length === 0) {
-    return null
-  }
-  return orderedDocumentIds
-}
 
 export function resolveProjectHierarchyTreeDragSiblingOrderSnapshot (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  documentId: string
+  documentId: string,
+  preferredNodeId: string | null = null
 ): I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null {
-  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(treeNodes, documentId)
+  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(
+    treeNodes,
+    documentId,
+    {
+      parentDocumentId: null,
+      parentNode: null
+    },
+    {
+      preferredNodeId
+    }
+  )
   if (parentBucket === null) {
     return null
   }
   const siblings = parentBucket.children.filter((row) => isProjectHierarchyTreeDocumentSiblingRow(row))
-  const movedNode = siblings.find((row) => row.id === documentId)
-  if (movedNode === undefined || movedNode.placementId === null) {
-    return null
-  }
+  // Parent-bucket lookup already matched this document sibling row.
+  const movedNode = siblings.find((row) => {
+    if (preferredNodeId !== null && preferredNodeId.length > 0) {
+      return row.id === preferredNodeId
+    }
+    return row.documentId === documentId || row.id === documentId
+  })!
   const orderedDocumentIds: string[] = []
   for (const sibling of siblings) {
     if (sibling.documentId !== null) {
       orderedDocumentIds.push(sibling.documentId)
     }
   }
+  if (
+    parentBucket.parentNode?.nodeKind === 'tag' &&
+    typeof movedNode.tagId === 'string' &&
+    movedNode.tagId.length > 0
+  ) {
+    return {
+      orderedDocumentIds,
+      parentDocumentId: null,
+      placementId: '',
+      tagId: movedNode.tagId,
+      treeNodeId: movedNode.id
+    }
+  }
+  if (movedNode.placementId === null) {
+    return null
+  }
   return {
     orderedDocumentIds,
     parentDocumentId: parentBucket.parentDocumentId,
-    placementId: movedNode.placementId
+    placementId: movedNode.placementId,
+    tagId: null,
+    treeNodeId: movedNode.id
   }
 }
 
 export function finalizeProjectHierarchyTreeDragSiblingOrderSnapshot (input: {
   documentId: string | null
+  preferredNodeId?: string | null | undefined
   setDragSiblingOrderSnapshot: (
     value: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   ) => void
@@ -126,7 +78,8 @@ export function finalizeProjectHierarchyTreeDragSiblingOrderSnapshot (input: {
   }
   const snapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
     input.treeNodes,
-    input.documentId
+    input.documentId,
+    input.preferredNodeId ?? null
   )
   input.setDragSiblingOrderSnapshot(snapshot)
   return snapshot
@@ -135,9 +88,20 @@ export function finalizeProjectHierarchyTreeDragSiblingOrderSnapshot (input: {
 export function applyProjectHierarchyTreeSiblingOrderToTreeData (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
   movedDocumentId: string,
-  orderedDocumentIds: string[]
+  orderedDocumentIds: string[],
+  preferredNodeId: string | null = null
 ): boolean {
-  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(treeNodes, movedDocumentId)
+  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(
+    treeNodes,
+    movedDocumentId,
+    {
+      parentDocumentId: null,
+      parentNode: null
+    },
+    {
+      preferredNodeId
+    }
+  )
   if (parentBucket === null) {
     return false
   }
@@ -158,9 +122,6 @@ export function applyProjectHierarchyTreeSiblingOrderToTreeData (
   }
   for (const row of siblingsByDocumentId.values()) {
     reorderedSiblingRows.push(row)
-  }
-  if (reorderedSiblingRows.length === 0) {
-    return false
   }
   let siblingIndex = 0
   for (let index = 0; index < parentBucket.children.length; index += 1) {
@@ -195,6 +156,7 @@ export function applyProjectHierarchyTreeDragCommitSiblingOrderPatch (input: {
   applyProjectHierarchyTreeSiblingOrderToTreeData(
     input.treeData,
     input.draggedDocumentId,
-    input.dragSiblingOrderSnapshot.orderedDocumentIds
+    input.dragSiblingOrderSnapshot.orderedDocumentIds,
+    input.dragSiblingOrderSnapshot.treeNodeId ?? null
   )
 }

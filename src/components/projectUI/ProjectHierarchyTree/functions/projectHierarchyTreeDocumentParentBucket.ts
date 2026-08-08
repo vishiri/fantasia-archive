@@ -1,7 +1,26 @@
 import type {
   I_faProjectHierarchyTreeDocumentParentBucket,
+  I_faProjectHierarchyTreeDocumentParentBucketLookupOptions,
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
+
+function isProjectHierarchyTreeDocumentParentBucketMatch (
+  node: I_faProjectHierarchyTreeHeTreeNode,
+  documentId: string,
+  preferredNodeId: string | null
+): boolean {
+  if (node.nodeKind !== 'document' || node.documentId === null) {
+    return false
+  }
+  const matchesDocument = node.documentId === documentId || node.id === documentId
+  if (!matchesDocument) {
+    return false
+  }
+  if (preferredNodeId === null || preferredNodeId.length === 0) {
+    return true
+  }
+  return node.id === preferredNodeId
+}
 
 export function findProjectHierarchyTreeDocumentParentBucket (
   nodes: I_faProjectHierarchyTreeHeTreeNode[],
@@ -12,14 +31,12 @@ export function findProjectHierarchyTreeDocumentParentBucket (
   } = {
     parentDocumentId: null,
     parentNode: null
-  }
+  },
+  options: I_faProjectHierarchyTreeDocumentParentBucketLookupOptions = {}
 ): I_faProjectHierarchyTreeDocumentParentBucket | null {
+  const preferredNodeId = options.preferredNodeId ?? null
   for (const node of nodes) {
-    if (
-      node.nodeKind === 'document' &&
-      node.documentId !== null &&
-      (node.documentId === documentId || node.id === documentId)
-    ) {
+    if (isProjectHierarchyTreeDocumentParentBucketMatch(node, documentId, preferredNodeId)) {
       return {
         children: nodes,
         parentDocumentId: parentContext.parentDocumentId,
@@ -33,7 +50,8 @@ export function findProjectHierarchyTreeDocumentParentBucket (
       {
         parentDocumentId,
         parentNode: node
-      }
+      },
+      options
     )
     if (nested !== null) {
       return nested

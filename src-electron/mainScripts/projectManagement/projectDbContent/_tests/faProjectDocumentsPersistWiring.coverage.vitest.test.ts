@@ -55,6 +55,13 @@ vi.mock('../faProjectDocumentsSqlWiring', () => {
   }
 })
 
+vi.mock('../faProjectTagsSqlHelpersWiring', () => {
+  return {
+    deleteFaProjectEmptyTagsByIds: vi.fn(),
+    listFaProjectTagIdsForDocument: vi.fn(() => [])
+  }
+})
+
 const { deleteFaProjectDocument, updateFaProjectDocument } = await import('../faProjectDocumentsPersistWiring')
 
 beforeEach(() => {

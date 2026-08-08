@@ -30,7 +30,7 @@ export function shouldReloadProjectHierarchyTreeNodeChildren (
   if (!node.hasChildren) {
     return false
   }
-  if (node.nodeKind !== 'templatePlacement' && node.nodeKind !== 'document') {
+  if (node.nodeKind !== 'templatePlacement' && node.nodeKind !== 'document' && node.nodeKind !== 'tag') {
     return false
   }
   return node.children.length === 0

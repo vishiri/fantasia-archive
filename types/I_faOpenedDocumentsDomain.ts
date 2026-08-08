@@ -1,3 +1,8 @@
+import type {
+  I_faProjectDocumentTagAssignmentInput,
+  I_faProjectDocumentTagRef
+} from 'app/types/I_faProjectTagDomain'
+
 /** How the workspace hierarchy tree requested opening a document tab. */
 export type T_faOpenedDocumentOpenMode = 'leftNavigate' | 'middleBackground'
 
@@ -40,6 +45,9 @@ export interface I_openedDocumentTabUnsavedCompareInput {
   savedTreeOrderNumber: number
   extraClassesDraft: string
   savedExtraClasses: string
+  /** Stable id-ordered tag membership fingerprint for dirty compare. */
+  tagsDraftFingerprint: string
+  savedTagsFingerprint: string
 }
 
 /** One open document tab in the workspace session. */
@@ -83,6 +91,10 @@ export interface I_faOpenedDocumentTab {
   /** Space-separated HTML class list for Custom Project CSS targeting. */
   extraClassesDraft: string
   savedExtraClasses: string
+  /** Tags field draft (FaSelectInput mode=tags object items). */
+  tagsDraft?: readonly I_faProjectDocumentTagAssignmentInput[] | undefined
+  /** Last saved tag membership (id + name). */
+  savedTags?: readonly I_faProjectDocumentTagRef[] | undefined
   hasUnsavedChanges: boolean
   /**
    * Per-tab workspace edit mode. false = preview (read-only presentation);
@@ -100,6 +112,8 @@ export interface I_faTemporaryOpenedDocumentCreateInput {
   documentId?: string | undefined
   openMode?: T_faOpenedDocumentOpenMode | undefined
   temporaryParentResolveDocumentIds?: readonly string[] | undefined
+  /** Prefill Tags draft (e.g. Add new document to this tag). */
+  initialTagsDraft?: I_faProjectDocumentTagAssignmentInput[] | undefined
 }
 
 /** Tree row metadata captured when a tab is opened from the hierarchy sidebar. */

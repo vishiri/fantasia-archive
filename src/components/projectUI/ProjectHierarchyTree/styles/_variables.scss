@@ -5,6 +5,8 @@
 /* COMPONENT - PROJECT HIERARCHY TREE */
 $projectHierarchyTree-addNewDocumentRow-color: fa-v('grey', $grey);
 $projectHierarchyTree-documentRow-color: fa-v('text-workspace-row', $text-workspace-row);
+$projectHierarchyTree-extraPadding-paddingLeft: 30px;
+$projectHierarchyTree-extraPadding-worldBleedPx: 18px;
 $projectHierarchyTree-groupRow-color: fa-v('primary-bright', $primary-bright);
 $projectHierarchyTree-groupRow-fontWeight: 700;
 $projectHierarchyTree-list-paddingBottom: 8px;

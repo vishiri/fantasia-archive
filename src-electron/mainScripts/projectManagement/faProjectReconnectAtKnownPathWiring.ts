@@ -5,10 +5,8 @@ import {
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
 } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
-import {
-  applyFaProjectMigrations,
-  assertFaProjectDatabaseQuickCheck
-} from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring'
+import { applyFaProjectMigrations } from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring'
+import { assertFaProjectDatabaseQuickCheck } from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrateMetaWiring'
 import { faDisplayNameFallbackFromProjectPath } from './projectManagementSharedPathWiring'
 import { resolveHardenedFaProjectFilePath } from './faProjectFilePathHardeningWiring'
 

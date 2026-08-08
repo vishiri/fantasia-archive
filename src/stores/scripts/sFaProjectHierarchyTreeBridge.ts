@@ -6,6 +6,11 @@ import type {
   I_faProjectHierarchyTreeWorkspaceLayoutResult
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import {
+  listFaProjectTagsWithDocumentCountsForWorldForRenderer,
+  listFaProjectWorkspaceHierarchyLayoutForRenderer
+} from 'app/src/scripts/componentTesting/faComponentTestingProjectContentTagsOverridesWiring'
+
 const EMPTY_UI_STATE: I_faProjectHierarchyTreeUiState = {
   expandedNodeIds: [],
   schemaVersion: 1,
@@ -61,24 +66,47 @@ export async function faProjectHierarchyTreePersistUiStatePatchFromBridge (
 }
 
 /**
- * Loads workspace hierarchy layout skeleton via projectContent bridge.
+ * Loads workspace hierarchy layout skeleton via projectContent bridge,
+ * then attaches per-world tags with document counts.
  */
 export async function faProjectHierarchyTreeRefreshLayoutFromBridge (): Promise<
 I_faProjectHierarchyTreeWorkspaceLayoutResult | null
 > {
-  const api = window.faContentBridgeAPIs?.projectContent
-  if (typeof api?.listWorkspaceHierarchyLayout !== 'function') {
-    return null
-  }
   const readResult = await ResultAsync.fromPromise(
-    api.listWorkspaceHierarchyLayout(),
+    listFaProjectWorkspaceHierarchyLayoutForRenderer(),
     (error): unknown => error
   )
   if (readResult.isErr()) {
     console.error('[S_FaProjectHierarchyTree] listWorkspaceHierarchyLayout failed', readResult.error)
     return null
   }
-  return readResult.value
+  const worlds = await Promise.all(readResult.value.worlds.map(async (world) => {
+    const tagsResult = await ResultAsync.fromPromise(
+      listFaProjectTagsWithDocumentCountsForWorldForRenderer({ worldId: world.id }),
+      (error): unknown => error
+    )
+    if (tagsResult.isErr()) {
+      console.error('[S_FaProjectHierarchyTree] listTagsWithDocumentCountsForWorld failed', tagsResult.error)
+      return {
+        ...world,
+        tags: world.tags ?? []
+      }
+    }
+    return {
+      ...world,
+      tags: tagsResult.value.items.map((item) => {
+        return {
+          categoryCount: item.categoryCount,
+          documentCount: item.documentCount,
+          id: item.id,
+          name: item.name
+        }
+      })
+    }
+  }))
+  return {
+    worlds
+  }
 }
 
 export function createEmptyProjectHierarchyTreeUiState (): I_faProjectHierarchyTreeUiState {

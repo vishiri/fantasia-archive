@@ -10,9 +10,11 @@ vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
       getPersistedScrollTopPx: () => number
       getTreeScrollHost: () => HTMLElement | null
       queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+      refreshHierarchyTreeNodes: (nodeIds: string[]) => void
       requestAnimationFrame: (callback: () => void) => number
     }) => {
       deps.queuePersistExpandedNodeIds(['world-1'])
+      deps.refreshHierarchyTreeNodes(['tag-1'])
       expect(deps.getPersistedScrollTopPx()).toBe(42)
       expect(deps.getTreeScrollHost()).toBeInstanceOf(HTMLElement)
       deps.requestAnimationFrame(() => undefined)
@@ -25,6 +27,7 @@ vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
 
 test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistExpandedNodeIds', () => {
   const queuePersistExpandedNodeIds = vi.fn()
+  const refreshHierarchyTreeNodes = vi.fn()
   const host = document.createElement('div')
   const wiring = createProjectHierarchyTreeSessionHandlersBindWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
@@ -58,6 +61,9 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
         runDeferredLazyLoadBatch: vi.fn(async (runBatch: () => Promise<void>) => {
           await runBatch()
         }),
+        syncWiring: {
+          resyncTreeDataFromLayout: vi.fn()
+        },
         uiStateWiring: {
           awaitHeTreeResyncIdle: vi.fn(async () => {}),
           isProgrammaticHeTreeResyncActive: () => false,
@@ -71,6 +77,8 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
     } as never,
     hierarchyStore: {
       queuePersistExpandedNodeIds,
+      refreshHierarchyTreeNodes,
+      refreshLayout: vi.fn(async () => {}),
       uiState: { scrollTopPx: 42 }
     },
     nextTick: async () => {},
@@ -81,5 +89,6 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
   })
 
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
+  expect(refreshHierarchyTreeNodes).toHaveBeenCalledWith(['tag-1'])
   expect(wiring.onNodeRowContextMenu).toBeDefined()
 })

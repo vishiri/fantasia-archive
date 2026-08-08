@@ -5,9 +5,14 @@ import { FA_PROJECT_CONTENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 const { handleMock, runWithDbMock, SAMPLE_UUID_HOISTED } = vi.hoisted(() => ({
   handleMock: vi.fn(),
   runWithDbMock: vi.fn(async (_event: unknown, work: (db: unknown) => unknown) => {
+    const db = {
+      transaction: (fn: () => unknown) => {
+        return () => fn()
+      }
+    }
     return {
       ok: true as const,
-      value: await work({})
+      value: await work(db)
     }
   }),
   SAMPLE_UUID_HOISTED: '550e8400-e29b-41d4-a716-446655440000'
@@ -83,6 +88,43 @@ vi.mock(
 )
 
 vi.mock(
+  'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectTagsQueryWiring',
+  () => ({
+    listFaProjectTagsForWorld: vi.fn(() => ({ items: [] })),
+    listFaProjectTagsWithDocumentCountsForWorld: vi.fn(() => ({ items: [] })),
+    listFaProjectDocumentTags: vi.fn(() => ({ items: [] })),
+    listFaProjectDocumentsUnderTag: vi.fn(() => ({ items: [] })),
+    getFaProjectTagById: vi.fn(() => ({
+      id: SAMPLE_UUID_HOISTED,
+      worldId: SAMPLE_UUID_HOISTED,
+      name: 'Stub',
+      createdAtMs: 0,
+      updatedAtMs: 0
+    }))
+  })
+)
+
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectTagsPersistWiring',
+  () => ({
+    setFaProjectDocumentTags: vi.fn(() => ({ items: [] })),
+    reorderFaProjectDocumentsUnderTag: vi.fn(),
+    renameFaProjectTag: vi.fn(() => ({
+      tag: {
+        id: SAMPLE_UUID_HOISTED,
+        worldId: SAMPLE_UUID_HOISTED,
+        name: 'Stub',
+        createdAtMs: 0,
+        updatedAtMs: 0
+      },
+      merged: false,
+      mergedFromTagId: null
+    })),
+    deleteFaProjectTag: vi.fn()
+  })
+)
+
+vi.mock(
   'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectHierarchyTreePersistWiring',
   () => ({
     listFaProjectWorkspaceHierarchyLayout: vi.fn(() => ({ worlds: [] })),
@@ -111,9 +153,14 @@ beforeEach(() => {
   handleMock.mockReset()
   runWithDbMock.mockReset()
   runWithDbMock.mockImplementation(async (_event: unknown, work: (db: unknown) => unknown) => {
+    const db = {
+      transaction: (fn: () => unknown) => {
+        return () => fn()
+      }
+    }
     return {
       ok: true as const,
-      value: await work({})
+      value: await work(db)
     }
   })
 })
@@ -134,6 +181,9 @@ test('Test that registerFaProjectContentIpc registers all project content channe
   const channels = handleMock.mock.calls.map((call) => call[0]!)
   expect(channels).toContain(FA_PROJECT_CONTENT_IPC.createWorldAsync)
   expect(channels).toContain(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync)
+  expect(channels).toContain(FA_PROJECT_CONTENT_IPC.setDocumentTagsAsync)
+  expect(channels).toContain(FA_PROJECT_CONTENT_IPC.renameTagAsync)
+  expect(channels).toContain(FA_PROJECT_CONTENT_IPC.deleteTagAsync)
   expect(channels.length).toBeGreaterThan(20)
 })
 
@@ -240,6 +290,29 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync)(event, { documentId: SAMPLE_UUID })
 
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listTagsForWorldAsync)(event, { worldId: SAMPLE_UUID })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listTagsWithDocumentCountsForWorldAsync)(event, {
+    worldId: SAMPLE_UUID
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentTagsAsync)(event, { documentId: SAMPLE_UUID })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentsUnderTagAsync)(event, { tagId: SAMPLE_UUID })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.setDocumentTagsAsync)(event, {
+    documentId: SAMPLE_UUID,
+    tags: [{
+      id: SAMPLE_UUID,
+      name: 'Heroes'
+    }]
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.reorderDocumentsUnderTagAsync)(event, {
+    tagId: SAMPLE_UUID,
+    orderedDocumentIds: [SAMPLE_UUID]
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.renameTagAsync)(event, {
+    tagId: SAMPLE_UUID,
+    newName: 'Villains'
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.deleteTagAsync)(event, { tagId: SAMPLE_UUID })
+
   await handlerFor(FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync)(event)
   await handlerFor(FA_PROJECT_CONTENT_IPC.listPlacementDocumentChildrenAsync)(event, {
     placementId: SAMPLE_UUID
@@ -251,7 +324,7 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   })
   await handlerFor(FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync)(event, { query: 'hero' })
 
-  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(33)
+  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(41)
 })
 
 /**

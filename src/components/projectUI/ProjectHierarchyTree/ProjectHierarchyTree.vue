@@ -17,7 +17,10 @@
         ref="treeComponentRef"
         :model-value="treeData"
         class="projectHierarchyTree hasScrollbar"
-        :class="treeRootClassList"
+        :class="[
+          treeRootClassList,
+          { 'projectHierarchyTree--extraPadding': usesExtraTreePadding }
+        ]"
         :default-open="false"
         :drag-open="isTreeDragActive"
         :drag-open-delay="PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS"
@@ -70,9 +73,9 @@
                 #documentButtonGroup
               >
                 <ProjectHierarchyTreeDocumentButtonGroup
-                  :shows-add-under="documentButtonVisibility.showsAddUnder"
-                  :shows-edit="documentButtonVisibility.showsEdit"
-                  :shows-open="documentButtonVisibility.showsOpen"
+                  :shows-add-under="resolveProjectHierarchyTreeDocumentButtonVisibilityForNode(node, documentButtonVisibility).showsAddUnder"
+                  :shows-edit="resolveProjectHierarchyTreeDocumentButtonVisibilityForNode(node, documentButtonVisibility).showsEdit"
+                  :shows-open="resolveProjectHierarchyTreeDocumentButtonVisibilityForNode(node, documentButtonVisibility).showsOpen"
                   @add-under-activate="onDocumentRowAddUnderButtonClick(node)"
                   @edit-activate="onDocumentRowEditButtonClick(node)"
                   @open-activate="onDocumentRowOpenButtonClick(node)"
@@ -82,28 +85,46 @@
           </div>
         </template>
       </Draggable>
-      <ProjectHierarchyTreeNodeContextMenu
-        v-model:is-open="isNodeContextMenuOpen"
+      <ProjectHierarchyTreeNodeMenusHost
+        v-model:is-node-context-menu-open="isNodeContextMenuOpen"
+        v-model:rename-tag-name-draft="renameTagNameDraft"
+        :add-document-placement-options="addDocumentPlacementOptions"
         :add-new-row-icon="contextMenuAddNewRowIcon"
         :add-new-row-label="contextMenuAddNewRowLabel"
         :anchor-node-id="contextMenuAnchorNodeId"
+        :delete-tag-confirm-open="deleteTagConfirmOpen"
+        :delete-tag-name="deleteTagName"
         :menu-pointer-position="nodeMenuPointerPosition"
         :on-add-new-click="onAddNewDocumentFromContextMenuClick"
+        :on-add-new-document-to-this-tag-click="onAddNewDocumentToThisTagFromContextMenuClick"
         :on-add-new-document-under-this-click="onAddNewDocumentUnderThisFromContextMenuClick"
         :on-collapse-all-click="onCollapseAllUnderNodeClick"
+        :on-confirm-delete-tag="onConfirmDeleteTag"
+        :on-confirm-rename-tag="onConfirmRenameTag"
         :on-copy-background-color-click="onCopyBackgroundColorFromContextMenuClick"
         :on-copy-document-click="onCopyDocumentFromContextMenuClick"
         :on-copy-name-click="onCopyNameFromContextMenuClick"
         :on-copy-text-color-click="onCopyTextColorFromContextMenuClick"
         :on-delete-document-click="onDeleteDocumentFromContextMenuClick"
+        :on-delete-tag-click="onDeleteTagFromContextMenuClick"
+        :on-dismiss-delete-tag-dialog="onDismissDeleteTagDialog"
+        :on-dismiss-rename-tag-dialog="onDismissRenameTagDialog"
         :on-edit-document-click="onEditDocumentFromContextMenuClick"
         :on-expand-all-click="onExpandAllUnderNodeClick"
         :on-hide="onNodeContextMenuHide"
         :on-open-document-click="onOpenDocumentFromContextMenuClick"
+        :on-rename-tag-click="onRenameTagFromContextMenuClick"
         :on-sort-by-item-click="onSortByItemFromContextMenuClick"
+        :rename-tag-can-confirm="renameTagCanConfirm"
+        :rename-tag-current-name="renameTagCurrentName"
+        :rename-tag-dialog-open="renameTagDialogOpen"
+        :rename-tag-merge-warning="renameTagMergeWarning"
         :shows-bulk-expand-rows="contextMenuShowsBulkExpandRows"
         :shows-copy-rows="contextMenuShowsCopyRows"
+        :shows-document-open-edit-rows="contextMenuShowsDocumentOpenEditRows"
         :shows-sort-by-rows="contextMenuShowsSortByRows"
+        :sort-by-direct-scope-only="contextMenuSortByDirectScopeOnly"
+        :shows-tag-menu-rows="contextMenuShowsTagMenuRows"
       />
     </div>
   </div>
@@ -116,7 +137,7 @@ import '@he-tree/vue/style/default.css'
 
 import ProjectHierarchyTreeDocumentButtonGroup from './ProjectHierarchyTreeDocumentButtonGroup.vue'
 import ProjectHierarchyTreeNode from './ProjectHierarchyTreeNode.vue'
-import ProjectHierarchyTreeNodeContextMenu from './ProjectHierarchyTreeNodeContextMenu.vue'
+import ProjectHierarchyTreeNodeMenusHost from './ProjectHierarchyTreeNodeMenusHost.vue'
 import ProjectHierarchyTreeOpenIcon from './ProjectHierarchyTreeOpenIcon.vue'
 import ProjectHierarchyTreeProjectNameTitle from './ProjectHierarchyTreeProjectNameTitle.vue'
 import type {
@@ -129,33 +150,35 @@ import {
   PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX
 } from './functions/projectHierarchyTreeConstants'
 import { projectHierarchyTreeNodeShowsOpenIcon } from './functions/projectHierarchyTreeDocumentHasChildrenSync'
-import { projectHierarchyTreeNodeShowsDocumentButtonGroup } from './functions/projectHierarchyTreeDocumentButtonVisibility'
+import { projectHierarchyTreeNodeShowsDocumentButtonGroup, resolveProjectHierarchyTreeDocumentButtonVisibilityForNode } from './functions/projectHierarchyTreeDocumentButtonVisibility'
 import { resolveProjectHierarchyTreeNodeRowKindClass } from './functions/projectHierarchyTreeTreeNodeKindClass'
 import { useProjectHierarchyTree } from './scripts/projectHierarchyTree_manager'
 
-defineOptions({
-  name: 'ProjectHierarchyTree'
-})
-
+defineOptions({ name: 'ProjectHierarchyTree' })
 const emit = defineEmits<{
   'document-open-request': [
     documentId: string,
-  mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
+    mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
     treeMeta: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTreeOpenMeta
   ]
 }>()
-
 const treeScrollHostRef = ref<HTMLElement | null>(null)
 const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
 
 const {
   activeDocumentId,
+  addDocumentPlacementOptions,
   contextMenuAddNewRowIcon,
   contextMenuAddNewRowLabel,
   contextMenuAnchorNodeId,
   contextMenuShowsBulkExpandRows,
   contextMenuShowsCopyRows,
+  contextMenuShowsDocumentOpenEditRows,
   contextMenuShowsSortByRows,
+  contextMenuSortByDirectScopeOnly,
+  contextMenuShowsTagMenuRows,
+  deleteTagConfirmOpen,
+  deleteTagName,
   documentButtonVisibility,
   eachDraggableHandler,
   eachDroppableHandler,
@@ -166,13 +189,19 @@ const {
   isTreeDragActive,
   nodeMenuPointerPosition,
   onAddNewDocumentFromContextMenuClick,
+  onAddNewDocumentToThisTagFromContextMenuClick,
   onAddNewDocumentUnderThisFromContextMenuClick,
   onCollapseAllUnderNodeClick,
+  onConfirmDeleteTag,
+  onConfirmRenameTag,
   onCopyBackgroundColorFromContextMenuClick,
   onCopyDocumentFromContextMenuClick,
   onCopyNameFromContextMenuClick,
   onCopyTextColorFromContextMenuClick,
   onDeleteDocumentFromContextMenuClick,
+  onDeleteTagFromContextMenuClick,
+  onDismissDeleteTagDialog,
+  onDismissRenameTagDialog,
   onDocumentRowAddUnderButtonClick,
   onDocumentRowAuxClick,
   onDocumentRowEditButtonClick,
@@ -185,7 +214,13 @@ const {
   onNodeOpen,
   onNodeRowContextMenu,
   onOpenDocumentFromContextMenuClick,
+  onRenameTagFromContextMenuClick,
   onSortByItemFromContextMenuClick,
+  renameTagCanConfirm,
+  renameTagCurrentName,
+  renameTagDialogOpen,
+  renameTagMergeWarning,
+  renameTagNameDraft,
   onNonWorldOpenIconClick,
   onNonWorldOpenIconPointerDown,
   onWorldNodeRowClick,
@@ -205,24 +240,16 @@ const {
   showsTreeLines,
   treeData,
   treeRootClassList,
-  treeStyle
+  treeStyle,
+  usesExtraTreePadding
 } = useProjectHierarchyTree({
   onDocumentOpenRequest: (documentId, mode, treeMeta) => {
     emit('document-open-request', documentId, mode, treeMeta)
   }
 })
 
-watch(treeScrollHostRef, (element) => {
-  setTreeScrollHostRef(element)
-}, {
-  immediate: true
-})
-
-watch(treeComponentRef, (instance) => {
-  setTreeComponentRef(instance)
-}, {
-  immediate: true
-})
+watch(treeScrollHostRef, (element) => { setTreeScrollHostRef(element) }, { immediate: true })
+watch(treeComponentRef, (instance) => { setTreeComponentRef(instance) }, { immediate: true })
 </script>
 
 <style lang="scss" src="./styles/ProjectHierarchyTree.unscoped.scss"></style>

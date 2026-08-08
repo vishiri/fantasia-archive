@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 
 import type {
+  I_faOpenedDocumentTab,
   I_faOpenedDocumentTreeOpenMeta,
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
@@ -22,14 +23,17 @@ import { createProjectHierarchyTreeSessionHandlersClickWiring } from './projectH
 import { createProjectHierarchyTreeSessionBulkContextMenuWiring } from './projectHierarchyTreeSessionBulkContextMenuWiring'
 
 type T_projectHierarchyTreeSessionHandlersWiringDeps = {
+  applyOpenedDocumentTabs?: ((tabs: I_faOpenedDocumentTab[]) => void) | undefined
   createTemporaryDocument: (input: {
     displayName: string
+    initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: T_faOpenedDocumentOpenMode
     parentDocumentId: null
     templateId: string
     worldId: string
   }) => Promise<string>
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  getOpenedDocumentTabs?: (() => readonly I_faOpenedDocumentTab[]) | undefined
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragContext: {
     dragNode: {
@@ -57,8 +61,11 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
     scheduleOpenIconExpandAnimation: (nodeId: string) => void
   }
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  refreshHierarchyTreeNodes?: ((nodeIds: string[]) => void) | undefined
+  refreshLayout?: (() => Promise<void>) | undefined
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   requestAnimationFrame: (callback: () => void) => number
+  resyncTreeDataFromLayout?: (() => void) | undefined
   runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
@@ -97,19 +104,32 @@ function buildProjectHierarchyTreeSessionHandlersReturn (input: {
     contextMenuAnchorNodeId: input.bulkContextMenuWiring.contextMenuAnchorNodeId,
     contextMenuShowsBulkExpandRows: input.bulkContextMenuWiring.contextMenuShowsBulkExpandRows,
     contextMenuShowsCopyRows: input.bulkContextMenuWiring.contextMenuShowsCopyRows,
+    contextMenuShowsDocumentOpenEditRows: input.bulkContextMenuWiring.contextMenuShowsDocumentOpenEditRows,
     contextMenuShowsSortByRows: input.bulkContextMenuWiring.contextMenuShowsSortByRows,
+    contextMenuSortByDirectScopeOnly: input.bulkContextMenuWiring.contextMenuSortByDirectScopeOnly,
+    contextMenuShowsTagMenuRows: input.bulkContextMenuWiring.contextMenuShowsTagMenuRows,
+    addDocumentPlacementOptions: input.bulkContextMenuWiring.addDocumentPlacementOptions,
+    deleteTagConfirmOpen: input.bulkContextMenuWiring.deleteTagConfirmOpen,
+    deleteTagName: input.bulkContextMenuWiring.deleteTagName,
     isNodeContextMenuOpen: input.bulkContextMenuWiring.isNodeContextMenuOpen,
     nodeMenuPointerPosition: input.bulkContextMenuWiring.nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick: input.bulkContextMenuWiring.onAddNewDocumentFromContextMenuClick,
+    onAddNewDocumentToThisTagFromContextMenuClick:
+      input.bulkContextMenuWiring.onAddNewDocumentToThisTagFromContextMenuClick,
     onAddNewDocumentUnderThisFromContextMenuClick:
       input.bulkContextMenuWiring.onAddNewDocumentUnderThisFromContextMenuClick,
     onCollapseAllUnderNodeClick: input.bulkContextMenuWiring.onCollapseAllUnderNodeClick,
+    onConfirmDeleteTag: input.bulkContextMenuWiring.onConfirmDeleteTag,
+    onConfirmRenameTag: input.bulkContextMenuWiring.onConfirmRenameTag,
     onCopyBackgroundColorFromContextMenuClick:
       input.bulkContextMenuWiring.onCopyBackgroundColorFromContextMenuClick,
     onCopyDocumentFromContextMenuClick: input.bulkContextMenuWiring.onCopyDocumentFromContextMenuClick,
     onCopyNameFromContextMenuClick: input.bulkContextMenuWiring.onCopyNameFromContextMenuClick,
     onCopyTextColorFromContextMenuClick: input.bulkContextMenuWiring.onCopyTextColorFromContextMenuClick,
     onDeleteDocumentFromContextMenuClick: input.bulkContextMenuWiring.onDeleteDocumentFromContextMenuClick,
+    onDeleteTagFromContextMenuClick: input.bulkContextMenuWiring.onDeleteTagFromContextMenuClick,
+    onDismissDeleteTagDialog: input.bulkContextMenuWiring.onDismissDeleteTagDialog,
+    onDismissRenameTagDialog: input.bulkContextMenuWiring.onDismissRenameTagDialog,
     onDocumentRowAuxClick: input.clickHandlersWiring.onDocumentRowAuxClick,
     onEditDocumentFromContextMenuClick: input.bulkContextMenuWiring.onEditDocumentFromContextMenuClick,
     onExpandAllUnderNodeClick: input.bulkContextMenuWiring.onExpandAllUnderNodeClick,
@@ -117,7 +137,13 @@ function buildProjectHierarchyTreeSessionHandlersReturn (input: {
     onNodeContextMenuHide: input.bulkContextMenuWiring.onNodeContextMenuHide,
     onNodeRowContextMenu: input.bulkContextMenuWiring.onNodeRowContextMenu,
     onOpenDocumentFromContextMenuClick: input.bulkContextMenuWiring.onOpenDocumentFromContextMenuClick,
+    onRenameTagFromContextMenuClick: input.bulkContextMenuWiring.onRenameTagFromContextMenuClick,
     onSortByItemFromContextMenuClick: input.bulkContextMenuWiring.onSortByItemFromContextMenuClick,
+    renameTagCanConfirm: input.bulkContextMenuWiring.renameTagCanConfirm,
+    renameTagCurrentName: input.bulkContextMenuWiring.renameTagCurrentName,
+    renameTagDialogOpen: input.bulkContextMenuWiring.renameTagDialogOpen,
+    renameTagMergeWarning: input.bulkContextMenuWiring.renameTagMergeWarning,
+    renameTagNameDraft: input.bulkContextMenuWiring.renameTagNameDraft,
     onNodeClose: input.expandHandlersWiring.onNodeClose,
     onNodeOpen: input.expandHandlersWiring.onNodeOpen,
     onNodeOpenIconClick: input.expandHandlersWiring.onNodeOpenIconClick,
@@ -170,14 +196,20 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     documentOpenHandlers
   })
   const bulkContextMenuWiring = createProjectHierarchyTreeSessionBulkContextMenuWiring({
+    applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs ?? (() => undefined),
+    createTemporaryDocument: deps.createTemporaryDocument,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getOpenedDocumentTabs: deps.getOpenedDocumentTabs ?? (() => []),
     getTreeRef: () => deps.treeComponentRef.value,
     lazyLoadWiring: deps.lazyLoadWiring,
     nextTick: deps.nextTick,
     onAddNewDocumentRowClick: addNewDocumentClickHandlers.onAddNewDocumentRowClick,
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    refreshHierarchyTreeNodes: deps.refreshHierarchyTreeNodes ?? (() => undefined),
+    refreshLayout: deps.refreshLayout ?? (async () => undefined),
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout ?? (() => undefined),
     runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.suppressTreeEmit,

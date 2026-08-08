@@ -849,7 +849,7 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace patches grouped placemen
 })
 
 /**
- * evictCollapsedNodeChildren leaves world and group structural children intact.
+ * evictCollapsedNodeChildren leaves world, group, and tagWrapper structural children intact.
  */
 test('Test that evictCollapsedNodeChildren no-ops for world and group nodes', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
@@ -862,6 +862,43 @@ test('Test that evictCollapsedNodeChildren no-ops for world and group nodes', ()
   evictCollapsedNodeChildren(placement)
   expect(world.children.length).toBe(childCount)
   expect(placement.children).toEqual([])
+})
+
+test('Test that evictCollapsedNodeChildren no-ops for tagWrapper structural children', () => {
+  const tagChild: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'tag-a',
+    label: 'A',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-a',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tagWrapper: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagChild],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1__tagWrapper',
+    label: 'Tags',
+    nodeKind: 'tagWrapper',
+    placementId: null,
+    tagId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  evictCollapsedNodeChildren(tagWrapper)
+  expect(tagWrapper.children).toHaveLength(1)
+  expect(tagWrapper.childrenLoaded).toBe(true)
+  expect(tagWrapper.children[0]?.id).toBe('tag-a')
 })
 
 /**
@@ -1903,7 +1940,9 @@ test('Test that resolveProjectHierarchyTreeTreeNodeKindClass maps node kinds', (
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('templatePlacement')).toBe('projectHierarchyTree-treeNode--documentTemplate')
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('document')).toBe('projectHierarchyTree-treeNode--document')
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('addNewDocument')).toBe('projectHierarchyTree-treeNode--addNewDocument')
-  expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(5)
+  expect(resolveProjectHierarchyTreeTreeNodeKindClass('tag')).toBe('projectHierarchyTree-treeNode--tag')
+  expect(resolveProjectHierarchyTreeTreeNodeKindClass('tagWrapper')).toBe('projectHierarchyTree-treeNode--tagWrapper')
+  expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(7)
 })
 
 /**
@@ -1915,7 +1954,9 @@ test('Test that resolveProjectHierarchyTreeNodeRowKindClass maps node kinds', ()
   expect(resolveProjectHierarchyTreeNodeRowKindClass('templatePlacement')).toBe('projectHierarchyTree__nodeRow--documentTemplate')
   expect(resolveProjectHierarchyTreeNodeRowKindClass('document')).toBe('projectHierarchyTree__nodeRow--document')
   expect(resolveProjectHierarchyTreeNodeRowKindClass('addNewDocument')).toBe('projectHierarchyTree__nodeRow--addNewDocument')
-  expect(PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST).toHaveLength(5)
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('tag')).toBe('projectHierarchyTree__nodeRow--tag')
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('tagWrapper')).toBe('projectHierarchyTree__nodeRow--tagWrapper')
+  expect(PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST).toHaveLength(7)
 })
 
 test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent flags world-level documents', () => {
@@ -1986,6 +2027,40 @@ test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent acce
     worldId: 'world-1'
   }
   expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([placementNode])).toEqual([])
+})
+
+test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent accepts tag children', () => {
+  const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-under-tag',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'tag-1__doc__doc-under-tag',
+    label: 'Tagged',
+    nodeKind: 'document',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [documentNode],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Tag',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([tagNode])).toEqual([])
 })
 
 test('Test that mapHierarchyDocumentChildrenToTreeNodes sorts rows by sortOrder', () => {
@@ -2227,7 +2302,9 @@ test('Test that resolveProjectHierarchyTreeDragSiblingOrderSnapshot reads siblin
   expect(snapshot).toEqual({
     orderedDocumentIds: ['doc-2', 'doc-1'],
     parentDocumentId: null,
-    placementId: 'placement-1'
+    placementId: 'placement-1',
+    tagId: null,
+    treeNodeId: 'doc-1'
   })
 })
 

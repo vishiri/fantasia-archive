@@ -116,6 +116,16 @@ test('Test that createFaProjectContentBridgeHarnessStub list methods return expe
     items: [stubWorldForSettingsShape]
   })
   await expect(api.listDocumentTemplatesForProjectSettings()).resolves.toEqual(emptyList)
+  await expect(api.listTagsForWorld({ worldId: STUB_UUID })).resolves.toEqual(emptyList)
+  await expect(api.listTagsWithDocumentCountsForWorld({ worldId: STUB_UUID })).resolves.toEqual(
+    emptyList
+  )
+  await expect(api.listDocumentTags({ documentId: STUB_UUID })).resolves.toEqual(emptyList)
+  await expect(api.listDocumentsUnderTag({ tagId: STUB_UUID })).resolves.toEqual(emptyList)
+  await expect(api.setDocumentTags({
+    documentId: STUB_UUID,
+    tags: []
+  })).resolves.toEqual(emptyList)
 })
 
 /**
@@ -151,6 +161,33 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
       titleSingularTranslations: {},
     }
   ])).resolves.toBeUndefined()
+  await expect(api.reorderDocumentsUnderTag({
+    tagId: STUB_UUID,
+    orderedDocumentIds: [STUB_UUID]
+  })).resolves.toBeUndefined()
+  await expect(api.deleteTag({ tagId: STUB_UUID })).resolves.toBeUndefined()
+})
+
+/**
+ * createFaProjectContentBridgeHarnessStub
+ * Tag rename returns a fixed non-merged stub tag result.
+ */
+test('Test that createFaProjectContentBridgeHarnessStub renameTag returns stub rename result', async () => {
+  const api = createFaProjectContentBridgeHarnessStub()
+  await expect(api.renameTag({
+    tagId: STUB_UUID,
+    newName: 'Renamed'
+  })).resolves.toEqual({
+    tag: {
+      id: STUB_UUID,
+      worldId: STUB_UUID,
+      name: 'Stub',
+      createdAtMs: 0,
+      updatedAtMs: 0
+    },
+    merged: false,
+    mergedFromTagId: null
+  })
 })
 
 /**

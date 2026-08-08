@@ -1,4 +1,5 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectDocumentTagAssignmentInput } from 'app/types/I_faProjectTagDomain'
 
 type T_normalizeOpenedDocumentNullableStringFromDb = (
   value: string | null | undefined
@@ -32,6 +33,7 @@ type T_temporaryOpenedDocumentTabSeedInput = {
   templateId: string
   temporaryParentResolveDocumentIds?: readonly string[] | undefined
   worldId: string
+  initialTagsDraft?: readonly I_faProjectDocumentTagAssignmentInput[] | undefined
 }
 
 /**
@@ -91,6 +93,8 @@ export function createCreateTemporaryOpenedDocumentTabCopySeed (deps: {
       savedTreeOrderNumber,
       extraClassesDraft: savedExtraClasses,
       savedExtraClasses,
+      tagsDraft: [],
+      savedTags: [],
       tabLabel: input.tabLabel,
       templateIcon: input.templateIcon,
       templateId: input.templateId,
@@ -111,13 +115,23 @@ export function createCreateTemporaryOpenedDocumentTabSeed (deps: {
     input: T_temporaryOpenedDocumentTabSeedInput
   ): I_faOpenedDocumentTab {
     const parentDocumentId = deps.normalizeNullableStringFromDb(input.parentDocumentId)
+    const initialTagsDraft = input.initialTagsDraft === undefined
+      ? []
+      : input.initialTagsDraft.map((tag) => {
+        return {
+          id: tag.id,
+          name: tag.name,
+          ...(tag.isNew === true ? { isNew: true as const } : {})
+        }
+      })
+    const hasInitialTags = initialTagsDraft.length > 0
     return {
       displayNameDraft: input.displayName,
       documentId: input.documentId,
       documentBackgroundColorDraft: '',
       documentTextColorDraft: '',
       editState: true,
-      hasUnsavedChanges: false,
+      hasUnsavedChanges: hasInitialTags,
       isCategoryDraft: false,
       isFinishedDraft: false,
       isMinorDraft: false,
@@ -137,6 +151,8 @@ export function createCreateTemporaryOpenedDocumentTabSeed (deps: {
       savedTreeOrderNumber: deps.emptyTreeOrderNumber,
       extraClassesDraft: '',
       savedExtraClasses: '',
+      tagsDraft: initialTagsDraft,
+      savedTags: [],
       tabLabel: input.tabLabel,
       templateIcon: input.templateIcon,
       templateId: input.templateId,

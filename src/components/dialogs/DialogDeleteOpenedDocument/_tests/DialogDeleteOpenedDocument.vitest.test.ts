@@ -109,6 +109,7 @@ test('Test that DialogDeleteOpenedDocument renders pending delete copy and confi
   expect(wrapper.find('.faConfirmationDialog__content').exists()).toBe(true)
   expect(wrapper.find('.faConfirmationDialog__body').exists()).toBe(true)
   expect(wrapper.text()).toContain('Hero')
+  expect(wrapper.find('[data-test-locator="dialogDeleteOpenedDocument-title"] .text-primary-bright').text()).toBe('Hero')
   expect(wrapper.find('[data-test-locator="dialogDeleteOpenedDocument-delete"]').exists()).toBe(true)
 
   wrapper.unmount()

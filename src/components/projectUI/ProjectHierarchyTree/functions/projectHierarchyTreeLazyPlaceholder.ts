@@ -2,7 +2,10 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 
 export function createProjectHierarchyTreeLazyPlaceholderApi () {
   function createLazyPlaceholderChild (
-    parent: Pick<I_faProjectHierarchyTreeHeTreeNode, 'icon' | 'id' | 'placementId' | 'worldColor' | 'worldId'>
+    parent: Pick<
+      I_faProjectHierarchyTreeHeTreeNode,
+      'icon' | 'id' | 'placementId' | 'tagId' | 'worldColor' | 'worldId'
+    >
   ): I_faProjectHierarchyTreeHeTreeNode {
     return {
       children: [],
@@ -15,6 +18,7 @@ export function createProjectHierarchyTreeLazyPlaceholderApi () {
       label: '',
       nodeKind: 'document',
       placementId: parent.placementId,
+      tagId: parent.tagId ?? null,
       worldColor: parent.worldColor,
       worldId: parent.worldId
     }
@@ -32,7 +36,12 @@ export function createProjectHierarchyTreeLazyPlaceholderApi () {
   function syncProjectHierarchyTreeNodeLazyChildren (
     node: I_faProjectHierarchyTreeHeTreeNode
   ): void {
-    if (node.nodeKind === 'world' || node.nodeKind === 'group' || node.childrenLoaded) {
+    if (
+      node.nodeKind === 'world' ||
+      node.nodeKind === 'group' ||
+      node.nodeKind === 'tagWrapper' ||
+      node.childrenLoaded
+    ) {
       return
     }
     if (!node.hasChildren) {

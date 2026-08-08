@@ -129,6 +129,33 @@ export const projectContentAPI: I_faProjectContentAPI = {
   listDocumentMedia: async (documentId) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync, { documentId })
   },
+  listTagsForWorld: async (input) => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listTagsForWorldAsync, input)
+  },
+  listTagsWithDocumentCountsForWorld: async (input) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.listTagsWithDocumentCountsForWorldAsync,
+      input
+    )
+  },
+  listDocumentTags: async (input) => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentTagsAsync, input)
+  },
+  listDocumentsUnderTag: async (input) => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentsUnderTagAsync, input)
+  },
+  setDocumentTags: async (input) => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.setDocumentTagsAsync, input)
+  },
+  reorderDocumentsUnderTag: async (input) => {
+    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.reorderDocumentsUnderTagAsync, input)
+  },
+  renameTag: async (input) => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.renameTagAsync, input)
+  },
+  deleteTag: async (input) => {
+    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.deleteTagAsync, input)
+  },
   listWorkspaceHierarchyLayout: async () => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync)
   },

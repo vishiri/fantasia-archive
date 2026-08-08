@@ -21,6 +21,22 @@ import type {
   I_faProjectSetDocumentWorldInput
 } from 'app/types/I_faProjectContentLinksDomain'
 import type {
+  I_faProjectDeleteTagInput,
+  I_faProjectDocumentTagListResult,
+  I_faProjectListDocumentTagsInput,
+  I_faProjectListDocumentsUnderTagInput,
+  I_faProjectListDocumentsUnderTagResult,
+  I_faProjectListTagsForWorldInput,
+  I_faProjectListTagsWithDocumentCountsForWorldInput,
+  I_faProjectListTagsWithDocumentCountsForWorldResult,
+  I_faProjectRenameTagInput,
+  I_faProjectRenameTagResult,
+  I_faProjectReorderDocumentsUnderTagInput,
+  I_faProjectSetDocumentTagsInput,
+  I_faProjectSetDocumentTagsResult,
+  I_faProjectTagListResult
+} from 'app/types/I_faProjectTagDomain'
+import type {
   I_faProjectMedia,
   I_faProjectMediaCreateInput,
   I_faProjectMediaListResult,
@@ -63,6 +79,16 @@ export interface I_faProjectContentAPI {
   getWorldById: (id: string) => Promise<I_faProjectWorld>
   linkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
   listDocumentMedia: (documentId: string) => Promise<I_faProjectDocumentMediaListResult>
+  listDocumentTags: (
+    input: I_faProjectListDocumentTagsInput
+  ) => Promise<I_faProjectDocumentTagListResult>
+  listDocumentsUnderTag: (
+    input: I_faProjectListDocumentsUnderTagInput
+  ) => Promise<I_faProjectListDocumentsUnderTagResult>
+  listTagsForWorld: (input: I_faProjectListTagsForWorldInput) => Promise<I_faProjectTagListResult>
+  listTagsWithDocumentCountsForWorld: (
+    input: I_faProjectListTagsWithDocumentCountsForWorldInput
+  ) => Promise<I_faProjectListTagsWithDocumentCountsForWorldResult>
   listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
   listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
   listDocumentTemplatesForProjectSettings: () => Promise<I_faProjectDocumentTemplatesForProjectSettingsResult>
@@ -79,11 +105,17 @@ export interface I_faProjectContentAPI {
   reindexDocumentSiblingsInHierarchy: (
     input: I_faProjectHierarchyTreeReindexDocumentSiblingsInput
   ) => Promise<I_faProjectHierarchyTreeDocumentChild>
+  renameTag: (input: I_faProjectRenameTagInput) => Promise<I_faProjectRenameTagResult>
+  reorderDocumentsUnderTag: (input: I_faProjectReorderDocumentsUnderTagInput) => Promise<void>
   searchProjectHierarchy: (query: string) => Promise<I_faProjectHierarchyTreeSearchResult>
   saveDocumentTemplatesSnapshot: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
   saveWorldsSnapshot: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
+  setDocumentTags: (
+    input: I_faProjectSetDocumentTagsInput
+  ) => Promise<I_faProjectSetDocumentTagsResult>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>
   setDocumentWorld: (input: I_faProjectSetDocumentWorldInput) => Promise<I_faProjectDocument>
+  deleteTag: (input: I_faProjectDeleteTagInput) => Promise<void>
   unlinkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
   updateDocument: (id: string, patch: I_faProjectDocumentPatch) => Promise<I_faProjectDocument>
   updateDocumentTemplate: (

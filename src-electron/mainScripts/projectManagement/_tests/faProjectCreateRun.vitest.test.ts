@@ -82,7 +82,12 @@ vi.mock('../faProjectActiveDatabaseWiring', () => {
 
 vi.mock('../faProjectDbMigrateWiring', () => {
   return {
-    applyFaProjectMigrations: applyMigrationsMock,
+    applyFaProjectMigrations: applyMigrationsMock
+  }
+})
+
+vi.mock('../faProjectDbMigrateMetaWiring', () => {
+  return {
     assertFaProjectDatabaseQuickCheck: quickCheckMock,
     readFaProjectStoredProjectUuid: readProjectUuidMock
   }

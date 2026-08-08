@@ -9,6 +9,10 @@ type T_topologySnapshot = {
     groupId: string | null
     id: string
   }>
+  tags: Array<{
+    id: string
+    wrapperId: string | null
+  }>
   worlds: Array<{
     id: string
   }>
@@ -31,6 +35,7 @@ function buildTopologySnapshotFromTree (
 
   const groups: T_topologySnapshot['groups'] = []
   const placements: T_topologySnapshot['placements'] = []
+  const tags: T_topologySnapshot['tags'] = []
 
   for (const worldNode of treeNodes) {
     for (const child of worldNode.children) {
@@ -51,25 +56,62 @@ function buildTopologySnapshotFromTree (
           groupId: null,
           id: child.id
         })
+        continue
+      }
+      if (child.nodeKind === 'tag') {
+        tags.push({
+          id: child.id,
+          wrapperId: null
+        })
+        continue
+      }
+      if (child.nodeKind === 'tagWrapper') {
+        for (const tagNode of child.children) {
+          if (tagNode.nodeKind !== 'tag') {
+            continue
+          }
+          tags.push({
+            id: tagNode.id,
+            wrapperId: child.id
+          })
+        }
       }
     }
   }
 
   groups.sort(compareTopologyIds)
   placements.sort((left, right) => left.id.localeCompare(right.id))
+  tags.sort((left, right) => left.id.localeCompare(right.id))
 
   return {
     groups,
     placements,
+    tags,
     worlds
   }
 }
 
 /**
- * Stable resync guard key from canonical world/group/placement topology (not labels or document rows).
+ * Stable resync guard key from canonical world/group/placement/tag topology
+ * (not labels or document rows).
  */
 export function mapProjectHierarchyTreeToTopologyKey (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[]
 ): string {
   return JSON.stringify(buildTopologySnapshotFromTree(treeNodes))
+}
+
+/**
+ * Resync guard for full skeleton replace: worlds/groups/placements only.
+ * Tag membership syncs in place via patchTagBranchLabelsInPlace.
+ */
+export function mapProjectHierarchyTreeToStructuralTopologyKey (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[]
+): string {
+  const snapshot = buildTopologySnapshotFromTree(treeNodes)
+  return JSON.stringify({
+    groups: snapshot.groups,
+    placements: snapshot.placements,
+    worlds: snapshot.worlds
+  })
 }

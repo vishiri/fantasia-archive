@@ -27,6 +27,7 @@
       :resolve-sort-by-item-detail-direction="resolveSortByItemDetailDirection"
       :resolve-sort-by-item-detail-scope="resolveSortByItemDetailScope"
       :resolve-sort-by-item-title="resolveSortByItemTitle"
+      :sort-by-direct-scope-only="sortByDirectScopeOnly"
     />
   </q-item>
 </template>
@@ -51,6 +52,7 @@ defineProps<{
   resolveSortByItemDetailDirection: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
   resolveSortByItemDetailScope: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
   resolveSortByItemTitle: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => string
+  sortByDirectScopeOnly: boolean
   sortByLabel: string
 }>()
 </script>

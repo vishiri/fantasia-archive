@@ -783,6 +783,27 @@ function makeProjectContentTestDb (): {
           get: () => ({ max_sort: null })
         }
       }
+      if (
+        normalized.includes('SELECT tag_id AS id FROM document_tags') &&
+        normalized.includes('document_id = ?')
+      ) {
+        return {
+          all: () => []
+        }
+      }
+      if (
+        normalized.includes('SELECT COUNT(*) AS c FROM document_tags') &&
+        normalized.includes('tag_id = ?')
+      ) {
+        return {
+          get: () => ({ c: 0 })
+        }
+      }
+      if (normalized.includes('DELETE FROM tags WHERE id = ?')) {
+        return {
+          run: () => ({ changes: 0 })
+        }
+      }
       throw new Error(`Unmocked SQL in test db: ${normalized}`)
     })
   }

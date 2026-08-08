@@ -12,6 +12,7 @@ import { wireDocumentWorkspacePageBelongsUnderField } from './createDocumentWork
 import { wireDocumentWorkspacePageOrderNumberField } from './createDocumentWorkspacePageOrderNumberFieldWiring'
 import { wireDocumentWorkspacePageExtraHtmlClassesField } from './createDocumentWorkspacePageExtraHtmlClassesFieldWiring'
 import { wireDocumentWorkspacePageStatusFlagToggles } from './createDocumentWorkspacePageStatusFlagTogglesWiring'
+import { wireDocumentWorkspacePageTagsField } from './createDocumentWorkspacePageTagsFieldWiring'
 
 function buildDocumentWorkspacePageApi (input: {
   belongsUnderField: ReturnType<typeof wireDocumentWorkspacePageBelongsUnderField>
@@ -21,6 +22,7 @@ function buildDocumentWorkspacePageApi (input: {
   orderNumberField: ReturnType<typeof wireDocumentWorkspacePageOrderNumberField>
   extraHtmlClassesField: ReturnType<typeof wireDocumentWorkspacePageExtraHtmlClassesField>
   statusFlagToggles: ReturnType<typeof wireDocumentWorkspacePageStatusFlagToggles>
+  tagsField: ReturnType<typeof wireDocumentWorkspacePageTagsField>
 }): ReturnType<T_useDocumentWorkspacePageApi> {
   const displayNameModel = input.coreModels.displayNameModel
   const documentShowsEditFields = input.coreModels.documentShowsEditFields
@@ -36,6 +38,7 @@ function buildDocumentWorkspacePageApi (input: {
     ...input.orderNumberField,
     ...input.extraHtmlClassesField,
     ...input.statusFlagToggles,
+    ...input.tagsField,
     displayNameModel,
     documentShowsEditFields,
     documentShowsPreview,
@@ -115,6 +118,21 @@ export function createUseDocumentWorkspacePage (
       routeDocumentId: coreModels.routeDocumentId
     })
 
+    const tagsField = wireDocumentWorkspacePageTagsField({
+      deps: {
+        ...deps,
+        ref: deps.ref
+      },
+      documentTab: coreModels.documentTab,
+      openedDocumentsStore: openedDocumentsStore as typeof openedDocumentsStore & {
+        updateTagsDraft: (
+          documentId: string,
+          value: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[]
+        ) => void
+      },
+      routeDocumentId: coreModels.routeDocumentId
+    })
+
     return buildDocumentWorkspacePageApi({
       belongsUnderField,
       colorPickers,
@@ -122,7 +140,8 @@ export function createUseDocumentWorkspacePage (
       extraHtmlClassesField,
       isCategoryToggle,
       orderNumberField,
-      statusFlagToggles
+      statusFlagToggles,
+      tagsField
     })
   }
 }

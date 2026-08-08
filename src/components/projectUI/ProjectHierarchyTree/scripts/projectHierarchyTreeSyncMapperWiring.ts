@@ -6,8 +6,11 @@ import type { T_faOpenedDocumentOpenMode } from 'app/types/I_faOpenedDocumentsDo
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { resolveTrimmedIconOrDefault } from 'app/src/scripts/faIcons/faIconDisplay_manager'
 
+import type { I_faProjectHierarchyTreeTagSettings } from 'app/types/I_faProjectHierarchyTreeDomain'
+
 import { createMapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapHierarchyDocumentChildrenToTreeNodes'
 import { createMapWorkspaceLayoutToHierarchyTreeSkeleton } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { patchWorkspaceLayoutPlacementNodeInPlace } from '../functions/mapWorkspaceLayoutPlacementNodePatch'
 import {
   PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON,
   PROJECT_HIERARCHY_TREE_GROUP_ICON
@@ -15,6 +18,15 @@ import {
 import { createProjectHierarchyTreeLazyPlaceholderApi } from '../functions/projectHierarchyTreeLazyPlaceholder'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from '../functions/projectHierarchyTreeAddNewDocumentLabel'
+import {
+  mergeProjectHierarchyTreeWorldChildrenWithTags,
+  resolveProjectHierarchyTreeTagBranchNodes
+} from '../functions/projectHierarchyTreeTagNodes'
+import { patchProjectHierarchyTreeTagBranchLabelsInPlace } from './projectHierarchyTreeTagBranchPatchWiring'
+import {
+  collectProjectHierarchyTreeTagIds,
+  publishProjectHierarchyTreeRootRevisionIfTagsRemoved
+} from './projectHierarchyTreeTagMembershipRevisionWiring'
 import {
   isProjectHierarchyTreeAddNewDocumentCreateSourceNode,
   refreshProjectHierarchyTreeAddNewDocumentLabelsInTree
@@ -27,10 +39,40 @@ function resolvePlacementDisplayIcon (icon: string): string {
   return resolveTrimmedIconOrDefault(icon, PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON)
 }
 
+const tagSkeletonResolvers = {
+  resolveTagSettings: (): I_faProjectHierarchyTreeTagSettings => {
+    return {
+      compactTags: false,
+      noTags: false,
+      tagsAtTop: false
+    }
+  },
+  resolveTagsLabel: (): string => 'Tags'
+}
+
+/**
+ * Binds live App Settings + i18n resolvers used by the hierarchy skeleton tag branch.
+ */
+export function bindProjectHierarchyTreeTagSkeletonResolvers (deps: {
+  resolveTagSettings: () => I_faProjectHierarchyTreeTagSettings
+  resolveTagsLabel: () => string
+}): void {
+  tagSkeletonResolvers.resolveTagSettings = deps.resolveTagSettings
+  tagSkeletonResolvers.resolveTagsLabel = deps.resolveTagsLabel
+}
+
 const workspaceLayoutMapperApi = createMapWorkspaceLayoutToHierarchyTreeSkeleton({
   groupIcon: PROJECT_HIERARCHY_TREE_GROUP_ICON,
   lazyPlaceholderApi,
-  resolvePlacementDisplayIcon
+  patchPlacementNodeInPlace: patchWorkspaceLayoutPlacementNodeInPlace,
+  resolvePlacementDisplayIcon,
+  resolveTagSettings: () => tagSkeletonResolvers.resolveTagSettings(),
+  resolveTagsLabel: () => tagSkeletonResolvers.resolveTagsLabel(),
+  tagBranchApi: {
+    mergeWorldChildrenWithTags: mergeProjectHierarchyTreeWorldChildrenWithTags,
+    patchTagBranchLabelsInPlace: patchProjectHierarchyTreeTagBranchLabelsInPlace,
+    resolveTagBranchNodes: resolveProjectHierarchyTreeTagBranchNodes
+  }
 })
 
 export const mapWorkspaceLayoutToHierarchyTreeSkeleton =
@@ -51,6 +93,16 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
+  function applySkeletonTreeData (
+    nextSkeleton: I_faProjectHierarchyTreeHeTreeNode[]
+  ): void {
+    deps.suppressTreeEmit.value = true
+    deps.treeData.value = nextSkeleton
+    void deps.nextTick().then(() => {
+      deps.suppressTreeEmit.value = false
+    })
+  }
+
   function resyncTreeDataFromLayout (): { structureMatched: boolean } {
     const worlds = deps.getWorlds()
     if (worlds.length === 0) {
@@ -64,6 +116,7 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
     const structureMatches = deps.treeData.value.length > 0 &&
       escapedDocuments.length === 0 &&
       projectHierarchyTreeLayoutStructureMatchesTree(deps.treeData.value, worlds)
+    const treeTagIdsBefore = collectProjectHierarchyTreeTagIds(deps.treeData.value)
     if (structureMatches) {
       patchHierarchyTreeSkeletonLabelsInPlace(
         deps.treeData.value,
@@ -73,17 +126,29 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
         deps.treeData.value,
         deps.getPreferredLanguageCode()
       )
-      return { structureMatched: true }
+      const tagsRemoved = publishProjectHierarchyTreeRootRevisionIfTagsRemoved({
+        nextTick: deps.nextTick,
+        suppressTreeEmit: deps.suppressTreeEmit,
+        treeData: deps.treeData,
+        treeTagIdsBefore
+      })
+      return { structureMatched: !tagsRemoved }
     }
-    deps.suppressTreeEmit.value = true
-    deps.treeData.value = nextSkeleton
-    void deps.nextTick().then(() => {
-      deps.suppressTreeEmit.value = false
-    })
+    applySkeletonTreeData(nextSkeleton)
     return { structureMatched: false }
   }
 
+  function forceResyncTreeDataFromLayout (): void {
+    const worlds = deps.getWorlds()
+    if (worlds.length === 0) {
+      deps.treeData.value = []
+      return
+    }
+    applySkeletonTreeData(mapWorkspaceLayoutToHierarchyTreeSkeleton(worlds))
+  }
+
   return {
+    forceResyncTreeDataFromLayout,
     resyncTreeDataFromLayout
   }
 }
@@ -104,6 +169,7 @@ export function bindProjectHierarchyTreeAddNewDocumentLanguageRefresh (deps: {
 export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
   createTemporaryDocument: (input: {
     displayName: string
+    initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: T_faOpenedDocumentOpenMode
     parentDocumentId: null
     templateId: string

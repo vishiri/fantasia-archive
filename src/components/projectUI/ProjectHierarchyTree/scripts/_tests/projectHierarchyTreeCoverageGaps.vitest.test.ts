@@ -4,10 +4,11 @@ import { ref, watch } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { readProjectHierarchyTreeDragSiblingOrderFromDom } from '../projectHierarchyTreeDnDOrderSupportWiring'
+import { readProjectHierarchyTreeDragSiblingOrderFromDom } from '../projectHierarchyTreeDnDOrderDomWiring'
 import {
   applyProjectHierarchyTreeDragCommitSiblingOrderPatch,
-  applyProjectHierarchyTreeSiblingOrderToTreeData
+  applyProjectHierarchyTreeSiblingOrderToTreeData,
+  resolveProjectHierarchyTreeDragSiblingOrderSnapshot
 } from '../projectHierarchyTreeDnDOrderSupportWiring'
 import { bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring } from '../projectHierarchyTreePendingDocumentRefreshWiring'
 
@@ -189,7 +190,7 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips DOM rows w
   })).toEqual(['doc-b', 'doc-c'])
 })
 
-test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when DOM node ids do not match document ids', () => {
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom maps tree node ids to document ids', () => {
   const movedRow = {
     ...buildDocumentNode('doc-a'),
     id: 'node-a'
@@ -226,9 +227,10 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null whe
   host.appendChild(treeRoot)
   expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
     getTreeScrollHost: () => host,
-    movedDocumentId: 'node-a',
+    movedDocumentId: 'doc-a',
+    preferredNodeId: 'node-a',
     treeData
-  })).toBeNull()
+  })).toEqual(['doc-a'])
 })
 
 test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when bucket rows lack document ids', () => {
@@ -340,6 +342,51 @@ test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false wh
   expect(applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'doc-a', ['doc-a'])).toBe(false)
 })
 
+/**
+ * resolveProjectHierarchyTreeDragSiblingOrderSnapshot
+ * Under-tag parents return tagId snapshots instead of placement ids.
+ */
+test('Test that resolveProjectHierarchyTreeDragSiblingOrderSnapshot snapshots under-tag siblings', () => {
+  const underTagDocA: I_faProjectHierarchyTreeHeTreeNode = {
+    ...buildDocumentNode('doc-a'),
+    id: 'tag-1__doc__doc-a',
+    placementId: null,
+    tagId: 'tag-1'
+  }
+  const underTagDocB: I_faProjectHierarchyTreeHeTreeNode = {
+    ...buildDocumentNode('doc-b'),
+    id: 'tag-1__doc__doc-b',
+    placementId: null,
+    tagId: 'tag-1'
+  }
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [underTagDocB, underTagDocA],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  expect(resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
+    [tagNode],
+    'doc-a',
+    'tag-1__doc__doc-a'
+  )).toEqual({
+    orderedDocumentIds: ['doc-b', 'doc-a'],
+    parentDocumentId: null,
+    placementId: '',
+    tagId: 'tag-1',
+    treeNodeId: 'tag-1__doc__doc-a'
+  })
+})
+
 test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch no-ops without drag snapshot', () => {
   const treeData: I_faProjectHierarchyTreeHeTreeNode[] = [buildPlacementWithDocuments()]
   applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
@@ -349,6 +396,101 @@ test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch no-ops with
     treeData
   })
   expect(treeData[0]?.children.map((child) => child.documentId)).toEqual(['doc-a', 'doc-b'])
+})
+
+/**
+ * readProjectHierarchyTreeDragSiblingOrderFromDom
+ * Skips non-preferred DOM matches, non-document tree nodes, and foreign sibling ids.
+ */
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips non-preferred and foreign DOM rows', () => {
+  const preferredRow = {
+    ...buildDocumentNode('doc-a'),
+    id: 'tag-1__doc__doc-a'
+  }
+  const treeData: I_faProjectHierarchyTreeHeTreeNode[] = [{
+    children: [preferredRow, buildDocumentNode('doc-b')],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }]
+  const host = document.createElement('div')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const parentTreeNode = document.createElement('div')
+  parentTreeNode.className = 'tree-node'
+
+  const appendTreeChild = (options: {
+    documentIdAttr: string | null
+    includeDocumentRow: boolean
+    isTreeNode: boolean
+  }): void => {
+    if (!options.isTreeNode) {
+      parentTreeNode.appendChild(document.createElement('span'))
+      return
+    }
+    const treeNode = document.createElement('div')
+    treeNode.className = 'tree-node'
+    if (options.includeDocumentRow) {
+      const row = document.createElement('div')
+      row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+      if (options.documentIdAttr !== null) {
+        const nodeRoot = document.createElement('div')
+        nodeRoot.setAttribute('data-test-hierarchy-node-id', options.documentIdAttr)
+        row.appendChild(nodeRoot)
+      }
+      treeNode.appendChild(row)
+    }
+    parentTreeNode.appendChild(treeNode)
+  }
+
+  appendTreeChild({
+    documentIdAttr: 'doc-a',
+    includeDocumentRow: true,
+    isTreeNode: true
+  })
+  appendTreeChild({
+    documentIdAttr: null,
+    includeDocumentRow: false,
+    isTreeNode: true
+  })
+  appendTreeChild({
+    documentIdAttr: 'foreign-doc',
+    includeDocumentRow: true,
+    isTreeNode: true
+  })
+  appendTreeChild({
+    documentIdAttr: null,
+    includeDocumentRow: true,
+    isTreeNode: false
+  })
+  appendTreeChild({
+    documentIdAttr: 'tag-1__doc__doc-a',
+    includeDocumentRow: true,
+    isTreeNode: true
+  })
+  appendTreeChild({
+    documentIdAttr: 'doc-b',
+    includeDocumentRow: true,
+    isTreeNode: true
+  })
+  treeRoot.appendChild(parentTreeNode)
+  host.appendChild(treeRoot)
+
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    preferredNodeId: preferredRow.id,
+    treeData
+  })).toEqual(['doc-a', 'doc-a', 'doc-b'])
 })
 
 test('Test that bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring opens refreshed nodes', async () => {

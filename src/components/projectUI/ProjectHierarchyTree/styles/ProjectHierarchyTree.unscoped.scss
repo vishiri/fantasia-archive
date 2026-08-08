@@ -31,6 +31,16 @@
   scrollbar-gutter: inherit;
   width: 100%;
 
+  &--extraPadding {
+    padding-left: $projectHierarchyTree-extraPadding-paddingLeft;
+
+    .projectHierarchyTree__nodeRow--world,
+    .projectHierarchyTree-treeNode--world {
+      margin-left: -$projectHierarchyTree-extraPadding-worldBleedPx;
+      width: calc(100% + #{$projectHierarchyTree-extraPadding-worldBleedPx}) !important;
+    }
+  }
+
   &--listDragging {
     user-select: none;
   }
@@ -228,10 +238,14 @@ body.fa-appTheme--fantasy .projectHierarchyTree__openIcon {
 .projectHierarchyTree__nodeRow--documentTemplate,
 .projectHierarchyTree__nodeRow--document,
 .projectHierarchyTree__nodeRow--addNewDocument,
+.projectHierarchyTree__nodeRow--tag,
+.projectHierarchyTree__nodeRow--tagWrapper,
 .projectHierarchyTree-treeNode--group,
 .projectHierarchyTree-treeNode--documentTemplate,
 .projectHierarchyTree-treeNode--document,
-.projectHierarchyTree-treeNode--addNewDocument {
+.projectHierarchyTree-treeNode--addNewDocument,
+.projectHierarchyTree-treeNode--tag,
+.projectHierarchyTree-treeNode--tagWrapper {
   cursor: pointer;
 
   &.projectHierarchyTree__leftPointerDown {

@@ -42,6 +42,7 @@ test('createLazyPlaceholderChild builds a lazy document placeholder from the par
     label: '',
     nodeKind: 'document',
     placementId: 'placement-1',
+    tagId: null,
     worldColor: '#000',
     worldId: 'world-1'
   })

@@ -1,4 +1,4 @@
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -31,6 +31,7 @@ export const useDocumentWorkspacePage = createUseDocumentWorkspacePage({
   navigateToWorkspaceHomeRoute,
   onMounted,
   parseFaProjectWorldColorPaletteToHexList,
+  ref,
   resolveOpenedDocumentDisplayNameFromTab,
   resolveOpenedDocumentTabIsInEditMode,
   resolveOpenedDocumentTabIsInPreviewMode,

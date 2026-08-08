@@ -6,6 +6,8 @@ export const FA_PROJECT_TABLE_DOCUMENTS = 'documents'
 export const FA_PROJECT_TABLE_DOCUMENT_TEMPLATES = 'document_templates'
 export const FA_PROJECT_TABLE_MEDIA = 'media'
 export const FA_PROJECT_TABLE_DOCUMENT_MEDIA = 'document_media'
+export const FA_PROJECT_TABLE_TAGS = 'tags'
+export const FA_PROJECT_TABLE_DOCUMENT_TAGS = 'document_tags'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS = 'world_template_groups'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS = 'world_template_placements'
 export const FA_PROJECT_TABLE_OPENED_DOCUMENTS = 'opened_documents'
@@ -299,6 +301,35 @@ CREATE INDEX IF NOT EXISTS idx_document_media_media_id ON ${FA_PROJECT_TABLE_DOC
 CREATE INDEX IF NOT EXISTS idx_worlds_sort_order ON ${FA_PROJECT_TABLE_WORLDS}(sort_order);
 CREATE INDEX IF NOT EXISTS idx_document_templates_sort_order
   ON ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(sort_order);
+`)
+  applyFaProjectContentSchemaV1TagsAndIndexes(db)
+}
+
+/**
+ * Creates tags tables and indexes for schema version 1.
+ */
+function applyFaProjectContentSchemaV1TagsAndIndexes (db: I_faProjectDbExec): void {
+  db.exec(`
+CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_TAGS} (
+  id TEXT NOT NULL PRIMARY KEY,
+  world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE CASCADE,
+  name TEXT NOT NULL CHECK (length(name) > 0),
+  created_at_ms INTEGER NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENT_TAGS} (
+  document_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
+  tag_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_TAGS}(id) ON DELETE CASCADE,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (document_id, tag_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tags_world_id_name_nocase
+  ON ${FA_PROJECT_TABLE_TAGS}(world_id, name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_tags_world_id ON ${FA_PROJECT_TABLE_TAGS}(world_id);
+CREATE INDEX IF NOT EXISTS idx_document_tags_tag_id_sort
+  ON ${FA_PROJECT_TABLE_DOCUMENT_TAGS}(tag_id, sort_order);
 `)
 }
 

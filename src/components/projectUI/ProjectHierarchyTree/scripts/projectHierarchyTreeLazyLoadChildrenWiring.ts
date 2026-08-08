@@ -5,6 +5,7 @@ import type {
   I_faProjectHierarchyTreeHeTreeNode,
   I_faProjectHierarchyTreeListPlacementChildrenInput
 } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_faProjectTagDocumentChild } from 'app/types/I_faProjectTagDomain'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import { isProjectHierarchyTreeAddNewDocumentNode } from '../functions/projectHierarchyTreeAddNewDocumentNodeKind'
@@ -23,6 +24,7 @@ import {
 import { createMergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
 import { finalizeProjectHierarchyTreePlacementTopLevelChildren } from './projectHierarchyTreeAddNewDocumentNode'
 import { mapHierarchyDocumentChildrenToTreeNodes } from './projectHierarchyTreeSyncMapperWiring'
+import { loadProjectHierarchyTreeTagNodeChildrenIfNeeded } from './projectHierarchyTreeLazyLoadTagChildrenWiring'
 
 export const mergeLoadedChildrenIntoNode = createMergeLoadedChildrenIntoNode({
   isAddNewDocumentNode: isProjectHierarchyTreeAddNewDocumentNode
@@ -117,6 +119,9 @@ export async function flushProjectHierarchyTreeStagedLoadedChildren (deps: {
 }
 
 export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps: {
+  listDocumentsUnderTag?: (
+    input: { tagId: string }
+  ) => Promise<{ items: I_faProjectTagDocumentChild[] }>
   listPlacementDocumentChildren: (
     input: I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] }>
@@ -138,11 +143,17 @@ export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps:
     node,
     preferredLanguageCode: deps.preferredLanguageCode,
     publishTreeRevision: deps.publishTreeRevision,
-    treeData: deps.treeData
+    treeData: deps.treeData,
+    ...(deps.listDocumentsUnderTag === undefined
+      ? {}
+      : { listDocumentsUnderTag: deps.listDocumentsUnderTag })
   })
 }
 
 export async function loadProjectHierarchyTreeNodeChildren (deps: {
+  listDocumentsUnderTag?: (
+    input: { tagId: string }
+  ) => Promise<{ items: I_faProjectTagDocumentChild[] }>
   listPlacementDocumentChildren: (
     input: I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] }>
@@ -159,6 +170,9 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
   if (!shouldReloadProjectHierarchyTreeNodeChildren(deps.node)) {
+    return
+  }
+  if (await loadProjectHierarchyTreeTagNodeChildrenIfNeeded(deps)) {
     return
   }
   if (deps.node.nodeKind === 'templatePlacement' && deps.node.placementId !== null) {

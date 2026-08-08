@@ -1,0 +1,45 @@
+@use '../../../dialogs/DialogDeleteOpenedDocument/styles/variables' as deleteDoc;
+@use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
+
+.projectHierarchyTreeDeleteTagDialog {
+  min-width: deleteDoc.$dialogDeleteOpenedDocument-minWidth;
+}
+
+/* Confirm inset: beat Quasar .q-card__section--vert (16px) so only shared tokens apply. */
+.q-dialog > .q-dialog__inner > .q-card.faConfirmationDialog.projectHierarchyTreeDeleteTagDialog > .faConfirmationDialog__content {
+  padding: $faConfirmationDialog-content-padding;
+
+  > .q-card__section:not(.faConfirmationDialog__body),
+  > .q-card__section--vert:not(.faConfirmationDialog__body) {
+    padding: 0;
+  }
+
+  > .faConfirmationDialog__body {
+    padding: $faConfirmationDialog-body-padding;
+    text-align: left;
+  }
+}
+
+.projectHierarchyTreeDeleteTagDialog__title {
+  word-break: break-word;
+}
+
+.projectHierarchyTreeDeleteTagDialog__body {
+  margin: 0;
+  max-width: 100%;
+  text-align: left;
+}
+
+.projectHierarchyTreeDeleteTagDialog__warning,
+.projectHierarchyTreeDeleteTagDialog__proceed {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.projectHierarchyTreeDeleteTagDialog__proceed {
+  margin-top: deleteDoc.$dialogDeleteOpenedDocument-proceed-marginTop;
+}
+
+.projectHierarchyTreeDeleteTagDialog__warning .text-secondary {
+  text-shadow: appControlSingleMenu.$appControlSingleMenu-item-secondary-textShadow;
+}

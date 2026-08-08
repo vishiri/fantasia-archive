@@ -123,7 +123,7 @@ export default {
       tags: 'simplified count, single number, less clutter'
     },
     compactTags: {
-      title: 'TODO - Compact tags',
+      title: 'Compact tags',
       description: 'Determines whether tags are shown as individual categories or as one category with each tag as a subcategory.',
       tags: 'tag grouping, single tag folder, nested tags, tag hierarchy'
     },
@@ -192,6 +192,11 @@ export default {
       title: 'Pronounced count divider',
       description: 'This setting adds another \\| character between the category and document count in the hierarchical tree.',
       tags: 'pipe, delimiter, separator, count format, tree counts'
+    },
+    extraTreePadding: {
+      title: 'Add extra tree padding',
+      description: 'Toggling this on adds extra padding on the left to the tree. This can be useful for example when using tags with long order numbers.',
+      tags: 'padding, indent, left margin, order numbers, tags, hierarchical tree'
     },
     forceSublevelCollapseInTree: {
       title: 'Force sublevel collapse in the tree',
@@ -305,7 +310,7 @@ export default {
       tags: 'root label, project title tree, header hide, multi-world projects'
     },
     noTags: {
-      title: 'TODO - Hide tags in tree',
+      title: 'Hide tags in tree',
       description: 'Determines whether tags are shown in the hierarchical tree at all.',
       tags: 'labels off, tag strip, tree labels, hide labels'
     },
@@ -356,7 +361,7 @@ export default {
       tags: 'tab scroll, scroll arrows, chevron, overflow, mousewheel, tab strip'
     },
     tagsAtTop: {
-      title: 'TODO - Top tags in tree',
+      title: 'Top tags in tree',
       description: 'Shows tags at the top of the hierarchical tree.',
       tags: 'tag order, tags first, above categories'
     },

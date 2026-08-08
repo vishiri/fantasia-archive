@@ -114,9 +114,67 @@ const storyHeroesDocumentChildren = [
   }
 ]
 
+const storyWorldId = '550e8400-e29b-41d4-a716-446655440001'
+const storyTagAlphaId = 'a77b1e3c-8ef3-44de-b58f-fdf48741672e'
+const storyTagBetaId = 'b638ddb1-eee2-4d78-89db-331723040d9c'
+const storyTagWrapperId = `${storyWorldId}__tagWrapper`
+
+const storyWorldsWithTags = [
+  {
+    ...storyWorlds[0]!,
+    tags: [
+      {
+        categoryCount: 0,
+        documentCount: 2,
+        id: storyTagAlphaId,
+        name: 'Alpha'
+      },
+      {
+        categoryCount: 0,
+        documentCount: 1,
+        id: storyTagBetaId,
+        name: 'Beta'
+      }
+    ]
+  }
+]
+
+const storyDocumentsUnderTagAlpha = [
+  {
+    displayName: 'Test Document - Character 01',
+    documentBackgroundColor: '',
+    documentId: '7c9e6679-7425-40de-944b-e07fc1f90afa',
+    documentTextColor: '#1565c0',
+    extraClasses: '',
+    isCategory: false,
+    isDead: false,
+    isFinished: true,
+    isMinor: false,
+    sortOrder: 0,
+    templateId: '7c9e6679-7425-40de-944b-e07fc1f90ae8',
+    treeOrderNumber: 10
+  },
+  {
+    displayName: 'Fallen Captain',
+    documentBackgroundColor: '#fff3e0',
+    documentId: '7c9e6679-7425-40de-944b-e07fc1f90afb',
+    documentTextColor: '#c62828',
+    extraClasses: '',
+    isCategory: false,
+    isDead: true,
+    isFinished: false,
+    isMinor: true,
+    sortOrder: 1,
+    templateId: '7c9e6679-7425-40de-944b-e07fc1f90ae8',
+    treeOrderNumber: 7
+  }
+]
+
 async function seedHierarchyStoryStores (options?: {
   expandedNodeIds?: string[]
+  listDocumentsUnderTag?: typeof window.faContentBridgeAPIs.projectContent.listDocumentsUnderTag
   listPlacementDocumentChildren?: typeof window.faContentBridgeAPIs.projectContent.listPlacementDocumentChildren
+  worlds?: typeof storyWorlds
 }): Promise<void> {
   const pinia = createPinia()
   setActivePinia(pinia)
@@ -137,10 +195,13 @@ async function seedHierarchyStoryStores (options?: {
   const contentApi = window.faContentBridgeAPIs?.projectContent
   if (contentApi !== undefined) {
     contentApi.listWorkspaceHierarchyLayout = async () => ({
-      worlds: storyWorlds
+      worlds: options?.worlds ?? storyWorlds
     })
     contentApi.listPlacementDocumentChildren = options?.listPlacementDocumentChildren ?? (async () => ({
       items: storyHeroesDocumentChildren
+    }))
+    contentApi.listDocumentsUnderTag = options?.listDocumentsUnderTag ?? (async () => ({
+      items: []
     }))
   }
   await S_FaProjectHierarchyTree().refreshLayout()
@@ -213,5 +274,38 @@ export const ExpandedEmptyPlacementWithAddNew: StoryObj<typeof meta> = {
       ProjectHierarchyTree
     },
     template: '<div style="height: 360px; width: 375px;"><ProjectHierarchyTree /></div>'
+  })
+}
+
+/** World tags wrapper + Alpha tag expanded with under-tag documents. */
+export const ExpandedTagsWithDocuments: StoryObj<typeof meta> = {
+  loaders: [
+    async () => {
+      await seedHierarchyStoryStores({
+        expandedNodeIds: [
+          storyWorldId,
+          storyTagWrapperId,
+          storyTagAlphaId
+        ],
+        listDocumentsUnderTag: async (input) => {
+          if (input.tagId !== storyTagAlphaId) {
+            return {
+              items: []
+            }
+          }
+          return {
+            items: storyDocumentsUnderTagAlpha
+          }
+        },
+        worlds: storyWorldsWithTags
+      })
+      return {}
+    }
+  ],
+  render: () => ({
+    components: {
+      ProjectHierarchyTree
+    },
+    template: '<div style="height: 480px; width: 375px;"><ProjectHierarchyTree /></div>'
   })
 }
