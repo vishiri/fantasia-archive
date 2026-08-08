@@ -14,7 +14,7 @@ alwaysApply: false
 
 Before designing/implementing template field definitions, document field values, template editor UI, or document form merge/save:
 
-1. Read [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved architecture (**not** in shipped schema; live **`user_version` max 6**; custom fields = future **v7+**).
+1. Read [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved architecture (**not** in shipped schema; live **`user_version` max 7**; custom fields = future **v8+**).
 2. Read [docs/database/projectDB.md](../../docs/database/projectDB.md) for **shipped** schema; migrations/IPC land → update **projectDB.md same commit** per [docs-database.mdc](docs-database.mdc).
 
 ## Non-negotiable design rules
