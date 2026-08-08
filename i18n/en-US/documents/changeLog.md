@@ -15,6 +15,10 @@
 - **Links**: Foreign http and https addresses no longer open inside the Fantasia Archive window. The app keeps only its own in-app routes; other web URLs open in your default browser.
 - **Projects**: Opening an older **`.faproject`** upgrades the world color-palette column name automatically so saved world swatch lists keep working.
 - **Workspace sidebar**: Hierarchy tree scroll no longer jumps to the top or leaves blank gaps when you expand or collapse rows, after drag-and-drop, or when opening a node near the bottom of a long list. **Collapse all under this node** also clears nested rows correctly again under virtualization.
+- **Workspace sidebar**: Hierarchy search label is **Search the tree...**. The search glyph turns primary-bright whenever the field has text, whether or not the field is focused.
+- **Workspace sidebar**: Individual tag icons in the hierarchy tree are slightly smaller so solid glyphs match outline neighbors; the main **Tags** wrapper icon stays full size.
+- **Help**: Diamond help icons use a slightly thinner border.
+- **Fantasy theme**: Bare primary-bright icons in field append and prepend slots keep the gold glyph (for example merge-warning icons in rename dialogs).
 
 ## 2.4.15
 

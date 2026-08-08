@@ -1,3 +1,3 @@
 export default {
-  label: 'Search...'
+  label: 'Search the tree...'
 }

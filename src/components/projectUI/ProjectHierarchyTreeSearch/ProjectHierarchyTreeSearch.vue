@@ -21,7 +21,7 @@
         @focus="isSearchFocused = true"
       >
         <template
-          v-if="searchQuery !== ''"
+          v-if="searchQueryHasText"
           #prepend
         >
           <q-icon
@@ -34,6 +34,8 @@
         <template #append>
           <q-icon
             class="projectHierarchyTreeSearch__appendIcon"
+            :class="{ 'text-primary-bright': searchQueryHasText }"
+            data-test-locator="projectHierarchyTreeSearch-appendIcon"
             name="mdi-text-search"
           />
         </template>
@@ -58,6 +60,10 @@ const {
   searchQuery,
   searchWrapperStyle
 } = useProjectHierarchyTreeSearch()
+
+const searchQueryHasText = computed(() => {
+  return searchQuery.value !== ''
+})
 
 const layoutModeClass = computed(() => {
   return `projectHierarchyTreeSearch--layout${layoutMode.value.charAt(0).toUpperCase()}${layoutMode.value.slice(1)}`

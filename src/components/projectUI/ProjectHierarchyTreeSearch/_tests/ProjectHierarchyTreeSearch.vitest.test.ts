@@ -50,7 +50,14 @@ function mountProjectHierarchyTreeSearch () {
           `
         },
         QIcon: {
-          template: '<button data-test-locator="projectHierarchyTreeSearch-clear" @click="$emit(\'click\')" />'
+          inheritAttrs: false,
+          props: ['name'],
+          template: `
+            <button
+              v-bind="$attrs"
+              @click="$emit('click')"
+            />
+          `
         }
       }
     }
@@ -132,4 +139,21 @@ test('Test that ProjectHierarchyTreeSearch shows a clear icon when the query is 
   expect(clearSearchQueryMock).toHaveBeenCalled()
   searchQueryRef.value = ''
   wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTreeSearch marks append icon primary-bright when query is non-empty', () => {
+  searchQueryRef.value = ''
+  const emptyWrapper = mountProjectHierarchyTreeSearch()
+  expect(
+    emptyWrapper.find('[data-test-locator="projectHierarchyTreeSearch-appendIcon"]').classes()
+  ).not.toContain('text-primary-bright')
+  emptyWrapper.unmount()
+
+  searchQueryRef.value = 'hero'
+  const filledWrapper = mountProjectHierarchyTreeSearch()
+  expect(
+    filledWrapper.find('[data-test-locator="projectHierarchyTreeSearch-appendIcon"]').classes()
+  ).toContain('text-primary-bright')
+  searchQueryRef.value = ''
+  filledWrapper.unmount()
 })
