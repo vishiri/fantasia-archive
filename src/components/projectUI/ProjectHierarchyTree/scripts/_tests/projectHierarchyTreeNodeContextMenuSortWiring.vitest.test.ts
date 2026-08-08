@@ -94,7 +94,13 @@ test('buildProjectHierarchyTreeNodeContextMenuSortHandlers no-ops for invalid an
   handlers.onSortByItemClick('namesDirectAsc')
   expect(runFaAction).not.toHaveBeenCalled()
 
-  handlers.onSortByItemClick('not-a-real-sort' as T_faProjectHierarchyTreeSortByMenuItemId)
+  const invalidItemHandlers = buildProjectHierarchyTreeNodeContextMenuSortHandlers({
+    contextMenuAnchorNodeId: ref('doc-1'),
+    isNodeContextMenuOpen,
+    runFaAction,
+    treeData: ref([documentNode()])
+  })
+  invalidItemHandlers.onSortByItemClick('not-a-real-sort' as T_faProjectHierarchyTreeSortByMenuItemId)
   expect(runFaAction).not.toHaveBeenCalled()
 
   const missingAnchorHandlers = buildProjectHierarchyTreeNodeContextMenuSortHandlers({
@@ -129,4 +135,50 @@ test('buildProjectHierarchyTreeNodeContextMenuSortHandlers no-ops for invalid an
   worldHandlers.onSortByItemClick('namesDirectAsc')
   expect(runFaAction).not.toHaveBeenCalled()
   expect(isNodeContextMenuOpen.value).toBe(true)
+})
+
+/**
+ * buildProjectHierarchyTreeNodeContextMenuSortHandlers
+ * Tag anchors only accept direct-scope sort items.
+ */
+test('buildProjectHierarchyTreeNodeContextMenuSortHandlers dispatches tag direct sort and ignores recursive', () => {
+  const runFaAction = vi.fn()
+  const isNodeContextMenuOpen = ref(true)
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const handlers = buildProjectHierarchyTreeNodeContextMenuSortHandlers({
+    contextMenuAnchorNodeId: ref('tag-1'),
+    isNodeContextMenuOpen,
+    runFaAction,
+    treeData: ref([tagNode])
+  })
+
+  handlers.onSortByItemClick('namesRecursiveAsc')
+  expect(runFaAction).not.toHaveBeenCalled()
+  expect(isNodeContextMenuOpen.value).toBe(true)
+
+  handlers.onSortByItemClick('namesDirectAsc')
+  expect(runFaAction).toHaveBeenCalledWith('sortHierarchyTreeDocuments', {
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: 'tag-1'
+  })
+  expect(isNodeContextMenuOpen.value).toBe(false)
 })

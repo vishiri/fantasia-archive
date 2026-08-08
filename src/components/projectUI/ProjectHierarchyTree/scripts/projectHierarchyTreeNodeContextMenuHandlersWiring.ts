@@ -195,6 +195,13 @@ function resolveSortAnchorNode (
   if (node.nodeKind === 'templatePlacement' && node.placementId !== null) {
     return node
   }
+  if (
+    node.nodeKind === 'tag' &&
+    typeof node.tagId === 'string' &&
+    node.tagId.trim().length > 0
+  ) {
+    return node
+  }
   return null
 }
 
@@ -221,7 +228,20 @@ export function buildProjectHierarchyTreeNodeContextMenuSortHandlers (input: {
     if (node === null) {
       return
     }
-    if (node.nodeKind === 'document') {
+    if (node.nodeKind === 'tag') {
+      if (menuItem.scope !== 'direct') {
+        return
+      }
+      input.runFaAction('sortHierarchyTreeDocuments', {
+        direction: menuItem.direction,
+        documentId: null,
+        key: menuItem.key,
+        nodeKind: 'tag',
+        placementId: '',
+        scope: 'direct',
+        tagId: node.tagId as string
+      })
+    } else if (node.nodeKind === 'document') {
       input.runFaAction('sortHierarchyTreeDocuments', {
         direction: menuItem.direction,
         documentId: node.documentId as string,

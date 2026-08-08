@@ -70,12 +70,14 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
       updateIsMinorDraft: () => {},
       updateParentDocumentIdDraft: () => {},
       updateTreeOrderNumberDraft: () => {},
-      updateExtraClassesDraft: () => {}
+      updateExtraClassesDraft: () => {},
+      updateTagsDraft: () => {}
     }) as never,
     S_FaProjectHierarchyTree: () => ({
       patchWorldColorPaletteInLayout: () => {}
     }) as never,
     computed: computed as never,
+    ref,
     createDocumentWorkspacePageColorPickers,
     createDocumentWorkspacePageDocumentBooleanToggle,
     createDocumentWorkspacePageIsCategoryToggle,

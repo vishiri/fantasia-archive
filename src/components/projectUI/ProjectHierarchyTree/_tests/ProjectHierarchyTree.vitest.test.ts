@@ -66,6 +66,11 @@ const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([
   }
 ])
 
+const renameTagNameDraft = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('')
+})
+
 const treeContextMenuState = {
   addNewRowIcon: ref<string | null>(null),
   addNewRowLabel: ref<string | null>(null),
@@ -74,7 +79,9 @@ const treeContextMenuState = {
   menuPointerPosition: ref<{ left: number, top: number } | null>(null),
   showsBulkExpandRows: ref(false),
   showsCopyRows: ref(false),
-  showsSortByRows: ref(false)
+  showsDocumentOpenEditRows: ref(false),
+  showsSortByRows: ref(false),
+  showsTagMenuRows: ref(false)
 }
 
 const documentButtonVisibility = ref({
@@ -84,6 +91,7 @@ const documentButtonVisibility = ref({
 })
 
 const showsTreeLines = ref(true)
+const usesExtraTreePadding = ref(false)
 const showsOrderNumberBadge = ref(true)
 const projectDisplayName = ref('')
 const showsProjectNameTitle = ref(false)
@@ -121,30 +129,47 @@ const projectHierarchyTreeContextMenuStubs = {
   }
 }
 
-const projectHierarchyTreeNodeContextMenuStub = {
-  name: 'ProjectHierarchyTreeNodeContextMenu',
+const projectHierarchyTreeNodeMenusHostStub = {
+  name: 'ProjectHierarchyTreeNodeMenusHost',
   props: [
+    'addDocumentPlacementOptions',
     'addNewRowIcon',
     'addNewRowLabel',
     'anchorNodeId',
-    'isOpen',
+    'deleteTagConfirmOpen',
+    'deleteTagName',
+    'isNodeContextMenuOpen',
     'menuPointerPosition',
     'onAddNewClick',
+    'onAddNewDocumentToThisTagClick',
     'onAddNewDocumentUnderThisClick',
     'onCollapseAllClick',
+    'onConfirmDeleteTag',
+    'onConfirmRenameTag',
     'onCopyBackgroundColorClick',
     'onCopyDocumentClick',
     'onCopyNameClick',
     'onCopyTextColorClick',
     'onDeleteDocumentClick',
+    'onDeleteTagClick',
+    'onDismissDeleteTagDialog',
+    'onDismissRenameTagDialog',
     'onEditDocumentClick',
     'onExpandAllClick',
     'onHide',
     'onOpenDocumentClick',
+    'onRenameTagClick',
     'onSortByItemClick',
+    'renameTagCanConfirm',
+    'renameTagCurrentName',
+    'renameTagDialogOpen',
+    'renameTagMergeWarning',
+    'renameTagNameDraft',
     'showsBulkExpandRows',
     'showsCopyRows',
-    'showsSortByRows'
+    'showsDocumentOpenEditRows',
+    'showsSortByRows',
+    'showsTagMenuRows'
   ],
   template: '<div data-test-locator="projectHierarchyTree-nodeContextMenu-stub" />'
 }
@@ -154,9 +179,14 @@ function mountProjectHierarchyTree (
   withNodeContextMenu = false
 ) {
   const contextMenuStubs = withNodeContextMenu
-    ? projectHierarchyTreeContextMenuStubs
+    ? {
+        ...projectHierarchyTreeContextMenuStubs,
+        ProjectHierarchyTreeTagDialogsHost: true,
+        ProjectHierarchyTreeRenameTagDialog: true,
+        ProjectHierarchyTreeDeleteTagDialog: true
+      }
     : {
-        ProjectHierarchyTreeNodeContextMenu: projectHierarchyTreeNodeContextMenuStub
+        ProjectHierarchyTreeNodeMenusHost: projectHierarchyTreeNodeMenusHostStub
       }
 
   return mount(ProjectHierarchyTree, {
@@ -180,12 +210,18 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
       treeOpenRequest.handler = options.onDocumentOpenRequest
       return {
         activeDocumentId: ref(null),
+        addDocumentPlacementOptions: ref([]),
         contextMenuAddNewRowIcon: treeContextMenuState.addNewRowIcon,
         contextMenuAddNewRowLabel: treeContextMenuState.addNewRowLabel,
         contextMenuAnchorNodeId: treeContextMenuState.anchorNodeId,
         contextMenuShowsBulkExpandRows: treeContextMenuState.showsBulkExpandRows,
         contextMenuShowsCopyRows: treeContextMenuState.showsCopyRows,
+        contextMenuShowsDocumentOpenEditRows: treeContextMenuState.showsDocumentOpenEditRows,
         contextMenuShowsSortByRows: treeContextMenuState.showsSortByRows,
+        contextMenuSortByDirectScopeOnly: ref(false),
+        contextMenuShowsTagMenuRows: treeContextMenuState.showsTagMenuRows,
+        deleteTagConfirmOpen: ref(false),
+        deleteTagName: ref(''),
         documentButtonVisibility,
         eachDraggableHandler: () => true,
         eachDroppableHandler: () => true,
@@ -196,16 +232,22 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         isTreeDragActive: ref(false),
         nodeMenuPointerPosition: treeContextMenuState.menuPointerPosition,
         onAddNewDocumentFromContextMenuClick: treeHandlers.onAddNewDocumentFromContextMenuClick,
+        onAddNewDocumentToThisTagFromContextMenuClick: vi.fn(),
         onAddNewDocumentUnderThisFromContextMenuClick:
           treeHandlers.onAddNewDocumentUnderThisFromContextMenuClick,
         onBeforeDragOpen: treeHandlers.onBeforeDragOpen,
         onBeforeDragStart: treeHandlers.onBeforeDragStart,
         onCollapseAllUnderNodeClick: treeHandlers.onCollapseAllUnderNodeClick,
+        onConfirmDeleteTag: vi.fn(),
+        onConfirmRenameTag: vi.fn(),
         onCopyBackgroundColorFromContextMenuClick: treeHandlers.onCopyBackgroundColorFromContextMenuClick,
         onCopyDocumentFromContextMenuClick: treeHandlers.onCopyDocumentFromContextMenuClick,
         onCopyNameFromContextMenuClick: treeHandlers.onCopyNameFromContextMenuClick,
         onCopyTextColorFromContextMenuClick: treeHandlers.onCopyTextColorFromContextMenuClick,
         onDeleteDocumentFromContextMenuClick: treeHandlers.onDeleteDocumentFromContextMenuClick,
+        onDeleteTagFromContextMenuClick: vi.fn(),
+        onDismissDeleteTagDialog: vi.fn(),
+        onDismissRenameTagDialog: vi.fn(),
         onDocumentRowAddUnderButtonClick: treeHandlers.onDocumentRowAddUnderButtonClick,
         onDocumentRowAuxClick: treeHandlers.onDocumentRowAuxClick,
         onDocumentRowEditButtonClick: treeHandlers.onDocumentRowEditButtonClick,
@@ -218,6 +260,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onNodeOpen: treeHandlers.onNodeOpen,
         onNodeRowContextMenu: treeHandlers.onNodeRowContextMenu,
         onOpenDocumentFromContextMenuClick: treeHandlers.onOpenDocumentFromContextMenuClick,
+        onRenameTagFromContextMenuClick: vi.fn(),
         onSortByItemFromContextMenuClick: treeHandlers.onSortByItemFromContextMenuClick,
         onNonWorldOpenIconClick: treeHandlers.onNonWorldOpenIconClick,
         onNonWorldOpenIconPointerDown: treeHandlers.onNonWorldOpenIconPointerDown,
@@ -226,6 +269,11 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onTreeDragEndCleanup: treeHandlers.onTreeDragEndCleanup,
         onWorldNodeRowClick: treeHandlers.onWorldNodeRowClick,
         onWorldNodeRowPointerDown: treeHandlers.onWorldNodeRowPointerDown,
+        renameTagCanConfirm: ref(false),
+        renameTagCurrentName: ref(''),
+        renameTagDialogOpen: ref(false),
+        renameTagMergeWarning: ref(false),
+        renameTagNameDraft,
         resolveOrderNumberBadgeLabelForNode: (node: { nodeKind: string, treeOrderNumber?: number | null }) => {
           if (!showsOrderNumberBadge.value || node.nodeKind !== 'document') {
             return null
@@ -273,7 +321,8 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         treeRootClassList: ref({}),
         treeStyle: ref({
           height: '100%'
-        })
+        }),
+        usesExtraTreePadding
       }
     }
   }
@@ -403,6 +452,32 @@ test('Test that ProjectHierarchyTree binds tree-line visibility from showsTreeLi
 
   expect(wrapper.find('[data-test-tree-line="false"]').exists()).toBe(true)
   wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree binds extra padding class from usesExtraTreePadding', async () => {
+  usesExtraTreePadding.value = false
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'stat'],
+          template: '<div data-test-locator="projectHierarchyTree-node-stub" />'
+        },
+        ProjectHierarchyTreeOpenIcon: true
+      }
+    }
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree"]').classes())
+    .not.toContain('projectHierarchyTree--extraPadding')
+
+  usesExtraTreePadding.value = true
+  await wrapper.vm.$nextTick()
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree"]').classes())
+    .toContain('projectHierarchyTree--extraPadding')
+  wrapper.unmount()
+  usesExtraTreePadding.value = false
 })
 
 test('Test that ProjectHierarchyTree forwards row and tree interaction handlers', async () => {
@@ -906,5 +981,36 @@ test('Test that ProjectHierarchyTree defaults missing placement counts to zero',
 
   expect(wrapper.get('[data-test-document-count]').attributes('data-test-document-count')).toBe('0')
   expect(wrapper.get('[data-test-category-count]').attributes('data-test-category-count')).toBe('0')
+  wrapper.unmount()
+})
+
+/**
+ * ProjectHierarchyTree
+ * Forwards tag dialog rename draft through ProjectHierarchyTreeNodeMenusHost v-model.
+ */
+test('Test that ProjectHierarchyTree forwards tag rename draft through menus host', async () => {
+  renameTagNameDraft.value = 'Heroes'
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNodeMenusHost: {
+          name: 'ProjectHierarchyTreeNodeMenusHost',
+          props: ['showsTagMenuRows', 'renameTagNameDraft'],
+          emits: ['update:renameTagNameDraft'],
+          template: '<div data-test-locator="tree-tag-menus-host" :data-shows-tag="showsTagMenuRows" :data-rename-draft="renameTagNameDraft" @click="$emit(\'update:renameTagNameDraft\', \'Places\')" />'
+        },
+        ProjectHierarchyTreeNode: true,
+        QIcon: true
+      }
+    }
+  })
+  const menusHost = wrapper.find('[data-test-locator="tree-tag-menus-host"]')
+  expect(menusHost.exists()).toBe(true)
+  expect(menusHost.attributes('data-rename-draft')).toBe('Heroes')
+  await menusHost.trigger('click')
+  expect(renameTagNameDraft.value).toBe('Places')
+  const menusHostComponent = wrapper.findComponent({ name: 'ProjectHierarchyTreeNodeMenusHost' })
+  await menusHostComponent.vm.$emit('update:renameTagNameDraft', 'Villains')
+  expect(renameTagNameDraft.value).toBe('Villains')
   wrapper.unmount()
 })

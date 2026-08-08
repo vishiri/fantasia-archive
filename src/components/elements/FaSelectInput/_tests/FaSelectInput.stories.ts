@@ -133,3 +133,64 @@ export const DocumentWithIsNew: StoryObj<typeof meta> = {
     `
   })
 }
+
+/** Document workspace Tags field shape: multi + create-new chips. */
+export const TagsMulti: StoryObj<typeof meta> = {
+  args: {
+    allowCreateNew: true,
+    mode: 'tags',
+    modelValue: [
+      {
+        id: 'tag-alpha',
+        name: 'Alpha'
+      },
+      {
+        id: 'tag-new',
+        isNew: true,
+        name: 'Draft tag'
+      }
+    ],
+    multiple: true,
+    options: [
+      {
+        id: 'tag-alpha',
+        name: 'Alpha'
+      },
+      {
+        id: 'tag-beta',
+        name: 'Beta'
+      },
+      {
+        id: 'tag-new',
+        isNew: true,
+        name: 'Draft tag'
+      }
+    ]
+  },
+  render: (args) => ({
+    components: {
+      FaSelectInput
+    },
+    setup () {
+      const value = ref(args.modelValue)
+      return {
+        args,
+        value
+      }
+    },
+    template: `
+      <div class="q-pa-md" style="max-width: 420px;">
+        <FaSelectInput
+          v-model="value"
+          allow-create-new
+          clear-input-on-select
+          mode="tags"
+          multiple
+          :options="args.options"
+          :test-locator="args.testLocator"
+          label="Tags"
+        />
+      </div>
+    `
+  })
+}

@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3'
-import { v4 as uuidv4, validate as validateUuid } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   applyFaProjectContentSchemaV1,
@@ -27,12 +27,13 @@ import { applyFaProjectDocumentTreeOrderNumberSchemaPatch } from './projectDbCon
 import { applyFaProjectDocumentExtraClassesSchemaPatch } from './projectDbContent/faProjectDocumentExtraClassesSchemaPatchWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 import { applyFaProjectWorldColorEmptyAllowedSchemaPatch } from './projectDbContent/faProjectWorldColorEmptyAllowedSchemaPatchWiring'
+import { applyFaProjectTagsSchemaPatch } from './projectDbContent/faProjectTagsSchemaPatchWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number + v5 extra_classes + v6 worlds.color_palette rename. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6
+/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number + v5 extra_classes + v6 worlds.color_palette rename + v7 tags. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7
 
 const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
   documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
@@ -103,6 +104,7 @@ function applyFaProjectSchemaPatchesAtCurrentVersion (db: Database): void {
   applyFaProjectDocumentExtraClassesSchemaPatch(db)
   applyFaProjectWorldColorEmptyAllowedSchemaPatch(db)
   applyFaProjectDocumentAppearanceEmptyColorSchemaPatch(db)
+  applyFaProjectTagsSchemaPatch(db)
   applyFaProjectOpenedDocumentsSchemaV1(db)
 }
 
@@ -164,6 +166,14 @@ function migrateFaProjectSchemaV5ToV6 (db: Database): void {
   runMigration()
 }
 
+function migrateFaProjectSchemaV6ToV7 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    applyFaProjectTagsSchemaPatch(db)
+    db.pragma('user_version = 7')
+  })
+  runMigration()
+}
+
 /**
  * Applies schema migrations. Fresh files bootstrap to the current revision and seed the default world.
  * Files already at the supported version run idempotent patches only.
@@ -182,56 +192,46 @@ export function applyFaProjectMigrations (
   }
   if (startVer === 1) {
     migrateFaProjectSchemaV1ToV2(db)
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 3) {
-      migrateFaProjectSchemaV2ToV3(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
-      migrateFaProjectSchemaV3ToV4(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
-      migrateFaProjectSchemaV4ToV5(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
-      migrateFaProjectSchemaV5ToV6(db)
-    }
+    migrateFaProjectSchemaV2ToV3(db)
+    migrateFaProjectSchemaV3ToV4(db)
+    migrateFaProjectSchemaV4ToV5(db)
+    migrateFaProjectSchemaV5ToV6(db)
+    migrateFaProjectSchemaV6ToV7(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 2) {
     migrateFaProjectSchemaV2ToV3(db)
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
-      migrateFaProjectSchemaV3ToV4(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
-      migrateFaProjectSchemaV4ToV5(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
-      migrateFaProjectSchemaV5ToV6(db)
-    }
+    migrateFaProjectSchemaV3ToV4(db)
+    migrateFaProjectSchemaV4ToV5(db)
+    migrateFaProjectSchemaV5ToV6(db)
+    migrateFaProjectSchemaV6ToV7(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 3) {
     migrateFaProjectSchemaV3ToV4(db)
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
-      migrateFaProjectSchemaV4ToV5(db)
-    }
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
-      migrateFaProjectSchemaV5ToV6(db)
-    }
+    migrateFaProjectSchemaV4ToV5(db)
+    migrateFaProjectSchemaV5ToV6(db)
+    migrateFaProjectSchemaV6ToV7(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 4) {
     migrateFaProjectSchemaV4ToV5(db)
-    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
-      migrateFaProjectSchemaV5ToV6(db)
-    }
+    migrateFaProjectSchemaV5ToV6(db)
+    migrateFaProjectSchemaV6ToV7(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 5) {
     migrateFaProjectSchemaV5ToV6(db)
+    migrateFaProjectSchemaV6ToV7(db)
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 6) {
+    migrateFaProjectSchemaV6ToV7(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
@@ -242,45 +242,4 @@ export function applyFaProjectMigrations (
     return
   }
   throw new Error('Unexpected project file schema state')
-}
-
-/**
- * Runs SQLite integrity quick_check; throws if result is not ok.
- */
-export function assertFaProjectDatabaseQuickCheck (db: Database): void {
-  const r = db.pragma('quick_check', { simple: true })
-  if (r !== 'ok') {
-    throw new Error('Project file failed SQLite quick_check')
-  }
-}
-
-/**
- * Reads persisted display name from schema after migrations.
- */
-export function readFaProjectStoredDisplayName (db: Database): string {
-  const row = db
-    .prepare(sqlSelectValueFromActiveTable())
-    .get(OPTION_PROJECT_NAME) as { v?: string } | undefined
-  const name = row?.v?.trim()
-  if (name === undefined || name.length === 0) {
-    throw new Error('Project file is missing project metadata')
-  }
-  return name
-}
-
-/**
- * Reads persisted logical project id ('project_data.project_uuid') after migrations.
- */
-export function readFaProjectStoredProjectUuid (db: Database): string {
-  const row = db
-    .prepare(sqlSelectValueFromActiveTable())
-    .get(OPTION_PROJECT_UUID) as { v?: string } | undefined
-  const raw = row?.v?.trim()
-  if (raw === undefined || raw.length === 0) {
-    throw new Error('Project file is missing project_uuid metadata')
-  }
-  if (!validateUuid(raw)) {
-    throw new Error('Project file has invalid project_uuid metadata')
-  }
-  return raw
 }

@@ -69,6 +69,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name / template titles / world appendix / layout groups / placement nicknames |
 | [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc) | **`q-menu`** / dropdown action rows — group separator vs **separatorAlt** |
 | [caveman-default.mdc](.cursor/rules/caveman-default.mdc) | Always — agent reply caveman style |
+| [subagent-model-policy.mdc](.cursor/rules/subagent-model-policy.mdc) | Always — Task/subagent **`cursor-grok-4.5-high`**; **never** Fast |
 | [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) | **`en-US`** UI copy capitalization |
 
 ## Stack (short)
@@ -84,7 +85,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Unit | Vitest — **`yarn test:unit`**; **`coverage.thresholds.perFile: true`** — each instrumented file **95/80/100/95** (stmts/branches/funcs/lines); dev edits → [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md); full **`yarn testbatch:verify`** at cleanup/commit |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
-| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 6** — see [projectDB.md](docs/database/projectDB.md) |
+| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 7** — see [projectDB.md](docs/database/projectDB.md) |
 
 ## Subsystems (pointers)
 

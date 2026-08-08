@@ -44,7 +44,7 @@ const sampleWorld = {
  */
 test('Test that projectHierarchyTreeLayoutStructureMatchesTree skips non-world root nodes', () => {
   const topologySpy = vi
-    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToTopologyKey')
+    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToStructuralTopologyKey')
     .mockReturnValue('topology-key')
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const strayRoot: I_faProjectHierarchyTreeHeTreeNode = {
@@ -71,7 +71,7 @@ test('Test that projectHierarchyTreeLayoutStructureMatchesTree skips non-world r
  */
 test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects missing layout worlds', () => {
   const topologySpy = vi
-    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToTopologyKey')
+    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToStructuralTopologyKey')
     .mockReturnValue('topology-key')
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   tree[0]!.id = 'missing-world'
@@ -84,10 +84,27 @@ test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects missing l
  */
 test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects structural child count mismatch', () => {
   const topologySpy = vi
-    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToTopologyKey')
+    .spyOn(topologyKeyModule, 'mapProjectHierarchyTreeToStructuralTopologyKey')
     .mockReturnValue('topology-key')
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   tree[0]!.children = []
   expect(projectHierarchyTreeLayoutStructureMatchesTree(tree, [sampleWorld])).toBe(false)
   topologySpy.mockRestore()
+})
+
+/**
+ * Tag-only membership changes still match structure so resync patches in place.
+ */
+test('Test that projectHierarchyTreeLayoutStructureMatchesTree ignores tag membership changes', () => {
+  const worldWithTags = {
+    ...sampleWorld,
+    tags: [{
+      categoryCount: 0,
+      documentCount: 1,
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  }
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(projectHierarchyTreeLayoutStructureMatchesTree(tree, [worldWithTags])).toBe(true)
 })

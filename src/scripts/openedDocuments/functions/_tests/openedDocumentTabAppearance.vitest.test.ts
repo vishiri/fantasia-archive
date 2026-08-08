@@ -120,6 +120,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -142,6 +144,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -164,6 +168,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
 })
 
@@ -197,6 +203,8 @@ test('Test that recomputeOpenedDocumentTabHasUnsavedChanges detects background c
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(false)
 })
 
@@ -222,6 +230,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects parent id drift',
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
 })
 
@@ -246,7 +256,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects tree order drift'
     treeOrderNumber: 7,
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
-    savedExtraClasses: ''
+    savedExtraClasses: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: ''
   })).toBe(true)
 })
 

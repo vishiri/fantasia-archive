@@ -118,12 +118,18 @@ type T_earlyWiring = ReturnType<typeof createProjectHierarchyTreeSessionEarlyWir
 
 type T_hierarchyStore = {
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  refreshHierarchyTreeNodes?: ((nodeIds: string[]) => void) | undefined
+  refreshLayout: () => Promise<void>
   uiState: { scrollTopPx: number }
 }
 
 export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
+  applyOpenedDocumentTabs?: ((
+    tabs: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTab[]
+  ) => void) | undefined
   createTemporaryDocument: (input: {
     displayName: string
+    initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode
     parentDocumentId: null
     templateId: string
@@ -135,6 +141,7 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     } | null
   }
   earlyWiring: T_earlyWiring
+  getOpenedDocumentTabs?: (() => readonly import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTab[]) | undefined
   hierarchyStore: T_hierarchyStore
   nextTick: () => Promise<void>
   onDocumentOpenRequest: (
@@ -147,7 +154,9 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
   return createProjectHierarchyTreeSessionHandlersWiring({
+    applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs,
     createTemporaryDocument: deps.createTemporaryDocument,
+    getOpenedDocumentTabs: deps.getOpenedDocumentTabs,
     documentRowDragHoldWiring: deps.earlyWiring.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.earlyWiring.bootstrap.documentRowExpandClickGesture,
     dragContext: deps.dragContext,
@@ -164,8 +173,15 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     queuePersistExpandedNodeIds: (expandedNodeIds) => {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
+    refreshHierarchyTreeNodes: (nodeIds) => {
+      deps.hierarchyStore.refreshHierarchyTreeNodes?.(nodeIds)
+    },
+    refreshLayout: () => deps.hierarchyStore.refreshLayout(),
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
     requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+    resyncTreeDataFromLayout: () => {
+      deps.earlyWiring.subWiring.syncWiring.resyncTreeDataFromLayout()
+    },
     runDeferredLazyLoadBatch: deps.earlyWiring.subWiring.runDeferredLazyLoadBatch,
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,

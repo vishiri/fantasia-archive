@@ -47,6 +47,7 @@ export interface I_faUserSettings {
   disableSpellCheck: boolean
   disableStartUpdateCheckMessage: boolean
   doubleDashDocCount: boolean
+  extraTreePadding: boolean
   forceSublevelCollapseInTree: boolean
   hideAdvSearchCheatsheetButton: boolean
   hideDeadCrossThrough: boolean

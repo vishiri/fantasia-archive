@@ -467,8 +467,12 @@ const selectorList = {
   dialogAppSettingsSave: 'dialogAppSettings-button-save',
   dialogAppSettingsTabHierarchicalTree: 'dialogAppSettings-tab-hierarchicalTree',
   dialogAppSettingsSettingHideTreeLines: 'dialogAppSettings-setting-hideTreeLines',
-  dialogAppSettingsSettingHideTreeOrderNumbers: 'dialogAppSettings-setting-hideTreeOrderNumbers'
+  dialogAppSettingsSettingHideTreeOrderNumbers: 'dialogAppSettings-setting-hideTreeOrderNumbers',
+  dialogAppSettingsSettingExtraTreePadding: 'dialogAppSettings-setting-extraTreePadding'
 } as const
+
+const EXTRA_TREE_PADDING_LEFT_PX = '30px'
+const EXTRA_TREE_PADDING_WORLD_BLEED_MARGIN = '-18px'
 
 const appSettingsTabSwitchSettleMs = 550
 const postSaveAppSettingsWaitMs = 500
@@ -516,6 +520,34 @@ async function toggleAppSettingsSwitch (
     await toggle.click()
   }
   await expect(toggle).toHaveAttribute('aria-checked', wantChecked ? 'true' : 'false')
+}
+
+async function expectHierarchyTreeExtraPaddingChrome (
+  page: Page,
+  enabled: boolean
+): Promise<void> {
+  const tree = page.locator(`[data-test-locator="${selectorList.tree}"]`)
+  await expect(tree).toHaveCount(1)
+  if (enabled) {
+    await expect(tree).toHaveClass(/projectHierarchyTree--extraPadding/)
+    await expect(tree).toHaveCSS('padding-left', EXTRA_TREE_PADDING_LEFT_PX)
+  } else {
+    await expect(tree).not.toHaveClass(/projectHierarchyTree--extraPadding/)
+    await expect(tree).toHaveCSS('padding-left', '0px')
+  }
+
+  const worldTreeNode = page.locator(
+    `[data-test-locator="${selectorList.tree}"] .projectHierarchyTree-treeNode--world`
+  )
+  await expect(worldTreeNode).toHaveCount(1)
+  const worldNodeRow = page.locator(
+    `[data-test-locator="${selectorList.tree}"] .projectHierarchyTree__nodeRow--world`
+  )
+  await expect(worldNodeRow).toHaveCount(1)
+  if (enabled) {
+    await expect(worldTreeNode).toHaveCSS('margin-left', EXTRA_TREE_PADDING_WORLD_BLEED_MARGIN)
+    await expect(worldNodeRow).toHaveCSS('margin-left', EXTRA_TREE_PADDING_WORLD_BLEED_MARGIN)
+  }
 }
 
 const defaultHierarchySeed: I_faComponentTestingStoreSeed = {
@@ -771,6 +803,7 @@ async function remountHierarchyTreeAfterStoreSeed (
     disableCategoryCount: seed.disableCategoryCount ?? false,
     disableDocumentCounts: seed.disableDocumentCounts ?? false,
     doubleDashDocCount: seed.doubleDashDocCount ?? false,
+    extraTreePadding: seed.extraTreePadding ?? false,
     forceSublevelCollapseInTree: seed.forceSublevelCollapseInTree ?? false,
     hideDeadCrossThrough: seed.hideDeadCrossThrough ?? false,
     hideHierarchyTree: seed.hideHierarchyTree ?? false,
@@ -780,7 +813,10 @@ async function remountHierarchyTreeAfterStoreSeed (
     hideTreeLines: seed.hideTreeLines ?? false,
     hideTreeOrderNumbers: seed.hideTreeOrderNumbers ?? false,
     invertCategoryPosition: seed.invertCategoryPosition ?? false,
-    noProjectName: seed.noProjectName ?? false
+    noProjectName: seed.noProjectName ?? false,
+    compactTags: seed.compactTags ?? false,
+    noTags: seed.noTags ?? false,
+    tagsAtTop: seed.tagsAtTop ?? false
   })
   await page.waitForTimeout(faFrontendRenderTimer)
 
@@ -806,6 +842,7 @@ async function remountHierarchyTreeAfterStoreSeed (
       disableCategoryCount: seed.disableCategoryCount ?? false,
       disableDocumentCounts: seed.disableDocumentCounts ?? false,
       doubleDashDocCount: seed.doubleDashDocCount ?? false,
+      extraTreePadding: seed.extraTreePadding ?? false,
       forceSublevelCollapseInTree: seed.forceSublevelCollapseInTree ?? false,
       hideDeadCrossThrough: seed.hideDeadCrossThrough ?? false,
       hideHierarchyTree: seed.hideHierarchyTree ?? false,
@@ -1477,6 +1514,49 @@ test.describe.serial('Project hierarchy tree chrome markers context add-new', ()
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.tree}"] .tree-line`)
     ).toHaveCount(0)
+  })
+
+  test('Check if extraTreePadding adds left padding and world bleed', async () => {
+    await remountHierarchyTreeAfterStoreSeed(appWindow, defaultHierarchySeed, workspaceTreeRemountOptions)
+    await expectHierarchyTreeExtraPaddingChrome(appWindow, false)
+
+    await remountHierarchyTreeAfterStoreSeed(appWindow, {
+      ...defaultHierarchySeed,
+      extraTreePadding: true
+    }, workspaceTreeRemountOptions)
+    await expectHierarchyTreeExtraPaddingChrome(appWindow, true)
+
+    await remountHierarchyTreeAfterStoreSeed(appWindow, {
+      ...defaultHierarchySeed,
+      extraTreePadding: false
+    }, workspaceTreeRemountOptions)
+    await expectHierarchyTreeExtraPaddingChrome(appWindow, false)
+  })
+
+  test('Check if Save extraTreePadding updates the mounted tree', async () => {
+    await remountHierarchyTreeAfterStoreSeed(appWindow, {
+      ...defaultHierarchySeed,
+      extraTreePadding: false
+    }, workspaceTreeRemountOptions)
+    await expectHierarchyTreeExtraPaddingChrome(appWindow, false)
+
+    await openAppSettingsFromHierarchyTreeHarness(appWindow)
+    await openAppSettingsHierarchicalTreeTab(appWindow)
+    await toggleAppSettingsSwitch(
+      appWindow,
+      selectorList.dialogAppSettingsSettingExtraTreePadding,
+      true
+    )
+    await appWindow.locator(`[data-test-locator="${selectorList.dialogAppSettingsSave}"]`).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.dialogAppSettingsTitle}"]`)
+    ).toHaveCount(0, { timeout: 15_000 })
+    await appWindow.waitForTimeout(postSaveAppSettingsWaitMs)
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.root}"]`)
+    ).toBeVisible()
+    await expectHierarchyTreeExtraPaddingChrome(appWindow, true)
   })
 
   test('Check if Save hierarchy chrome flags update the mounted tree', async () => {

@@ -140,6 +140,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: T_sessionSubWi
   return {
     beforeDragOpenWiring,
     dndWiring,
+    forceResyncTreeDataFromLayout: syncWiring.forceResyncTreeDataFromLayout,
     lazyLoadWiring,
     openIconExpandAnimationWiring,
     runDeferredLazyLoadBatch,

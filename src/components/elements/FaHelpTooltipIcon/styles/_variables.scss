@@ -1,7 +1,7 @@
 @use '../../../../css/app.palette.scss' as *;
 
 /* COMPONENT - FA HELP TOOLTIP ICON */
-$faHelpTooltipIcon-border-width: 2px;
+$faHelpTooltipIcon-border-width: 1.5px;
 $faHelpTooltipIcon-circle-color: fa-v('white', $white);
 $faHelpTooltipIcon-circle-size: 16px;
 $faHelpTooltipIcon-color: fa-v('primary-bright', $primary-bright);

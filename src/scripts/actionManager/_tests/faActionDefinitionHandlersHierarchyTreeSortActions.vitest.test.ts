@@ -298,3 +298,178 @@ test('handleSortHierarchyTreeDocuments refreshes completed buckets before rethro
 
   expect(refreshHierarchyTreeNodes).toHaveBeenCalledWith(['placement-1'])
 })
+
+test('handleSortHierarchyTreeDocuments sorts documents under a tag via overrides', async () => {
+  setFaComponentTestingProjectContentOverrides({
+    documentsUnderTagByTagId: {
+      'tag-1': [
+        {
+          documentBackgroundColor: '',
+          documentId: 'doc-b',
+          documentTextColor: '',
+          displayName: 'Beta',
+          extraClasses: '',
+          isCategory: false,
+          isDead: false,
+          isFinished: false,
+          isMinor: false,
+          sortOrder: 0,
+          templateId: null,
+          treeOrderNumber: Number.MIN_SAFE_INTEGER
+        },
+        {
+          documentBackgroundColor: '',
+          documentId: 'doc-a',
+          documentTextColor: '',
+          displayName: 'Alpha',
+          extraClasses: '',
+          isCategory: false,
+          isDead: false,
+          isFinished: false,
+          isMinor: false,
+          sortOrder: 1,
+          templateId: null,
+          treeOrderNumber: Number.MIN_SAFE_INTEGER
+        }
+      ]
+    }
+  })
+  stubProjectContentApi(undefined)
+  const refreshHierarchyTreeNodes = vi.fn()
+  const { handleSortHierarchyTreeDocuments } = createFaActionDefinitionHandlersHierarchyTreeSortActions({
+    S_FaProjectHierarchyTree: () => ({ refreshHierarchyTreeNodes })
+  })
+
+  const continuation = await handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: 'tag-1'
+  })
+
+  expect(refreshHierarchyTreeNodes).toHaveBeenCalledWith(['tag-1'])
+  expect(continuation).toEqual({ payloadPreview: 'direct:name:asc:tag' })
+})
+
+test('handleSortHierarchyTreeDocuments under-tag no-ops and throws on missing bridge', async () => {
+  stubProjectContentApi(undefined)
+  const refreshHierarchyTreeNodes = vi.fn()
+  const { handleSortHierarchyTreeDocuments } = createFaActionDefinitionHandlersHierarchyTreeSortActions({
+    S_FaProjectHierarchyTree: () => ({ refreshHierarchyTreeNodes })
+  })
+
+  await expect(handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'recursive',
+    tagId: 'tag-1'
+  })).resolves.toBeUndefined()
+
+  await expect(handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: '   '
+  })).resolves.toBeUndefined()
+
+  await expect(handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: 'tag-1'
+  })).rejects.toThrow('Project hierarchy under-tag sort bridge is unavailable')
+
+  setFaComponentTestingProjectContentOverrides({
+    documentsUnderTagByTagId: {
+      'tag-empty': []
+    }
+  })
+  await expect(handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: 'tag-empty'
+  })).resolves.toEqual({
+    payloadPreview: 'direct:name:asc:tag'
+  })
+  expect(refreshHierarchyTreeNodes).not.toHaveBeenCalled()
+})
+
+test('handleSortHierarchyTreeDocuments under-tag uses bridge APIs when present', async () => {
+  const listDocumentsUnderTag = vi.fn(async () => ({
+    items: [
+      {
+        documentBackgroundColor: '',
+        documentId: 'doc-b',
+        documentTextColor: '',
+        displayName: 'Beta',
+        extraClasses: '',
+        isCategory: false,
+        isDead: false,
+        isFinished: false,
+        isMinor: false,
+        sortOrder: 0,
+        templateId: null,
+        treeOrderNumber: Number.MIN_SAFE_INTEGER
+      },
+      {
+        documentBackgroundColor: '',
+        documentId: 'doc-a',
+        documentTextColor: '',
+        displayName: 'Alpha',
+        extraClasses: '',
+        isCategory: false,
+        isDead: false,
+        isFinished: false,
+        isMinor: false,
+        sortOrder: 1,
+        templateId: null,
+        treeOrderNumber: Number.MIN_SAFE_INTEGER
+      }
+    ]
+  }))
+  const reorderDocumentsUnderTag = vi.fn(async () => undefined)
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {
+      projectContent: {
+        listDocumentsUnderTag,
+        reorderDocumentsUnderTag
+      }
+    }
+  })
+  const refreshHierarchyTreeNodes = vi.fn()
+  const { handleSortHierarchyTreeDocuments } = createFaActionDefinitionHandlersHierarchyTreeSortActions({
+    S_FaProjectHierarchyTree: () => ({ refreshHierarchyTreeNodes })
+  })
+
+  await handleSortHierarchyTreeDocuments({
+    direction: 'asc',
+    documentId: null,
+    key: 'name',
+    nodeKind: 'tag',
+    placementId: '',
+    scope: 'direct',
+    tagId: 'tag-1'
+  })
+
+  expect(reorderDocumentsUnderTag).toHaveBeenCalledWith({
+    orderedDocumentIds: ['doc-a', 'doc-b'],
+    tagId: 'tag-1'
+  })
+  expect(refreshHierarchyTreeNodes).toHaveBeenCalledWith(['tag-1'])
+})

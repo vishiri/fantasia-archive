@@ -107,6 +107,8 @@ async function seedDirtyPersistedOpenedDocumentTab (
         savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
         extraClassesDraft: '',
         savedExtraClasses: '',
+        tagsDraft: [],
+        savedTags: [],
         tabLabel: labels.draftLabel,
         templateIcon: 'mdi-file-document'
       }]

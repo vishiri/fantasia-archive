@@ -137,6 +137,47 @@ test('Test that createTemporaryOpenedDocumentTabSeed starts in edit mode without
   expect(tab.hasUnsavedChanges).toBe(false)
   expect(tab.savedDisplayName).toBe('Aria')
   expect(tab.worldId).toBe('world-1')
+  expect(tab.tagsDraft).toEqual([])
+})
+
+/**
+ * createTemporaryOpenedDocumentTabSeed
+ * Prefills Tags draft and marks dirty when initialTagsDraft is provided.
+ */
+test('Test that createTemporaryOpenedDocumentTabSeed prefills initialTagsDraft', () => {
+  const tab = createTemporaryOpenedDocumentTabSeed({
+    displayName: 'Aria',
+    documentId: 'temp-1',
+    initialTagsDraft: [
+      {
+        id: 'tag-1',
+        name: 'Heroes'
+      },
+      {
+        id: 'tag-new',
+        name: 'Places',
+        isNew: true
+      }
+    ],
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  expect(tab.hasUnsavedChanges).toBe(true)
+  expect(tab.tagsDraft).toEqual([
+    {
+      id: 'tag-1',
+      name: 'Heroes'
+    },
+    {
+      id: 'tag-new',
+      name: 'Places',
+      isNew: true
+    }
+  ])
+  expect(tab.savedTags).toEqual([])
 })
 
 test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only after draft edits', () => {

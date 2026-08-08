@@ -26,6 +26,9 @@ export default {
     'This setting allows for setting the current document to minor document mode. A document with minor document mode toggled on will not show in any other relationship searches. The idea behind this setting is to allow for creation of documents that will not clutter the search, but could be theoretically relevant in some very specific cases to the story (eg: distant relatives of a character).',
   isMinorTitle: 'Is a minor document',
   nameFieldLabel: 'Document name',
+  tagsFieldDescription:
+    'Assign one or more tags to this document. Tags are scoped per world and appear as branches in the hierarchical tree. Create a new tag by typing a name and pressing Enter.',
+  tagsFieldLabel: 'Tags',
   textColorFieldDescription:
     'This field allows for custom-coloring your document to any available HEX or RGB color. The selected color will show on the icon and name of the document both in the hierarchical tree on the left and in the top tabs.',
   textColorFieldLabel: 'Cor do texto do documento'

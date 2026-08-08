@@ -42,6 +42,10 @@ export type T_createUseDocumentWorkspacePageDeps = {
     updateParentDocumentIdDraft: (documentId: string, value: string) => void
     updateTreeOrderNumberDraft: (documentId: string, value: string) => void
     updateExtraClassesDraft: (documentId: string, value: string) => void
+    updateTagsDraft: (
+      documentId: string,
+      value: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[]
+    ) => void
   }
   S_FaProjectHierarchyTree: () => StoreGeneric & {
     patchWorldColorPaletteInLayout: (worldId: string, colorPalette: string) => void
@@ -51,8 +55,9 @@ export type T_createUseDocumentWorkspacePageDeps = {
     <T>(options: {
       get: () => T
       set: (value: T) => void
-    }): I_computedRef<T>
+    }): import('app/types/I_vueCompositionShims').I_writableComputedRef<T>
   }
+  ref: <T>(value: T) => import('app/types/I_vueCompositionShims').I_ref<T>
   createDocumentWorkspacePageColorPickers: (
     input: T_createDocumentWorkspacePageColorPickersDeps
   ) => {
@@ -187,7 +192,17 @@ export type T_useDocumentWorkspacePageApi = () => {
   extraHtmlClassesModel: I_computedRef<string>
   workspacePageExtraHtmlClassList: I_computedRef<string[]>
   onAppendToWorldPalette: (colorPalette: string) => void
+  onTagsRequestOptions: () => void
   previewDisplayName: I_computedRef<string>
+  tagsFieldDescription: I_computedRef<string>
+  tagsFieldLabel: I_computedRef<string>
+  tagsFieldReadOnly: I_computedRef<boolean>
+  tagsModel: import('app/types/I_vueCompositionShims').I_writableComputedRef<
+    import('app/types/I_faSelectInput').I_faSelectInputObjectItem[]
+  >
+  tagsOptions: import('app/types/I_vueCompositionShims').I_ref<
+    import('app/types/I_faSelectInput').I_faSelectInputObjectItem[]
+  >
   textColorFieldDescription: I_computedRef<string>
   textColorFieldLabel: I_computedRef<string>
   textColorModel: I_computedRef<string>

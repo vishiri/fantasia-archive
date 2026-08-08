@@ -1,6 +1,6 @@
 # Document template custom fields (approved design)
 
-**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. Shipped **`user_version` max 6** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_palette`**, **`worlds.sort_order`**, per-world template layout via **`world_template_groups`** / **`world_template_placements`**, per-locale translations, default-world seed on create, document hierarchy/status/appearance/`extra_classes`). Custom fields = **separate future migration** after supported max (**v7+**).
+**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. Shipped **`user_version` max 7** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_palette`**, **`worlds.sort_order`**, per-world template layout via **`world_template_groups`** / **`world_template_placements`**, per-locale translations, default-world seed on create, document hierarchy/status/appearance/`extra_classes`, per-world **`tags`** / **`document_tags`**). Custom fields = **separate future migration** after supported max (**v8+**).
 
 ## Problem
 
@@ -188,7 +188,7 @@ Templates define a live, soft-deletable field catalog; documents store a persist
 
 Phases are ordered for future work. Update [projectDB.md](projectDB.md) in the **same commit** as each schema/IPC phase.
 
-### Phase 1 — Schema v7+ (custom fields)
+### Phase 1 — Schema v8+ (custom fields)
 
 Baseline = shipped max (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`**); see [projectDB.md](projectDB.md).
 

@@ -61,6 +61,26 @@
   }
 }
 
+.projectHierarchyTreeNode--tag,
+.projectHierarchyTreeNode--tagWrapper {
+  color: $projectHierarchyTree-documentRow-color;
+
+  .projectHierarchyTreeNode__icon {
+    --fa-color-glyph-base: #{$projectHierarchyTree-groupRow-color};
+
+    color: var(--fa-color-glyph-base);
+  }
+
+  .projectHierarchyTreeNode__label {
+    color: $projectHierarchyTree-documentRow-color;
+  }
+}
+
+/* Solid mdi-tag on leaf tags reads heavier than outline icons; wrapper Tags glyph stays full size. */
+.projectHierarchyTreeNode--tag .projectHierarchyTreeNode__icon--layoutKind {
+  --fa-q-icon-display-mdi-fit-scale: #{$projectHierarchyTree-tagNodeIcon-mdiFitScale};
+}
+
 .projectHierarchyTreeNode--world .projectHierarchyTreeNode__icon {
   margin-right: $projectHierarchyTree-nodeIcon-marginRight;
 }

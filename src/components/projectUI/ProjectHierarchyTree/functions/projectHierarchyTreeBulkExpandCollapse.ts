@@ -87,7 +87,9 @@ function isStructuralBulkExpandCollapseKind (
   return nodeKind === 'world' ||
     nodeKind === 'group' ||
     nodeKind === 'templatePlacement' ||
-    nodeKind === 'document'
+    nodeKind === 'document' ||
+    nodeKind === 'tag' ||
+    nodeKind === 'tagWrapper'
 }
 
 function hasNonAddNewStructuralChild (
@@ -232,13 +234,13 @@ export function collectProjectHierarchyTreeBulkCollapseOpenIdPruneSet (
 function isBulkExpandTargetNode (
   node: I_faProjectHierarchyTreeHeTreeNode
 ): boolean {
-  if (node.nodeKind === 'addNewDocument') {
+  if (!isStructuralBulkExpandCollapseKind(node.nodeKind)) {
     return false
   }
-  if (node.nodeKind === 'world' || node.nodeKind === 'group' || node.nodeKind === 'templatePlacement') {
-    return true
+  if (node.nodeKind === 'document') {
+    return node.hasChildren
   }
-  return node.nodeKind === 'document' && node.hasChildren
+  return true
 }
 
 /**

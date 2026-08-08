@@ -9,6 +9,7 @@ import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTre
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 
+import { i18n } from 'app/i18n/externalFileLoader'
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
 import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreeDisplayChromeWiring'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
@@ -33,6 +34,7 @@ export const useProjectHierarchyTree = createUseProjectHierarchyTree({
   S_FaUserSettings,
   computed,
   dragContext,
+  i18nT: (key) => String(i18n.global.t(key)),
   nextTick,
   onMounted,
   onUnmounted,

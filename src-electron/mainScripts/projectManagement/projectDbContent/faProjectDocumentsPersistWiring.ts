@@ -39,6 +39,10 @@ import {
 import { getFaProjectDocumentById } from './faProjectDocumentsQueryWiring'
 import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
 import {
+  deleteFaProjectEmptyTagsByIds,
+  listFaProjectTagIdsForDocument
+} from './faProjectTagsSqlHelpersWiring'
+import {
   resolveFaProjectDocumentIdForCreate,
   validateDocumentParentForeignKey
 } from './faProjectDocumentCreateWiring'
@@ -209,6 +213,7 @@ export function updateFaProjectDocument (
 }
 
 export function deleteFaProjectDocument (db: Database, id: string): void {
+  const tagIds = listFaProjectTagIdsForDocument(db, id)
   promoteFaProjectDocumentChildrenBeforeDelete(db, id)
   const result = db
     .prepare(`DELETE FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
@@ -216,6 +221,7 @@ export function deleteFaProjectDocument (db: Database, id: string): void {
   if (result.changes === 0) {
     throw new FaProjectContentNotFoundError(DOCUMENT_ENTITY_LABEL, id)
   }
+  deleteFaProjectEmptyTagsByIds(db, tagIds)
 }
 
 export function setFaProjectDocumentWorld (

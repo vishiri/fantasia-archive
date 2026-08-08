@@ -70,7 +70,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
-    savedDocumentTextColor: ''
+    savedDocumentTextColor: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Same',
@@ -92,7 +94,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
-    savedDocumentTextColor: ''
+    savedDocumentTextColor: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(false)
 })
 
@@ -117,7 +121,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects color draft chang
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
     extraClassesDraft: '',
     savedExtraClasses: '',
-    savedDocumentTextColor: ''
+    savedDocumentTextColor: '',
+    tagsDraftFingerprint: '',
+    savedTagsFingerprint: '',
   })).toBe(true)
 })
 

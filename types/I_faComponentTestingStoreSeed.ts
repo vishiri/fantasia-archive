@@ -9,6 +9,12 @@ import type {
   I_faProjectHierarchyTreeUiState,
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectDocumentTagRef,
+  I_faProjectTag,
+  I_faProjectTagDocumentChild,
+  I_faProjectTagWithDocumentCount
+} from 'app/types/I_faProjectTagDomain'
 import type { I_faProjectWorld } from 'app/types/I_faProjectWorldDomain'
 
 /**
@@ -39,6 +45,14 @@ export interface I_faComponentTestingHierarchyTreeSeed {
 export interface I_faComponentTestingProjectContentOverrides {
   documentsById?: Record<string, I_faProjectDocument> | undefined
   /**
+   * Document tag membership keyed by document id.
+   */
+  documentTagsByDocumentId?: Record<string, I_faProjectDocumentTagRef[]> | undefined
+  /**
+   * Lazy-load rows under a tag, keyed by tag id.
+   */
+  documentsUnderTagByTagId?: Record<string, I_faProjectTagDocumentChild[]> | undefined
+  /**
    * Placement children lists keyed by 'placementId::__root__' or 'placementId::<parentDocumentId>'.
    * Used when frozen contextBridge blocks listPlacementDocumentChildren / reindex stubs.
    */
@@ -48,7 +62,19 @@ export interface I_faComponentTestingProjectContentOverrides {
    * Used when frozen contextBridge blocks searchProjectHierarchy stubs.
    */
   searchHitsByQuery?: Record<string, I_faProjectHierarchyTreeSearchHit[]> | undefined
+  /**
+   * World-scoped tags for FaSelectInput Tags options.
+   */
+  tagsByWorldId?: Record<string, I_faProjectTag[]> | undefined
+  /**
+   * World-scoped tags with counts for hierarchy layout refresh.
+   */
+  tagsWithCountsByWorldId?: Record<string, I_faProjectTagWithDocumentCount[]> | undefined
   templatesById?: Record<string, I_faProjectDocumentTemplate> | undefined
+  /**
+   * Layout skeleton worlds for refreshLayout when frozen bridge returns empty.
+   */
+  workspaceHierarchyLayoutWorlds?: I_faProjectHierarchyTreeWorkspaceWorld[] | undefined
   worldsById?: Record<string, I_faProjectWorld> | undefined
 }
 
@@ -109,6 +135,26 @@ export interface I_faComponentTestingStoreSeed {
    * When defined, patches hideTreeLines on S_FaUserSettings.
    */
   hideTreeLines?: boolean | undefined
+
+  /**
+   * When defined, patches extraTreePadding on S_FaUserSettings.
+   */
+  extraTreePadding?: boolean | undefined
+
+  /**
+   * When defined, patches compactTags on S_FaUserSettings.
+   */
+  compactTags?: boolean | undefined
+
+  /**
+   * When defined, patches noTags on S_FaUserSettings.
+   */
+  noTags?: boolean | undefined
+
+  /**
+   * When defined, patches tagsAtTop on S_FaUserSettings.
+   */
+  tagsAtTop?: boolean | undefined
 
   /**
    * When defined, patches noProjectName on S_FaUserSettings.

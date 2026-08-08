@@ -4,7 +4,7 @@ import type {
   I_faProjectSettingsPatch,
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
-import { readFaProjectStoredDisplayName } from './faProjectDbMigrateWiring'
+import { readFaProjectStoredDisplayName } from './faProjectDbMigrateMetaWiring'
 import {
   readFaProjectDataKv,
   upsertFaProjectDataKv

@@ -4,7 +4,7 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from './projectHierarchyTreeSyncMapperWiring'
-import { mapProjectHierarchyTreeToTopologyKey } from '../functions/projectHierarchyTreeTopologyKey'
+import { mapProjectHierarchyTreeToStructuralTopologyKey } from '../functions/projectHierarchyTreeTopologyKey'
 
 function resolveProjectHierarchyTreeWorldStructuralChildCount (
   world: I_faProjectHierarchyTreeWorkspaceWorld
@@ -29,7 +29,10 @@ export function projectHierarchyTreeLayoutStructureMatchesTree (
   worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
 ): boolean {
   const nextSkeleton = mapWorkspaceLayoutToHierarchyTreeSkeleton(worlds)
-  if (mapProjectHierarchyTreeToTopologyKey(treeNodes) !== mapProjectHierarchyTreeToTopologyKey(nextSkeleton)) {
+  if (
+    mapProjectHierarchyTreeToStructuralTopologyKey(treeNodes) !==
+    mapProjectHierarchyTreeToStructuralTopologyKey(nextSkeleton)
+  ) {
     return false
   }
   const worldById = new Map(worlds.map((world) => [world.id, world]))

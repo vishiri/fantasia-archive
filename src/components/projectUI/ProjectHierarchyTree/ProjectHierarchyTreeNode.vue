@@ -134,6 +134,8 @@ const nodeRootClassList = computed(() => {
     'projectHierarchyTreeNode--document': props.node.nodeKind === 'document',
     'projectHierarchyTreeNode--group': props.node.nodeKind === 'group',
     'projectHierarchyTreeNode--documentTemplate': props.node.nodeKind === 'templatePlacement',
+    'projectHierarchyTreeNode--tag': props.node.nodeKind === 'tag',
+    'projectHierarchyTreeNode--tagWrapper': props.node.nodeKind === 'tagWrapper',
     'projectHierarchyTreeNode--world': props.node.nodeKind === 'world'
   }
 })

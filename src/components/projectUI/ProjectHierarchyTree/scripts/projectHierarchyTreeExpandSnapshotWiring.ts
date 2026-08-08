@@ -1,45 +1,16 @@
 import type { Ref } from 'vue'
 import type { I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions, I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { applyPersistedProjectHierarchyTreeOpenNodeIds, collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
-import { expandProjectHierarchyTreeExpandedNodeIdsWithAncestors, findProjectHierarchyTreeNodeById, pruneProjectHierarchyTreeExpandedNodeIdsToAncestors, publishProjectHierarchyTreeRootRevision, collectExpandedNodeIdsFromTree, shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse } from '../functions/projectHierarchyTreeExpandState'
+import { expandProjectHierarchyTreeExpandedNodeIdsWithAncestors, findProjectHierarchyTreeNodeById, pruneProjectHierarchyTreeExpandedNodeIdsToAncestors, collectExpandedNodeIdsFromTree, shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse } from '../functions/projectHierarchyTreeExpandState'
+import { partitionProjectHierarchyTreeExpandedIdsForLazyOpen } from './projectHierarchyTreeExpandedIdsLazyOpenPartitionWiring'
 import { shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
-import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
-import { reapplyProjectHierarchyTreeHeTreeOpenState } from './projectHierarchyTreeUiStateWiring'
+import { loadAndReapplyExpandedSnapshotAfterOpenSet } from './projectHierarchyTreeExpandSnapshotLoadReapplyWiring'
 import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeHelpersWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
 
-function createLoadChildrenAlongRevealPath (deps: {
-  loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): (nodeIds: string[]) => Promise<void> {
-  return async (nodeIds: string[]) => {
-    for (const nodeId of nodeIds) {
-      const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-      if (node === null) {
-        continue
-      }
-      await deps.loadChildrenForNode(node)
-    }
-  }
-}
-
-async function reapplyExpandedSnapshotToHeTree (deps: {
-  getTreeRef: () => T_treeRef
-  nextTick: () => Promise<void>
-  openNodeIds: Ref<Set<string>>
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): Promise<void> {
-  deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
-  await deps.nextTick()
-  reapplyProjectHierarchyTreeHeTreeOpenState({
-    getTreeRef: deps.getTreeRef,
-    openNodeIds: deps.openNodeIds,
-    treeData: deps.treeData
-  })
-}
-
 export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
+  commitStagedLoadedChildren: () => boolean
   expandedNodeIds: string[]
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   getTreeRef: () => T_treeRef
@@ -49,6 +20,10 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
   openNodeIds: Ref<Set<string>>
   requestAnimationFrame: (callback: () => void) => number
   restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  runDeferredLazyLoadBatch: (
+    runBatch: () => Promise<void>,
+    options?: { skipReapplyHeTreeOpenState?: boolean }
+  ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
   const withAncestors = deps.restoreOptions?.includeAncestorClosure === true
@@ -67,10 +42,14 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     deps.treeData.value,
     ancestorPruned
   )
-  deps.openNodeIds.value = new Set(pruned)
+  const { immediateOpenNodeIds } = partitionProjectHierarchyTreeExpandedIdsForLazyOpen({
+    expandedNodeIds: pruned,
+    treeNodes: deps.treeData.value
+  })
+  deps.openNodeIds.value = new Set(immediateOpenNodeIds)
   const persistedExpandedNodeIds = collectProjectHierarchyTreePersistedExpandedNodeIds(
     deps.treeData.value,
-    deps.openNodeIds.value
+    new Set(pruned)
   )
   if (shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
     intendedExpandedNodeIds: ancestorPruned,
@@ -80,37 +59,17 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     deps.onExpandedNodeIdsChange(persistedExpandedNodeIds)
   }
 
-  const loadChildrenAlongRevealPath = createLoadChildrenAlongRevealPath({
+  await loadAndReapplyExpandedSnapshotAfterOpenSet({
+    commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
+    fullOpenNodeIds: pruned,
+    getTreeRef: deps.getTreeRef,
     loadChildrenForNode: deps.loadChildrenForNode,
-    treeData: deps.treeData
-  })
-  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
-    getTreeRef: deps.getTreeRef,
-    loadChildrenAlongRevealPath,
-    openNodeIds: deps.openNodeIds,
-    treeData: deps.treeData
-  })
-  await deps.flushDeferredTreeRevisionPublish()
-
-  const treeRef = deps.getTreeRef()
-  if (treeRef === null) {
-    return
-  }
-
-  const reapplyDeps = {
-    getTreeRef: deps.getTreeRef,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
+    runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     treeData: deps.treeData
-  }
-  await reapplyExpandedSnapshotToHeTree(reapplyDeps)
-  await deps.nextTick()
-  await new Promise<void>((resolve) => {
-    deps.requestAnimationFrame(() => {
-      resolve()
-    })
   })
-  await reapplyExpandedSnapshotToHeTree(reapplyDeps)
 }
 
 function openExpandedHeTreeNodesAfterExpand (deps: {

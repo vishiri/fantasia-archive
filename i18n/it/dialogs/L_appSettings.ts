@@ -195,6 +195,11 @@ export default {
       tags: 'pipe, delimitatore, separatore, formato di conteggio, conteggi di alberi',
     },
 
+    extraTreePadding: {
+      title: 'Add extra tree padding',
+      description: 'Toggling this on adds extra padding on the left to the tree. This can be useful for example when using tags with long order numbers.',
+      tags: 'padding, indent, left margin, order numbers, tags, hierarchical tree'
+    },
     forceSublevelCollapseInTree: {
       title: 'Force sublevel collapse in the tree',
       description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',

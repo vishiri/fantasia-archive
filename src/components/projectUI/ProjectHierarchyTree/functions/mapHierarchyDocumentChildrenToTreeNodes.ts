@@ -54,6 +54,7 @@ export function createMapHierarchyDocumentChildrenToTreeNodes (deps: {
         label: item.displayName,
         nodeKind: 'document',
         placementId: item.placementId,
+        tagId: null,
         worldColor: input.worldColor,
         worldId: input.worldId
       }

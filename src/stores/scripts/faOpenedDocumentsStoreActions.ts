@@ -96,6 +96,8 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
     savedTreeOrderNumber,
     extraClassesDraft: savedExtraClasses,
     savedExtraClasses,
+    tagsDraft: [],
+    savedTags: [],
     hasUnsavedChanges: false,
     editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
     worldId: input.worldId

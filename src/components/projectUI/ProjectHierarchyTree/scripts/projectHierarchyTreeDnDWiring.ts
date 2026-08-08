@@ -117,6 +117,7 @@ function buildProjectHierarchyTreeDnDHandlerDeps (
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     draggedDocumentId: dragSessionState.draggedDocumentId,
+    draggedTreeNodeId: dragSessionState.draggedTreeNodeId,
     dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot,
     dragSiblingOrderSnapshot: dragSessionState.dragSiblingOrderSnapshot,
     captureDragModelValueRevisionAtDrop: dragSessionState.captureDragModelValueRevisionAtDrop,

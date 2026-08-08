@@ -17,6 +17,7 @@ type T_hierarchyStore = {
   flushUiStatePersist: () => void
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   queuePersistScrollTopPx: (scrollTopPx: number) => void
+  refreshHierarchyTreeNodes?: ((nodeIds: string[]) => void) | undefined
   refreshLayout: () => Promise<void>
   refreshUiState: () => Promise<void>
   resetOnProjectClose: () => void
@@ -28,14 +29,19 @@ type T_sessionWiringDeps = {
     activeProject: { id: string } | null
     hasActiveProject: boolean
   }
+  applyOpenedDocumentTabs?: ((
+    tabs: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTab[]
+  ) => void) | undefined
   computed: <T>(getter: () => T) => { value: T }
   createTemporaryDocument: (input: {
     displayName: string
+    initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode
     parentDocumentId: null
     templateId: string
     worldId: string
   }) => Promise<string>
+  getOpenedDocumentTabs?: (() => readonly import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTab[]) | undefined
   dragContext: {
     dragNode: {
       data: I_faProjectHierarchyTreeHeTreeNode
@@ -117,9 +123,11 @@ export function createProjectHierarchyTreeSessionWiring (deps: T_sessionWiringDe
   bindProjectHierarchyTreeSessionSideEffects(deps, earlyWiring)
   return buildProjectHierarchyTreeSessionApi({
     handlersWiring: createProjectHierarchyTreeSessionHandlersBindWiring({
+      applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs,
       createTemporaryDocument: deps.createTemporaryDocument,
       dragContext: deps.dragContext,
       earlyWiring,
+      getOpenedDocumentTabs: deps.getOpenedDocumentTabs,
       hierarchyStore: deps.hierarchyStore,
       nextTick: deps.nextTick,
       onDocumentOpenRequest: deps.onDocumentOpenRequest,

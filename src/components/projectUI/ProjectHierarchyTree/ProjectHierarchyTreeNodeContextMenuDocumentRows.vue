@@ -48,12 +48,14 @@
   </q-item>
 
   <q-separator
+    v-if="showsCopyDocument !== false"
     class="projectHierarchyTreeNodeContextMenu__separatorAlt"
     dark
     role="separator"
   />
 
   <q-item
+    v-if="showsCopyDocument !== false"
     v-close-popup
     clickable
     class="projectHierarchyTreeNodeContextMenu__item non-selectable"
@@ -75,12 +77,14 @@
   </q-item>
 
   <q-separator
+    v-if="showsCopyDocument !== false && showsAddUnder !== false"
     class="projectHierarchyTreeNodeContextMenu__separatorAlt"
     dark
     role="separator"
   />
 
   <q-item
+    v-if="showsAddUnder !== false"
     v-close-popup
     clickable
     class="projectHierarchyTreeNodeContextMenu__item non-selectable"
@@ -107,7 +111,7 @@ defineOptions({
   name: 'ProjectHierarchyTreeNodeContextMenuDocumentRows'
 })
 
-defineProps<{
+withDefaults(defineProps<{
   addNewDocumentUnderThisLabel: string
   copyDocumentLabel: string
   editDocumentLabel: string
@@ -116,5 +120,10 @@ defineProps<{
   onEditDocumentClick: () => void
   onOpenDocumentClick: () => void
   openDocumentLabel: string
-}>()
+  showsAddUnder?: boolean
+  showsCopyDocument?: boolean
+}>(), {
+  showsAddUnder: true,
+  showsCopyDocument: true
+})
 </script>

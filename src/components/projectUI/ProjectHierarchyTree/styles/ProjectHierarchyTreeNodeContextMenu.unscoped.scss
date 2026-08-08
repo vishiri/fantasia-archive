@@ -18,7 +18,8 @@
   z-index: $projectHierarchyTree-nodeContextMenu-zIndex !important;
 }
 
-.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
+.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu,
+.projectHierarchyTreeNodeContextMenu__tagAddSubmenu.q-menu {
   background-color: $projectHierarchyTree-nodeContextMenu-sortBySubmenu-bgColor;
   z-index: $projectHierarchyTree-nodeContextMenu-zIndex !important;
 
@@ -28,7 +29,8 @@
 }
 
 .projectHierarchyTreeNodeContextMenu.q-menu,
-.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
+.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu,
+.projectHierarchyTreeNodeContextMenu__tagAddSubmenu.q-menu {
   .projectHierarchyTreeNodeContextMenu__item.q-item {
     align-items: center;
   }

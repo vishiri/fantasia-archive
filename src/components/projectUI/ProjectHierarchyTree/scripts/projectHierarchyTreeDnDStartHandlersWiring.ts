@@ -59,6 +59,9 @@ type T_projectHierarchyTreeDnDModelValueUpdateDeps = {
   draggedDocumentId: {
     get: () => string | null
   }
+  draggedTreeNodeId: {
+    get: () => string | null
+  }
   dragSiblingOrderSnapshot: {
     get: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
     set: (
@@ -93,7 +96,11 @@ export function applyProjectHierarchyTreeHeTreeModelValueUpdate (
   const draggedDocumentId = deps.draggedDocumentId.get()
   if (draggedDocumentId !== null) {
     deps.dragSiblingOrderSnapshot.set(
-      resolveProjectHierarchyTreeDragSiblingOrderSnapshot(deps.treeData.value, draggedDocumentId)
+      resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
+        deps.treeData.value,
+        draggedDocumentId,
+        deps.draggedTreeNodeId.get()
+      )
     )
   }
 }
@@ -111,6 +118,9 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   draggedDocumentId: {
+    set: (value: string | null) => void
+  }
+  draggedTreeNodeId: {
     set: (value: string | null) => void
   }
   dragExpandedSnapshot: {
@@ -134,6 +144,7 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
   deps.documentRowDragHoldWiring.markDragStartedFromHold()
   deps.documentRowExpandClickGesture.markDragStartedForGesture()
   deps.draggedDocumentId.set(stat.data.documentId)
+  deps.draggedTreeNodeId.set(stat.data.id)
   deps.resetDragModelValueRevisionForDragStart()
   deps.captureDragScrollTopPxAtDragStart(
     readProjectHierarchyTreeScrollTopPx(
@@ -144,12 +155,14 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
     documentId: stat.data.documentId,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
+    preferredNodeId: stat.data.id,
     treeData: deps.treeData.value
   })
   deps.captureDragSiblingOrderAtDragStart(dragStartOrder.orderedDocumentIds)
   const dragStartParentSnapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
     deps.treeData.value,
-    stat.data.documentId
+    stat.data.documentId,
+    stat.data.id
   )
   deps.captureDragParentDocumentIdAtDragStart(
     dragStartParentSnapshot?.parentDocumentId ?? null

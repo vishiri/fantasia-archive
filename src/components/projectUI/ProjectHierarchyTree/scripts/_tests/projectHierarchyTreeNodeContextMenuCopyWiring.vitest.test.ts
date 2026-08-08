@@ -164,3 +164,37 @@ test('Test that buildProjectHierarchyTreeNodeContextMenuCopyHandlers no-ops when
 
   expect(runFaAction).not.toHaveBeenCalled()
 })
+
+/**
+ * buildProjectHierarchyTreeNodeContextMenuCopyHandlers
+ * Omits optional color fields so ?? '' drafts resolve for copy helpers.
+ */
+test('Test that buildProjectHierarchyTreeNodeContextMenuCopyHandlers treats missing color fields as empty', () => {
+  const runFaAction = vi.fn()
+  const nodeWithoutColors: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-a',
+    groupId: 'group-1',
+    hasChildren: false,
+    icon: '',
+    id: 'doc-a',
+    label: 'Named',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const handlers = buildProjectHierarchyTreeNodeContextMenuCopyHandlers({
+    contextMenuAnchorNodeId: ref('doc-a'),
+    runFaAction,
+    treeData: ref([nodeWithoutColors])
+  })
+
+  handlers.onCopyTextColorClick()
+  handlers.onCopyBackgroundColorClick()
+  handlers.onCopyNameClick()
+
+  expect(runFaAction).toHaveBeenCalledTimes(1)
+  expect(runFaAction).toHaveBeenCalledWith('copyHierarchyTreeDocumentName', { documentId: 'doc-a' })
+})

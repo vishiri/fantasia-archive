@@ -24,6 +24,15 @@ export {
   resolveOpenedDocumentParentMoveAppendSortOrder
 } from './functions/openedDocumentParentId'
 export {
+  mapOpenedDocumentSavedTagsToDraft,
+  mapOpenedDocumentTagsDraftToSetInput,
+  resolveOpenedDocumentTagsFingerprint
+} from './functions/openedDocumentTagsDomain'
+export {
+  applyOpenedDocumentTagDeleteAcrossTabs,
+  applyOpenedDocumentTagRenameAcrossTabs
+} from './openedDocumentTagMutationAcrossTabsWiring'
+export {
   computeOpenedDocumentHasUnsavedChanges,
   normalizeOpenedDocumentTabAppearanceColors,
   recomputeOpenedDocumentTabHasUnsavedChanges,

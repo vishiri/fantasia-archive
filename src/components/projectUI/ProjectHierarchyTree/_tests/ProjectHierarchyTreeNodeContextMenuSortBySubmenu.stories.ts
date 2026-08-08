@@ -38,7 +38,8 @@ export const Default: StoryObj<typeof meta> = {
         onSubmenuContentLeave: () => {},
         resolveSortByItemDetailDirection: () => 'A -> Z',
         resolveSortByItemDetailScope: () => 'direct children',
-        resolveSortByItemTitle: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => String(itemId)
+        resolveSortByItemTitle: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => String(itemId),
+        sortByDirectScopeOnly: false
       }
     },
     template: `
@@ -52,6 +53,7 @@ export const Default: StoryObj<typeof meta> = {
           :resolve-sort-by-item-detail-direction="resolveSortByItemDetailDirection"
           :resolve-sort-by-item-detail-scope="resolveSortByItemDetailScope"
           :resolve-sort-by-item-title="resolveSortByItemTitle"
+          :sort-by-direct-scope-only="sortByDirectScopeOnly"
         />
       </div>
     `

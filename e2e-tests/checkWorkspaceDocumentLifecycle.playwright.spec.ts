@@ -105,6 +105,8 @@ async function seedEditableDocumentTab (
           savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
           extraClassesDraft: '',
           savedExtraClasses: '',
+          tagsDraft: [],
+          savedTags: [],
           tabLabel,
           templateIcon: 'mdi-file-document'
         }

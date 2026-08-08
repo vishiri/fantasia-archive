@@ -13,6 +13,8 @@ description: >
 
 Cavecrew = three subagent presets that emit caveman output. Same job as Anthropic defaults (`Explore`, edit-style agents, reviewer); difference is the tool-result they return is compressed, so main context shrinks per delegation.
 
+**Model:** every cavecrew / Task spawn must follow [subagent-model-policy.mdc](../../.cursor/rules/subagent-model-policy.mdc) — **`cursor-grok-4.5-high`** when allowed; **never** Fast (`composer-2.5-fast` or any `*fast*` slug).
+
 ## When to use cavecrew vs alternatives
 
 | Task | Use |

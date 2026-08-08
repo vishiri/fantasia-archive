@@ -14,13 +14,16 @@ const hierarchyTreeContextMenuI18n = createI18n({
       projectUI: {
         projectHierarchyTree: {
           contextMenu: {
+            addNewDocumentToThisTag: 'Add new document to this tag',
             addNewDocumentUnderThis: 'Add new document under this',
             collapseAllUnderNode: 'Collapse all under this node',
             copyDocument: 'Copy document',
             deleteDocument: 'Delete document',
+            deleteTag: 'Delete tag',
             editDocument: 'Edit document',
             expandAllUnderNode: 'Expand all under this node',
             openDocument: 'Open document',
+            renameTag: 'Rename tag',
             sortBy: 'Sort by',
             sortAlphabetically: 'Sort alphabetically',
             sortByCustomOrder: 'Sort by Custom order',
@@ -44,11 +47,15 @@ const hierarchyTreeContextMenuI18n = createI18n({
 
 function mountHierarchyTreeContextMenu (
   overrides: {
+    addDocumentPlacementOptions?: readonly []
     addNewRowIcon?: string | null
     addNewRowLabel?: string | null
     showsBulkExpandRows?: boolean
     showsCopyRows?: boolean
+    showsDocumentOpenEditRows?: boolean
     showsSortByRows?: boolean
+    sortByDirectScopeOnly?: boolean
+    showsTagMenuRows?: boolean
   } = {}
 ) {
   const isOpen = ref(true)
@@ -59,14 +66,18 @@ function mountHierarchyTreeContextMenu (
   const onCopyTextColorClick = vi.fn()
   const onCopyBackgroundColorClick = vi.fn()
   const onAddNewDocumentUnderThisClick = vi.fn()
+  const onAddNewDocumentToThisTagClick = vi.fn()
   const onCopyDocumentClick = vi.fn()
   const onDeleteDocumentClick = vi.fn()
+  const onDeleteTagClick = vi.fn()
   const onEditDocumentClick = vi.fn()
   const onHide = vi.fn()
   const onOpenDocumentClick = vi.fn()
+  const onRenameTagClick = vi.fn()
   const onSortByItemClick = vi.fn()
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
+      addDocumentPlacementOptions: overrides.addDocumentPlacementOptions ?? [],
       addNewRowIcon: overrides.addNewRowIcon ?? null,
       addNewRowLabel: overrides.addNewRowLabel ?? null,
       anchorNodeId: 'world-1',
@@ -76,6 +87,7 @@ function mountHierarchyTreeContextMenu (
         top: 80
       },
       onAddNewClick,
+      onAddNewDocumentToThisTagClick,
       onAddNewDocumentUnderThisClick,
       onCollapseAllClick,
       onCopyBackgroundColorClick,
@@ -83,14 +95,19 @@ function mountHierarchyTreeContextMenu (
       onCopyNameClick,
       onCopyTextColorClick,
       onDeleteDocumentClick,
+      onDeleteTagClick,
       onEditDocumentClick,
       onExpandAllClick,
       onHide,
       onOpenDocumentClick,
+      onRenameTagClick,
       onSortByItemClick,
       showsBulkExpandRows: overrides.showsBulkExpandRows ?? true,
       showsCopyRows: overrides.showsCopyRows ?? false,
+      showsDocumentOpenEditRows: overrides.showsDocumentOpenEditRows ?? false,
       showsSortByRows: overrides.showsSortByRows ?? false,
+      sortByDirectScopeOnly: overrides.sortByDirectScopeOnly ?? false,
+      showsTagMenuRows: overrides.showsTagMenuRows ?? false,
       'onUpdate:isOpen': (value: boolean) => {
         isOpen.value = value
       }
@@ -156,12 +173,14 @@ test('ProjectHierarchyTreeNodeContextMenu renders expand and collapse actions', 
 test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are null', () => {
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
+      addDocumentPlacementOptions: [],
       addNewRowIcon: null,
       addNewRowLabel: null,
       anchorNodeId: null,
       isOpen: false,
       menuPointerPosition: null,
       onAddNewClick: vi.fn(),
+      onAddNewDocumentToThisTagClick: vi.fn(),
       onAddNewDocumentUnderThisClick: vi.fn(),
       onCollapseAllClick: vi.fn(),
       onCopyBackgroundColorClick: vi.fn(),
@@ -169,14 +188,19 @@ test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are n
       onCopyNameClick: vi.fn(),
       onCopyTextColorClick: vi.fn(),
       onDeleteDocumentClick: vi.fn(),
+      onDeleteTagClick: vi.fn(),
       onEditDocumentClick: vi.fn(),
       onExpandAllClick: vi.fn(),
       onHide: vi.fn(),
       onOpenDocumentClick: vi.fn(),
+      onRenameTagClick: vi.fn(),
       onSortByItemClick: vi.fn(),
       showsBulkExpandRows: false,
       showsCopyRows: false,
+      showsDocumentOpenEditRows: false,
       showsSortByRows: false,
+      sortByDirectScopeOnly: false,
+      showsTagMenuRows: false,
       'onUpdate:isOpen': vi.fn()
     },
     global: {
@@ -345,4 +369,59 @@ test('ProjectHierarchyTreeNodeContextMenu opens Sort by submenu and dispatches i
   sortBySubmenu.props('onSortBySubmenuModelUpdate')(true)
   await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBy-namesDirectAsc"]').trigger('click')
   expect(onSortByItemClick).toHaveBeenCalledWith('namesDirectAsc')
+})
+
+test('ProjectHierarchyTreeNodeContextMenu renders tag menu rows without leading separator', () => {
+  const { wrapper } = mountHierarchyTreeContextMenu({
+    addDocumentPlacementOptions: [],
+    showsBulkExpandRows: false,
+    showsCopyRows: false,
+    showsDocumentOpenEditRows: false,
+    showsSortByRows: false,
+    showsTagMenuRows: true
+  })
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNewDocumentToThisTag"]').exists()).toBe(true)
+  const menuHtml = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').html()
+  const tagIndex = menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-addNewDocumentToThisTag')
+  const beforeTag = menuHtml.slice(0, tagIndex)
+  expect(beforeTag).not.toMatch(/projectHierarchyTreeNodeContextMenu__separator(?!Alt)/)
+})
+
+test('ProjectHierarchyTreeNodeContextMenu renders document open/edit without delete separator', () => {
+  const { wrapper } = mountHierarchyTreeContextMenu({
+    showsBulkExpandRows: true,
+    showsCopyRows: false,
+    showsDocumentOpenEditRows: true,
+    showsSortByRows: false,
+    showsTagMenuRows: false
+  })
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-openDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-deleteDocument"]').exists()).toBe(false)
+})
+
+test('ProjectHierarchyTreeNodeContextMenu hides add-under for under-tag document copy menu', () => {
+  const { wrapper } = mountHierarchyTreeContextMenu({
+    showsBulkExpandRows: false,
+    showsCopyRows: true,
+    showsDocumentOpenEditRows: true,
+    showsSortByRows: false,
+    showsTagMenuRows: false
+  })
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-openDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis"]').exists()).toBe(false)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-deleteDocument"]').exists()).toBe(true)
+})
+
+test('ProjectHierarchyTreeNodeContextMenu renders tag rows without leading separator when alone', () => {
+  const { wrapper } = mountHierarchyTreeContextMenu({
+    addDocumentPlacementOptions: [],
+    showsBulkExpandRows: false,
+    showsCopyRows: false,
+    showsDocumentOpenEditRows: false,
+    showsSortByRows: false,
+    showsTagMenuRows: true
+  })
+  expect(wrapper.find('.projectHierarchyTreeNodeContextMenu__separator').exists()).toBe(false)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-renameTag"]').exists()).toBe(true)
 })

@@ -14,42 +14,11 @@ import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridg
  */
 function buildVitestProjectContentApiMock (): ReturnType<typeof createFaProjectContentBridgeHarnessStub> {
   const stub = createFaProjectContentBridgeHarnessStub()
-  return {
-    createDocument: vi.fn(stub.createDocument),
-    createDocumentTemplate: vi.fn(stub.createDocumentTemplate),
-    createMedia: vi.fn(stub.createMedia),
-    createWorld: vi.fn(stub.createWorld),
-    deleteDocument: vi.fn(stub.deleteDocument),
-    deleteDocumentTemplate: vi.fn(stub.deleteDocumentTemplate),
-    deleteMedia: vi.fn(stub.deleteMedia),
-    deleteWorld: vi.fn(stub.deleteWorld),
-    getDocumentById: vi.fn(stub.getDocumentById),
-    getDocumentTemplateById: vi.fn(stub.getDocumentTemplateById),
-    getMediaById: vi.fn(stub.getMediaById),
-    getWorldById: vi.fn(stub.getWorldById),
-    linkDocumentMedia: vi.fn(stub.linkDocumentMedia),
-    listDocumentMedia: vi.fn(stub.listDocumentMedia),
-    listDocumentTemplates: vi.fn(stub.listDocumentTemplates),
-    listDocumentTemplatesForProjectSettings: vi.fn(stub.listDocumentTemplatesForProjectSettings),
-    listDocuments: vi.fn(stub.listDocuments),
-    listMedia: vi.fn(stub.listMedia),
-    listWorlds: vi.fn(stub.listWorlds),
-    listWorldsForProjectSettings: vi.fn(stub.listWorldsForProjectSettings),
-    listWorkspaceHierarchyLayout: vi.fn(stub.listWorkspaceHierarchyLayout),
-    listPlacementDocumentChildren: vi.fn(stub.listPlacementDocumentChildren),
-    reindexDocumentSiblingsInHierarchy: vi.fn(stub.reindexDocumentSiblingsInHierarchy),
-    moveDocumentInHierarchy: vi.fn(stub.moveDocumentInHierarchy),
-    searchProjectHierarchy: vi.fn(stub.searchProjectHierarchy),
-    saveDocumentTemplatesSnapshot: vi.fn(stub.saveDocumentTemplatesSnapshot),
-    saveWorldsSnapshot: vi.fn(stub.saveWorldsSnapshot),
-    setDocumentTemplate: vi.fn(stub.setDocumentTemplate),
-    setDocumentWorld: vi.fn(stub.setDocumentWorld),
-    unlinkDocumentMedia: vi.fn(stub.unlinkDocumentMedia),
-    updateDocument: vi.fn(stub.updateDocument),
-    updateDocumentTemplate: vi.fn(stub.updateDocumentTemplate),
-    updateMedia: vi.fn(stub.updateMedia),
-    updateWorld: vi.fn(stub.updateWorld)
+  const mocked = {} as Record<string, unknown>
+  for (const [key, value] of Object.entries(stub)) {
+    mocked[key] = typeof value === 'function' ? vi.fn(value) : value
   }
+  return mocked as unknown as ReturnType<typeof createFaProjectContentBridgeHarnessStub>
 }
 
 function buildVitestProjectManagementApiMock (): NonNullable<

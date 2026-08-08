@@ -219,10 +219,56 @@ test('collectProjectHierarchyTreeBulkExpandTargetIds returns empty for unknown a
   expect(collectProjectHierarchyTreeBulkExpandTargetIds(sampleTree, 'missing-anchor')).toEqual([])
 })
 
-test('collectProjectHierarchyTreeBulkExpandTargetIds skips add-new rows in subtree walk', () => {
-  const targetIds = collectProjectHierarchyTreeBulkExpandTargetIds(sampleTree, 'placement-2')
-  expect(targetIds).toContain('placement-2')
-  expect(targetIds).not.toContain('add-new-placement-2')
+test('collectProjectHierarchyTreeBulkExpandTargetIds includes tagWrapper and tag rows', () => {
+  const tagA: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'tag-a',
+    label: 'A',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-a',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tagWrapper: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagA],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1__tagWrapper',
+    label: 'Tags',
+    nodeKind: 'tagWrapper',
+    placementId: null,
+    tagId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const tree: I_faProjectHierarchyTreeHeTreeNode[] = [{
+    children: [tagWrapper],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World 1',
+    nodeKind: 'world',
+    placementId: null,
+    tagId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+  const targetIds = collectProjectHierarchyTreeBulkExpandTargetIds(tree, 'world-1__tagWrapper')
+  expect(targetIds).toContain('world-1')
+  expect(targetIds).toContain('world-1__tagWrapper')
+  expect(targetIds).toContain('tag-a')
 })
 
 test('collectProjectHierarchyTreeBulkCollapseOpenIdPruneSet adds open descendants under anchor', () => {

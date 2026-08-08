@@ -1,6 +1,7 @@
 import type { Ref, watch as WatchFn } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode, I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { listFaProjectPlacementDocumentChildrenForRenderer } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
+import { listFaProjectDocumentsUnderTagForRenderer } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentTagsOverridesWiring'
 import { createProjectHierarchyTreeLazyLoadWiring, runProjectHierarchyTreeDeferredLazyLoadBatch } from './projectHierarchyTreeLazyLoadWiring'
 import { createProjectHierarchyTreeUiStateSessionExpandWiring, createProjectHierarchyTreeUiStateSessionRestoreWiring } from './projectHierarchyTreeUiStateSessionPartsWiring'
 import { attachProjectHierarchyTreeUiStateScrollListeners } from './projectHierarchyTreeScrollPersistListenersWiring'
@@ -71,6 +72,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
     deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: deps.getPreferredLanguageCode,
+    listDocumentsUnderTag: listFaProjectDocumentsUnderTagForRenderer,
     listPlacementDocumentChildren: listFaProjectPlacementDocumentChildrenForRenderer,
     nextTick: deps.nextTick,
     onAfterTreeRevisionPublished: () => {
@@ -173,7 +175,10 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   queuePersistScrollTopPx: (scrollTopPx: number) => void
   requestAnimationFrame: (callback: () => void) => number
-  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
+  runDeferredLazyLoadBatch: (
+    runBatch: () => Promise<void>,
+    options?: { skipReapplyHeTreeOpenState?: boolean }
+  ) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof WatchFn
@@ -192,6 +197,7 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
     treeData: deps.treeData
   })
   const restoreWiring = createProjectHierarchyTreeUiStateSessionRestoreWiring({
+    commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     getExpandedNodeIds: deps.getExpandedNodeIds,
     getPendingRevealPath: deps.getPendingRevealPath,

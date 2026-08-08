@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeNodeContextMenuWiring } from '../projectHierarchyTreeNodeContextMenuWiring'
+import { createProjectHierarchyTreeNodeContextMenuWiring } from '../projectHierarchyTreeNodeContextMenuSessionWiring'
 
 const sampleTree: I_faProjectHierarchyTreeHeTreeNode[] = [
   {
@@ -188,7 +188,7 @@ test('onNodeRowContextMenu opens menu for leaf document rows with copy section o
   expect(wiring.contextMenuAnchorNodeId.value).toBe('doc-leaf')
   expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(false)
   expect(wiring.contextMenuShowsCopyRows.value).toBe(true)
-  expect(wiring.contextMenuShowsSortByRows.value).toBe(true)
+  expect(wiring.contextMenuShowsSortByRows.value).toBe(false)
 })
 
 test('menu actions delegate to bulk wiring and close menu', async () => {

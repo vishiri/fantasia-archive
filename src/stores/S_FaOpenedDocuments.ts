@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import debounce from 'lodash-es/debounce.js'
 import { ResultAsync } from 'neverthrow'
 import { Notify } from 'quasar'
-import { readonly, ref, watch } from 'vue'
+import { nextTick, readonly, ref, watch } from 'vue'
 
 import type { Ref } from 'vue'
 
@@ -30,6 +30,7 @@ import {
   hasFaProjectDocumentByIdReader,
   hasFaProjectDocumentCreateWriter,
   hasFaProjectDocumentUpdateWriter,
+  listFaProjectDocumentTagsForRenderer,
   listFaProjectPlacementDocumentChildrenForRenderer,
   updateFaProjectDocumentForRenderer
 } from 'app/src/scripts/componentTesting/componentTesting_manager'
@@ -50,6 +51,10 @@ import {
 } from 'app/src/stores/scripts/faOpenedDocumentsParentIdStoreActions'
 import { applyFaOpenedDocumentTreeOrderNumberDraft } from 'app/src/stores/scripts/faOpenedDocumentsTreeOrderNumberStoreActions'
 import { applyFaOpenedDocumentExtraClassesDraft } from 'app/src/stores/scripts/faOpenedDocumentsExtraClassesStoreActions'
+import {
+  applyFaOpenedDocumentTagsDraft,
+  persistFaOpenedDocumentTagsAfterSave
+} from 'app/src/stores/scripts/faOpenedDocumentsTagsStoreActions'
 import {
   applyFaOpenedDocumentIsDeadDraft,
   applyFaOpenedDocumentIsFinishedDraft,
@@ -79,6 +84,7 @@ import {
   resolveOpenedDocumentTabIsTemporary,
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose,
+  resolveOpenedDocumentTagsFingerprint,
   resolveOpenedDocumentTreeOrderNumberDraftForPersist,
   resolveTemporaryDocumentParentDocumentIdForSave,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
@@ -92,6 +98,7 @@ import {
 import { reconcileTemporaryOpenedDocumentTabFromSnapshot } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { collectProjectHierarchyTreeLoadedTagNodeIdsForRefresh } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeLoadedTagNodeIds'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeAddNewDocumentLabel'
 import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
@@ -291,21 +298,40 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return null
     }
     const doc = documentResult.value
-    return createFaOpenedDocumentTabFromOpenMeta({
-      documentId,
-      displayName: doc.displayName,
-      documentBackgroundColor: doc.documentBackgroundColor,
-      documentTextColor: doc.documentTextColor,
-      isCategory: doc.isCategory,
-      isFinished: doc.isFinished,
-      isMinor: doc.isMinor,
-      isDead: doc.isDead,
-      parentDocumentId: doc.parentDocumentId,
-      treeOrderNumber: doc.treeOrderNumber,
-      extraClasses: doc.extraClasses,
-      treeMeta,
-      worldId: doc.worldId
-    })
+    let tagsDraft: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] = []
+    let savedTags: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagRef[] = []
+    const tagsResult = await ResultAsync.fromPromise(
+      listFaProjectDocumentTagsForRenderer({ documentId }),
+      (error): unknown => error
+    )
+    if (tagsResult.isOk()) {
+      savedTags = tagsResult.value.items
+      tagsDraft = savedTags.map((tag) => {
+        return {
+          id: tag.id,
+          name: tag.name
+        }
+      })
+    }
+    return {
+      ...createFaOpenedDocumentTabFromOpenMeta({
+        documentId,
+        displayName: doc.displayName,
+        documentBackgroundColor: doc.documentBackgroundColor,
+        documentTextColor: doc.documentTextColor,
+        isCategory: doc.isCategory,
+        isFinished: doc.isFinished,
+        isMinor: doc.isMinor,
+        isDead: doc.isDead,
+        parentDocumentId: doc.parentDocumentId,
+        treeOrderNumber: doc.treeOrderNumber,
+        extraClasses: doc.extraClasses,
+        treeMeta,
+        worldId: doc.worldId
+      }),
+      tagsDraft,
+      savedTags
+    }
   }
 
   async function openFromTree (
@@ -377,7 +403,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       templateIcon: template.icon,
       templateId: input.templateId,
       temporaryParentResolveDocumentIds: input.temporaryParentResolveDocumentIds,
-      worldId: input.worldId
+      worldId: input.worldId,
+      ...(input.initialTagsDraft === undefined
+        ? {}
+        : { initialTagsDraft: input.initialTagsDraft })
     })
     const openMode = input.openMode ?? 'leftNavigate'
     const openResult = resolveFaOpenedDocumentOpenFromTree({
@@ -842,6 +871,24 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot()
   }
 
+  function updateTagsDraft (
+    documentId: string,
+    value: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[]
+  ): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentTagsDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
   function syncOpenedDocumentParentFromHierarchy (
     documentId: string,
     parentDocumentId: string | null
@@ -1013,6 +1060,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
             savedTreeOrderNumber: savedDocument.treeOrderNumber,
             savedExtraClasses: savedDocument.extraClasses
           })
+          nextTabs[savedIndex] = await persistFaOpenedDocumentTagsAfterSave(
+            nextTabs[savedIndex]!,
+            savedDocument.id
+          )
           tabs.value = nextTabs
           schedulePersistSnapshot.flush()
           await flushPersistSnapshot()
@@ -1061,6 +1112,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const persistedSaveResult = await ResultAsync.fromPromise(
       (async () => {
         const savedIsCategoryBeforeSave = current.savedIsCategory
+        const tagsChanged =
+          resolveOpenedDocumentTagsFingerprint(current.tagsDraft ?? []) !==
+          resolveOpenedDocumentTagsFingerprint(current.savedTags ?? [])
+        const previousSavedTagIds = (current.savedTags ?? []).map((tag) => tag.id)
         const parentChanged = current.parentDocumentIdDraft !== current.savedParentDocumentId
         let savedParentDocumentId = current.savedParentDocumentId
         let parentMoveTreeRefreshInput: {
@@ -1146,12 +1201,32 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
           savedTreeOrderNumber,
           savedExtraClasses
         })
+        nextTabs[index] = await persistFaOpenedDocumentTagsAfterSave(
+          nextTabs[index]!,
+          documentId
+        )
         tabs.value = nextTabs
         schedulePersistSnapshot.flush()
         await flushPersistSnapshot()
         const hierarchyStore = S_FaProjectHierarchyTree()
-        if (parentChanged || savedIsCategoryBeforeSave !== savedIsCategory) {
+        const categoryChanged = savedIsCategoryBeforeSave !== savedIsCategory
+        const willRefreshLayout = parentChanged || categoryChanged || tagsChanged
+        if (willRefreshLayout) {
           await hierarchyStore.refreshLayout()
+          await nextTick()
+        }
+        if (tagsChanged) {
+          const nextSavedTagIds = (tabs.value[index]?.savedTags ?? []).map((tag) => tag.id)
+          const affectedTagIds = [...new Set([...previousSavedTagIds, ...nextSavedTagIds])]
+          const newlyAssignedTagIds = nextSavedTagIds.filter((tagId) => {
+            return !previousSavedTagIds.includes(tagId)
+          })
+          const loadedTagNodeIds = collectProjectHierarchyTreeLoadedTagNodeIdsForRefresh(
+            hierarchyStore.treeData,
+            affectedTagIds,
+            newlyAssignedTagIds
+          )
+          hierarchyStore.refreshHierarchyTreeNodes(loadedTagNodeIds)
         }
         hierarchyStore.refreshDocumentsInTree([documentId])
         if (parentMoveTreeRefreshInput !== null) {
@@ -1433,6 +1508,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     hydrationComplete.value = true
   }
 
+  function replaceOpenedDocumentTabs (nextTabs: I_faOpenedDocumentTab[]): void {
+    tabs.value = duplicateOpenedDocumentTabs(nextTabs)
+  }
+
   watch(
     () => [tabs.value, activeDocumentId.value] as const,
     () => {
@@ -1470,6 +1549,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     moveActiveDocumentTab,
     moveDocumentTab,
     reorderDocumentTabs,
+    replaceOpenedDocumentTabs,
     openFromTree,
     pendingCloseDocumentId: readonly(pendingCloseDocumentId),
     pendingDeleteDocumentId: readonly(pendingDeleteDocumentId),
@@ -1492,6 +1572,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     updateParentDocumentIdDraft,
     updateTreeOrderNumberDraft,
     updateExtraClassesDraft,
+    updateTagsDraft,
     updateTemporaryDocumentParent
   }
 })

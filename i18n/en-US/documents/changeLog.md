@@ -4,15 +4,21 @@
 ## 2.4.16
 
 ### New features
+- **Project tags**: Each world keeps a tag list in the hierarchy tree (**Tags** wrapper, or flat when **Compact tags** is on). Assign tags on a document via the workspace **Tags** field (**FaSelectInput** tags mode, create-new supported). Empty unused tags are removed after save. Right-click a tag to rename (merge on name clash), delete, add a new document under a placement into that tag, or sort documents under the tag. Drag reorder under a tag is reserved for a later pass.
+- **App Settings**: Under **Hierarchical tree**, **Compact tags**, **No tags**, and **Tags at the top** control whether tags appear, how they nest under a world, and whether the tags block sits above or below template layout rows.
 - **App Settings**: **Disable spellcheck** under **Visuals & app-wide functionality** turns Chromium spellcheck on or off immediately for the current interface language (no app restart). The former restart-required note is gone.
 - **Help**: **Check for updates** (between **Tips, Tricks & Trivia** and **About Fantasia Archive**) compares the installed version to the latest GitHub release. When a newer release exists, an info notification shows the version, Fantasia reading mascot, and a **Download** button that opens the releases page. The same check also runs once at app start. If you are already on the newest version, only a manual Help check shows a success notification. **Fantasia Archive Settings** → **Visuals & app-wide functionality** includes **Disable start update check message** to turn off the automatic start check while keeping the Help menu action.
-- **Controls**: Reusable **FaSelectInput** select fields support chips, filter highlighting of whole matching words, optional create-new, and document / template / simple modes. Dropdown menus use a fixed **600px** width, center under the field when space allows, and match app-menu separator styling between options.
+- **Controls**: Reusable **FaSelectInput** select fields support chips, filter highlighting of whole matching words, optional create-new, and document / template / simple / **tags** modes. Dropdown menus use a fixed **600px** width, center under the field when space allows, and match app-menu separator styling between options.
 
 ### Bugfixes & Optimizations
 - **Help / keybinds**: **Toggle developer tools** works again in installed (packaged) builds. A security guard had been blocking DevTools IPC after packaging so the menu item and shortcut did nothing.
 - **Links**: Foreign http and https addresses no longer open inside the Fantasia Archive window. The app keeps only its own in-app routes; other web URLs open in your default browser.
 - **Projects**: Opening an older **`.faproject`** upgrades the world color-palette column name automatically so saved world swatch lists keep working.
 - **Workspace sidebar**: Hierarchy tree scroll no longer jumps to the top or leaves blank gaps when you expand or collapse rows, after drag-and-drop, or when opening a node near the bottom of a long list. **Collapse all under this node** also clears nested rows correctly again under virtualization.
+- **Workspace sidebar**: Hierarchy search label is **Search the tree...**. The search glyph turns primary-bright whenever the field has text, whether or not the field is focused.
+- **Workspace sidebar**: Individual tag icons in the hierarchy tree are slightly smaller so solid glyphs match outline neighbors; the main **Tags** wrapper icon stays full size.
+- **Help**: Diamond help icons use a slightly thinner border.
+- **Fantasy theme**: Bare primary-bright icons in field append and prepend slots keep the gold glyph (for example merge-warning icons in rename dialogs).
 
 ## 2.4.15
 

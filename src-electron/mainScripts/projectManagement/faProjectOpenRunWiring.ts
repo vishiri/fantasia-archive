@@ -21,12 +21,12 @@ import {
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
 } from './faProjectActiveDatabaseWiring'
+import { applyFaProjectMigrations } from './faProjectDbMigrateWiring'
 import {
-  applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrateWiring'
+} from './faProjectDbMigrateMetaWiring'
 import {
   faDisplayNameFallbackFromProjectPath
 } from './projectManagementSharedPathWiring'

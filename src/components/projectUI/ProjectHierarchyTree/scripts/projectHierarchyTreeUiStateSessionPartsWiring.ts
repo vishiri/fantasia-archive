@@ -25,6 +25,7 @@ import {
 } from './projectHierarchyTreeLatentExpandReapplyWiring'
 
 export function createProjectHierarchyTreeUiStateSessionRestoreWiring (deps: {
+  commitStagedLoadedChildren: () => boolean
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   getExpandedNodeIds: () => string[]
   getPendingRevealPath: () => string[]
@@ -39,7 +40,10 @@ export function createProjectHierarchyTreeUiStateSessionRestoreWiring (deps: {
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   requestAnimationFrame: (callback: () => void) => number
-  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
+  runDeferredLazyLoadBatch: (
+    runBatch: () => Promise<void>,
+    options?: { skipReapplyHeTreeOpenState?: boolean }
+  ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
   async function restoreExpandedSnapshot (
@@ -47,6 +51,7 @@ export function createProjectHierarchyTreeUiStateSessionRestoreWiring (deps: {
     restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   ): Promise<void> {
     await restoreProjectHierarchyTreeExpandedSnapshot({
+      commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
       expandedNodeIds,
       flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
       getTreeRef: deps.getTreeRef,
@@ -55,6 +60,7 @@ export function createProjectHierarchyTreeUiStateSessionRestoreWiring (deps: {
       onExpandedNodeIdsChange: deps.queuePersistExpandedNodeIds,
       openNodeIds: deps.openNodeIds,
       requestAnimationFrame: deps.requestAnimationFrame,
+      runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
       treeData: deps.treeData,
       ...(restoreOptions === undefined ? {} : { restoreOptions })
     })

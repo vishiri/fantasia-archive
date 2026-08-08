@@ -81,6 +81,10 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     getWorldById: async () => stubWorld(),
     linkDocumentMedia: noop,
     listDocumentMedia: emptyList,
+    listDocumentTags: emptyList,
+    listDocumentsUnderTag: emptyList,
+    listTagsForWorld: emptyList,
+    listTagsWithDocumentCountsForWorld: emptyList,
     listDocumentTemplates: emptyList,
     listDocumentTemplatesForProjectSettings: async () => ({ items: [] }),
     listDocuments: emptyList,
@@ -107,6 +111,18 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
       isCategory: false,
       hasChildren: false
     }),
+    renameTag: async () => ({
+      tag: {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        worldId: '550e8400-e29b-41d4-a716-446655440000',
+        name: 'Stub',
+        createdAtMs: 0,
+        updatedAtMs: 0
+      },
+      merged: false,
+      mergedFromTagId: null
+    }),
+    reorderDocumentsUnderTag: noop,
     searchProjectHierarchy: async (query) => {
       return {
         hits: [],
@@ -115,8 +131,10 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     },
     saveDocumentTemplatesSnapshot: noop,
     saveWorldsSnapshot: noop,
+    setDocumentTags: emptyList,
     setDocumentTemplate: async () => stubDocument(),
     setDocumentWorld: async () => stubDocument(),
+    deleteTag: noop,
     unlinkDocumentMedia: noop,
     updateDocument: async () => stubDocument(),
     updateDocumentTemplate: async () => stubDocumentTemplate(),

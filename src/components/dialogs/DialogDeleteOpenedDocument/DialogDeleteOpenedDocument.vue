@@ -15,7 +15,7 @@
             data-test-locator="dialogDeleteOpenedDocument-title"
           >
             {{ $t('dialogs.deleteOpenedDocument.titlePrefix') }}
-            <span class="text-warning">{{ documentName }}</span>{{ $t('dialogs.deleteOpenedDocument.titleSuffix') }}
+            <span class="text-primary-bright">{{ documentName }}</span>{{ $t('dialogs.deleteOpenedDocument.titleSuffix') }}
           </h6>
         </q-card-section>
         <q-card-section class="faConfirmationDialog__body dialogDeleteOpenedDocument__body text-left">

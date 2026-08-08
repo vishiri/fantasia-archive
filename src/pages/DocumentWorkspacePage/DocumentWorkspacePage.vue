@@ -107,6 +107,16 @@
       :order-number-field-read-only="orderNumberFieldReadOnly"
     />
 
+    <DocumentWorkspacePageTagsField
+      v-model:tags-model="tagsModel"
+      :document-tab="documentTab"
+      :on-tags-request-options="onTagsRequestOptions"
+      :tags-field-description="tagsFieldDescription"
+      :tags-field-label="tagsFieldLabel"
+      :tags-field-read-only="tagsFieldReadOnly"
+      :tags-options="tagsOptions"
+    />
+
     <FaLabeledBooleanToggle
       v-if="documentTab !== null"
       v-model="isCategoryModel"
@@ -166,6 +176,7 @@ import DocumentWorkspacePageBelongsUnderField from './DocumentWorkspacePageBelon
 import DocumentWorkspacePageExtraHtmlClassesField from './DocumentWorkspacePageExtraHtmlClassesField.vue'
 import DocumentWorkspacePageOrderNumberField from './DocumentWorkspacePageOrderNumberField.vue'
 import DocumentWorkspacePageSelectSmoke from './DocumentWorkspacePageSelectSmoke.vue'
+import DocumentWorkspacePageTagsField from './DocumentWorkspacePageTagsField.vue'
 import { useDocumentWorkspacePage } from './scripts/documentWorkspacePage_manager'
 
 defineOptions({
@@ -208,12 +219,18 @@ const {
   nameFieldLabel,
   oneWayRelationshipTooltip,
   onAppendToWorldPalette,
+  onTagsRequestOptions,
   orderNumberFieldDescription,
   orderNumberFieldLabel,
   orderNumberFieldReadOnly,
   orderNumberModel,
   previewDisplayName,
   isCategoryToggleReadOnly,
+  tagsFieldDescription,
+  tagsFieldLabel,
+  tagsFieldReadOnly,
+  tagsModel,
+  tagsOptions,
   textColorFieldDescription,
   textColorFieldLabel,
   textColorModel,

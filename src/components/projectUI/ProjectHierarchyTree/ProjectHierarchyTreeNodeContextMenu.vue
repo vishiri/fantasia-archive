@@ -44,6 +44,7 @@
           :resolve-sort-by-item-detail-direction="resolveSortByItemDetailDirection"
           :resolve-sort-by-item-detail-scope="resolveSortByItemDetailScope"
           :resolve-sort-by-item-title="resolveSortByItemTitle"
+          :sort-by-direct-scope-only="sortByDirectScopeOnly"
           :sort-by-label="menuLabels.sortByLabel"
         />
       </template>
@@ -104,6 +105,7 @@
           :on-edit-document-click="onEditDocumentClick"
           :on-open-document-click="onOpenDocumentClick"
           :open-document-label="menuLabels.openDocumentLabel"
+          :shows-add-under="!showsDocumentOpenEditRows"
         />
         <q-separator
           class="projectHierarchyTreeNodeContextMenu__separator"
@@ -115,36 +117,86 @@
           :on-delete-document-click="onDeleteDocumentClick"
         />
       </template>
+      <template v-else-if="showsDocumentOpenEditRows">
+        <q-separator
+          v-if="showsBulkExpandRows || showsAddNewRow || showsSortByRows"
+          class="projectHierarchyTreeNodeContextMenu__separator"
+          dark
+          role="separator"
+        />
+        <ProjectHierarchyTreeNodeContextMenuDocumentRows
+          :add-new-document-under-this-label="menuLabels.addNewDocumentUnderThisLabel"
+          :copy-document-label="menuLabels.copyDocumentLabel"
+          :edit-document-label="menuLabels.editDocumentLabel"
+          :on-add-new-document-under-this-click="onAddNewDocumentUnderThisClick"
+          :on-copy-document-click="onCopyDocumentClick"
+          :on-edit-document-click="onEditDocumentClick"
+          :on-open-document-click="onOpenDocumentClick"
+          :open-document-label="menuLabels.openDocumentLabel"
+          :shows-add-under="false"
+          :shows-copy-document="false"
+        />
+      </template>
+      <template v-if="showsTagMenuRows">
+        <q-separator
+          v-if="showsBulkExpandRows || showsAddNewRow || showsSortByRows || showsCopyRows || showsDocumentOpenEditRows"
+          class="projectHierarchyTreeNodeContextMenu__separator"
+          dark
+          role="separator"
+        />
+        <ProjectHierarchyTreeNodeContextMenuTagRows
+          :add-document-placement-options="addDocumentPlacementOptions"
+          :add-new-document-to-this-tag-label="menuLabels.addNewDocumentToThisTagLabel"
+          :delete-tag-label="menuLabels.deleteTagLabel"
+          :is-add-to-tag-submenu-open="isAddToTagSubmenuOpen"
+          :on-add-new-document-to-this-tag-click="onAddNewDocumentToThisTagClick"
+          :on-add-to-tag-submenu-activator-enter="onAddToTagSubmenuActivatorEnter"
+          :on-add-to-tag-submenu-model-update="onAddToTagSubmenuModelUpdate"
+          :on-delete-tag-click="onDeleteTagClick"
+          :on-rename-tag-click="onRenameTagClick"
+          :on-submenu-activator-leave="onSubmenuActivatorLeave"
+          :on-submenu-content-enter="onSubmenuContentEnter"
+          :on-submenu-content-leave="onSubmenuContentLeave"
+          :rename-tag-label="menuLabels.renameTagLabel"
+        />
+      </template>
     </q-list>
   </q-menu>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { I_qMenuViewportPointerPosition } from 'app/types/I_qMenuViewportPointerPosition'
-import type { T_faProjectHierarchyTreeSortByMenuItemId } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeTagAddDocumentPlacementOption,
+  T_faProjectHierarchyTreeSortByMenuItemId
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createAppControlSingleMenuSubmenuHover } from 'app/src/components/globals/AppControlSingleMenu/scripts/appControlSingleMenu_manager'
-import { PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS } from './scripts/projectHierarchyTreeSortByMenuItems'
 import ProjectHierarchyTreeNodeContextMenuBulkRows from './ProjectHierarchyTreeNodeContextMenuBulkRows.vue'
 import ProjectHierarchyTreeNodeContextMenuCopyRows from './ProjectHierarchyTreeNodeContextMenuCopyRows.vue'
 import ProjectHierarchyTreeNodeContextMenuDeleteRow from './ProjectHierarchyTreeNodeContextMenuDeleteRow.vue'
 import ProjectHierarchyTreeNodeContextMenuDocumentRows from './ProjectHierarchyTreeNodeContextMenuDocumentRows.vue'
 import ProjectHierarchyTreeNodeContextMenuSortByRow from './ProjectHierarchyTreeNodeContextMenuSortByRow.vue'
-import { resolveProjectHierarchyTreeNodeContextMenuLabels } from './scripts/projectHierarchyTree_manager'
+import ProjectHierarchyTreeNodeContextMenuTagRows from './ProjectHierarchyTreeNodeContextMenuTagRows.vue'
+import {
+  createProjectHierarchyTreeNodeContextMenuUiWiring,
+  resolveProjectHierarchyTreeNodeContextMenuPointerAnchorStyle
+} from './scripts/projectHierarchyTreeNodeContextMenuUiWiring'
 
 defineOptions({
   name: 'ProjectHierarchyTreeNodeContextMenu'
 })
 
 const props = defineProps<{
+  addDocumentPlacementOptions: readonly I_faProjectHierarchyTreeTagAddDocumentPlacementOption[]
   addNewRowIcon: string | null
   addNewRowLabel: string | null
   anchorNodeId: string | null
   menuPointerPosition: I_qMenuViewportPointerPosition | null
   onAddNewClick: () => void
+  onAddNewDocumentToThisTagClick: (placementNodeId: string) => void
   onAddNewDocumentUnderThisClick: () => void
   onCollapseAllClick: () => void
   onCopyBackgroundColorClick: () => void
@@ -152,106 +204,51 @@ const props = defineProps<{
   onCopyNameClick: () => void
   onCopyTextColorClick: () => void
   onDeleteDocumentClick: () => void
+  onDeleteTagClick: () => void
   onEditDocumentClick: () => void
   onExpandAllClick: () => void
   onHide: () => void
   onOpenDocumentClick: () => void
+  onRenameTagClick: () => void
   onSortByItemClick: (itemId: T_faProjectHierarchyTreeSortByMenuItemId) => void
   showsBulkExpandRows: boolean
   showsCopyRows: boolean
+  showsDocumentOpenEditRows: boolean
   showsSortByRows: boolean
+  sortByDirectScopeOnly: boolean
+  showsTagMenuRows: boolean
 }>()
 
-const isOpenModel = defineModel<boolean>('isOpen', {
-  required: true
-})
-
+const isOpenModel = defineModel<boolean>('isOpen', { required: true })
 const { t } = useI18n()
-
-const PROJECT_HIERARCHY_TREE_SORT_BY_SUBMENU_ROW_INDEX = 0
-const submenuHover = createAppControlSingleMenuSubmenuHover()
-const isSortBySubmenuOpen = computed(() => {
-  return submenuHover.openSubmenuRowIndex.value === PROJECT_HIERARCHY_TREE_SORT_BY_SUBMENU_ROW_INDEX
-})
-
-const pointerAnchorRef = ref<HTMLElement | null>(null)
-
-const menuLabels = computed(() => resolveProjectHierarchyTreeNodeContextMenuLabels(t))
+const ui = createProjectHierarchyTreeNodeContextMenuUiWiring({ t })
+const {
+  isAddToTagSubmenuOpen,
+  isSortBySubmenuOpen,
+  menuLabels,
+  onAddToTagSubmenuActivatorEnter,
+  onAddToTagSubmenuModelUpdate,
+  onSortBySubmenuActivatorEnter,
+  onSortBySubmenuModelUpdate,
+  onSubmenuActivatorLeave,
+  onSubmenuContentEnter,
+  onSubmenuContentLeave,
+  pointerAnchorRef,
+  resolveSortByItemDetailDirection,
+  resolveSortByItemDetailScope,
+  resolveSortByItemTitle
+} = ui
 
 const showsAddNewRow = computed(() => {
   return props.addNewRowLabel !== null && props.addNewRowIcon !== null
 })
 
-const pointerAnchorStyle = computed((): Record<string, string> => {
-  const position = props.menuPointerPosition
-  if (position === null) {
-    return {
-      height: '0',
-      left: '0',
-      opacity: '0',
-      pointerEvents: 'none',
-      position: 'fixed',
-      top: '0',
-      width: '0'
-    }
-  }
-
-  return {
-    height: '1px',
-    left: `${position.left}px`,
-    pointerEvents: 'none',
-    position: 'fixed',
-    top: `${position.top}px`,
-    width: '1px'
-  }
+const pointerAnchorStyle = computed(() => {
+  return resolveProjectHierarchyTreeNodeContextMenuPointerAnchorStyle(props.menuPointerPosition)
 })
-
-function onSortBySubmenuActivatorEnter (): void {
-  submenuHover.onSubmenuActivatorEnter(PROJECT_HIERARCHY_TREE_SORT_BY_SUBMENU_ROW_INDEX)
-}
-
-function onSortBySubmenuModelUpdate (shown: boolean): void {
-  submenuHover.onSubmenuModelUpdate(PROJECT_HIERARCHY_TREE_SORT_BY_SUBMENU_ROW_INDEX, shown)
-}
-
-function findSortByMenuItem (itemId: T_faProjectHierarchyTreeSortByMenuItemId) {
-  return PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS.find((item) => {
-    return item.id === itemId
-  }) as (typeof PROJECT_HIERARCHY_TREE_SORT_BY_MENU_ITEMS)[number]
-}
-
-function resolveSortByItemTitle (itemId: T_faProjectHierarchyTreeSortByMenuItemId): string {
-  return t(findSortByMenuItem(itemId).titleKey)
-}
-
-function resolveSortByItemDetailDirection (itemId: T_faProjectHierarchyTreeSortByMenuItemId): string {
-  return t(findSortByMenuItem(itemId).detailDirectionKey)
-}
-
-function resolveSortByItemDetailScope (itemId: T_faProjectHierarchyTreeSortByMenuItemId): string {
-  return t(findSortByMenuItem(itemId).detailScopeKey)
-}
-
 function onRootMenuHide (): void {
-  submenuHover.onRootMenuHide()
-  props.onHide()
+  ui.onRootMenuHide(props.onHide)
 }
-
-const onAddNewClick = props.onAddNewClick
-const onAddNewDocumentUnderThisClick = props.onAddNewDocumentUnderThisClick
-const onCollapseAllClick = props.onCollapseAllClick
-const onCopyBackgroundColorClick = props.onCopyBackgroundColorClick
-const onCopyDocumentClick = props.onCopyDocumentClick
-const onCopyNameClick = props.onCopyNameClick
-const onCopyTextColorClick = props.onCopyTextColorClick
-const onDeleteDocumentClick = props.onDeleteDocumentClick
-const onEditDocumentClick = props.onEditDocumentClick
-const onExpandAllClick = props.onExpandAllClick
-const onOpenDocumentClick = props.onOpenDocumentClick
-const onSortByItemClick = props.onSortByItemClick
-const onSubmenuActivatorLeave = submenuHover.onSubmenuActivatorLeave
-const onSubmenuContentEnter = submenuHover.onSubmenuContentEnter
-const onSubmenuContentLeave = submenuHover.onSubmenuContentLeave
 </script>
 
 <style lang="scss" src="./styles/ProjectHierarchyTreeNodeContextMenu.unscoped.scss"></style>

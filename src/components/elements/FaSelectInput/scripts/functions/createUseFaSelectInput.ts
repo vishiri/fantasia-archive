@@ -1,4 +1,5 @@
 import type {
+  I_faSelectInputObjectItem,
   I_faSelectInputUseDeps,
   I_faSelectInputUseInput,
   T_faSelectInputLabelHighlightSegment,
@@ -14,6 +15,8 @@ type T_faSelectInputQSelectRef = {
 
 type T_faSelectInputFilterUpdate = (callbackFn: () => void) => void
 
+type T_faSelectInputNewValueDoneMode = 'add' | 'add-unique' | 'toggle'
+
 type T_faSelectInputApi = {
   chipColorForOption: (opt: T_faSelectInputOption) => string
   clearIsNewFlags: (ids: readonly string[]) => void
@@ -21,7 +24,13 @@ type T_faSelectInputApi = {
   isObjectMode: I_computedRef<boolean>
   onFilter: (needle: string, update: T_faSelectInputFilterUpdate) => void
   onFocus: () => void
-  onNewValue: (typedText: string) => void
+  onNewValue: (
+    typedText: string,
+    done?: (
+      value?: string | I_faSelectInputObjectItem,
+      mode?: T_faSelectInputNewValueDoneMode
+    ) => void
+  ) => void
   onPopupShow: () => void
   onUpdateModelValue: (value: T_faSelectInputModelValue) => void
   optionLabelHighlightSegments: (
@@ -143,8 +152,15 @@ function createFaSelectInputApi (
     maybeClearSearchInputAfterSelect()
   }
 
-  function onNewValue (typedText: string): void {
+  function onNewValue (
+    typedText: string,
+    done?: (
+      value?: string | I_faSelectInputObjectItem,
+      mode?: T_faSelectInputNewValueDoneMode
+    ) => void
+  ): void {
     if (!input.getAllowCreateNew()) {
+      done?.()
       return
     }
     const created = deps.createFaSelectInputNewItem(
@@ -153,6 +169,7 @@ function createFaSelectInputApi (
       deps.createId
     )
     if (created === null) {
+      done?.()
       return
     }
     const nextValue = deps.appendFaSelectInputCreatedValue(
@@ -163,6 +180,8 @@ function createFaSelectInputApi (
     emitModelAndChange(nextValue)
     input.emitNewValue(created)
     maybeClearSearchInputAfterSelect()
+    // Call done with no value so Quasar clears filter without double-adding.
+    done?.()
   }
 
   function onFocus (): void {

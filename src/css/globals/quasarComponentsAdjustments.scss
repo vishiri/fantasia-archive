@@ -361,7 +361,11 @@ body.fa-appTheme--fantasy {
   }
 
   .q-field__prepend .q-btn.text-primary-bright .q-icon,
-  .q-field__append .q-btn.text-primary-bright .q-icon {
+  .q-field__append .q-btn.text-primary-bright .q-icon,
+  .q-field__prepend > .q-icon.text-primary-bright,
+  .q-field__append > .q-icon.text-primary-bright,
+  .q-field__after > .q-icon.text-primary-bright,
+  .q-field__marginal > .q-icon.text-primary-bright {
     --fa-color-glyph-base: #{$faOutlineButtonGlow-color-primaryBright};
   }
 

@@ -140,6 +140,8 @@ async function seedOpenedDocumentTab (
         savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
         extraClassesDraft: '',
         savedExtraClasses: '',
+        tagsDraft: [],
+        savedTags: [],
         tabLabel: label,
         templateIcon: 'mdi-file-document'
       }]

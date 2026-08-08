@@ -111,6 +111,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
   isTreeDragActive: Ref<boolean>
 }) {
   const draggedDocumentId = createProjectHierarchyTreeDragSessionNullableBinding<string | null>(null)
+  const draggedTreeNodeId = createProjectHierarchyTreeDragSessionNullableBinding<string | null>(null)
   const dragExpandedSnapshot = createProjectHierarchyTreeDragSessionNullableBinding<string[] | null>(null)
   const dragSiblingOrderSnapshot = createProjectHierarchyTreeDragSessionNullableBinding<
     I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
@@ -128,6 +129,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     deps.dragCommitScheduled.value = false
     deps.dragDropCommitted.value = false
     draggedDocumentId.write(null)
+    draggedTreeNodeId.write(null)
     dragExpandedSnapshot.write(null)
     dragSiblingOrderSnapshot.write(null)
     dragSiblingOrderAtDragStart = null
@@ -176,6 +178,10 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     get: draggedDocumentId.get,
     set: draggedDocumentId.set
   }
+  const draggedTreeNodeIdApi = {
+    get: draggedTreeNodeId.get,
+    set: draggedTreeNodeId.set
+  }
   const dragExpandedSnapshotApi = {
     get: dragExpandedSnapshot.get,
     set: dragExpandedSnapshot.set
@@ -193,6 +199,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     clearDragSessionFlags,
     dragExpandedSnapshot: dragExpandedSnapshotApi,
     draggedDocumentId: draggedDocumentIdApi,
+    draggedTreeNodeId: draggedTreeNodeIdApi,
     dragSiblingOrderSnapshot: dragSiblingOrderSnapshotApi,
     incrementDragModelValueRevision,
     readDragParentDocumentIdAtDragStart,

@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue'
+import type { ComputedRef, Ref, WritableComputedRef } from 'vue'
 
 /**
  * Structural ref types for level-1 functions/ factories (Vue APIs injected by managers).
@@ -7,6 +7,9 @@ import type { ComputedRef, Ref } from 'vue'
 export type I_ref<T> = Ref<T>
 
 export type I_computedRef<T> = ComputedRef<T>
+
+/** Writable computed (get/set) for level-1 factories that return v-model bindings. */
+export type I_writableComputedRef<T> = WritableComputedRef<T>
 
 /**
  * Subset of Vue App used by boot factories (structural; managers pass the real App).

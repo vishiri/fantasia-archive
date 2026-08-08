@@ -15,20 +15,19 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { resolveProjectHierarchyTreeForceSublevelCollapse } from '../functions/projectHierarchyTreeForceSublevelCollapse'
-import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeSessionWiring'
-import {
-  createProjectHierarchyTreeOrderNumberBadgeWiring,
-  createProjectHierarchyTreePlacementCountWiring,
-  createProjectHierarchyTreeProjectNameTitleWiring,
-  createProjectHierarchyTreeTreeLineWiring
-} from './projectHierarchyTreeDisplayChromeWiring'
 import {
   createProjectHierarchyTreeDocumentButtonGroupWiring,
   createProjectHierarchyTreeNodeDisplayBindings,
   createProjectHierarchyTreeSettingsSurfaceWiring
 } from './projectHierarchyTreeSettingsSurfaceWiring'
+import {
+  createProjectHierarchyTreeExtraTreePaddingWiring,
+  createProjectHierarchyTreeOrderNumberBadgeWiring,
+  createProjectHierarchyTreePlacementCountWiring,
+  createProjectHierarchyTreeProjectNameTitleWiring,
+  createProjectHierarchyTreeTreeLineWiring
+} from './projectHierarchyTreeDisplayChromeWiring'
+import { bindProjectHierarchyTreeTagSessionWiring } from './projectHierarchyTreeTagSessionBindWiring'
 
 import type {
   I_faOpenedDocumentTreeOpenMeta,
@@ -45,9 +44,10 @@ type T_useProjectHierarchyTreeOptions = {
 
 type T_useProjectHierarchyTree = (
   opts: T_useProjectHierarchyTreeOptions
-) => ReturnType<typeof createProjectHierarchyTreeSessionWiring> &
+) => ReturnType<typeof bindProjectHierarchyTreeTagSessionWiring> &
   ReturnType<typeof createProjectHierarchyTreeDocumentButtonGroupWiring> &
   ReturnType<typeof createProjectHierarchyTreeTreeLineWiring> &
+  ReturnType<typeof createProjectHierarchyTreeExtraTreePaddingWiring> &
   ReturnType<typeof createProjectHierarchyTreePlacementCountWiring> &
   ReturnType<typeof createProjectHierarchyTreeOrderNumberBadgeWiring> &
   ReturnType<typeof createProjectHierarchyTreeProjectNameTitleWiring> &
@@ -62,6 +62,7 @@ export function createUseProjectHierarchyTree (deps: {
   S_FaUserSettings: typeof S_FaUserSettings
   computed: typeof computed
   dragContext: typeof dragContext
+  i18nT: (key: string) => string
   nextTick: typeof nextTick
   onMounted: typeof onMounted
   onUnmounted: typeof onUnmounted
@@ -89,13 +90,14 @@ export function createUseProjectHierarchyTree (deps: {
     const activeDocumentId = deps.computed((): string | null => {
       return deps.resolveFaDocumentWorkspaceRouteDocumentId(route.path ?? '')
     })
-
-    const sessionApi = createProjectHierarchyTreeSessionWiring({
+    const sessionApi = bindProjectHierarchyTreeTagSessionWiring({
       S_FaActiveProject: deps.S_FaActiveProject,
+      S_FaOpenedDocuments: deps.S_FaOpenedDocuments,
+      S_FaUserSettings: deps.S_FaUserSettings,
       computed: deps.computed,
-      createTemporaryDocument: (input) => deps.S_FaOpenedDocuments().createTemporaryDocument(input),
       dragContext: deps.dragContext,
       hierarchyStore,
+      i18nT: deps.i18nT,
       layoutRefreshGeneration: layoutRefreshGeneration as Ref<number>,
       nextTick: deps.nextTick,
       onDocumentOpenRequest: opts.onDocumentOpenRequest,
@@ -105,24 +107,12 @@ export function createUseProjectHierarchyTree (deps: {
       pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIds as Ref<string[]>,
       pendingRevealPath: pendingRevealPath as Ref<string[]>,
       ref: deps.ref,
-      resolveForceSublevelCollapseInTree: () => {
-        const userSettingsStore = deps.S_FaUserSettings()
-        return resolveProjectHierarchyTreeForceSublevelCollapse(
-          userSettingsStore.settings,
-          userSettingsStore.appSettingsDialogPreview,
-          {
-            forceSublevelCollapseInTree: FA_USER_SETTINGS_DEFAULTS.forceSublevelCollapseInTree
-          }
-        )
-      },
-      resolvePreferredLanguageCode: () => deps.S_FaUserSettings().settings?.languageCode ?? 'en-US',
       runFaAction: deps.runFaAction,
       treeData: treeData as Ref<I_faProjectHierarchyTreeHeTreeNode[]>,
       uiState: uiState as Ref<I_faProjectHierarchyTreeUiState>,
       watch: deps.watch,
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
-
     const settingsSurface = createProjectHierarchyTreeSettingsSurfaceWiring({
       S_FaActiveProject: deps.S_FaActiveProject,
       S_FaUserSettings: deps.S_FaUserSettings,
@@ -131,12 +121,12 @@ export function createUseProjectHierarchyTree (deps: {
       storeToRefs: deps.storeToRefs,
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
-
     return {
       activeDocumentId,
       ...sessionApi,
       ...settingsSurface.documentButtonGroupWiring,
       ...settingsSurface.treeLineWiring,
+      ...settingsSurface.extraTreePaddingWiring,
       ...settingsSurface.placementCountWiring,
       ...settingsSurface.orderNumberBadgeWiring,
       ...settingsSurface.projectNameTitleWiring,

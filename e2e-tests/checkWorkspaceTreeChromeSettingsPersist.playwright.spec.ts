@@ -242,7 +242,7 @@ test.describe.serial('Opened documents E2E — tree chrome settings before cold 
     })
   })
 
-  test('Tree chrome user settings hide lines order badges and row icons', async () => {
+  test('Tree chrome user settings hide lines order badges row icons and extra padding', async () => {
     await createE2eProjectOnWorkspaceRoute(appWindow, electronApp)
     e2eTreeChromeDocumentId = await seedTreeDocumentAndRefreshHierarchy(appWindow)
     expect(e2eTreeChromeDocumentId.length).toBeGreaterThan(0)
@@ -265,6 +265,7 @@ test.describe.serial('Opened documents E2E — tree chrome settings before cold 
     ).not.toHaveCount(0)
 
     await patchUserSettingsSilentlyViaPinia(appWindow, {
+      extraTreePadding: true,
       hideTreeIconAddUnder: true,
       hideTreeIconEdit: true,
       hideTreeIconView: true,
@@ -273,6 +274,17 @@ test.describe.serial('Opened documents E2E — tree chrome settings before cold 
     })
     await appWindow.waitForTimeout(USER_SETTINGS_PERSIST_SETTLE_MS)
 
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.hierarchyTree}"]`)
+    ).toHaveClass(/projectHierarchyTree--extraPadding/)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.hierarchyTree}"]`)
+    ).toHaveCSS('padding-left', '30px')
+    await expect(
+      appWindow.locator(
+        `[data-test-locator="${selectorList.hierarchyTree}"] .projectHierarchyTree-treeNode--world`
+      )
+    ).toHaveCSS('margin-left', '-18px')
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.orderNumberBadge}"]`)
     ).toHaveCount(0)
@@ -347,6 +359,7 @@ test.describe.serial('Opened documents E2E — cold restart keeps tree chrome se
                 $pinia?: {
                   _s?: Map<string, {
                     settings?: {
+                      extraTreePadding?: boolean
                       hideTreeIconAddUnder?: boolean
                       hideTreeIconEdit?: boolean
                       hideTreeIconView?: boolean
@@ -364,6 +377,7 @@ test.describe.serial('Opened documents E2E — cold restart keeps tree chrome se
           return null
         }
         return {
+          extraTreePadding: settings.extraTreePadding,
           hideTreeIconAddUnder: settings.hideTreeIconAddUnder,
           hideTreeIconEdit: settings.hideTreeIconEdit,
           hideTreeIconView: settings.hideTreeIconView,
@@ -372,6 +386,7 @@ test.describe.serial('Opened documents E2E — cold restart keeps tree chrome se
         }
       })
     }).toEqual({
+      extraTreePadding: true,
       hideTreeIconAddUnder: true,
       hideTreeIconEdit: true,
       hideTreeIconView: true,
@@ -387,6 +402,17 @@ test.describe.serial('Opened documents E2E — cold restart keeps tree chrome se
     await worldOpenIcon.dispatchEvent('pointerdown')
     await worldOpenIcon.click({ force: true })
 
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.hierarchyTree}"]`)
+    ).toHaveClass(/projectHierarchyTree--extraPadding/)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.hierarchyTree}"]`)
+    ).toHaveCSS('padding-left', '30px')
+    await expect(
+      appWindow.locator(
+        `[data-test-locator="${selectorList.hierarchyTree}"] .projectHierarchyTree-treeNode--world`
+      )
+    ).toHaveCSS('margin-left', '-18px')
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.orderNumberBadge}"]`)
     ).toHaveCount(0)

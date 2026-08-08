@@ -187,6 +187,7 @@ test('Test that patchFaComponentTestingStores merges hierarchy tree chrome flags
     disableCategoryCount: true,
     disableDocumentCounts: true,
     doubleDashDocCount: true,
+    extraTreePadding: true,
     forceSublevelCollapseInTree: true,
     hideDeadCrossThrough: true,
     hideHierarchyTree: true,
@@ -203,6 +204,7 @@ test('Test that patchFaComponentTestingStores merges hierarchy tree chrome flags
   expect(mergedSettings.disableCategoryCount).toBe(true)
   expect(mergedSettings.disableDocumentCounts).toBe(true)
   expect(mergedSettings.doubleDashDocCount).toBe(true)
+  expect(mergedSettings.extraTreePadding).toBe(true)
   expect(mergedSettings.forceSublevelCollapseInTree).toBe(true)
   expect(mergedSettings.hideDeadCrossThrough).toBe(true)
   expect(mergedSettings.hideHierarchyTree).toBe(true)

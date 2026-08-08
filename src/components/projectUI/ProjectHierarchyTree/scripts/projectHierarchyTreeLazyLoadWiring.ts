@@ -91,6 +91,9 @@ export async function runProjectHierarchyTreeDeferredLazyLoadBatch (deps: {
 export function createProjectHierarchyTreeLazyLoadWiring (deps: {
   deferLazyLoadTreeRevisionPublish: Ref<boolean>
   getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  listDocumentsUnderTag?: (
+    input: { tagId: string }
+  ) => Promise<{ items: import('app/types/I_faProjectTagDomain').I_faProjectTagDocumentChild[] }>
   listPlacementDocumentChildren: (
     input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDocumentChild[] }>
@@ -148,6 +151,9 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
       preferredLanguageCode: deps.getPreferredLanguageCode(),
       publishTreeRevision,
       treeData: deps.treeData,
+      ...(deps.listDocumentsUnderTag === undefined
+        ? {}
+        : { listDocumentsUnderTag: deps.listDocumentsUnderTag }),
       ...(stageLoadedChildrenForNode === undefined
         ? {}
         : { stageLoadedChildrenForNode })
@@ -168,7 +174,10 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
       nodeId,
       preferredLanguageCode: deps.getPreferredLanguageCode(),
       publishTreeRevision,
-      treeData: deps.treeData
+      treeData: deps.treeData,
+      ...(deps.listDocumentsUnderTag === undefined
+        ? {}
+        : { listDocumentsUnderTag: deps.listDocumentsUnderTag })
     })
   }
 
