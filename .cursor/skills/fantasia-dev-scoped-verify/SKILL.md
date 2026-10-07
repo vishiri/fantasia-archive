@@ -41,7 +41,7 @@ For **each** touched production module (not test-only edits):
 
 1. **Colocated** — same tree **`_tests/*.vitest.test.ts`**, **`scripts/_tests/*.vitest.test.ts`**.
 2. **SFC** — **`src/components|layouts|pages/<Feature>/_tests/<Name>.vitest.test.ts`** matching **`.vue`** basename.
-3. **Ripgrep importers** — basename or exported symbol from touched **`.ts`** in **`**/*.vitest.test.ts`**. Arbor **`get_callers`** may hint production importers; **do not** replace this ripgrep for spec paths.
+3. **Ripgrep importers** — basename or exported symbol from touched **`.ts`** in **`**/*.vitest.test.ts`**.
 4. **Types** — **`types/<Module>.ts`** → specs importing **`app/types/...`** path.
 5. **i18n** — locale file touched → **`i18n/_tests/**`** specs for that locale or key family.
 6. **Stores / IPC** — grep store id, IPC channel string, action id in **`_tests/`**.

@@ -24,7 +24,7 @@ Always-on rule: [yagni.mdc](../../rules/yagni.mdc). **Precedence:** other **`.cu
 4. Installed **`package.json`** dep?
 5. Minimum inside conventions — shortest diff passing dev scoped gate ([dev-scoped-verify.mdc](../../rules/dev-scoped-verify.mdc)); full **`yarn testbatch:verify`** at commit/final cleanup
 
-Trace real flow before picking rung. Prefer project Arbor **`get_callers`** / **`get_callees`** ([fantasia-arbor](../fantasia-arbor/SKILL.md)) then Read. Mandatory two-level, **`types/`**, Vitest/Playwright/Storybook, neverthrow, line caps — **not** skippable for brevity.
+Trace real flow before picking rung. Grep callers, then Read. Mandatory two-level, **`types/`**, Vitest/Playwright/Storybook, neverthrow, line caps — **not** skippable for brevity.
 
 ## Orthogonal to caveman
 

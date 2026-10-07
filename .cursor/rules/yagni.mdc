@@ -42,7 +42,7 @@ Do **not** skip for brevity when rules/skills require:
 
 ## Bug fixes
 
-Fix root cause at shared function when one guard beats N caller patches. **`get_callers`** (project Arbor MCP) then Grep if graph empty or MCP down. Symptom-only patch on one path may leave siblings broken.
+Fix root cause at shared function when one guard beats N caller patches. Grep callers before a one-path patch. Symptom-only patch on one path may leave siblings broken.
 
 ## Question complex requests
 
@@ -53,4 +53,3 @@ When user asks for X, check whether existing Y in repo already covers it — pro
 - **Clarify before assume:** [clarify-before-assume.mdc](clarify-before-assume.mdc) — ask on product/UX/scope/implementation gaps; ladder step 1 "skip or ask" = scope gate; clarify rule = product/UX gate
 - **Agent replies:** [caveman-default.mdc](caveman-default.mdc) + **`.agents/skills/caveman/`** — terse prose only; does not govern code shape.
 - **Playbook:** [fantasia-yagni](../skills/fantasia-yagni/SKILL.md)
-- **Callers / impact:** [fantasia-arbor.mdc](fantasia-arbor.mdc), [fantasia-arbor](../skills/fantasia-arbor/SKILL.md)

@@ -28,7 +28,7 @@ yarn
 
 ## Optional: Caveman ecosystem (AI)
 
-Not required to build/run app. **caveman** compressed agent replies — [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **YAGNI** minimal implementation — [`.cursor/rules/yagni.mdc`](.cursor/rules/yagni.mdc). **cavemem** cross-session memory — global install + [`.cursor/hooks.json`](.cursor/hooks.json). **Arbor** (optional MCP code graph) — local gitignored **`.cursor/mcp.json`** (`arbor.exe` **`bridge`**), [fantasia-arbor](.cursor/skills/fantasia-arbor/SKILL.md). Setup cavemem:
+Not required to build/run app. **caveman** compressed agent replies — [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **YAGNI** minimal implementation — [`.cursor/rules/yagni.mdc`](.cursor/rules/yagni.mdc). **cavemem** cross-session memory — global install + [`.cursor/hooks.json`](.cursor/hooks.json). Setup cavemem:
 
 ```bash
 npm install -g cavemem

@@ -51,12 +51,6 @@ debug-storybook.log*
 # Playwright MCP (Cursor MCP server local workspace state; not app test output)
 .playwright-mcp/
 
-# Project Arbor MCP config (machine arbor.exe path; not committed)
-.cursor/mcp.json
-
-# Arbor local graph cache (optional MCP; not app source)
-.arbor/
-
 # Windows accidental NUL device file
 /NUL
 NUL

@@ -97,5 +97,4 @@ No two-level rules on: `**/*playwright*`, `helpers/playwrightHelpers_*`, `e2e-te
 
 - [code-size-decomposition.mdc](code-size-decomposition.mdc) — `*_manager.ts`, `S_*.ts` exempt from max-lines
 - [fantasia-two-level-architecture skill](../skills/fantasia-two-level-architecture/SKILL.md) — migration
-- [fantasia-arbor](../skills/fantasia-arbor/SKILL.md) — callers across Vue / manager / **`functions/`**
 - [vue-quasar.mdc](vue-quasar.mdc), [typescript-scripts.mdc](typescript-scripts.mdc)
