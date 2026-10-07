@@ -5,9 +5,12 @@ const {
   showSaveDialogMock,
   applyMigrationsMock,
   quickCheckMock,
+  discardBackupMock,
   openDbMock,
   replaceMock,
+  restoreBackupMock,
   unlinkMock,
+  promoteMock,
   takeE2ePathMock,
   readProjectUuidMock,
   browserWindowStub,
@@ -23,9 +26,13 @@ const {
     },
     openDbMock: vi.fn(function () {
       return {
+        close: vi.fn(),
         pragma: vi.fn()
       }
     }),
+    discardBackupMock: vi.fn(),
+    promoteMock: vi.fn(),
+    restoreBackupMock: vi.fn(),
     quickCheckMock: vi.fn(),
     readProjectUuidMock: vi.fn(() => '22222222-2222-4222-8222-222222222222'),
     replaceMock: vi.fn(),
@@ -74,8 +81,12 @@ vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 
 vi.mock('../faProjectActiveDatabaseWiring', () => {
   return {
+    discardFaProjectCreateBackupFile: discardBackupMock,
+    faProjectCreateStagingFilePath: (filePath: string) => `${filePath}.creating`,
     openFaProjectDatabase: openDbMock,
+    promoteFaProjectCreateStagingFile: promoteMock,
     replaceFaProjectActiveDatabase: replaceMock,
+    restoreFaProjectCreateBackupFile: restoreBackupMock,
     unlinkFaProjectFileIfExists: unlinkMock
   }
 })
@@ -120,8 +131,17 @@ beforeEach(() => {
   applyMigrationsMock.mockReset()
   quickCheckMock.mockReset()
   openDbMock.mockReset()
+  openDbMock.mockImplementation(function () {
+    return {
+      close: vi.fn(),
+      pragma: vi.fn()
+    }
+  })
   replaceMock.mockReset()
   unlinkMock.mockReset()
+  promoteMock.mockReset()
+  discardBackupMock.mockReset()
+  restoreBackupMock.mockReset()
   takeE2ePathMock.mockReset()
   takeE2ePathMock.mockReturnValue(null)
   recordRecentForCreateMock.mockReset()
@@ -132,6 +152,7 @@ beforeEach(() => {
     filePath: 'D:\\dl\\proj.faproject'
   })
   openDbMock.mockReturnValue({
+    close: vi.fn(),
     pragma: vi.fn()
   })
 })
@@ -167,8 +188,15 @@ test('runFaProjectCreateFromIpc returns error when save dialog returns an empty 
 test('runFaProjectCreateFromIpc creates project when save path chosen', async () => {
   const r = await runFaProjectCreateFromIpc({} as never, { projectName: 'Realm' })
   expect(r.outcome).toBe('created')
-  expect(unlinkMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject')
+  expect(unlinkMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject.creating')
+  expect(promoteMock).toHaveBeenCalledWith(
+    'D:\\dl\\proj.faproject.creating',
+    'D:\\dl\\proj.faproject'
+  )
+  expect(openDbMock).toHaveBeenCalledTimes(2)
   expect(replaceMock).toHaveBeenCalledOnce()
+  expect(discardBackupMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject')
+  expect(restoreBackupMock).not.toHaveBeenCalled()
   expect(applyMigrationsMock).toHaveBeenCalled()
   expect(quickCheckMock).toHaveBeenCalled()
   expect(r.project?.name).toBe('Realm')
@@ -331,7 +359,29 @@ test('runFaProjectCreateFromIpc returns error when migrations fail', async () =>
   const r = await runFaProjectCreateFromIpc({} as never, { projectName: 'A' })
   logSpy.mockRestore()
   expect(r.outcome).toBe('error')
-  expect(unlinkMock).toHaveBeenCalled()
+  expect(promoteMock).not.toHaveBeenCalled()
+  expect(unlinkMock).not.toHaveBeenCalledWith('D:\\dl\\proj.faproject')
+  expect(unlinkMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject.creating')
+})
+
+test('runFaProjectCreateFromIpc restores the previous file when reopening the promoted project fails', async () => {
+  openDbMock.mockImplementationOnce(function () {
+    return {
+      close: vi.fn(),
+      pragma: vi.fn()
+    }
+  })
+  openDbMock.mockImplementationOnce(function () {
+    throw new Error('reopen-fail')
+  })
+  const logSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const r = await runFaProjectCreateFromIpc({} as never, { projectName: 'A' })
+  logSpy.mockRestore()
+  expect(r.outcome).toBe('error')
+  expect(promoteMock).toHaveBeenCalledOnce()
+  expect(replaceMock).not.toHaveBeenCalled()
+  expect(restoreBackupMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject')
+  expect(discardBackupMock).not.toHaveBeenCalled()
 })
 
 test('runFaProjectCreateFromIpc returns error when openFaProjectDatabase fails', async () => {
@@ -387,4 +437,33 @@ test('runFaProjectCreateFromIpc tolerates db.close failures during rollback', as
   logSpy.mockRestore()
   expect(r.outcome).toBe('error')
   expect(boomClose).toHaveBeenCalled()
+})
+
+test('runFaProjectCreateFromIpc tolerates discard backup failure after a successful create', async () => {
+  discardBackupMock.mockImplementationOnce(() => {
+    throw new Error('discard-boom')
+  })
+  const r = await runFaProjectCreateFromIpc({} as never, { projectName: 'A' })
+  expect(r.outcome).toBe('created')
+  expect(discardBackupMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject')
+})
+
+test('runFaProjectCreateFromIpc tolerates restore backup failure when reopen fails', async () => {
+  openDbMock.mockImplementationOnce(function () {
+    return {
+      close: vi.fn(),
+      pragma: vi.fn()
+    }
+  })
+  openDbMock.mockImplementationOnce(function () {
+    throw new Error('reopen-fail')
+  })
+  restoreBackupMock.mockImplementationOnce(() => {
+    throw new Error('restore-boom')
+  })
+  const logSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const r = await runFaProjectCreateFromIpc({} as never, { projectName: 'A' })
+  logSpy.mockRestore()
+  expect(r.outcome).toBe('error')
+  expect(restoreBackupMock).toHaveBeenCalledWith('D:\\dl\\proj.faproject')
 })

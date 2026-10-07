@@ -13,6 +13,11 @@ export function createFetchLatestGithubReleaseVersion (deps: {
   ResultAsync: T_injectedResultAsync
   fetchLatestReleaseJson: (url: string) => Promise<unknown>
   latestApiUrl: string
+  releaseErrorMessages: {
+    emptyAfterStrip: () => string
+    missingTagName: () => string
+    responseNotObject: () => string
+  }
   stripFaSemverVersion: (raw: string) => string
 }): {
     fetchLatestGithubReleaseVersion: () => Promise<T_faGithubLatestVersionResult>
@@ -21,15 +26,15 @@ export function createFetchLatestGithubReleaseVersion (deps: {
     const result = await deps.ResultAsync.fromPromise(
       deps.fetchLatestReleaseJson(deps.latestApiUrl).then((body) => {
         if (body === null || typeof body !== 'object') {
-          throw new Error('GitHub latest release response was not an object.')
+          throw new Error(deps.releaseErrorMessages.responseNotObject())
         }
         const tagName = (body as { tag_name?: unknown }).tag_name
         if (typeof tagName !== 'string' || tagName.trim().length === 0) {
-          throw new Error('GitHub latest release missing tag_name.')
+          throw new Error(deps.releaseErrorMessages.missingTagName())
         }
         const stripped = deps.stripFaSemverVersion(tagName)
         if (stripped.length === 0) {
-          throw new Error('GitHub latest release tag_name was empty after strip.')
+          throw new Error(deps.releaseErrorMessages.emptyAfterStrip())
         }
         return stripped
       }),
@@ -41,16 +46,28 @@ export function createFetchLatestGithubReleaseVersion (deps: {
       }
     )
     if (result.isErr()) {
+      const error = result.error
+      const isErr = (): boolean => {
+        return true
+      }
+      const value = ''
+
       return {
-        error: result.error,
-        isErr: () => true,
-        value: ''
+        error,
+        isErr,
+        value
       }
     }
+    const error = new Error('unused')
+    const isErr = (): boolean => {
+      return false
+    }
+    const value = result.value
+
     return {
-      error: new Error('unused'),
-      isErr: () => false,
-      value: result.value
+      error,
+      isErr,
+      value
     }
   }
 

@@ -13,10 +13,13 @@ let registered = false
 
 function appStylingSnapshot (): I_faAppStylingRoot {
   const s = getFaAppStyling().store
+  const css = s.css
+  const frame = s.frame
+  const schemaVersion = s.schemaVersion
   return {
-    css: s.css,
-    frame: s.frame,
-    schemaVersion: s.schemaVersion
+    css,
+    frame,
+    schemaVersion
   }
 }
 

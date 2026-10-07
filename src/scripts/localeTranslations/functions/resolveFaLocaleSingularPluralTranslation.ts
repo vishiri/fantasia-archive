@@ -1,6 +1,7 @@
 import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faLocaleSingularPluralMissingTranslationWarning, T_faLocaleSingularPluralMissingForm } from 'app/types/I_faLocaleSingularPluralMissingTranslationWarning'
 import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+import type { T_faLocaleSingularPluralResolveApi } from 'app/types/T_faLocaleSingularPluralResolveApi'
 import type { T_faLocaleSingularPluralUsedForm } from 'app/types/T_faLocaleSingularPluralUsedForm'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
@@ -82,10 +83,12 @@ function resolveFaLocaleSingularPluralDisplayTranslationResolution (
   for (const languageCode of chain) {
     const resolved = resolveFaLocaleSingularPluralForLocale(translations, languageCode)
     if (resolved.value.length > 0) {
+      const usedForm = resolved.usedForm
+      const value = resolved.value
       return {
         displayLanguageCode: languageCode,
-        usedForm: resolved.usedForm,
-        value: resolved.value
+        usedForm,
+        value
       }
     }
   }
@@ -189,75 +192,70 @@ function resolveFaLocaleSingularPluralMissingTranslationWarning (
 
 export function createResolveFaLocaleSingularPluralTranslation (deps: {
   languageCodes: readonly T_faUserSettingsLanguageCode[]
-}): {
-    hasFaLocaleSingularPluralTranslation: (
-      translations: I_faLocaleSingularPluralTranslations
-    ) => boolean
-    resolveFaLocaleSingularPluralDisplayTranslation: (
-      translations: I_faLocaleSingularPluralTranslations,
-      preferredLanguageCode: T_faUserSettingsLanguageCode
-    ) => string
-    resolveFaLocaleSingularPluralDisplayTranslationForStorage: (
-      translations: I_faLocaleSingularPluralTranslations
-    ) => string
-    resolveFaLocaleSingularPluralDisplayTranslationLanguageCode: (
-      translations: I_faLocaleSingularPluralTranslations,
-      preferredLanguageCode: T_faUserSettingsLanguageCode
-    ) => T_faUserSettingsLanguageCode | null
-    resolveFaLocaleSingularPluralDisplayTranslationResolution: (
-      translations: I_faLocaleSingularPluralTranslations,
-      preferredLanguageCode: T_faUserSettingsLanguageCode
-    ) => {
-      displayLanguageCode: T_faUserSettingsLanguageCode | null
-      usedForm: T_faLocaleSingularPluralUsedForm
-      value: string
-    }
-    resolveFaLocaleSingularPluralMissingFormsForLanguage: (
-      translations: I_faLocaleSingularPluralTranslations,
-      languageCode: T_faUserSettingsLanguageCode
-    ) => T_faLocaleSingularPluralMissingForm | null
-    resolveFaLocaleSingularPluralMissingTranslationWarning: (
-      translations: I_faLocaleSingularPluralTranslations,
-      languageCode: T_faUserSettingsLanguageCode
-    ) => I_faLocaleSingularPluralMissingTranslationWarning | null
-  } {
+}): T_faLocaleSingularPluralResolveApi {
   const languageCodes = deps.languageCodes
+  const hasFaLocaleSingularPluralTranslationBound = (
+    translations: I_faLocaleSingularPluralTranslations
+  ): boolean => {
+    return hasFaLocaleSingularPluralTranslation(languageCodes, translations)
+  }
+  const resolveFaLocaleSingularPluralDisplayTranslationBound = (
+    translations: I_faLocaleSingularPluralTranslations,
+    preferredLanguageCode: T_faUserSettingsLanguageCode
+  ): string => {
+    return resolveFaLocaleSingularPluralDisplayTranslation(
+      languageCodes,
+      translations,
+      preferredLanguageCode
+    )
+  }
+  const resolveFaLocaleSingularPluralDisplayTranslationForStorageBound = (
+    translations: I_faLocaleSingularPluralTranslations
+  ): string => {
+    return resolveFaLocaleSingularPluralDisplayTranslationForStorage(languageCodes, translations)
+  }
+  const resolveFaLocaleSingularPluralDisplayTranslationLanguageCodeBound = (
+    translations: I_faLocaleSingularPluralTranslations,
+    preferredLanguageCode: T_faUserSettingsLanguageCode
+  ): T_faUserSettingsLanguageCode | null => {
+    return resolveFaLocaleSingularPluralDisplayTranslationLanguageCode(
+      languageCodes,
+      translations,
+      preferredLanguageCode
+    )
+  }
+  const resolveFaLocaleSingularPluralDisplayTranslationResolutionBound = (
+    translations: I_faLocaleSingularPluralTranslations,
+    preferredLanguageCode: T_faUserSettingsLanguageCode
+  ): {
+    displayLanguageCode: T_faUserSettingsLanguageCode | null
+    usedForm: T_faLocaleSingularPluralUsedForm
+    value: string
+  } => {
+    return resolveFaLocaleSingularPluralDisplayTranslationResolution(
+      languageCodes,
+      translations,
+      preferredLanguageCode
+    )
+  }
+  const resolveFaLocaleSingularPluralMissingTranslationWarningBound = (
+    translations: I_faLocaleSingularPluralTranslations,
+    languageCode: T_faUserSettingsLanguageCode
+  ): I_faLocaleSingularPluralMissingTranslationWarning | null => {
+    return resolveFaLocaleSingularPluralMissingTranslationWarning(
+      languageCodes,
+      translations,
+      languageCode
+    )
+  }
 
   return {
-    hasFaLocaleSingularPluralTranslation: (translations) => {
-      return hasFaLocaleSingularPluralTranslation(languageCodes, translations)
-    },
-    resolveFaLocaleSingularPluralDisplayTranslation: (translations, preferredLanguageCode) => {
-      return resolveFaLocaleSingularPluralDisplayTranslation(
-        languageCodes,
-        translations,
-        preferredLanguageCode
-      )
-    },
-    resolveFaLocaleSingularPluralDisplayTranslationForStorage: (translations) => {
-      return resolveFaLocaleSingularPluralDisplayTranslationForStorage(languageCodes, translations)
-    },
-    resolveFaLocaleSingularPluralDisplayTranslationLanguageCode: (translations, preferredLanguageCode) => {
-      return resolveFaLocaleSingularPluralDisplayTranslationLanguageCode(
-        languageCodes,
-        translations,
-        preferredLanguageCode
-      )
-    },
-    resolveFaLocaleSingularPluralDisplayTranslationResolution: (translations, preferredLanguageCode) => {
-      return resolveFaLocaleSingularPluralDisplayTranslationResolution(
-        languageCodes,
-        translations,
-        preferredLanguageCode
-      )
-    },
+    hasFaLocaleSingularPluralTranslation: hasFaLocaleSingularPluralTranslationBound,
+    resolveFaLocaleSingularPluralDisplayTranslation: resolveFaLocaleSingularPluralDisplayTranslationBound,
+    resolveFaLocaleSingularPluralDisplayTranslationForStorage: resolveFaLocaleSingularPluralDisplayTranslationForStorageBound,
+    resolveFaLocaleSingularPluralDisplayTranslationLanguageCode: resolveFaLocaleSingularPluralDisplayTranslationLanguageCodeBound,
+    resolveFaLocaleSingularPluralDisplayTranslationResolution: resolveFaLocaleSingularPluralDisplayTranslationResolutionBound,
     resolveFaLocaleSingularPluralMissingFormsForLanguage,
-    resolveFaLocaleSingularPluralMissingTranslationWarning: (translations, languageCode) => {
-      return resolveFaLocaleSingularPluralMissingTranslationWarning(
-        languageCodes,
-        translations,
-        languageCode
-      )
-    }
+    resolveFaLocaleSingularPluralMissingTranslationWarning: resolveFaLocaleSingularPluralMissingTranslationWarningBound
   }
 }

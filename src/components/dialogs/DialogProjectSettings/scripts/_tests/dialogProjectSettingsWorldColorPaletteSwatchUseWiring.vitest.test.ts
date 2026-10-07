@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onUnmounted, reactive, ref, watch } from 'vue'
 import { expect, test } from 'vitest'
 
 import { createFaColorPickerPopoverEmit } from 'app/src/scripts/faColorPicker/faColorPicker_manager'
@@ -10,12 +10,12 @@ import {
   FA_DIALOG_PROJECT_SETTINGS_WORLD_COLOR_PALETTE_DUPLICATE_ICON_MIN_CONTRAST_RATIO
 } from 'app/types/I_faColorContrast'
 import throttle from 'lodash-es/throttle.js'
-import { onUnmounted } from 'vue'
 
 import { isDialogProjectSettingsWorldColorPaletteSwatchDuplicate } from '../functions/dialogProjectSettingsWorldColorPalette'
 import { createUseDialogProjectSettingsWorldColorPaletteSwatch } from '../dialogProjectSettingsWorldColorPaletteSwatchUseWiring'
 
 const useFaColorPickerPopoverEmit = createFaColorPickerPopoverEmit({
+  onBeforeUnmount,
   onUnmounted,
   ref,
   throttle,

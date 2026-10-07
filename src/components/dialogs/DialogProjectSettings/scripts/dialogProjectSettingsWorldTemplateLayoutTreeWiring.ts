@@ -61,6 +61,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeWiring (deps: 
       dragCommitPending: deps.dragCommitPending,
       dragCommitScheduled: deps.dragCommitScheduled,
       emitLayoutFromTreeDataIfChanged: deps.emitLayoutFromTreeDataIfChanged,
+      isTreeDragActive: deps.isTreeDragActive,
       nextTick: deps.nextTick,
       removeDragCancelListeners,
       suppressTreeEmit: deps.suppressTreeEmit
@@ -96,16 +97,19 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeWiring (deps: 
     clearDragSessionFlags()
   }
 
+  const emitLayoutFromTreeDataIfChanged = deps.emitLayoutFromTreeDataIfChanged
+  const finishDragSessionWithoutCommit = dragCancelWiring.finishDragSessionWithoutCommit
+  const resyncTreeDataFromProps = deps.resyncTreeDataFromProps
   return {
     clearDragSessionFlags,
-    emitLayoutFromTreeDataIfChanged: deps.emitLayoutFromTreeDataIfChanged,
-    finishDragSessionWithoutCommit: dragCancelWiring.finishDragSessionWithoutCommit,
+    emitLayoutFromTreeDataIfChanged,
+    finishDragSessionWithoutCommit,
     onBeforeDragStart,
     onTreeAfterDrop,
     onTreeDataUpdate,
     onTreeDragEndCleanup,
     onUnmountedCleanup,
     removeDragCancelListeners,
-    resyncTreeDataFromProps: deps.resyncTreeDataFromProps
+    resyncTreeDataFromProps
   }
 }

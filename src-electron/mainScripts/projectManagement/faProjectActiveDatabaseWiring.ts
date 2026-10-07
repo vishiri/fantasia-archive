@@ -71,3 +71,55 @@ export function unlinkFaProjectFileIfExists (filePath: string): void {
     fs.unlinkSync(filePath)
   }
 }
+
+/** Sibling path used while a new project database is built, before the chosen path is replaced. */
+export function faProjectCreateStagingFilePath (filePath: string): string {
+  return `${filePath}.creating`
+}
+
+function faProjectCreateBackupFilePath (filePath: string): string {
+  return `${filePath}.creating-bak`
+}
+
+/**
+ * Replaces filePath with a finished staging database.
+ * The previous file is moved aside first and put back if the staging rename fails.
+ */
+export function promoteFaProjectCreateStagingFile (
+  stagingPath: string,
+  filePath: string
+): void {
+  const backupPath = faProjectCreateBackupFilePath(filePath)
+  unlinkFaProjectFileIfExists(backupPath)
+  const movedExistingAside = fs.existsSync(filePath)
+  if (movedExistingAside) {
+    fs.renameSync(filePath, backupPath)
+  }
+  const renamed = Result.fromThrowable(
+    (): void => {
+      fs.renameSync(stagingPath, filePath)
+    },
+    (error): unknown => error
+  )()
+  if (renamed.isOk()) {
+    return
+  }
+  if (movedExistingAside) {
+    fs.renameSync(backupPath, filePath)
+  }
+  const error = renamed.error
+  throw error instanceof Error ? error : new Error(String(error))
+}
+
+export function discardFaProjectCreateBackupFile (filePath: string): void {
+  unlinkFaProjectFileIfExists(faProjectCreateBackupFilePath(filePath))
+}
+
+export function restoreFaProjectCreateBackupFile (filePath: string): void {
+  const backupPath = faProjectCreateBackupFilePath(filePath)
+  if (!fs.existsSync(backupPath)) {
+    return
+  }
+  unlinkFaProjectFileIfExists(filePath)
+  fs.renameSync(backupPath, filePath)
+}

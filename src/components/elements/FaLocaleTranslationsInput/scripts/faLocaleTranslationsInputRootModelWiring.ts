@@ -64,12 +64,18 @@ export function createFaLocaleTranslationsInputRootModelWiring (deps: {
     useFaLocaleTranslationsInput: deps.useFaLocaleTranslationsInput,
     useFaLocaleTranslationsInputSingularPlural: deps.useFaLocaleTranslationsInputSingularPlural
   })
+  const {
+    activeComposable,
+    readPreferredLanguageInputFocus,
+    resolvedTextareaRows,
+    setPreferredLanguageInputRef
+  } = composableWiring
   return {
-    activeComposable: composableWiring.activeComposable,
+    activeComposable,
     isSingularPluralForms,
-    readPreferredLanguageInputFocus: composableWiring.readPreferredLanguageInputFocus,
-    resolvedTextareaRows: composableWiring.resolvedTextareaRows,
-    setPreferredLanguageInputRef: composableWiring.setPreferredLanguageInputRef,
+    readPreferredLanguageInputFocus,
+    resolvedTextareaRows,
+    setPreferredLanguageInputRef,
     singularPluralModelValueRef
   }
 }

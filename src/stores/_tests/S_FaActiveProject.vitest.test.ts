@@ -6,6 +6,7 @@ import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 import { registerFaAppRouterSession } from 'app/src/scripts/appInternals/appInternals_manager'
 
 import { S_FaActiveProject } from '../S_FaActiveProject'
+import { registerFaProjectReplacementPersistHook } from 'app/src/scripts/floatingWindows/faProjectReplacementPersistHooksWiring'
 
 const routerPushMock = vi.fn()
 let faVitestRouterPath = '/'
@@ -73,6 +74,19 @@ test('Test that setActiveProject assigns activeProject and sets hasActiveProject
   expect(store.activeProject).toEqual(payload)
   expect(store.hasActiveProject).toBe(true)
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
+})
+
+test('Test that S_FaActiveProject bumps the content epoch when the project changes', () => {
+  const epochAtStart = store.readProjectContentEpoch()
+  store.setActiveProject({
+    filePath: 'C:\\p\\a.faproject',
+    id: 'proj-1',
+    name: 'My world'
+  })
+  const epochAfterOpen = store.readProjectContentEpoch()
+  expect(epochAfterOpen).toBe(epochAtStart + 1)
+  store.clearActiveProject()
+  expect(store.readProjectContentEpoch()).toBe(epochAfterOpen + 1)
 })
 
 /**
@@ -350,17 +364,70 @@ test('Test that openProjectFromKnownPath invokes openProject with filePath', asy
   expect(openProjectMock).toHaveBeenCalledWith({ filePath: 'D:\\by-path.faproject' })
 })
 
-test('Test that openProjectFromUserDialog returns superseded when a newer open starts first', async () => {
-  let resolveFirst: (value: unknown) => void = () => {}
-  const firstPending = new Promise((resolve) => {
-    resolveFirst = resolve
+test('Test that openProjectFromUserDialog saves opened documents before the open IPC', async () => {
+  const saveOpenedDocumentsSnapshot = vi.fn(async () => true)
+  const replacementHook = vi.fn(async () => undefined)
+  registerFaProjectReplacementPersistHook(replacementHook)
+  const projectManagement = window.faContentBridgeAPIs?.projectManagement as unknown as {
+    saveOpenedDocumentsSnapshot: (snapshot: unknown) => Promise<boolean>
+  }
+  projectManagement.saveOpenedDocumentsSnapshot = saveOpenedDocumentsSnapshot
+  store.setActiveProject({
+    filePath: 'D:\\old.faproject',
+    id: 'old-project',
+    name: 'Old'
   })
-  openProjectMock.mockImplementationOnce(() => firstPending)
+  openProjectMock.mockImplementation(async () => {
+    expect(saveOpenedDocumentsSnapshot).toHaveBeenCalled()
+    expect(replacementHook).toHaveBeenCalledOnce()
+    return { outcome: 'canceled' as const }
+  })
+  const outcome = await store.openProjectFromUserDialog()
+  expect(outcome).toBe('canceled')
+  expect(openProjectMock).toHaveBeenCalledOnce()
+})
+
+test('Test that openProjectFromUserDialog rejects when pre-open persist fails', async () => {
+  let failPersist = true
+  registerFaProjectReplacementPersistHook(async () => {
+    if (!failPersist) {
+      return
+    }
+    failPersist = false
+    throw new Error('persist failed')
+  })
+  store.setActiveProject({
+    filePath: 'D:\\old.faproject',
+    id: 'old-project',
+    name: 'Old'
+  })
+  await expect(store.openProjectFromUserDialog()).rejects.toThrow('persist failed')
+  expect(openProjectMock).not.toHaveBeenCalled()
+  expect(store.activeProject?.id).toBe('old-project')
+})
+
+test('Test that openProjectFromUserDialog ignores an in-flight open when a newer open starts', async () => {
+  const saveOpenedDocumentsSnapshot = vi.fn(async () => true)
+  const projectManagement = window.faContentBridgeAPIs?.projectManagement as unknown as {
+    saveOpenedDocumentsSnapshot: (snapshot: unknown) => Promise<boolean>
+  }
+  projectManagement.saveOpenedDocumentsSnapshot = saveOpenedDocumentsSnapshot
+  store.setActiveProject({
+    filePath: 'D:\\old.faproject',
+    id: 'old-project',
+    name: 'Old'
+  })
+  let resolveFirst: (value: unknown) => void = () => {}
+  openProjectMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveFirst = resolve
+    })
+  })
   openProjectMock.mockResolvedValueOnce({ outcome: 'canceled' as const })
 
   const firstOpen = store.openProjectFromUserDialog()
+  await vi.waitUntil(() => openProjectMock.mock.calls.length === 1)
   const secondOpen = store.openProjectFromUserDialog()
-
   resolveFirst({
     outcome: 'opened' as const,
     project: {
@@ -371,8 +438,10 @@ test('Test that openProjectFromUserDialog returns superseded when a newer open s
   })
 
   expect(await firstOpen).toBe('superseded')
-  expect(store.activeProject).toBeNull()
+  expect(store.activeProject?.id).toBe('old-project')
   expect(await secondOpen).toBe('canceled')
+  expect(openProjectMock).toHaveBeenCalledTimes(2)
+  expect(saveOpenedDocumentsSnapshot).toHaveBeenCalledOnce()
 })
 
 test('Test that openProjectFromKnownPath throws when bridge is unavailable', async () => {

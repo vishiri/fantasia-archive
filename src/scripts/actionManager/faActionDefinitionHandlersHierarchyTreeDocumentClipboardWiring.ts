@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerDomain'
 
@@ -7,6 +9,11 @@ import {
 } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyAppearanceColor'
 import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 import { findProjectHierarchyTreeDocumentNodeByDocumentId } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentNodeLookup'
+import {
+  getFaProjectDocumentByIdForRenderer,
+  hasFaProjectDocumentByIdReader
+} from 'app/src/scripts/componentTesting/faComponentTestingProjectContentOverridesWiring'
+import { throwUnlessFaProjectContentMissingRow } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 
 import { createFaActionClipboardCopyResolvedText } from './functions/createFaActionClipboardCopyResolvedText'
 
@@ -40,6 +47,54 @@ function findHierarchyTreeDocumentNode (
   )
 }
 
+function canReadUnloadedHierarchyDocument (): boolean {
+  if (typeof window === 'undefined') {
+    return false
+  }
+  return hasFaProjectDocumentByIdReader()
+}
+
+async function resolveHierarchyTreeDocumentClipboardFields (
+  deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
+  documentId: string
+): Promise<{
+  backgroundColor: string
+  label: string
+  textColor: string
+} | null> {
+  const node = findHierarchyTreeDocumentNode(deps, documentId)
+  if (node !== null) {
+    const backgroundColor = node.documentBackgroundColor ?? ''
+    const label = node.label
+    const textColor = node.documentTextColor ?? ''
+    return {
+      backgroundColor,
+      label,
+      textColor
+    }
+  }
+  if (!canReadUnloadedHierarchyDocument()) {
+    return null
+  }
+  const documentResult = await ResultAsync.fromPromise(
+    getFaProjectDocumentByIdForRenderer(documentId),
+    (error): unknown => error
+  )
+  if (documentResult.isErr()) {
+    throwUnlessFaProjectContentMissingRow(documentResult.error)
+    return null
+  }
+  const doc = documentResult.value
+  const backgroundColor = doc.documentBackgroundColor ?? ''
+  const label = doc.displayName
+  const textColor = doc.documentTextColor ?? ''
+  return {
+    backgroundColor,
+    label,
+    textColor
+  }
+}
+
 function createHandleCopyHierarchyTreeDocumentName (
   deps: T_hierarchyTreeDocumentClipboardHandlerDeps,
   copyResolvedText: (
@@ -50,12 +105,12 @@ function createHandleCopyHierarchyTreeDocumentName (
   return async function handleCopyHierarchyTreeDocumentName (payload: {
     documentId: string
   }): Promise<T_faActionHandlerContinuation | void> {
-    const node = findHierarchyTreeDocumentNode(deps, payload.documentId)
-    if (node === null) {
+    const fields = await resolveHierarchyTreeDocumentClipboardFields(deps, payload.documentId)
+    if (fields === null) {
       return
     }
 
-    const copyText = resolveProjectAppControlBarTabCopyNameText(node.label)
+    const copyText = resolveProjectAppControlBarTabCopyNameText(fields.label)
     if (copyText === null) {
       return
     }
@@ -77,13 +132,13 @@ function createHandleCopyHierarchyTreeDocumentTextColor (
   return async function handleCopyHierarchyTreeDocumentTextColor (payload: {
     documentId: string
   }): Promise<T_faActionHandlerContinuation | void> {
-    const node = findHierarchyTreeDocumentNode(deps, payload.documentId)
-    if (node === null) {
+    const fields = await resolveHierarchyTreeDocumentClipboardFields(deps, payload.documentId)
+    if (fields === null) {
       return
     }
 
     const copyText = resolveProjectAppControlBarTabCopyTextColorText({
-      documentTextColorDraft: node.documentTextColor ?? ''
+      documentTextColorDraft: fields.textColor
     })
     if (copyText === null) {
       return
@@ -106,13 +161,13 @@ function createHandleCopyHierarchyTreeDocumentBackgroundColor (
   return async function handleCopyHierarchyTreeDocumentBackgroundColor (payload: {
     documentId: string
   }): Promise<T_faActionHandlerContinuation | void> {
-    const node = findHierarchyTreeDocumentNode(deps, payload.documentId)
-    if (node === null) {
+    const fields = await resolveHierarchyTreeDocumentClipboardFields(deps, payload.documentId)
+    if (fields === null) {
       return
     }
 
     const copyText = resolveProjectAppControlBarTabCopyBackgroundColorText({
-      documentBackgroundColorDraft: node.documentBackgroundColor ?? ''
+      documentBackgroundColorDraft: fields.backgroundColor
     })
     if (copyText === null) {
       return

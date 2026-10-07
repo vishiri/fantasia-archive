@@ -10,8 +10,9 @@ export function applyFaOpenedDocumentTreeOrderNumberDraft (
     ...tab,
     treeOrderNumberDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }

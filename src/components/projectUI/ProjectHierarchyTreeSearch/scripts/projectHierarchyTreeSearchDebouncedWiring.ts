@@ -18,6 +18,7 @@ export function createUseProjectHierarchyTreeSearchDebounced (deps: {
   ref: <T>(value: T) => I_ref<T>
   resolveProjectHierarchyTreeSearchLayout: typeof resolveProjectHierarchyTreeSearchLayout
   runProjectHierarchyTreeSearchQuery: typeof runProjectHierarchyTreeSearchQuery
+  readProjectContentEpoch: () => number
   S_FaProjectSidebar: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
   storeToRefs: T_piniaStoreToRefs
@@ -36,9 +37,18 @@ export function createUseProjectHierarchyTreeSearchDebounced (deps: {
   return function useProjectHierarchyTreeSearchDebounced () {
     const api = useSearchBase()
     const hierarchyStore = deps.S_FaProjectHierarchyTree()
+    const searchRequestSerial = {
+      current: 0
+    }
 
     const runDebouncedSearch = deps.debounce((query: string) => {
-      void deps.runProjectHierarchyTreeSearchQuery(query, hierarchyStore)
+      void deps.runProjectHierarchyTreeSearchQuery(
+        query,
+        hierarchyStore,
+        (issuedQuery) => api.searchQuery.value.trim() === issuedQuery,
+        deps.readProjectContentEpoch,
+        searchRequestSerial
+      )
     }, deps.SEARCH_DEBOUNCE_MS)
 
     deps.watch(

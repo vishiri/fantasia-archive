@@ -2925,7 +2925,7 @@ test('Test that createProjectHierarchyTreeDragSessionState tracks drag session b
   expect(session.draggedDocumentId.get()).toBeNull()
 })
 
-test('Test that mapHierarchyDocumentChildrenToTreeNodes tie-breaks equal sortOrder by name then id', () => {
+test('Test that mapHierarchyDocumentChildrenToTreeNodes orders equal sortOrder by name', () => {
   const nodes = mapHierarchyDocumentChildrenToTreeNodes({
     items: [
       {
@@ -2958,6 +2958,33 @@ test('Test that mapHierarchyDocumentChildrenToTreeNodes tie-breaks equal sortOrd
     worldId: 'world-1'
   })
   expect(nodes.map((node) => node.id)).toEqual(['doc-a', 'doc-c', 'doc-b'])
+})
+
+test('Test that mapHierarchyDocumentChildrenToTreeNodes keeps equal name query order', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Alpha',
+        hasChildren: false,
+        id: 'doc-z',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      },
+      {
+        displayName: 'Alpha',
+        hasChildren: false,
+        id: 'doc-a',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes.map((node) => node.id)).toEqual(['doc-z', 'doc-a'])
 })
 
 test('Test that replaceProjectHierarchyTreeNodeByIdInPlace skips undefined tree slots', () => {

@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3'
 
-import { mapFaProjectDocumentRow } from '../functions/faProjectContentRowMap'
+import { mapFaProjectDocumentRow } from '../functions/faProjectDocumentRowMap'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import {
   buildFaProjectDocumentSelectSql
@@ -42,7 +42,7 @@ export function listFaProjectDocuments (
   const worldId = filter?.worldId
   const orderSql =
     `ORDER BY ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ASC, ` +
-    'display_name COLLATE NOCASE ASC, created_at_ms ASC'
+    'display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC'
   let rows: I_faSqlProjectDocumentRow[]
   if (worldId !== undefined) {
     rows = db
@@ -53,5 +53,6 @@ export function listFaProjectDocuments (
       .prepare(`${buildFaProjectDocumentSelectSql()} ${orderSql}`)
       .all() as I_faSqlProjectDocumentRow[]
   }
-  return { items: rows.map(mapFaProjectDocumentRow) }
+  const items = rows.map(mapFaProjectDocumentRow)
+  return { items }
 }

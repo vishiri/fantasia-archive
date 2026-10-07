@@ -17,11 +17,13 @@ export function buildDialogProjectSettingsWorldColorPaletteTooltipContent (parts
     duplicationBullet
   ].join('\n')
 
+  const intro = parts.intro
+  const rightClickIntro = parts.rightClickIntro
   return {
     deletionBullet,
     duplicationBullet,
     flatText,
-    intro: parts.intro,
-    rightClickIntro: parts.rightClickIntro
+    intro,
+    rightClickIntro
   }
 }

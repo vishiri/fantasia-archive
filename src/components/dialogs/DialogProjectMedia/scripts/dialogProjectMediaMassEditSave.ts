@@ -5,6 +5,8 @@ import type {
 } from 'app/types/I_faProjectMediaDomain'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 
+import { enqueueDialogProjectMediaSave } from './dialogProjectMediaSaveQueue'
+
 const listPanel: T_faProjectMediaPanel = 'mediaList'
 
 export async function persistDialogProjectMediaMassEdit (input: {
@@ -18,17 +20,24 @@ export async function persistDialogProjectMediaMassEdit (input: {
   ) => Promise<boolean>
   selectedPanel: I_ref<T_faProjectMediaPanel>
 }): Promise<void> {
-  const items = input.mapRowsToUpsertItems(input.massEditRows.value)
-  const saved = await input.runFaActionAwait('saveProjectMedia', { items })
-  if (!saved) {
-    return
-  }
-  if (input.afterSuccess === 'close') {
-    input.dialogModel.value = false
-    return
-  }
-  input.massEditRows.value = []
-  input.selectedPanel.value = listPanel
+  const rowsAtSave = input.massEditRows.value
+  const savedSnapshot = JSON.stringify(rowsAtSave)
+  const items = input.mapRowsToUpsertItems(rowsAtSave)
+  await enqueueDialogProjectMediaSave(async () => {
+    const saved = await input.runFaActionAwait('saveProjectMedia', { items })
+    if (!saved) {
+      return
+    }
+    if (JSON.stringify(input.massEditRows.value) !== savedSnapshot) {
+      return
+    }
+    if (input.afterSuccess === 'close') {
+      input.dialogModel.value = false
+      return
+    }
+    input.massEditRows.value = []
+    input.selectedPanel.value = listPanel
+  })
 }
 
 export function bindDialogProjectMediaMassEditSave (input: {

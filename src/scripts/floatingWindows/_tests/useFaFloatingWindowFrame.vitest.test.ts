@@ -589,6 +589,45 @@ test('Test that useFaFloatingWindowFrame reapplies persisted geometry when persi
 
 /**
  * useFaFloatingWindowFrame
+ * A fresh object with the same rectangle must not snap a drag back to the saved position.
+ */
+test('Test that useFaFloatingWindowFrame keeps a live drag when persistedFrame is replaced with the same rectangle', async () => {
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
+  const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
+    height: 300,
+    width: 300,
+    x: 10,
+    y: 40
+  })
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    persistedFrame
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { left: string; top: string }
+    x: number
+    y: number
+  }
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  vm.x = 220
+  vm.y = 180
+  await wrapper.vm.$nextTick()
+  persistedFrame.value = {
+    height: 300,
+    width: 300,
+    x: 10,
+    y: 40
+  }
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('220px')
+  expect(vm.frameStyle.top).toBe('180px')
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
  * When 'persistedFrame' updates while the window is hidden, geometry is not reapplied until the user opens the window again.
  */
 test('Test that useFaFloatingWindowFrame ignores persistedFrame updates while hidden', async () => {

@@ -4,6 +4,8 @@ import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
 import {
   buildFaActiveProjectFromBridgeProject,
+  coerceFaActiveProjectCreateUserOutcome,
+  coerceFaActiveProjectOpenUserOutcome,
   patchFaActiveProjectDisplayName
 } from '../faActiveProjectSnapshot'
 
@@ -39,4 +41,17 @@ test('Test that buildFaActiveProjectFromBridgeProject copies bridge fields', () 
     id: 'id-2',
     name: 'New'
   })
+})
+
+test('Test that coerceFaActiveProjectCreateUserOutcome maps open results to canceled', () => {
+  expect(coerceFaActiveProjectCreateUserOutcome('opened')).toBe('canceled')
+  expect(coerceFaActiveProjectCreateUserOutcome('reused')).toBe('canceled')
+  expect(coerceFaActiveProjectCreateUserOutcome('created')).toBe('created')
+  expect(coerceFaActiveProjectCreateUserOutcome('superseded')).toBe('superseded')
+})
+
+test('Test that coerceFaActiveProjectOpenUserOutcome maps created to canceled', () => {
+  expect(coerceFaActiveProjectOpenUserOutcome('created')).toBe('canceled')
+  expect(coerceFaActiveProjectOpenUserOutcome('opened')).toBe('opened')
+  expect(coerceFaActiveProjectOpenUserOutcome('reused')).toBe('reused')
 })

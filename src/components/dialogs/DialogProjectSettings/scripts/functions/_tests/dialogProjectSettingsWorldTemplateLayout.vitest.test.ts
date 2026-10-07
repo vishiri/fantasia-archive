@@ -10,13 +10,13 @@ import {
   appendDialogProjectSettingsWorldTemplatePlacementDraft,
   createEmptyDialogProjectSettingsWorldTemplateLayoutDraft,
   hasDialogProjectSettingsWorldTemplateGroupNameValidationError,
-  mapDialogProjectSettingsWorldTemplateLayoutFromApi,
   mapDialogProjectSettingsWorldTemplateLayoutToSnapshot,
   removeDialogProjectSettingsWorldTemplateGroupDraft,
   removeDialogProjectSettingsWorldTemplatePlacementDraft,
   renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft,
   renameDialogProjectSettingsWorldTemplatePlacementNicknameTranslationsDraft
 } from '../../dialogProjectSettingsWorldTemplateLayoutDraft'
+import { mapDialogProjectSettingsWorldTemplateLayoutFromApi } from '../../dialogProjectSettingsWorldTemplateLayoutFromApi'
 import {
   buildHeTreeNodesFromWorldTemplateLayoutDraft,
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes,
@@ -381,6 +381,108 @@ test('Test that he-tree reverse mapping falls back to node fields without prior 
   expect(mapped.placements).toHaveLength(2)
   expect(mapped.placements[0]!?.groupId).toBe(groupId)
   expect(mapped.placements[1]!?.rootSortOrder).toBe(1)
+})
+
+/**
+ * dialogProjectSettingsWorldTemplateLayoutTreeReverseMap
+ * A layout reorder must keep placement singular nicknames.
+ */
+test('Test that he-tree reverse mapping keeps singular nicknames', () => {
+  const rootSingular = { 'en-US': 'Hero' }
+  const groupedSingular = { 'en-US': 'Beast' }
+  const groupId = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee'
+  const priorLayout = {
+    groups: [
+      {
+        displayNameTranslations: { 'en-US': 'Creatures' },
+        id: groupId,
+        rootSortOrder: 0
+      }
+    ],
+    placements: [
+      {
+        categoryCountInWorld: 0,
+        documentCountInWorld: 1,
+        documentTemplateId: 'template-a',
+        groupId,
+        groupSortOrder: 0,
+        icon: 'mdi-paw',
+        id: 'grouped-placement',
+        nicknamePluralTranslations: { 'en-US': 'Beasts' },
+        nicknameSingularTranslations: groupedSingular,
+        rootSortOrder: null,
+        templateDisplayName: 'Creature',
+        worldAppendix: ''
+      },
+      {
+        categoryCountInWorld: 0,
+        documentCountInWorld: 1,
+        documentTemplateId: 'template-b',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-map',
+        id: 'root-placement',
+        nicknamePluralTranslations: { 'en-US': 'Heroes' },
+        nicknameSingularTranslations: rootSingular,
+        rootSortOrder: 1,
+        templateDisplayName: 'Character',
+        worldAppendix: ''
+      }
+    ]
+  }
+  const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft([
+    {
+      children: [
+        {
+          children: [],
+          documentCountInWorld: 1,
+          categoryCountInWorld: 0,
+          documentTemplateId: 'template-a',
+          icon: 'mdi-paw',
+          id: 'grouped-placement',
+          label: 'Beast',
+          displayNameTranslations: {},
+          nodeKind: 'template' as const,
+          nicknamePluralTranslations: { 'en-US': 'Beasts' },
+          nicknameSingularTranslations: groupedSingular,
+          templateDisplayName: 'Creature',
+          usesNickname: true,
+          worldAppendix: ''
+        }
+      ],
+      documentCountInWorld: 0,
+      categoryCountInWorld: 0,
+      documentTemplateId: null,
+      icon: 'mdi-folder',
+      id: groupId,
+      label: 'Creatures',
+      displayNameTranslations: { 'en-US': 'Creatures' },
+      nodeKind: 'group' as const,
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
+      templateDisplayName: '',
+      usesNickname: false,
+      worldAppendix: ''
+    },
+    {
+      children: [],
+      documentCountInWorld: 1,
+      categoryCountInWorld: 0,
+      documentTemplateId: 'template-b',
+      icon: 'mdi-map',
+      id: 'root-placement',
+      label: 'Hero',
+      displayNameTranslations: {},
+      nodeKind: 'template' as const,
+      nicknamePluralTranslations: { 'en-US': 'Heroes' },
+      nicknameSingularTranslations: rootSingular,
+      templateDisplayName: 'Character',
+      usesNickname: true,
+      worldAppendix: ''
+    }
+  ], priorLayout)
+  expect(mapped.placements[0]?.nicknameSingularTranslations).toEqual(groupedSingular)
+  expect(mapped.placements[1]?.nicknameSingularTranslations).toEqual(rootSingular)
 })
 
 /**

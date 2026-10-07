@@ -1,11 +1,7 @@
-import type { CSSProperties } from 'vue'
-
-import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type {
   I_assembleProjectAppControlBarApiInput,
   I_projectAppControlBarComposableApi
 } from 'app/types/I_faProjectAppControlBarDomain'
-import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import { buildProjectAppControlBarKeybindTooltipLabels } from '../functions/projectAppControlBarKeybindTooltipLabels'
 import { buildProjectAppControlBarFixedStripLeftHandlers } from '../functions/projectAppControlBarFixedStripLeftHandlers'
@@ -15,41 +11,8 @@ import {
 import { buildProjectAppControlBarActiveDocumentStateApi } from './projectAppControlBarActiveDocumentStateWiring'
 import { buildProjectAppControlBarEditModeHandlers } from './projectAppControlBarEditModeHandlersWiring'
 import { buildProjectAppControlBarTabContextMenuHandlers } from './projectAppControlBarTabContextMenuWiring'
-import {
-  resolveProjectAppControlBarTabAppearanceChrome,
-  resolveProjectAppControlBarTabInlineStyle
-} from './projectAppControlBarTabAppearanceChromeWiring'
-import { resolveProjectAppControlBarTabDisplayIcon } from '../functions/projectAppControlBarTabDisplayIcon'
+import { buildProjectAppControlBarTabAppearanceChromeApi } from './projectAppControlBarTabAppearanceChromeWiring'
 import { buildProjectAppControlBarWorldTabIndicatorApi } from './projectAppControlBarWorldTabIndicatorWiring'
-
-function buildProjectAppControlBarTabAppearanceChromeApi (): Pick<
-  I_projectAppControlBarComposableApi,
-  | 'resolveDocumentTabAppearanceChrome'
-  | 'resolveDocumentTabDisplayIcon'
-  | 'resolveDocumentTabInlineStyle'
-> {
-  function resolveDocumentTabAppearanceChrome (
-    tab: I_faOpenedDocumentTab
-  ): I_faDocumentAppearanceChromeStyle | undefined {
-    return resolveProjectAppControlBarTabAppearanceChrome(tab)
-  }
-
-  function resolveDocumentTabDisplayIcon (tab: I_faOpenedDocumentTab): string {
-    return resolveProjectAppControlBarTabDisplayIcon(tab)
-  }
-
-  function resolveDocumentTabInlineStyle (
-    tab: I_faOpenedDocumentTab
-  ): CSSProperties | undefined {
-    return resolveProjectAppControlBarTabInlineStyle(tab)
-  }
-
-  return {
-    resolveDocumentTabAppearanceChrome,
-    resolveDocumentTabDisplayIcon,
-    resolveDocumentTabInlineStyle
-  }
-}
 
 function buildProjectAppControlBarTabHandlers (input: {
   closeAllTabsWithoutChanges: () => void | Promise<void>
@@ -263,15 +226,20 @@ export function assembleProjectAppControlBarApi (
     runFaAction: input.runFaAction
   })
 
+  const openedDocumentTabs = input.tabs
+  const hideHierarchyTree = input.hideHierarchyTree
+  const hideTabCloseButton = input.hideTabCloseButton
+  const showTabBarScrollButtons = input.showTabBarScrollButtons
+
   return {
-    openedDocumentTabs: input.tabs,
+    openedDocumentTabs,
     ...stripVisibilityApi,
     showDocumentTabs,
     showAppNoteboardContentDot,
     showProjectNoteboardContentDot,
-    hideHierarchyTree: input.hideHierarchyTree,
-    hideTabCloseButton: input.hideTabCloseButton,
-    showTabBarScrollButtons: input.showTabBarScrollButtons,
+    hideHierarchyTree,
+    hideTabCloseButton,
+    showTabBarScrollButtons,
     ...activeDocumentStateApi,
     ...worldTabIndicatorApi,
     ...tabAppearanceChromeApi,

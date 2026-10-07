@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import { FA_KEYBIND_COMMAND_IDS } from 'app/types/I_faKeybindsDomain'
@@ -40,15 +41,6 @@ export const faKeybindsPatchSchema = z.object({
     })
   }
 })
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses IPC patch for keybind overrides. Throws on invalid shape.

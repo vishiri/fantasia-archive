@@ -9,15 +9,24 @@ export function mapFaProjectMediaMassEditRowToUpsertItem (
 ): I_faProjectMediaUpsertItem {
   const trimmed = row.displayName.trim()
   const displayName = trimmed.length > 0 ? trimmed : untitledDisplayName
+  const {
+    externalEmbed,
+    externalLink,
+    externalType,
+    id,
+    internalLink,
+    internalType,
+    type
+  } = row
   return {
     displayName,
-    externalEmbed: row.externalEmbed,
-    externalLink: row.externalLink,
-    externalType: row.externalType,
-    id: row.id,
-    internalLink: row.internalLink,
-    internalType: row.internalType,
-    type: row.type
+    externalEmbed,
+    externalLink,
+    externalType,
+    id,
+    internalLink,
+    internalType,
+    type
   }
 }
 

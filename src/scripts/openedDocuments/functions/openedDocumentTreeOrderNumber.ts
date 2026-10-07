@@ -41,6 +41,17 @@ export function resolveOpenedDocumentTreeOrderNumberDraftForPersist (
 }
 
 /**
+ * True when the draft cannot be stored as an exact integer.
+ * Blank and non-numeric drafts map to the empty sentinel and do not exceed.
+ */
+export function openedDocumentTreeOrderNumberDraftExceedsStorage (
+  draft: string
+): boolean {
+  const value = resolveOpenedDocumentTreeOrderNumberDraftForPersist(draft)
+  return !Number.isSafeInteger(value)
+}
+
+/**
  * Resolves badge label text for hierarchy tree rows; null when hidden.
  */
 export function resolveFaDocumentTreeOrderNumberBadgeLabel (

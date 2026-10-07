@@ -63,6 +63,8 @@ type T_projectHierarchyTreeDnDWiringDeps = {
   nextTick: () => Promise<void>
   reapplyHeTreeOpenState: () => void
   reapplyLatentDescendantExpandState: () => Promise<void>
+  isProjectReplacementInFlight?: () => boolean
+  readProjectContentEpoch?: () => number
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   refreshLayout: () => Promise<void>
@@ -106,52 +108,43 @@ function buildProjectHierarchyTreeDnDHandlerDeps (
   dragSessionState: ReturnType<typeof createProjectHierarchyTreeDragSessionState>,
   dragCancelWiring: ReturnType<typeof createProjectHierarchyTreeDragCancelWiring>
 ) {
+  const {
+    captureDragModelValueRevisionAtDrop,
+    captureDragParentDocumentIdAtDragStart,
+    captureDragScrollTopPxAtDragStart,
+    captureDragSiblingOrderAtDragStart,
+    clearDragSessionFlags,
+    dragExpandedSnapshot,
+    dragSiblingOrderSnapshot,
+    draggedDocumentId,
+    draggedTreeNodeId,
+    incrementDragModelValueRevision,
+    readDragModelValueSettledForCommit,
+    readDragParentDocumentIdAtDragStart,
+    readDragScrollTopPxAtDragStart,
+    readDragSiblingOrderAtDragStart,
+    resetDragModelValueRevisionForDragStart
+  } = dragSessionState
+  const removeDragCancelListeners = dragCancelWiring.removeDragCancelListeners
   return {
-    clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
-    documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
-    documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
+    ...deps,
+    captureDragModelValueRevisionAtDrop,
+    captureDragParentDocumentIdAtDragStart,
+    captureDragScrollTopPxAtDragStart,
+    captureDragSiblingOrderAtDragStart,
+    clearDragSessionFlags,
     dragCancelWiring,
-    dragCommitPending: deps.dragCommitPending,
-    dragCommitScheduled: deps.dragCommitScheduled,
-    dragDropCommitted: deps.dragDropCommitted,
-    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
-    dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    draggedDocumentId: dragSessionState.draggedDocumentId,
-    draggedTreeNodeId: dragSessionState.draggedTreeNodeId,
-    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot,
-    dragSiblingOrderSnapshot: dragSessionState.dragSiblingOrderSnapshot,
-    captureDragModelValueRevisionAtDrop: dragSessionState.captureDragModelValueRevisionAtDrop,
-    captureDragParentDocumentIdAtDragStart: dragSessionState.captureDragParentDocumentIdAtDragStart,
-    captureDragScrollTopPxAtDragStart: dragSessionState.captureDragScrollTopPxAtDragStart,
-    captureDragSiblingOrderAtDragStart: dragSessionState.captureDragSiblingOrderAtDragStart,
-    incrementDragModelValueRevision: dragSessionState.incrementDragModelValueRevision,
-    readDragSiblingOrderAtDragStart: dragSessionState.readDragSiblingOrderAtDragStart,
-    readDragParentDocumentIdAtDragStart: dragSessionState.readDragParentDocumentIdAtDragStart,
-    readDragScrollTopPxAtDragStart: dragSessionState.readDragScrollTopPxAtDragStart,
-    readDragModelValueSettledForCommit: dragSessionState.readDragModelValueSettledForCommit,
-    resetDragModelValueRevisionForDragStart: dragSessionState.resetDragModelValueRevisionForDragStart,
-    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
-    flushUiStatePersist: deps.flushUiStatePersist,
-    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
-    getTreeRef: deps.getTreeRef,
-    getTreeScrollHost: deps.getTreeScrollHost,
-    isTreeDragActive: deps.isTreeDragActive,
-    loadChildrenForNode: deps.loadChildrenForNode,
-    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
-    markNodeClosed: deps.markNodeClosed,
-    markNodeOpen: deps.markNodeOpen,
-    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
-    nextTick: deps.nextTick,
-    reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
-    openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-    refreshLayout: deps.refreshLayout,
-    removeDragCancelListeners: dragCancelWiring.removeDragCancelListeners,
-    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
-    suppressTreeEmit: deps.suppressTreeEmit,
-    treeData: deps.treeData
+    dragExpandedSnapshot,
+    dragSiblingOrderSnapshot,
+    draggedDocumentId,
+    draggedTreeNodeId,
+    incrementDragModelValueRevision,
+    readDragModelValueSettledForCommit,
+    readDragParentDocumentIdAtDragStart,
+    readDragScrollTopPxAtDragStart,
+    readDragSiblingOrderAtDragStart,
+    removeDragCancelListeners,
+    resetDragModelValueRevisionForDragStart
   }
 }
 

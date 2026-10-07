@@ -32,6 +32,11 @@ export class FaFloatingWindowTitleDragPointerSession {
     if (e.button !== 0) {
       return
     }
+    if (this.moveRafId !== null) {
+      window.cancelAnimationFrame(this.moveRafId)
+      this.moveRafId = null
+    }
+    this.pendingMoveEvent = null
     e.preventDefault()
     this.isDragActive.value = true
     this.dragPointerId = e.pointerId

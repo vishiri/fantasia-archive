@@ -1,5 +1,6 @@
 import type { OpenDialogOptions } from 'electron'
 import { dialog, ipcMain } from 'electron'
+import { ResultAsync } from 'neverthrow'
 
 import { FA_APP_CONFIG_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
@@ -41,17 +42,23 @@ export function registerFaAppConfigIpc (): void {
   ipcMain.handle(
     FA_APP_CONFIG_IPC.exportToFileAsync,
     async (event, options: unknown): Promise<I_faAppConfigExportResult> => {
-      try {
+      const exported = await ResultAsync.fromPromise((async () => {
         const parsed = parseFaAppConfigExportOptions(options)
         return await runExportAppConfigToFile(event, parsed)
-      } catch (error) {
-        const err = error instanceof Error ? error : new Error(String(error))
+      })(), (error: unknown) => {
+        return error instanceof Error ? error : new Error(String(error))
+      })
+      if (exported.isErr()) {
+        const errorMessage = exported.error.message
+        const errorName = exported.error.name
+        const outcome = 'error' as const
         return {
-          errorMessage: err.message,
-          errorName: err.name,
-          outcome: 'error'
+          errorMessage,
+          errorName,
+          outcome
         }
       }
+      return exported.value
     }
   )
 

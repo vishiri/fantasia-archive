@@ -1,10 +1,6 @@
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
-import type { I_faProjectSettingsPatch } from 'app/types/I_faProjectSettingsDomain'
-import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
-import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
-
 type T_createFaActionDefinitionHandlersDeps = {
   notifyCreate: (options: { group: boolean, message: string, type: string }) => void
   i18n: { global: { t: (key: string) => string } }
@@ -14,21 +10,12 @@ type T_createFaActionDefinitionHandlersDeps = {
   S_FaActiveProject: () => { hasActiveProject: boolean }
   S_FaAppStyling: () => { updateAppStyling: (patch: { css: string }) => Promise<boolean> }
   S_FaProjectStyling: () => { savePersistedCssFromEditor: (css: string) => Promise<boolean> }
-  S_FaProjectSettings: () => { updateProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<void> }
-  S_FaProjectHierarchyTree: () => {
-    bumpDocumentCensusRefreshGeneration: () => void
-    reloadDocumentIndexFromBridge: () => Promise<void>
-  }
-  S_FaProjectWorkspaceWorlds: () => { refreshWorkspaceWorlds: () => Promise<void> }
   S_FaUserSettings: () => {
     patchSettingsSilently: (patch: Partial<I_faUserSettings>) => Promise<void>
     settings: I_faUserSettings | null
+    toggleHideHierarchyTreeSilently: () => Promise<void>
     updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void>
   }
-  faProjectWorldsPersistSnapshotFromDialog: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
-  faProjectDocumentTemplatesPersistSnapshotFromDialog: (
-    items: I_faProjectDocumentTemplateSnapshotItem[]
-  ) => Promise<void>
   canOpenFloatingWindowWhileNoModal: () => boolean
   applyFaUserSettingsLanguageSelection: (
     updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void>,
@@ -73,11 +60,7 @@ async function handleToggleProjectNoteboardWindow (deps: T_createFaActionDefinit
 }
 
 async function handleToggleHierarchicalTree (deps: T_createFaActionDefinitionHandlersDeps): Promise<void> {
-  const userSettingsStore = deps.S_FaUserSettings()
-  const currentValue = userSettingsStore.settings?.hideHierarchyTree ?? false
-  await userSettingsStore.patchSettingsSilently({
-    hideHierarchyTree: !currentValue
-  })
+  await deps.S_FaUserSettings().toggleHideHierarchyTreeSilently()
 }
 
 async function handleReportAppStylingPersistFailure (payload: { message: string }): Promise<void> {
@@ -110,39 +93,6 @@ async function handleSaveAppSettings (
   payload: { settings: I_faUserSettings }
 ): Promise<void> {
   await deps.S_FaUserSettings().updateSettings(payload.settings)
-}
-
-async function handleSaveProjectSettings (
-  deps: T_createFaActionDefinitionHandlersDeps,
-  payload: {
-    documentTemplates?: I_faProjectDocumentTemplateSnapshotItem[]
-    settings: I_faProjectSettingsPatch
-    worlds?: I_faProjectWorldSnapshotItem[]
-  }
-): Promise<void> {
-  if (!deps.S_FaActiveProject().hasActiveProject) {
-    throw new Error(deps.i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
-  }
-  await deps.S_FaProjectSettings().updateProjectSettings(payload.settings)
-  let shouldRefreshOverviewDocumentCensus = false
-  if (payload.documentTemplates !== undefined) {
-    await deps.faProjectDocumentTemplatesPersistSnapshotFromDialog(payload.documentTemplates)
-    shouldRefreshOverviewDocumentCensus = true
-  }
-  if (payload.worlds !== undefined) {
-    await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
-    await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
-    await deps.S_FaProjectHierarchyTree().reloadDocumentIndexFromBridge()
-    shouldRefreshOverviewDocumentCensus = true
-  }
-  if (shouldRefreshOverviewDocumentCensus) {
-    deps.S_FaProjectHierarchyTree().bumpDocumentCensusRefreshGeneration()
-  }
-  deps.notifyCreate({
-    group: false,
-    type: 'positive',
-    message: deps.i18n.global.t('globalFunctionality.faProjectSettings.saveSuccess')
-  })
 }
 
 async function handleSaveAppStyling (
@@ -191,29 +141,54 @@ export function createFaActionDefinitionHandlers (deps: T_createFaActionDefiniti
   handleReportBridgeLoadFailure: (payload: { message: string }) => Promise<void>
   handleSaveKeybindSettings: (payload: { overrides: I_faKeybindsRoot['overrides'] }) => Promise<void>
   handleSaveAppSettings: (payload: { settings: I_faUserSettings }) => Promise<void>
-  handleSaveProjectSettings: (payload: {
-    documentTemplates?: I_faProjectDocumentTemplateSnapshotItem[]
-    settings: I_faProjectSettingsPatch
-    worlds?: I_faProjectWorldSnapshotItem[]
-  }) => Promise<void>
   handleSaveAppStyling: (payload: { css: string }) => Promise<void>
   handleSaveProjectStyling: (payload: { css: string }) => Promise<void>
   handleLanguageSwitch: (payload: I_faActionPayloadMap['languageSwitch']) => Promise<void>
 } {
+  const handleLanguageSwitchBound = (
+    payload: I_faActionPayloadMap['languageSwitch']
+  ): Promise<void> => {
+    return handleLanguageSwitch(deps, payload)
+  }
+  const handleSaveAppSettingsBound = (
+    payload: { settings: I_faUserSettings }
+  ): Promise<void> => {
+    return handleSaveAppSettings(deps, payload)
+  }
+  const handleSaveAppStylingBound = (payload: { css: string }): Promise<void> => {
+    return handleSaveAppStyling(deps, payload)
+  }
+  const handleSaveKeybindSettingsBound = (
+    payload: { overrides: I_faKeybindsRoot['overrides'] }
+  ): Promise<void> => {
+    return handleSaveKeybindSettings(deps, payload)
+  }
+  const handleSaveProjectStylingBound = (payload: { css: string }): Promise<void> => {
+    return handleSaveProjectStyling(deps, payload)
+  }
+  const handleToggleAppNoteboardWindowBound = (): Promise<void> => {
+    return handleToggleAppNoteboardWindow(deps)
+  }
+  const handleToggleHierarchicalTreeBound = (): Promise<void> => {
+    return handleToggleHierarchicalTree(deps)
+  }
+  const handleToggleProjectNoteboardWindowBound = (): Promise<void> => {
+    return handleToggleProjectNoteboardWindow(deps)
+  }
+
   return {
-    handleLanguageSwitch: (payload) => handleLanguageSwitch(deps, payload),
+    handleLanguageSwitch: handleLanguageSwitchBound,
     handleReportAppNoteboardSaveFailure,
     handleReportAppStylingPersistFailure,
     handleReportBridgeLoadFailure,
     handleReportProjectNoteboardSaveFailure,
     handleReportProjectStylingSaveFailure,
-    handleSaveAppSettings: (payload) => handleSaveAppSettings(deps, payload),
-    handleSaveAppStyling: (payload) => handleSaveAppStyling(deps, payload),
-    handleSaveKeybindSettings: (payload) => handleSaveKeybindSettings(deps, payload),
-    handleSaveProjectSettings: (payload) => handleSaveProjectSettings(deps, payload),
-    handleSaveProjectStyling: (payload) => handleSaveProjectStyling(deps, payload),
-    handleToggleAppNoteboardWindow: () => handleToggleAppNoteboardWindow(deps),
-    handleToggleHierarchicalTree: () => handleToggleHierarchicalTree(deps),
-    handleToggleProjectNoteboardWindow: () => handleToggleProjectNoteboardWindow(deps)
+    handleSaveAppSettings: handleSaveAppSettingsBound,
+    handleSaveAppStyling: handleSaveAppStylingBound,
+    handleSaveKeybindSettings: handleSaveKeybindSettingsBound,
+    handleSaveProjectStyling: handleSaveProjectStylingBound,
+    handleToggleAppNoteboardWindow: handleToggleAppNoteboardWindowBound,
+    handleToggleHierarchicalTree: handleToggleHierarchicalTreeBound,
+    handleToggleProjectNoteboardWindow: handleToggleProjectNoteboardWindowBound
   }
 }

@@ -21,8 +21,12 @@ vi.mock('../faAppStartupSkipWelcomeScreen_manager', () => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession', () => {
+vi.mock('app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession')
+  >()
   return {
+    ...actual,
     markWelcomeScreenAutoLoadBootAttempted: markWelcomeScreenAutoLoadBootAttemptedMock,
     markWelcomeScreenAutoLoadBootCompletion: markWelcomeScreenAutoLoadBootCompletionMock
   }
@@ -30,7 +34,16 @@ vi.mock('app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSess
 
 vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
-    runFaAction: runFaActionMock
+    runFaAction: runFaActionMock,
+    runFaActionAwait: vi.fn()
+  }
+})
+
+vi.mock('app/src/stores/S_FaActiveProject', () => {
+  return {
+    S_FaActiveProject: () => ({
+      hasActiveProject: false
+    })
   }
 })
 

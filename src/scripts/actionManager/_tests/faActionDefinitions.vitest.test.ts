@@ -23,7 +23,8 @@ const faActiveProjectFixture = vi.hoisted(() => ({
     filePath: 'C:\\fixture.faproject',
     id: 'fixture-id',
     name: 'Fixture Realm'
-  }
+  },
+  replacementInFlight: false
 }))
 
 const canOpenFloatingWindowWhileNoModalMock = vi.hoisted(() => {
@@ -71,6 +72,7 @@ const {
   updateAppStylingMock,
   updateSettingsMock,
   patchSettingsSilentlyMock,
+  toggleHideHierarchyTreeSilentlyMock,
   navigateToWorkspaceHomeRouteMock
 } = vi.hoisted(() => ({
   applyImportMock: vi.fn(
@@ -107,6 +109,7 @@ const {
   updateAppStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined),
   patchSettingsSilentlyMock: vi.fn(async () => undefined),
+  toggleHideHierarchyTreeSilentlyMock: vi.fn(async () => undefined),
   navigateToWorkspaceHomeRouteMock: vi.fn(async () => undefined)
 }))
 
@@ -138,7 +141,9 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
       return faActiveProjectFixture.activeProject !== null
     },
     createProjectFromUserInput: createProjectFromUserInputMock,
+    isProjectReplacementInFlight: () => faActiveProjectFixture.replacementInFlight,
     openProjectFromKnownPath: openProjectFromKnownPathMock,
+    readProjectContentEpoch: () => 1,
     openProjectFromUserDialog: openProjectFromUserDialogMock
   })
 }))
@@ -214,6 +219,7 @@ vi.mock('app/src/stores/S_FaUserSettings', () => ({
       return userSettingsFixture
     },
     patchSettingsSilently: patchSettingsSilentlyMock,
+    toggleHideHierarchyTreeSilently: toggleHideHierarchyTreeSilentlyMock,
     refreshSettings: refreshSettingsMock,
     updateSettings: updateSettingsMock
   })
@@ -293,6 +299,8 @@ beforeEach(() => {
   updateSettingsMock.mockImplementation(async () => undefined)
   patchSettingsSilentlyMock.mockReset()
   patchSettingsSilentlyMock.mockImplementation(async () => undefined)
+  toggleHideHierarchyTreeSilentlyMock.mockReset()
+  toggleHideHierarchyTreeSilentlyMock.mockImplementation(async () => undefined)
   userSettingsFixture.allowQuickPopupSameKeyClose = false
   userSettingsFixture.hideHierarchyTree = false
   userSettingsFixture.preventFilledAppNoteBoardPopup = false
@@ -300,6 +308,7 @@ beforeEach(() => {
   dialogStoreFixture.projectMediaRequestedPanel = 'mediaList'
   dialogStoreFixture.projectSettingsInitialTab = null
   projectNoteboardTextFixture.text = ''
+  faActiveProjectFixture.replacementInFlight = false
   refreshKeybindsMock.mockReset()
   refreshKeybindsMock.mockImplementation(async () => undefined)
   refreshAppStylingMock.mockReset()
@@ -443,15 +452,16 @@ test('Test that openProjectStylingDialog handler skips when modal chrome blocks 
   expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
 
-test('Test that openProjectStylingDialog handler skips without an active project', () => {
+test('Test that openProjectStylingDialog handler skips without an active project', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     definitionFor('openProjectStylingDialog').handler(undefined)
     expect(openDialogComponentMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that showProjectDashboard handler navigates to workspace home when a project is active', async () => {
@@ -462,38 +472,41 @@ test('Test that showProjectDashboard handler navigates to workspace home when a 
 test('Test that showProjectDashboard handler skips navigation without an active project', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     await (definitionFor('showProjectDashboard').handler(undefined) as Promise<unknown>)
     expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that saveProjectStyling handler throws saveNoActiveProject without calling the store when no project is open', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     await expect(
       (definitionFor('saveProjectStyling').handler({ css: 'x' }) as Promise<unknown>)
     ).rejects.toThrow(/globalFunctionality\.faProjectStyling\.saveNoActiveProject/)
     expect(savePersistedCssFromEditorMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that saveProjectStyling handler throws saveNoActiveProject without calling the store when no project is open', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     await expect(
       (definitionFor('saveProjectStyling').handler({ css: 'x' }) as Promise<unknown>)
     ).rejects.toThrow(/globalFunctionality\.faProjectStyling\.saveNoActiveProject/)
     expect(savePersistedCssFromEditorMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that saveProjectStyling handler forwards css to savePersistedCssFromEditor on success', async () => {
@@ -542,13 +555,9 @@ test('Test that reportAppStylingPersistFailure handler throws the payload messag
 })
 
 test('Test that toggleHierarchicalTree handler flips hideHierarchyTree silently', async () => {
-  userSettingsFixture.hideHierarchyTree = false
   await definitionFor('toggleHierarchicalTree').handler(undefined)
-  expect(patchSettingsSilentlyMock).toHaveBeenCalledWith({ hideHierarchyTree: true })
-
-  userSettingsFixture.hideHierarchyTree = true
-  await definitionFor('toggleHierarchicalTree').handler(undefined)
-  expect(patchSettingsSilentlyMock).toHaveBeenCalledWith({ hideHierarchyTree: false })
+  expect(toggleHideHierarchyTreeSilentlyMock).toHaveBeenCalledOnce()
+  expect(patchSettingsSilentlyMock).not.toHaveBeenCalled()
 })
 
 test('Test that openAdvancedSearchGuideDialog handler opens the advancedSearchGuide markdown document', () => {
@@ -614,15 +623,16 @@ test('Test that openQuickAddDocumentDialog skips dismiss when allowQuickPopupSam
   expect(openDialogComponentMock).toHaveBeenCalledWith('QuickAddDocument')
 })
 
-test('Test that openQuickAddDocumentDialog no-ops without an active project', () => {
+test('Test that openQuickAddDocumentDialog no-ops without an active project', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     definitionFor('openQuickAddDocumentDialog').handler(undefined)
     expect(openDialogComponentMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that openQuickSearchDocumentDialog handler opens QuickSearchDocument when a project is active', () => {
@@ -668,24 +678,26 @@ test('Test that openProjectMediaDialog defaults to add when listMedia is empty',
       }
     }
   })
-  try {
+  const run = (async () => {
     await definitionFor('openProjectMediaDialog').handler(undefined)
     expect(S_DialogComponent().projectMediaRequestedPanel).toBe('mediaAdd')
     expect(openDialogComponentMock).toHaveBeenCalledWith('ProjectMedia')
-  } finally {
+  })()
+  await run.finally(() => {
     window.faContentBridgeAPIs = prev
-  }
+  })
 })
 
-test('Test that openProjectMediaDialog no-ops without an active project', () => {
+test('Test that openProjectMediaDialog no-ops without an active project', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     definitionFor('openProjectMediaDialog').handler(undefined)
     expect(openDialogComponentMock).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that createNewProject handler delegates to S_FaActiveProject when creation succeeds', async () => {
@@ -724,6 +736,16 @@ test('Test that createNewProject auto-opens filled project noteboard when preven
   projectNoteboardTextFixture.text = 'saved notes'
   await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
   expect(setProjectNoteboardWindowOpenMock).toHaveBeenCalledWith(true)
+})
+
+test('Test that createNewProject does not auto-open the noteboard when a project switch is in flight', async () => {
+  refreshProjectNoteboardMock.mockImplementationOnce(async () => {
+    faActiveProjectFixture.replacementInFlight = true
+    return true
+  })
+  projectNoteboardTextFixture.text = 'saved notes'
+  await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
+  expect(setProjectNoteboardWindowOpenMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -800,14 +822,15 @@ test('Test that loadExistingProject handler delegates to openProjectFromKnownPat
 test('Test that loadExistingProject handler throws when open succeeds but active project is missing', async () => {
   const prior = faActiveProjectFixture.activeProject
   faActiveProjectFixture.activeProject = null as never
-  try {
+  const run = (async () => {
     await expect(
       definitionFor('loadExistingProject').handler({}) as Promise<unknown>
     ).rejects.toThrow(/no active project snapshot/)
     expect(refreshRecentProjectsMock).toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     faActiveProjectFixture.activeProject = prior
-  }
+  })
 })
 
 test('Test that loadExistingProject handler throws FaActionUserCanceledError when load is canceled', async () => {
@@ -1104,8 +1127,14 @@ test('Test that reportBridgeLoadFailure handler throws the payload message', asy
 })
 
 test('Test that showStartupTipsNotification handler invokes the notification helper', async () => {
-  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
-  expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+    expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
 })
 
 test('Test that checkForAppUpdates handler forwards the source to checkForAppUpdates', async () => {
@@ -1116,6 +1145,8 @@ test('Test that checkForAppUpdates handler forwards the source to checkForAppUpd
 
 test('Test that showStartupTipsNotification handler shows notify when hideTooltipsStart is false in persisted settings', async () => {
   tipsNotificationMock.mockClear()
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
   const prev = window.faContentBridgeAPIs
   Object.assign(window, {
     faContentBridgeAPIs: {
@@ -1130,14 +1161,19 @@ test('Test that showStartupTipsNotification handler shows notify when hideToolti
     }
   })
 
-  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
-
-  expect(tipsNotificationMock).toHaveBeenCalledWith(false)
-  Object.assign(window, { faContentBridgeAPIs: prev })
+  try {
+    await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+    expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+    Object.assign(window, { faContentBridgeAPIs: prev })
+  }
 })
 
 test('Test that showStartupTipsNotification handler hides mascot avatar when hidePlushes is enabled', async () => {
   tipsNotificationMock.mockClear()
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
   const prev = window.faContentBridgeAPIs
   Object.assign(window, {
     faContentBridgeAPIs: {
@@ -1152,9 +1188,46 @@ test('Test that showStartupTipsNotification handler hides mascot avatar when hid
     }
   })
 
-  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+  try {
+    await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+    expect(tipsNotificationMock).toHaveBeenCalledWith(true)
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+    Object.assign(window, { faContentBridgeAPIs: prev })
+  }
+})
 
-  expect(tipsNotificationMock).toHaveBeenCalledWith(true)
+test('Test that showStartupTipsNotification handler skips notify when a project opens during settings read', async () => {
+  tipsNotificationMock.mockClear()
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  const prev = window.faContentBridgeAPIs
+  let releaseSettings: (() => void) | undefined
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...prev,
+      faUserSettings: {
+        getSettings: () => new Promise((resolve) => {
+          releaseSettings = () => {
+            faActiveProjectFixture.activeProject = prior
+            resolve({
+              hidePlushes: false,
+              hideTooltipsStart: false
+            })
+          }
+        }),
+        setSettings: vi.fn()
+      }
+    }
+  })
+
+  const pending = definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>
+  await vi.waitUntil(() => releaseSettings !== undefined)
+  releaseSettings?.()
+  await pending
+
+  expect(tipsNotificationMock).not.toHaveBeenCalled()
+  faActiveProjectFixture.activeProject = prior
   Object.assign(window, { faContentBridgeAPIs: prev })
 })
 

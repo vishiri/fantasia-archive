@@ -16,19 +16,16 @@ export function resolveProjectHierarchyTreeWorldsLayoutExpandSnapshot (input: {
 }
 
 /**
- * Avoid wiping persisted expand ids when restore prunes to empty because the
- * skeleton tree is not ready yet.
+ * Avoid wiping persisted expand ids when restore prunes to empty.
+ * An empty restored list with a non-empty intended list means the skeleton
+ * does not contain those rows yet, not that the user collapsed the branch.
  */
 export function shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds (input: {
   intendedExpandedNodeIds: readonly string[]
   restoredExpandedNodeIds: readonly string[]
-  treeNodeCount: number
 }): boolean {
   if (input.restoredExpandedNodeIds.length > 0) {
     return true
   }
-  if (input.intendedExpandedNodeIds.length === 0) {
-    return true
-  }
-  return input.treeNodeCount > 0
+  return input.intendedExpandedNodeIds.length === 0
 }

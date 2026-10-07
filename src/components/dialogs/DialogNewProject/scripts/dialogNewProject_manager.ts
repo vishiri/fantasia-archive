@@ -1,5 +1,6 @@
 import { FA_PROJECT_NAME_MAX_LEN as faProjectNameMaxLen } from 'app/src-electron/shared/faProjectConstants'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
+import { shouldAcceptFaEnterOutsideIme } from 'app/src/scripts/dom/dom_manager'
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -29,6 +30,7 @@ const dialogNewProjectApi = createDialogNewProject({
   ref,
   registerComponentDialogStackGuard,
   resolveDialogComponentStoreOrNull: resolveDialogComponentStoreOrNullBinding,
+  shouldSubmitDialogNewProjectOnEnter: shouldAcceptFaEnterOutsideIme,
   runFaActionAwait,
   watch
 })

@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { expect, test, vi } from 'vitest'
 
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
@@ -73,7 +73,7 @@ function mountDeleteDialog (input: {
       pendingDeleteDocumentId
     }) as never,
     watch: (source, effect) => {
-      watch(source, effect, { immediate: true })
+      watch(source, effect)
     }
   })
 
@@ -129,6 +129,84 @@ test('Test that delete dialog document name falls back to document id when tab a
   expect(api.documentName.value).toBe('doc-missing')
 })
 
+test('Test that delete dialog document name uses the stored document when the tree row is not loaded', async () => {
+  const readDocumentDisplayName = vi.fn(async () => ' Hidden Hero ')
+  const pendingDeleteDocumentId = ref<string | null>('doc-hidden')
+  const useDialog = createUseDialogDeleteOpenedDocument({
+    S_FaOpenedDocuments: () => ({
+      confirmDeleteOpenedDocument: vi.fn(async () => undefined),
+      dismissPendingDelete: vi.fn(),
+      findTabByDocumentId: () => null
+    }) as never,
+    S_FaProjectHierarchyTree: () => ({
+      treeData: []
+    }),
+    findProjectHierarchyTreeDocumentNodeByDocumentId: () => null,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    i18n: {
+      global: {
+        t: (key: string) => key
+      }
+    },
+    readDocumentDisplayName,
+    ref: ref as <T>(value: T) => I_ref<T>,
+    resolveOpenedDocumentTabListLabel: ({ displayNameDraft }) => displayNameDraft,
+    storeToRefs: () => ({
+      pendingDeleteDocumentId
+    }) as never,
+    watch: (source, effect) => {
+      watch(source, effect)
+    }
+  })
+  const api = useDialog()
+  expect(api.documentName.value).toBe('doc-hidden')
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(readDocumentDisplayName).toHaveBeenCalledWith('doc-hidden')
+  expect(api.documentName.value).toBe('Hidden Hero')
+})
+
+test('Test that delete dialog ignores a name read error after the pending document changes', async () => {
+  let rejectRead: (error: Error) => void = () => {}
+  const readDocumentDisplayName = vi.fn(() => new Promise<string | null>((_resolve, reject) => {
+    rejectRead = reject
+  }))
+  const reportDocumentNameReadError = vi.fn()
+  const pendingDeleteDocumentId = ref<string | null>('doc-hidden')
+  const useDialog = createUseDialogDeleteOpenedDocument({
+    S_FaOpenedDocuments: () => ({
+      confirmDeleteOpenedDocument: vi.fn(async () => undefined),
+      dismissPendingDelete: vi.fn(),
+      findTabByDocumentId: () => null
+    }) as never,
+    S_FaProjectHierarchyTree: () => ({
+      treeData: []
+    }),
+    findProjectHierarchyTreeDocumentNodeByDocumentId: () => null,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    i18n: {
+      global: {
+        t: (key: string) => key
+      }
+    },
+    readDocumentDisplayName,
+    reportDocumentNameReadError,
+    ref: ref as <T>(value: T) => I_ref<T>,
+    resolveOpenedDocumentTabListLabel: ({ displayNameDraft }) => displayNameDraft,
+    storeToRefs: () => ({
+      pendingDeleteDocumentId
+    }) as never,
+    watch: (source, effect) => {
+      watch(source, effect)
+    }
+  })
+  useDialog()
+  pendingDeleteDocumentId.value = 'doc-other'
+  rejectRead(new Error('name read failed'))
+  await Promise.resolve()
+  expect(reportDocumentNameReadError).not.toHaveBeenCalled()
+})
+
 test('Test that onDialogHide dismisses pending delete when still set', () => {
   const { api, dismissPendingDelete } = mountDeleteDialog({
     pendingDeleteDocumentId: 'doc-a'
@@ -145,13 +223,40 @@ test('Test that onDialogHide is a no-op when no tab is pending delete', () => {
   expect(dismissPendingDelete).not.toHaveBeenCalled()
 })
 
-test('Test that onConfirmDelete closes dialog and confirms delete for pending tab', () => {
-  const { api, confirmDeleteOpenedDocument } = mountDeleteDialog({
+test('Test that onConfirmDelete confirms delete and closes when the pending id clears', async () => {
+  const { api, confirmDeleteOpenedDocument, pendingDeleteDocumentId } = mountDeleteDialog({
     pendingDeleteDocumentId: 'doc-a'
   })
+  confirmDeleteOpenedDocument.mockImplementation(async () => {
+    pendingDeleteDocumentId.value = null
+    return undefined
+  })
   api.onConfirmDelete()
-  expect(api.dialogOpen.value).toBe(false)
   expect(confirmDeleteOpenedDocument).toHaveBeenCalledWith('doc-a')
+  await nextTick()
+  expect(api.dialogOpen.value).toBe(false)
+})
+
+test('Test that onConfirmDelete keeps the dialog open when delete is still running', async () => {
+  let resolveDelete: ((value: undefined) => void) | undefined
+  const { api, confirmDeleteOpenedDocument, dismissPendingDelete } = mountDeleteDialog({
+    pendingDeleteDocumentId: 'doc-a'
+  })
+  confirmDeleteOpenedDocument.mockImplementation(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveDelete = resolve
+    })
+  })
+  api.onConfirmDelete()
+  api.onConfirmDelete()
+  api.onDialogHide()
+  expect(confirmDeleteOpenedDocument).toHaveBeenCalledTimes(1)
+  expect(dismissPendingDelete).not.toHaveBeenCalled()
+  expect(api.dialogOpen.value).toBe(true)
+  resolveDelete?.(undefined)
+  await Promise.resolve()
+  api.onDialogHide()
+  expect(dismissPendingDelete).toHaveBeenCalledTimes(1)
 })
 
 test('Test that onConfirmDelete is a no-op when no tab is pending delete', () => {

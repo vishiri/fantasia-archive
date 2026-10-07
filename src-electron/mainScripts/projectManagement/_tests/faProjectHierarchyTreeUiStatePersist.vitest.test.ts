@@ -86,6 +86,72 @@ test('Test that upsertFaProjectHierarchyTreeUiStateKv writes merged JSON patch',
  * upsertFaProjectHierarchyTreeUiStateKv
  * No-ops when patch has no recognized fields.
  */
+/**
+ * upsertFaProjectHierarchyTreeUiStateKv
+ * A writer whose base list is stale must not replace the stored expand ids.
+ */
+test('Test that upsertFaProjectHierarchyTreeUiStateKv keeps expand ids when the base is stale', () => {
+  const runs: Array<{ name: string, value: string }> = []
+  const db = {
+    prepare: vi.fn((sql: string) => ({
+      get: vi.fn(() => ({
+        v: JSON.stringify({
+          schemaVersion: 1,
+          expandedNodeIds: ['world-1'],
+          scrollTopPx: 12
+        })
+      })),
+      run: vi.fn((payload: { name: string, value: string }) => {
+        if (sql.includes('INSERT') || sql.includes('UPDATE')) {
+          runs.push(payload)
+        }
+      })
+    }))
+  }
+  upsertFaProjectHierarchyTreeUiStateKv(db as never, {
+    expandedNodeIds: [],
+    expandedNodeIdsBaseJson: '[]'
+  })
+  const last = runs[runs.length - 1]
+  const parsed = JSON.parse(last?.value ?? '{}') as {
+    expandedNodeIds: string[]
+  }
+  expect(parsed.expandedNodeIds).toEqual(['world-1'])
+})
+
+/**
+ * upsertFaProjectHierarchyTreeUiStateKv
+ * A matching base still applies the new expand list.
+ */
+test('Test that upsertFaProjectHierarchyTreeUiStateKv applies expand ids when the base matches', () => {
+  const runs: Array<{ name: string, value: string }> = []
+  const db = {
+    prepare: vi.fn((sql: string) => ({
+      get: vi.fn(() => ({
+        v: JSON.stringify({
+          schemaVersion: 1,
+          expandedNodeIds: ['world-1'],
+          scrollTopPx: 12
+        })
+      })),
+      run: vi.fn((payload: { name: string, value: string }) => {
+        if (sql.includes('INSERT') || sql.includes('UPDATE')) {
+          runs.push(payload)
+        }
+      })
+    }))
+  }
+  upsertFaProjectHierarchyTreeUiStateKv(db as never, {
+    expandedNodeIds: [],
+    expandedNodeIdsBaseJson: '["world-1"]'
+  })
+  const last = runs[runs.length - 1]
+  const parsed = JSON.parse(last?.value ?? '{}') as {
+    expandedNodeIds: string[]
+  }
+  expect(parsed.expandedNodeIds).toEqual([])
+})
+
 test('Test that upsertFaProjectHierarchyTreeUiStateKv no-ops on empty patch', () => {
   const db = {
     prepare: vi.fn()

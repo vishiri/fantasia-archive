@@ -46,11 +46,13 @@ export function mergeOrphanPlacementsFromPriorWorldTemplateLayout (
   if (orphanPlacements.length === 0) {
     return mapped
   }
+  const groups = mapped.groups
+  const placements = [
+    ...mapped.placements,
+    ...orphanPlacements
+  ]
   return {
-    groups: mapped.groups,
-    placements: [
-      ...mapped.placements,
-      ...orphanPlacements
-    ]
+    groups,
+    placements
   }
 }

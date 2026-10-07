@@ -4,6 +4,44 @@ import type { I_faProjectDocumentTagAssignmentInput } from 'app/types/I_faProjec
 import type { I_faSelectInputObjectItem } from 'app/types/I_faSelectInput'
 import type { I_computedRef, I_ref, I_writableComputedRef } from 'app/types/I_vueCompositionShims'
 
+function requestDocumentWorkspacePageTagsOptions (input: {
+  documentTab: I_computedRef<I_faOpenedDocumentTab | null>
+  listTagsForWorld: (worldId: string) => Promise<I_faSelectInputObjectItem[]>
+  requestSerialBox: { current: number }
+  tagsOptions: I_ref<I_faSelectInputObjectItem[]>
+  tagsOptionsWorldId: { current: string | null }
+}): void {
+  const requestSerial = input.requestSerialBox.current + 1
+  input.requestSerialBox.current = requestSerial
+  const worldId = input.documentTab.value?.worldId
+  if (worldId === undefined || worldId.length === 0) {
+    input.tagsOptionsWorldId.current = null
+    input.tagsOptions.value = []
+    return
+  }
+  if (input.tagsOptionsWorldId.current !== worldId) {
+    input.tagsOptionsWorldId.current = worldId
+    input.tagsOptions.value = []
+  }
+  void input.listTagsForWorld(worldId).then((items) => {
+    if (requestSerial !== input.requestSerialBox.current) {
+      return
+    }
+    if (input.documentTab.value?.worldId !== worldId) {
+      return
+    }
+    input.tagsOptions.value = items
+  }, () => {
+    if (requestSerial !== input.requestSerialBox.current) {
+      return
+    }
+    if (input.documentTab.value?.worldId !== worldId) {
+      return
+    }
+    input.tagsOptions.value = []
+  })
+}
+
 export function createDocumentWorkspacePageTagsField (deps: {
   computed: T_createUseDocumentWorkspacePageDeps['computed']
   documentTab: I_computedRef<I_faOpenedDocumentTab | null>
@@ -22,6 +60,12 @@ export function createDocumentWorkspacePageTagsField (deps: {
     tagsOptions: I_ref<I_faSelectInputObjectItem[]>
   } {
   const tagsOptions = deps.ref<I_faSelectInputObjectItem[]>([])
+  const tagsOptionsRequestSerial = {
+    current: 0
+  }
+  const tagsOptionsWorldId = {
+    current: null as string | null
+  }
 
   const tagsFieldLabel = deps.computed(() => {
     return deps.i18n.global.t('documentWorkspacePage.tagsFieldLabel')
@@ -33,7 +77,7 @@ export function createDocumentWorkspacePageTagsField (deps: {
 
   const tagsFieldReadOnly = deps.computed(() => {
     const tab = deps.documentTab.value
-    if (tab === null) {
+    if (tab === null || tab.tagsDraft === undefined) {
       return true
     }
     return deps.resolveOpenedDocumentTabIsInPreviewMode(tab.editState)
@@ -42,15 +86,26 @@ export function createDocumentWorkspacePageTagsField (deps: {
   const tagsModel: I_writableComputedRef<I_faSelectInputObjectItem[]> = deps.computed({
     get (): I_faSelectInputObjectItem[] {
       return (deps.documentTab.value?.tagsDraft ?? []).map((tag) => {
+        const id = tag.id
+        const name = tag.name
+        if (tag.isNew === true) {
+          return {
+            id,
+            isNew: true,
+            name
+          }
+        }
         return {
-          id: tag.id,
-          name: tag.name,
-          ...(tag.isNew === true ? { isNew: true } : {})
+          id,
+          name
         }
       })
     },
     set (value: I_faSelectInputObjectItem[]) {
       if (deps.routeDocumentId.value.length === 0 || tagsFieldReadOnly.value) {
+        return
+      }
+      if (deps.documentTab.value?.tagsDraft === undefined) {
         return
       }
       const nextDraft: I_faProjectDocumentTagAssignmentInput[] = value.map((item) => {
@@ -68,13 +123,12 @@ export function createDocumentWorkspacePageTagsField (deps: {
   })
 
   function onTagsRequestOptions (): void {
-    const worldId = deps.documentTab.value?.worldId
-    if (worldId === undefined || worldId.length === 0) {
-      tagsOptions.value = []
-      return
-    }
-    void deps.listTagsForWorld(worldId).then((items) => {
-      tagsOptions.value = items
+    requestDocumentWorkspacePageTagsOptions({
+      documentTab: deps.documentTab,
+      listTagsForWorld: deps.listTagsForWorld,
+      requestSerialBox: tagsOptionsRequestSerial,
+      tagsOptions,
+      tagsOptionsWorldId
     })
   }
 

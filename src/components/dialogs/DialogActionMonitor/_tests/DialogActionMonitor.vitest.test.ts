@@ -385,6 +385,33 @@ test('Test that clicking a DialogActionMonitor row dispatches the clipboard help
   w.unmount()
 })
 
+test('Test that DialogActionMonitor copies a row whose payload preview is not JSON', async () => {
+  copyToClipboardMock.mockClear()
+  const w = mount(DialogActionMonitor, {
+    global: monitorDialogGlobal,
+    props: {
+      directHistorySnapshot: [
+        {
+          enqueuedAt: 1,
+          id: 'closeApp',
+          kind: 'sync',
+          payloadPreview: 'not-json',
+          status: 'success',
+          uid: 'uid-bad-json'
+        }
+      ],
+      directInput: 'ActionMonitor'
+    }
+  })
+  await flushPromises()
+  await w.find('[data-test-locator="stub-q-table-row"]').trigger('click')
+  await flushPromises()
+  expect(copyToClipboardMock).toHaveBeenCalledOnce()
+  const payload = copyToClipboardMock.mock.calls[0]?.[0]
+  expect(String(payload)).toContain('not-json')
+  w.unmount()
+})
+
 /**
  * DialogActionMonitor
  * Without a directHistorySnapshot the dialog should call snapshotActionHistory and render its result.

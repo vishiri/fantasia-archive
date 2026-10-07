@@ -51,20 +51,26 @@ function duplicateFaProjectOverlayFrame (
 function duplicateFaProjectNoteboardSnapshot (
   next: I_faProjectNoteboardRoot
 ): I_faProjectNoteboardRoot {
+  const frame = duplicateFaProjectOverlayFrame(next.frame)
+  const schemaVersion = next.schemaVersion
+  const text = next.text
   return {
-    frame: duplicateFaProjectOverlayFrame(next.frame),
-    schemaVersion: next.schemaVersion,
-    text: next.text
+    frame,
+    schemaVersion,
+    text
   }
 }
 
 function duplicateFaProjectStylingSnapshot (
   next: I_faProjectStylingRoot
 ): I_faProjectStylingRoot {
+  const css = next.css
+  const frame = duplicateFaProjectOverlayFrame(next.frame)
+  const schemaVersion = next.schemaVersion
   return {
-    css: next.css,
-    frame: duplicateFaProjectOverlayFrame(next.frame),
-    schemaVersion: next.schemaVersion
+    css,
+    frame,
+    schemaVersion
   }
 }
 

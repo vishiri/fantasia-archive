@@ -20,19 +20,15 @@ export const FA_DIALOG_QUICK_SEARCH_DOCUMENT_CATEGORY_ICON = 'mdi-folder-open'
 export const FA_DIALOG_QUICK_SEARCH_DOCUMENT_DEFAULT_ICON = 'mdi-file-outline'
 
 /**
- * Sorts world rows by Project Settings sortOrder ascending (stable for equal sortOrder).
+ * Sorts world rows by Project Settings sortOrder ascending.
+ * Equal sortOrder keeps the incoming list order (worlds query: created_at_ms, then id).
  */
 export function sortDialogQuickSearchDocumentWorldsBySortOrder <
   T extends { id: string, sortOrder: number }
 > (
   worlds: readonly T[]
 ): T[] {
-  return [...worlds].sort((a, b) => {
-    if (a.sortOrder !== b.sortOrder) {
-      return a.sortOrder - b.sortOrder
-    }
-    return a.id.localeCompare(b.id)
-  })
+  return [...worlds].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
 /**
@@ -70,11 +66,14 @@ export function buildDialogQuickSearchDocumentWorldOptions (input: {
       world.displayNameTranslations,
       input.preferredLanguageCode
     )
+    const color = world.color
+    const id = world.id
+    const name = label.length > 0 ? label : world.id
     return {
-      color: world.color,
+      color,
       icon: FA_DIALOG_QUICK_SEARCH_DOCUMENT_WORLD_ICON,
-      id: world.id,
-      name: label.length > 0 ? label : world.id
+      id,
+      name
     }
   })
 }
@@ -102,6 +101,7 @@ export function resolveDialogQuickSearchDocumentOptionIcon (
 
 /**
  * Builds document FaSelectInput options (categories included; name filter only at FaSelectInput).
+ * Equal name and sortOrder keep older createdAtMs, then id.
  */
 export function buildDialogQuickSearchDocumentDocumentOptions (input: {
   documents: readonly I_dialogQuickSearchDocumentDocumentSource[]
@@ -122,6 +122,10 @@ export function buildDialogQuickSearchDocumentDocumentOptions (input: {
     }
     if (left.sortOrder !== right.sortOrder) {
       return left.sortOrder - right.sortOrder
+    }
+    const createdAtDelta = (left.createdAtMs ?? 0) - (right.createdAtMs ?? 0)
+    if (createdAtDelta !== 0) {
+      return createdAtDelta
     }
     return left.id.localeCompare(right.id)
   })

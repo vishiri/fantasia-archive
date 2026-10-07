@@ -7,6 +7,8 @@ import {
 import {
   faProjectContentDisplayNameSchema,
   faProjectContentIdSchema,
+  parseFaProjectContentDroppedRecord,
+  parseFaProjectContentIdPayload,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { faProjectWorldTemplateLayoutSnapshotSchema, parseFaProjectWorldTemplateLayoutSnapshot } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
@@ -50,12 +52,11 @@ export function parseFaProjectWorldCreateInput (
 }
 
 export function parseFaProjectWorldPatch (payload: unknown): I_faProjectWorldPatch {
-  const parsed = faProjectWorldPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectWorldPatch
+  return parseFaProjectContentDroppedRecord(faProjectWorldPatchSchema, payload)
 }
 
 export function parseFaProjectWorldIdPayload (payload: unknown): string {
-  return faProjectWorldIdPayloadSchema.parse(parseFaProjectContentPlainRecord(payload)).id
+  return parseFaProjectContentIdPayload(faProjectWorldIdPayloadSchema, payload)
 }
 
 export const faProjectWorldUpdatePayloadSchema = z.object({
@@ -67,9 +68,11 @@ export function parseFaProjectWorldUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectWorldPatch } {
   const parsed = faProjectWorldUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const id = parsed.id
+  const patch = dropUndefinedRecordValues(parsed.patch) as I_faProjectWorldPatch
   return {
-    id: parsed.id,
-    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectWorldPatch
+    id,
+    patch
   }
 }
 

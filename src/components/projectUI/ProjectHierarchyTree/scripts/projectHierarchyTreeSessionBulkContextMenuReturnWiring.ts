@@ -19,6 +19,78 @@ type T_sortHandlers = {
   onSortByItemClick: (itemId: import('app/types/I_faProjectHierarchyTreeDomain').T_faProjectHierarchyTreeSortByMenuItemId) => void
 }
 
+function pickNodeContextMenuApiFields (nodeContextMenuWiring: T_nodeContextMenuWiring) {
+  const {
+    contextMenuAddNewRowIcon,
+    contextMenuAddNewRowLabel,
+    contextMenuAnchorNodeId,
+    contextMenuShowsBulkExpandRows,
+    contextMenuShowsCopyRows,
+    contextMenuShowsDocumentOpenEditRows,
+    contextMenuShowsSortByRows,
+    contextMenuSortByDirectScopeOnly,
+    contextMenuShowsTagMenuRows,
+    isNodeContextMenuOpen,
+    nodeMenuPointerPosition,
+    onAddNewDocumentFromContextMenuClick,
+    onCollapseAllUnderNodeClick,
+    onExpandAllUnderNodeClick
+  } = nodeContextMenuWiring
+  return {
+    contextMenuAddNewRowIcon,
+    contextMenuAddNewRowLabel,
+    contextMenuAnchorNodeId,
+    contextMenuShowsBulkExpandRows,
+    contextMenuShowsCopyRows,
+    contextMenuShowsDocumentOpenEditRows,
+    contextMenuShowsSortByRows,
+    contextMenuSortByDirectScopeOnly,
+    contextMenuShowsTagMenuRows,
+    isNodeContextMenuOpen,
+    nodeMenuPointerPosition,
+    onAddNewDocumentFromContextMenuClick,
+    onCollapseAllUnderNodeClick,
+    onExpandAllUnderNodeClick
+  }
+}
+
+function pickTagDialogApiFields (tagDialogsWiring: T_tagDialogsWiring) {
+  const {
+    addDocumentPlacementOptions,
+    deleteTagConfirmOpen,
+    deleteTagName,
+    onAddNewDocumentToThisTagClick: onAddNewDocumentToThisTagFromContextMenuClick,
+    onConfirmDeleteTag,
+    onConfirmRenameTag,
+    onDeleteTagFromContextMenuClick,
+    onDismissDeleteTagDialog,
+    onDismissRenameTagDialog,
+    onRenameTagFromContextMenuClick,
+    renameTagCanConfirm,
+    renameTagCurrentName,
+    renameTagDialogOpen,
+    renameTagMergeWarning,
+    renameTagNameDraft
+  } = tagDialogsWiring
+  return {
+    addDocumentPlacementOptions,
+    deleteTagConfirmOpen,
+    deleteTagName,
+    onAddNewDocumentToThisTagFromContextMenuClick,
+    onConfirmDeleteTag,
+    onConfirmRenameTag,
+    onDeleteTagFromContextMenuClick,
+    onDismissDeleteTagDialog,
+    onDismissRenameTagDialog,
+    onRenameTagFromContextMenuClick,
+    renameTagCanConfirm,
+    renameTagCurrentName,
+    renameTagDialogOpen,
+    renameTagMergeWarning,
+    renameTagNameDraft
+  }
+}
+
 export function buildProjectHierarchyTreeSessionBulkContextMenuApi (input: {
   copyHandlers: T_copyHandlers
   documentActionHandlers: T_documentActionHandlers
@@ -28,49 +100,43 @@ export function buildProjectHierarchyTreeSessionBulkContextMenuApi (input: {
   sortHandlers: T_sortHandlers
   tagDialogsWiring: T_tagDialogsWiring
 }) {
-  const { nodeContextMenuWiring, tagDialogsWiring } = input
+  const {
+    copyHandlers,
+    documentActionHandlers,
+    nodeContextMenuWiring,
+    onNodeContextMenuHide,
+    onNodeRowContextMenu,
+    sortHandlers,
+    tagDialogsWiring
+  } = input
+  const nodeFields = pickNodeContextMenuApiFields(nodeContextMenuWiring)
+  const tagFields = pickTagDialogApiFields(tagDialogsWiring)
+  const {
+    onAddNewDocumentUnderThisClick: onAddNewDocumentUnderThisFromContextMenuClick,
+    onCopyDocumentClick: onCopyDocumentFromContextMenuClick,
+    onDeleteDocumentClick: onDeleteDocumentFromContextMenuClick,
+    onEditDocumentClick: onEditDocumentFromContextMenuClick,
+    onOpenDocumentClick: onOpenDocumentFromContextMenuClick
+  } = documentActionHandlers
+  const {
+    onCopyBackgroundColorClick: onCopyBackgroundColorFromContextMenuClick,
+    onCopyNameClick: onCopyNameFromContextMenuClick,
+    onCopyTextColorClick: onCopyTextColorFromContextMenuClick
+  } = copyHandlers
+  const { onSortByItemClick: onSortByItemFromContextMenuClick } = sortHandlers
   return {
-    addDocumentPlacementOptions: tagDialogsWiring.addDocumentPlacementOptions,
-    contextMenuAddNewRowIcon: nodeContextMenuWiring.contextMenuAddNewRowIcon,
-    contextMenuAddNewRowLabel: nodeContextMenuWiring.contextMenuAddNewRowLabel,
-    contextMenuAnchorNodeId: nodeContextMenuWiring.contextMenuAnchorNodeId,
-    contextMenuShowsBulkExpandRows: nodeContextMenuWiring.contextMenuShowsBulkExpandRows,
-    contextMenuShowsCopyRows: nodeContextMenuWiring.contextMenuShowsCopyRows,
-    contextMenuShowsDocumentOpenEditRows: nodeContextMenuWiring.contextMenuShowsDocumentOpenEditRows,
-    contextMenuShowsSortByRows: nodeContextMenuWiring.contextMenuShowsSortByRows,
-    contextMenuSortByDirectScopeOnly: nodeContextMenuWiring.contextMenuSortByDirectScopeOnly,
-    contextMenuShowsTagMenuRows: nodeContextMenuWiring.contextMenuShowsTagMenuRows,
-    deleteTagConfirmOpen: tagDialogsWiring.deleteTagConfirmOpen,
-    deleteTagName: tagDialogsWiring.deleteTagName,
-    isNodeContextMenuOpen: nodeContextMenuWiring.isNodeContextMenuOpen,
-    nodeMenuPointerPosition: nodeContextMenuWiring.nodeMenuPointerPosition,
-    onAddNewDocumentFromContextMenuClick: nodeContextMenuWiring.onAddNewDocumentFromContextMenuClick,
-    onAddNewDocumentToThisTagFromContextMenuClick:
-      tagDialogsWiring.onAddNewDocumentToThisTagClick,
-    onAddNewDocumentUnderThisFromContextMenuClick:
-      input.documentActionHandlers.onAddNewDocumentUnderThisClick,
-    onCollapseAllUnderNodeClick: nodeContextMenuWiring.onCollapseAllUnderNodeClick,
-    onConfirmDeleteTag: tagDialogsWiring.onConfirmDeleteTag,
-    onConfirmRenameTag: tagDialogsWiring.onConfirmRenameTag,
-    onCopyBackgroundColorFromContextMenuClick: input.copyHandlers.onCopyBackgroundColorClick,
-    onCopyDocumentFromContextMenuClick: input.documentActionHandlers.onCopyDocumentClick,
-    onCopyNameFromContextMenuClick: input.copyHandlers.onCopyNameClick,
-    onCopyTextColorFromContextMenuClick: input.copyHandlers.onCopyTextColorClick,
-    onDeleteDocumentFromContextMenuClick: input.documentActionHandlers.onDeleteDocumentClick,
-    onDeleteTagFromContextMenuClick: tagDialogsWiring.onDeleteTagFromContextMenuClick,
-    onDismissDeleteTagDialog: tagDialogsWiring.onDismissDeleteTagDialog,
-    onDismissRenameTagDialog: tagDialogsWiring.onDismissRenameTagDialog,
-    onEditDocumentFromContextMenuClick: input.documentActionHandlers.onEditDocumentClick,
-    onExpandAllUnderNodeClick: nodeContextMenuWiring.onExpandAllUnderNodeClick,
-    onNodeContextMenuHide: input.onNodeContextMenuHide,
-    onNodeRowContextMenu: input.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: input.documentActionHandlers.onOpenDocumentClick,
-    onRenameTagFromContextMenuClick: tagDialogsWiring.onRenameTagFromContextMenuClick,
-    onSortByItemFromContextMenuClick: input.sortHandlers.onSortByItemClick,
-    renameTagCanConfirm: tagDialogsWiring.renameTagCanConfirm,
-    renameTagCurrentName: tagDialogsWiring.renameTagCurrentName,
-    renameTagDialogOpen: tagDialogsWiring.renameTagDialogOpen,
-    renameTagMergeWarning: tagDialogsWiring.renameTagMergeWarning,
-    renameTagNameDraft: tagDialogsWiring.renameTagNameDraft
+    ...nodeFields,
+    ...tagFields,
+    onAddNewDocumentUnderThisFromContextMenuClick,
+    onCopyBackgroundColorFromContextMenuClick,
+    onCopyDocumentFromContextMenuClick,
+    onCopyNameFromContextMenuClick,
+    onCopyTextColorFromContextMenuClick,
+    onDeleteDocumentFromContextMenuClick,
+    onEditDocumentFromContextMenuClick,
+    onNodeContextMenuHide,
+    onNodeRowContextMenu,
+    onOpenDocumentFromContextMenuClick,
+    onSortByItemFromContextMenuClick
   }
 }

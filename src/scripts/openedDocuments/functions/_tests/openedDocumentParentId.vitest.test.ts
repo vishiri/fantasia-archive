@@ -3,7 +3,10 @@ import { expect, test } from 'vitest'
 import {
   normalizeOpenedDocumentParentIdFromDb
 } from '../openedDocumentNullableStringFromDb'
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import {
+  remapOpenedDocumentTabParentAfterDeletedDocument,
   resolveOpenedDocumentParentIdDraftForPersist,
   resolveOpenedDocumentParentMoveAppendSortOrder
 } from '../openedDocumentParentId'
@@ -37,4 +40,84 @@ test('Test that resolveOpenedDocumentParentMoveAppendSortOrder appends after max
       sortOrder: 4
     }
   ], 'doc-1')).toBe(0)
+})
+
+function parentTab (patch: Partial<I_faOpenedDocumentTab>): I_faOpenedDocumentTab {
+  return {
+    displayNameDraft: 'Child',
+    documentBackgroundColorDraft: '',
+    documentId: 'doc-child',
+    documentTextColorDraft: '',
+    editState: false,
+    extraClassesDraft: '',
+    hasUnsavedChanges: false,
+    isCategoryDraft: false,
+    isDeadDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    parentDocumentIdDraft: 'doc-deleted',
+    persistenceState: 'persisted',
+    savedDisplayName: 'Child',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: '',
+    savedExtraClasses: '',
+    savedIsCategory: false,
+    savedIsDead: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedParentDocumentId: 'doc-deleted',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    tabLabel: 'Child',
+    templateIcon: 'mdi-account',
+    treeOrderNumberDraft: '',
+    ...patch
+  }
+}
+
+test('Test that remapOpenedDocumentTabParentAfterDeletedDocument follows the promoted parent', () => {
+  const next = remapOpenedDocumentTabParentAfterDeletedDocument(
+    parentTab({
+      parentDocumentId: 'doc-deleted'
+    }),
+    'doc-deleted',
+    'doc-root'
+  )
+  expect(next?.parentDocumentIdDraft).toBe('doc-root')
+  expect(next?.savedParentDocumentId).toBe('doc-root')
+  expect(next?.parentDocumentId).toBe('doc-root')
+})
+
+test('Test that remapOpenedDocumentTabParentAfterDeletedDocument keeps a user-edited parent draft', () => {
+  const next = remapOpenedDocumentTabParentAfterDeletedDocument(
+    parentTab({
+      parentDocumentIdDraft: 'other-parent'
+    }),
+    'doc-deleted',
+    'doc-root'
+  )
+  expect(next?.parentDocumentIdDraft).toBe('other-parent')
+  expect(next?.savedParentDocumentId).toBe('doc-root')
+})
+
+test('Test that remapOpenedDocumentTabParentAfterDeletedDocument ignores unrelated tabs', () => {
+  expect(remapOpenedDocumentTabParentAfterDeletedDocument(
+    parentTab({
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: ''
+    }),
+    'doc-deleted',
+    'doc-root'
+  )).toBeNull()
+})
+
+test('Test that remapOpenedDocumentTabParentAfterDeletedDocument maps an empty promoted parent to null', () => {
+  const next = remapOpenedDocumentTabParentAfterDeletedDocument(
+    parentTab({
+      parentDocumentId: 'doc-deleted'
+    }),
+    'doc-deleted',
+    ''
+  )
+  expect(next?.parentDocumentId).toBeNull()
+  expect(next?.parentDocumentIdDraft).toBe('')
 })

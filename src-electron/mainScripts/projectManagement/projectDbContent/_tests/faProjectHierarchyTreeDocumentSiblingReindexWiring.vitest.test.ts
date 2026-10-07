@@ -336,6 +336,66 @@ test('Test that reindexFaProjectHierarchyDocumentSiblings nests moved document u
 
 /**
  * reindexFaProjectHierarchyDocumentSiblings
+ * Cross-parent reindex keeps destination siblings omitted from the client order.
+ */
+test('Test that reindexFaProjectHierarchyDocumentSiblings keeps omitted destination siblings', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const alpha = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Alpha',
+    sortOrder: 0
+  })
+  const middle = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Middle',
+    sortOrder: 1
+  })
+  const beta = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Beta',
+    sortOrder: 2
+  })
+  const moved = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Moved',
+    sortOrder: 1
+  })
+  reindexFaProjectHierarchyDocumentSiblings(connection, {
+    movedDocumentId: moved.id,
+    orderedDocumentIds: [alpha.id, moved.id, beta.id],
+    parentDocumentId: parent.id,
+    placementId: seeded.placementId
+  })
+  const nested = listFaProjectPlacementDocumentChildren(connection, {
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id
+  })
+  expect(nested.items.map((item) => item.id)).toEqual([alpha.id, moved.id, middle.id, beta.id])
+  expect(nested.items.map((item) => item.sortOrder)).toEqual([0, 1, 2, 3])
+})
+
+/**
+ * reindexFaProjectHierarchyDocumentSiblings
  * Dedupes duplicate ids in orderedDocumentIds before persisting order.
  */
 test('Test that reindexFaProjectHierarchyDocumentSiblings dedupes duplicate ordered ids', () => {
@@ -366,4 +426,152 @@ test('Test that reindexFaProjectHierarchyDocumentSiblings dedupes duplicate orde
     placementId: seeded.placementId
   })
   expect(children.items.map((item) => item.displayName)).toEqual(['Second', 'First'])
+})
+
+/**
+ * reindexFaProjectHierarchyDocumentSiblings
+ * An ordered destination id that sits before the anchor stays in the client order.
+ */
+test('Test that reindexFaProjectHierarchyDocumentSiblings skips ordered ids while filling gaps', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const alpha = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Alpha',
+    sortOrder: 0
+  })
+  const middle = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Middle',
+    sortOrder: 1
+  })
+  const beta = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Beta',
+    sortOrder: 2
+  })
+  const moved = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Moved',
+    sortOrder: 1
+  })
+  reindexFaProjectHierarchyDocumentSiblings(connection, {
+    movedDocumentId: moved.id,
+    orderedDocumentIds: [beta.id, alpha.id, moved.id],
+    parentDocumentId: parent.id,
+    placementId: seeded.placementId
+  })
+  const nested = listFaProjectPlacementDocumentChildren(connection, {
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id
+  })
+  expect(nested.items.map((item) => item.id)).toEqual([middle.id, beta.id, alpha.id, moved.id])
+})
+
+/**
+ * reindexFaProjectHierarchyDocumentSiblings
+ * Destination siblings after the last ordered anchor stay at the end.
+ */
+test('Test that reindexFaProjectHierarchyDocumentSiblings appends siblings after the last anchor', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const alpha = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Alpha',
+    sortOrder: 0
+  })
+  const tail = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Tail',
+    sortOrder: 1
+  })
+  const moved = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Moved',
+    sortOrder: 1
+  })
+  reindexFaProjectHierarchyDocumentSiblings(connection, {
+    movedDocumentId: moved.id,
+    orderedDocumentIds: [alpha.id, moved.id],
+    parentDocumentId: parent.id,
+    placementId: seeded.placementId
+  })
+  const nested = listFaProjectPlacementDocumentChildren(connection, {
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id
+  })
+  expect(nested.items.map((item) => item.id)).toEqual([alpha.id, moved.id, tail.id])
+})
+
+/**
+ * reindexFaProjectHierarchyDocumentSiblings
+ * Cross-parent reindex that omits the moved id cannot return that row.
+ */
+test('Test that reindexFaProjectHierarchyDocumentSiblings throws when the moved id is omitted', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const alpha = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Alpha',
+    sortOrder: 0
+  })
+  const moved = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Moved',
+    sortOrder: 1
+  })
+  expect(() => reindexFaProjectHierarchyDocumentSiblings(connection, {
+    movedDocumentId: moved.id,
+    orderedDocumentIds: [alpha.id],
+    parentDocumentId: parent.id,
+    placementId: seeded.placementId
+  })).toThrow('Document')
 })

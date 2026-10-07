@@ -10,9 +10,10 @@ export function applyFaOpenedDocumentIsFinishedDraft (
     ...tab,
     isFinishedDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }
 
@@ -24,9 +25,10 @@ export function applyFaOpenedDocumentIsMinorDraft (
     ...tab,
     isMinorDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }
 
@@ -38,8 +40,9 @@ export function applyFaOpenedDocumentIsDeadDraft (
     ...tab,
     isDeadDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }

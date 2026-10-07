@@ -7,6 +7,10 @@ import type {
 
 import { isProjectHierarchyTreeDragExpandUiFrozen } from '../functions/projectHierarchyTreeDragExpandFreeze'
 import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from '../functions/projectHierarchyTreeSuppressEmitDepth'
+import {
   collectProjectHierarchyTreeBulkCollapseOpenIdPruneSet,
   collectProjectHierarchyTreeBulkExpandCollapseSubtreeIds,
   collectProjectHierarchyTreeBulkExpandTargetIds
@@ -116,12 +120,15 @@ async function runCollapseAllUnderNode (deps: {
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     treeData: deps.treeData
   })
-  deps.suppressTreeEmit.value = true
-  await deps.nextTick()
-  // closeAll then reopen remaining — reapply alone only opens, so virt rows stay visible.
-  deps.getTreeRef()?.closeAll()
-  deps.reapplyHeTreeOpenState()
-  deps.suppressTreeEmit.value = false
+  beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
+  try {
+    await deps.nextTick()
+    // closeAll then reopen remaining — reapply alone only opens, so virt rows stay visible.
+    deps.getTreeRef()?.closeAll()
+    deps.reapplyHeTreeOpenState()
+  } finally {
+    endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
+  }
 }
 
 export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
@@ -164,26 +171,24 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
       treeData: deps.treeData
     })
     void (async () => {
-      try {
-        await deps.runDeferredLazyLoadBatch(async () => {
-          if (expandGeneration !== bulkExpandCollapseGeneration) {
-            return
-          }
-          await runBulkExpandDeepPasses({
-            anchorId,
-            isExpandGenerationCurrent: () => expandGeneration === bulkExpandCollapseGeneration,
-            openNodeIds: deps.openNodeIds,
-            queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-            reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
-            treeData: deps.treeData
-          })
-        })
-      } finally {
-        if (expandGeneration === bulkExpandCollapseGeneration) {
-          bulkExpandCollapseInFlight = false
+      await deps.runDeferredLazyLoadBatch(async () => {
+        if (expandGeneration !== bulkExpandCollapseGeneration) {
+          return
         }
+        await runBulkExpandDeepPasses({
+          anchorId,
+          isExpandGenerationCurrent: () => expandGeneration === bulkExpandCollapseGeneration,
+          openNodeIds: deps.openNodeIds,
+          queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+          reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
+          treeData: deps.treeData
+        })
+      })
+    })().finally(() => {
+      if (expandGeneration === bulkExpandCollapseGeneration) {
+        bulkExpandCollapseInFlight = false
       }
-    })()
+    })
   }
 
   async function collapseAllUnderNode (anchorId: string): Promise<void> {
@@ -193,20 +198,18 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
     // Preempt in-flight expand so context Collapse all is never a silent no-op.
     bulkExpandCollapseGeneration += 1
     bulkExpandCollapseInFlight = true
-    try {
-      await runCollapseAllUnderNode({
-        anchorId,
-        getTreeRef: deps.getTreeRef,
-        nextTick: deps.nextTick,
-        openNodeIds: deps.openNodeIds,
-        queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-        reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
-        suppressTreeEmit: deps.suppressTreeEmit,
-        treeData: deps.treeData
-      })
-    } finally {
+    await runCollapseAllUnderNode({
+      anchorId,
+      getTreeRef: deps.getTreeRef,
+      nextTick: deps.nextTick,
+      openNodeIds: deps.openNodeIds,
+      queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+      reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
+      suppressTreeEmit: deps.suppressTreeEmit,
+      treeData: deps.treeData
+    }).finally(() => {
       bulkExpandCollapseInFlight = false
-    }
+    })
   }
 
   function isBulkExpandCollapseInFlight (): boolean {

@@ -36,16 +36,19 @@ export function resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec (i
   clientWidth: number
   contentLeft: number
   contentRight: number
+  direction?: 'ltr' | 'rtl'
   maxSpeedPxPerSec: number
   pointerClientX: number
   scrollLeft: number
   scrollSensitivityPx: number
   scrollWidth: number
 }): number | null {
-  const maxScroll = input.scrollWidth - input.clientWidth
-  if (maxScroll <= 0) {
+  const extent = input.scrollWidth - input.clientWidth
+  if (extent <= 0) {
     return null
   }
+  const minScrollLeft = input.direction === 'rtl' ? -extent : 0
+  const maxScrollLeft = input.direction === 'rtl' ? 0 : extent
 
   const distanceFromLeft = input.pointerClientX - input.contentLeft
   const distanceFromRight = input.contentRight - input.pointerClientX
@@ -54,17 +57,26 @@ export function resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec (i
     distanceFromLeft,
     input.scrollSensitivityPx
   )
-  if (leftIntensity > 0 && input.scrollLeft > 0) {
-    return -(input.maxSpeedPxPerSec * leftIntensity)
-  }
-
   const rightIntensity = resolveProjectAppControlBarTabsDragEdgeScrollIntensity(
     distanceFromRight,
     input.scrollSensitivityPx
   )
-  if (rightIntensity > 0 && input.scrollLeft < maxScroll) {
-    return input.maxSpeedPxPerSec * rightIntensity
-  }
+  const leftVelocity = leftIntensity > 0 && input.scrollLeft > minScrollLeft
+    ? -(input.maxSpeedPxPerSec * leftIntensity)
+    : null
+  const rightVelocity = rightIntensity > 0 && input.scrollLeft < maxScrollLeft
+    ? input.maxSpeedPxPerSec * rightIntensity
+    : null
 
-  return null
+  if (leftVelocity !== null && rightVelocity !== null) {
+    if (leftIntensity === rightIntensity) {
+      return null
+    }
+    const closerEdgeVelocity = leftIntensity > rightIntensity ? leftVelocity : rightVelocity
+    return closerEdgeVelocity
+  }
+  if (leftVelocity !== null) {
+    return leftVelocity
+  }
+  return rightVelocity
 }

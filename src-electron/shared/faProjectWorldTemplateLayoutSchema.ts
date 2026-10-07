@@ -6,7 +6,11 @@ import { faProjectContentIdSchema, faProjectWorldTemplatePlacementNicknameSchema
 import { faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateGroupDisplayNameTranslationsSchema'
 import { faProjectWorldTemplatePlacementNicknameSingularTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameSingularTranslationsSchema'
 import { faProjectWorldTemplatePlacementNicknameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameTranslationsSchema'
-import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
+import type {
+  I_faProjectWorldTemplateGroupSnapshotItem,
+  I_faProjectWorldTemplateLayoutSnapshot,
+  I_faProjectWorldTemplatePlacementSnapshotItem
+} from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { I_faProjectWorldTemplateGroupDisplayNameTranslations } from 'app/types/I_faProjectWorldTemplateGroupDisplayNameTranslations'
 import type { I_faProjectWorldTemplatePlacementNicknameSingularTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameSingularTranslations'
 import type { I_faProjectWorldTemplatePlacementNicknameTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
@@ -58,44 +62,63 @@ export const faProjectWorldTemplateLayoutSnapshotSchema = z.object({
   placements: z.array(faProjectWorldTemplatePlacementSnapshotItemInputSchema)
 }).strict()
 
+function mapFaProjectWorldTemplateGroupSnapshotItem (
+  group: z.infer<typeof faProjectWorldTemplateGroupSnapshotItemInputSchema>
+): I_faProjectWorldTemplateGroupSnapshotItem {
+  const displayNameTranslations = dropUndefinedRecordValues(
+    group.displayNameTranslations
+  ) as I_faProjectWorldTemplateGroupDisplayNameTranslations
+  const displayName = resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations)
+  const id = group.id
+  const rootSortOrder = group.rootSortOrder
+  return {
+    displayName,
+    displayNameTranslations,
+    id,
+    rootSortOrder
+  }
+}
+
+function mapFaProjectWorldTemplatePlacementSnapshotItem (
+  placement: z.infer<typeof faProjectWorldTemplatePlacementSnapshotItemInputSchema>
+): I_faProjectWorldTemplatePlacementSnapshotItem {
+  const nicknamePluralTranslations = dropUndefinedRecordValues(
+    placement.nicknamePluralTranslations
+  ) as I_faProjectWorldTemplatePlacementNicknameTranslations
+  const nicknameSingularTranslations = dropUndefinedRecordValues(
+    placement.nicknameSingularTranslations ?? {}
+  ) as I_faProjectWorldTemplatePlacementNicknameSingularTranslations
+  const nickname = resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+    buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
+      nicknamePluralTranslations,
+      nicknameSingularTranslations
+    })
+  )
+  const documentTemplateId = placement.documentTemplateId
+  const groupId = placement.groupId
+  const groupSortOrder = placement.groupSortOrder
+  const id = placement.id
+  const rootSortOrder = placement.rootSortOrder
+  return {
+    documentTemplateId,
+    groupId,
+    groupSortOrder,
+    id,
+    nickname,
+    nicknamePluralTranslations,
+    nicknameSingularTranslations,
+    rootSortOrder
+  }
+}
+
 export function parseFaProjectWorldTemplateLayoutSnapshot (
   payload: unknown
 ): I_faProjectWorldTemplateLayoutSnapshot {
   const parsed = faProjectWorldTemplateLayoutSnapshotSchema.parse(payload)
+  const groups = parsed.groups.map(mapFaProjectWorldTemplateGroupSnapshotItem)
+  const placements = parsed.placements.map(mapFaProjectWorldTemplatePlacementSnapshotItem)
   return {
-    groups: parsed.groups.map((group) => {
-      const displayNameTranslations = dropUndefinedRecordValues(
-        group.displayNameTranslations
-      ) as I_faProjectWorldTemplateGroupDisplayNameTranslations
-      return {
-        displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
-        displayNameTranslations,
-        id: group.id,
-        rootSortOrder: group.rootSortOrder
-      }
-    }),
-    placements: parsed.placements.map((placement) => {
-      const nicknamePluralTranslations = dropUndefinedRecordValues(
-        placement.nicknamePluralTranslations
-      ) as I_faProjectWorldTemplatePlacementNicknameTranslations
-      const nicknameSingularTranslations = dropUndefinedRecordValues(
-        placement.nicknameSingularTranslations ?? {}
-      ) as I_faProjectWorldTemplatePlacementNicknameSingularTranslations
-      return {
-        documentTemplateId: placement.documentTemplateId,
-        groupId: placement.groupId,
-        groupSortOrder: placement.groupSortOrder,
-        id: placement.id,
-        nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
-          buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
-            nicknamePluralTranslations,
-            nicknameSingularTranslations
-          })
-        ),
-        nicknamePluralTranslations,
-        nicknameSingularTranslations,
-        rootSortOrder: placement.rootSortOrder
-      }
-    })
+    groups,
+    placements
   }
 }

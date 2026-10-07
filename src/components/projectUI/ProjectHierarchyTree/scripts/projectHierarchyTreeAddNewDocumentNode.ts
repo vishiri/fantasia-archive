@@ -25,23 +25,31 @@ export function createProjectHierarchyTreeAddNewDocumentNode (input: {
   placement: I_faProjectHierarchyTreePlacementAddNewSource
 }): I_faProjectHierarchyTreeHeTreeNode {
   const placementId = input.placement.placementId ?? input.placement.id
+  const children: I_faProjectHierarchyTreeHeTreeNode[] = []
+  const documentTemplateId = input.placement.documentTemplateId ?? null
+  const id = resolveProjectHierarchyTreeAddNewDocumentNodeId(placementId)
+  const label = input.label
+  const titlePluralTranslations = input.placement.titlePluralTranslations
+  const titleSingularTranslations = input.placement.titleSingularTranslations
+  const worldColor = input.placement.worldColor
+  const worldId = input.placement.worldId
   return {
-    children: [],
+    children,
     childrenLoaded: true,
     documentId: null,
-    documentTemplateId: input.placement.documentTemplateId ?? null,
+    documentTemplateId,
     groupId: null,
     hasChildren: false,
     icon: PROJECT_HIERARCHY_TREE_ADD_NEW_DOCUMENT_ICON,
-    id: resolveProjectHierarchyTreeAddNewDocumentNodeId(placementId),
-    label: input.label,
+    id,
+    label,
     nodeKind: 'addNewDocument',
     placementId,
     tagId: null,
-    titlePluralTranslations: input.placement.titlePluralTranslations,
-    titleSingularTranslations: input.placement.titleSingularTranslations,
-    worldColor: input.placement.worldColor,
-    worldId: input.placement.worldId
+    titlePluralTranslations,
+    titleSingularTranslations,
+    worldColor,
+    worldId
   }
 }
 

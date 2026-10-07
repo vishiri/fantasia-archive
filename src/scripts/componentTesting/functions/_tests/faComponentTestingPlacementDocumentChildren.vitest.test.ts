@@ -110,6 +110,151 @@ describe('faComponentTestingPlacementDocumentChildren', () => {
     expect(childrenByKey['p1::parent']?.[0]?.parentDocumentId).toBe('parent')
   })
 
+  test('Test that applyFaComponentTestingPlacementDocumentChildrenReindex keeps omitted destination siblings', () => {
+    const alpha: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Alpha',
+      hasChildren: false,
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 0
+    }
+    const middle: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Middle',
+      hasChildren: false,
+      id: 'middle',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const beta: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Beta',
+      hasChildren: false,
+      id: 'beta',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 2
+    }
+    const moved: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Moved',
+      hasChildren: false,
+      id: 'moved',
+      parentDocumentId: null,
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const childrenByKey: Record<string, I_faProjectHierarchyTreeDocumentChild[]> = {
+      'p1::__root__': [moved],
+      'p1::parent': [alpha, middle, beta]
+    }
+    applyFaComponentTestingPlacementDocumentChildrenReindex(childrenByKey, {
+      movedDocumentId: 'moved',
+      orderedDocumentIds: ['alpha', 'moved', 'beta'],
+      parentDocumentId: 'parent',
+      placementId: 'p1'
+    })
+    expect(childrenByKey['p1::parent']?.map((item) => item.id)).toEqual([
+      'alpha',
+      'moved',
+      'middle',
+      'beta'
+    ])
+    expect(childrenByKey['p1::__root__']).toEqual([])
+  })
+
+  test('Test that applyFaComponentTestingPlacementDocumentChildrenReindex keeps an ordered id in its client slot', () => {
+    const alpha: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Alpha',
+      hasChildren: false,
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 0
+    }
+    const middle: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Middle',
+      hasChildren: false,
+      id: 'middle',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const beta: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Beta',
+      hasChildren: false,
+      id: 'beta',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 2
+    }
+    const moved: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Moved',
+      hasChildren: false,
+      id: 'moved',
+      parentDocumentId: null,
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const childrenByKey: Record<string, I_faProjectHierarchyTreeDocumentChild[]> = {
+      'p1::__root__': [moved],
+      'p1::parent': [alpha, middle, beta]
+    }
+    applyFaComponentTestingPlacementDocumentChildrenReindex(childrenByKey, {
+      movedDocumentId: 'moved',
+      orderedDocumentIds: ['beta', 'alpha', 'moved'],
+      parentDocumentId: 'parent',
+      placementId: 'p1'
+    })
+    expect(childrenByKey['p1::parent']?.map((item) => item.id)).toEqual([
+      'middle',
+      'beta',
+      'alpha',
+      'moved'
+    ])
+  })
+
+  test('Test that applyFaComponentTestingPlacementDocumentChildrenReindex appends siblings after the last anchor', () => {
+    const alpha: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Alpha',
+      hasChildren: false,
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 0
+    }
+    const tail: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Tail',
+      hasChildren: false,
+      id: 'tail',
+      parentDocumentId: 'parent',
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const moved: I_faProjectHierarchyTreeDocumentChild = {
+      displayName: 'Moved',
+      hasChildren: false,
+      id: 'moved',
+      parentDocumentId: null,
+      placementId: 'p1',
+      sortOrder: 1
+    }
+    const childrenByKey: Record<string, I_faProjectHierarchyTreeDocumentChild[]> = {
+      'p1::__root__': [moved],
+      'p1::parent': [alpha, tail]
+    }
+    applyFaComponentTestingPlacementDocumentChildrenReindex(childrenByKey, {
+      movedDocumentId: 'moved',
+      orderedDocumentIds: ['alpha', 'moved'],
+      parentDocumentId: 'parent',
+      placementId: 'p1'
+    })
+    expect(childrenByKey['p1::parent']?.map((item) => item.id)).toEqual([
+      'alpha',
+      'moved',
+      'tail'
+    ])
+  })
+
   test('Test that applyFaComponentTestingDocumentsByIdParentFromReindex updates parent and sortOrder', () => {
     const documentsById: Record<string, I_faProjectDocument> = {
       leaf: {

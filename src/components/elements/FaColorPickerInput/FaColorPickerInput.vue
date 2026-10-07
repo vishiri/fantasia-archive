@@ -126,7 +126,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'append-to-world-palette': [colorPalette: string]
+  'append-to-world-palette': [colorPalette: string, worldId: string]
   'update:modelValue': [value: string]
 }>()
 
@@ -137,11 +137,12 @@ function emitModelValueUpdate (value: string): void {
   emit('update:modelValue', value)
 }
 
-function emitAppendToWorldPalette (colorPalette: string): void {
-  emit('append-to-world-palette', colorPalette)
+function emitAppendToWorldPalette (colorPalette: string, worldId: string): void {
+  emit('append-to-world-palette', colorPalette, worldId)
 }
 
 const {
+  applyTextModelValue,
   colorSwatchStyle,
   displayHex,
   hasPaletteFooter,
@@ -199,7 +200,8 @@ function emitModelValueFromInput (value: string | number | null): void {
   if (props.readOnly) {
     return
   }
-  emitModelValueUpdate(value === null || value === undefined ? '' : String(value))
+  const nextValue = value === null || value === undefined ? '' : String(value)
+  applyTextModelValue(nextValue)
 }
 </script>
 

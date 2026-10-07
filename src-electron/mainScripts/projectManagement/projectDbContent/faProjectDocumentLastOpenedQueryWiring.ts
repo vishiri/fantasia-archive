@@ -31,17 +31,27 @@ interface I_faSqlDocumentLastOpenedRow {
 function mapFaProjectDocumentLastOpenedRow (
   row: I_faSqlDocumentLastOpenedRow
 ): I_faProjectDocumentLastOpenedItem {
+  const documentId = row.document_id
+  const worldId = row.world_id
+  const templateId = row.template_id
+  const templateIcon = row.template_icon ?? ''
+  const displayName = row.display_name
+  const documentTextColor = row.document_text_color
+  const documentBackgroundColor = row.document_background_color
+  const isCategory = row.is_category === 1
+  const isDead = row.is_dead === 1
+  const openedAtMs = row.opened_at_ms
   return {
-    documentId: row.document_id,
-    worldId: row.world_id,
-    templateId: row.template_id,
-    templateIcon: row.template_icon ?? '',
-    displayName: row.display_name,
-    documentTextColor: row.document_text_color,
-    documentBackgroundColor: row.document_background_color,
-    isCategory: row.is_category === 1,
-    isDead: row.is_dead === 1,
-    openedAtMs: row.opened_at_ms
+    documentId,
+    worldId,
+    templateId,
+    templateIcon,
+    displayName,
+    documentTextColor,
+    documentBackgroundColor,
+    isCategory,
+    isDead,
+    openedAtMs
   }
 }
 
@@ -64,9 +74,12 @@ export function listFaProjectDocumentLastOpened (
         `FROM ${FA_PROJECT_TABLE_DOCUMENT_LAST_OPENED} dlo ` +
         `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENTS} d ON d.id = dlo.document_id ` +
         `LEFT JOIN ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} dt ON dt.id = d.template_id ` +
-        'ORDER BY dlo.opened_at_ms DESC ' +
+        'ORDER BY dlo.opened_at_ms DESC, dlo.rowid DESC ' +
         `LIMIT ${FA_PROJECT_DOCUMENT_LAST_OPENED_MAX}`
     )
     .all() as I_faSqlDocumentLastOpenedRow[]
-  return { items: rows.map(mapFaProjectDocumentLastOpenedRow) }
+  const items = rows.map(mapFaProjectDocumentLastOpenedRow)
+  return {
+    items
+  }
 }

@@ -10,8 +10,9 @@ export function applyFaOpenedDocumentExtraClassesDraft (
     ...tab,
     extraClassesDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }

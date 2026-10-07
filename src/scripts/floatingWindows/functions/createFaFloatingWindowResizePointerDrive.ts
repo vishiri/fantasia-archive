@@ -41,8 +41,12 @@ export function createFaFloatingWindowResizePointerDrive (deps: {
     FaFloatingWindowResizePointerSession: T_faFloatingWindowResizePointerSessionConstructor
     applyFaFloatingWindowResizePointerSample: T_applyFaFloatingWindowResizePointerSample
   } {
+  const {
+    FaFloatingWindowResizePointerSession,
+    applyFaFloatingWindowResizePointerSample
+  } = deps
   return {
-    FaFloatingWindowResizePointerSession: deps.FaFloatingWindowResizePointerSession,
-    applyFaFloatingWindowResizePointerSample: deps.applyFaFloatingWindowResizePointerSample
+    FaFloatingWindowResizePointerSession,
+    applyFaFloatingWindowResizePointerSample
   }
 }

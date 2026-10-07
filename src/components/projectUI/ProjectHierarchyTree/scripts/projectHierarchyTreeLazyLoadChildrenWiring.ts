@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type { Ref } from 'vue'
 
 import type {
@@ -18,10 +20,12 @@ import {
   publishProjectHierarchyTreeRootRevision
 } from '../functions/projectHierarchyTreeExpandState'
 import {
+  beginProjectHierarchyTreeChildLoad,
   isProjectHierarchyTreePlacementDocumentListNotFoundError,
   shouldReloadProjectHierarchyTreeNodeChildren
 } from '../functions/projectHierarchyTreeLazyLoadChildReload'
 import { createMergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
+import { beginProjectHierarchyTreeSuppressEmit, endProjectHierarchyTreeSuppressEmit } from '../functions/projectHierarchyTreeSuppressEmitDepth'
 import { finalizeProjectHierarchyTreePlacementTopLevelChildren } from './projectHierarchyTreeAddNewDocumentNode'
 import { mapHierarchyDocumentChildrenToTreeNodes } from './projectHierarchyTreeSyncMapperWiring'
 import { loadProjectHierarchyTreeTagNodeChildrenIfNeeded } from './projectHierarchyTreeLazyLoadTagChildrenWiring'
@@ -55,8 +59,8 @@ export async function publishProjectHierarchyTreeLazyLoadRevision (
   nodeId: string,
   options?: { skipRootRevision?: boolean }
 ): Promise<void> {
-  deps.suppressTreeEmit.value = true
-  try {
+  beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
+  const publishWork = (async () => {
     const loadedNode = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
     if (loadedNode !== null && loadedNode.childrenLoaded) {
       replaceProjectHierarchyTreeNodeByIdInPlace(
@@ -69,9 +73,10 @@ export async function publishProjectHierarchyTreeLazyLoadRevision (
       deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
     }
     await notifyAfterProjectHierarchyTreeRevisionPublished(deps)
-  } finally {
-    deps.suppressTreeEmit.value = false
-  }
+  })()
+  await publishWork.finally(() => {
+    endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
+  })
 }
 
 export function commitProjectHierarchyTreeStagedLoadedChildren (deps: {
@@ -150,6 +155,25 @@ export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps:
   })
 }
 
+async function listPlacementChildrenOrSkipMissing (
+  listPlacementDocumentChildren: (
+    input: I_faProjectHierarchyTreeListPlacementChildrenInput
+  ) => Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] }>,
+  input: I_faProjectHierarchyTreeListPlacementChildrenInput
+): Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] } | null> {
+  const listed = await ResultAsync.fromPromise(
+    listPlacementDocumentChildren(input),
+    (error: unknown) => error
+  )
+  if (listed.isErr()) {
+    if (isProjectHierarchyTreePlacementDocumentListNotFoundError(listed.error)) {
+      return null
+    }
+    throw listed.error
+  }
+  return listed.value
+}
+
 export async function loadProjectHierarchyTreeNodeChildren (deps: {
   listDocumentsUnderTag?: (
     input: { tagId: string }
@@ -172,20 +196,20 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
   if (!shouldReloadProjectHierarchyTreeNodeChildren(deps.node)) {
     return
   }
-  if (await loadProjectHierarchyTreeTagNodeChildrenIfNeeded(deps)) {
+  const isStillCurrent = beginProjectHierarchyTreeChildLoad(deps.node.id)
+  if (await loadProjectHierarchyTreeTagNodeChildrenIfNeeded({
+    ...deps,
+    isStillCurrent
+  })) {
     return
   }
   if (deps.node.nodeKind === 'templatePlacement' && deps.node.placementId !== null) {
-    let result: { items: I_faProjectHierarchyTreeDocumentChild[] }
-    try {
-      result = await deps.listPlacementDocumentChildren({
-        placementId: deps.node.placementId
-      })
-    } catch (error) {
-      if (isProjectHierarchyTreePlacementDocumentListNotFoundError(error)) {
-        return
-      }
-      throw error
+    const result = await listPlacementChildrenOrSkipMissing(
+      deps.listPlacementDocumentChildren,
+      { placementId: deps.node.placementId }
+    )
+    if (result === null || !isStillCurrent()) {
+      return
     }
     const docChildren = mapHierarchyDocumentChildrenToTreeNodes({
       items: result.items,
@@ -215,17 +239,15 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
     deps.node.placementId !== null &&
     deps.node.documentId !== null
   ) {
-    let result: { items: I_faProjectHierarchyTreeDocumentChild[] }
-    try {
-      result = await deps.listPlacementDocumentChildren({
+    const result = await listPlacementChildrenOrSkipMissing(
+      deps.listPlacementDocumentChildren,
+      {
         parentDocumentId: deps.node.documentId,
         placementId: deps.node.placementId
-      })
-    } catch (error) {
-      if (isProjectHierarchyTreePlacementDocumentListNotFoundError(error)) {
-        return
       }
-      throw error
+    )
+    if (result === null || !isStillCurrent()) {
+      return
     }
     const children = mapHierarchyDocumentChildrenToTreeNodes({
       items: result.items,

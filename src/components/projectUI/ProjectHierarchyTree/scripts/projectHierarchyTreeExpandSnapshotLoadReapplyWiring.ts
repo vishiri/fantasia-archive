@@ -51,6 +51,7 @@ export async function loadAndReapplyExpandedSnapshotAfterOpenSet (deps: {
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   fullOpenNodeIds: readonly string[]
   getTreeRef: () => T_treeRef
+  isStillCurrent?: () => boolean
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
@@ -76,8 +77,14 @@ export async function loadAndReapplyExpandedSnapshotAfterOpenSet (deps: {
     })
   }, { skipReapplyHeTreeOpenState: true })
   await deps.flushDeferredTreeRevisionPublish()
+  if (deps.isStillCurrent?.() === false) {
+    return
+  }
   deps.openNodeIds.value = new Set(deps.fullOpenNodeIds)
   if (deps.getTreeRef() === null) {
+    return
+  }
+  if (deps.isStillCurrent?.() === false) {
     return
   }
   await reapplyExpandedSnapshotToHeTree({

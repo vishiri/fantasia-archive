@@ -1,3 +1,4 @@
+import { getActivePinia } from 'pinia'
 import { ResultAsync } from 'neverthrow'
 
 import type {
@@ -26,6 +27,14 @@ export async function readFaProjectDialogUiPrefFromBridge (
   return result.value.value
 }
 
+async function dialogUiPrefWriteBlockedByProjectReplacement (): Promise<boolean> {
+  if (getActivePinia() === undefined) {
+    return false
+  }
+  const activeProjectModule = await import('app/src/stores/S_FaActiveProject')
+  return activeProjectModule.S_FaActiveProject().isProjectReplacementInFlight()
+}
+
 /**
  * Writes one allowlisted dialog UI preference (best-effort; does not throw to callers).
  */
@@ -35,6 +44,9 @@ export async function writeFaProjectDialogUiPrefViaBridge (
 ): Promise<void> {
   const api = window.faContentBridgeAPIs?.projectManagement
   if (typeof api?.setProjectDialogUiPref !== 'function') {
+    return
+  }
+  if (await dialogUiPrefWriteBlockedByProjectReplacement()) {
     return
   }
   const result = await ResultAsync.fromPromise(
@@ -58,14 +70,21 @@ export async function readFaProjectLastSelectedWorldId (): Promise<string | null
   )
 }
 
+let lastSelectedWorldWriteTail: Promise<void> = Promise.resolve()
+
 /**
  * Persists shared last-selected world id for Quick-add / Quick-search.
+ * Overlapping picks run in order so an older write cannot finish last.
  */
 export async function writeFaProjectLastSelectedWorldId (
   worldId: string
 ): Promise<void> {
-  await writeFaProjectDialogUiPrefViaBridge(
-    FA_PROJECT_DIALOG_UI_PREF_LAST_SELECTED_WORLD_ID,
-    worldId
-  )
+  const run = lastSelectedWorldWriteTail.then(() => {
+    return writeFaProjectDialogUiPrefViaBridge(
+      FA_PROJECT_DIALOG_UI_PREF_LAST_SELECTED_WORLD_ID,
+      worldId
+    )
+  })
+  lastSelectedWorldWriteTail = run.then(() => undefined, () => undefined)
+  await run
 }

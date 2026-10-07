@@ -12,10 +12,17 @@ import { refreshProjectHierarchyTreeDragCommitSourceContainer } from './projectH
 import { touchProjectHierarchyTreePreservedScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
 import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
 
+function projectHierarchyTreeDragCommitSuperseded (
+  isDragCommitStillCurrent: (() => boolean) | undefined
+): boolean {
+  return isDragCommitStillCurrent?.() === false
+}
+
 export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
   clearDragSessionFlags: () => void
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
+  isDragCommitStillCurrent?: () => boolean
   expandedSnapshot: string[]
   flushUiStatePersist: () => void
   nextTick: () => Promise<void>
@@ -27,9 +34,15 @@ export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
     restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   ) => Promise<void>
 }): Promise<void> {
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   await deps.reapplyLatentDescendantExpandState()
   await deps.nextTick()
   await deps.nextTick()
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   deps.dragExpandUiFrozen.value = false
   await deps.nextTick()
   await new Promise<void>((resolve) => {
@@ -37,12 +50,21 @@ export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
       resolve()
     })
   })
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   await deps.restoreExpandedSnapshot(
     deps.expandedSnapshot,
     PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
   )
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   touchProjectHierarchyTreePreservedScrollTop()
   await deps.reapplyLatentDescendantExpandState()
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   deps.reapplyHeTreeOpenState()
   deps.flushUiStatePersist()
   deps.clearDragSessionFlags()
@@ -53,6 +75,9 @@ export async function finalizeProjectHierarchyTreeDragCommitExpandState (deps: {
       resolve()
     })
   })
+  if (projectHierarchyTreeDragCommitSuperseded(deps.isDragCommitStillCurrent)) {
+    return
+  }
   deps.reapplyHeTreeOpenState()
   await deps.reapplyLatentDescendantExpandState()
   deps.reapplyHeTreeOpenState()
@@ -112,6 +137,7 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
+  isDragCommitStillCurrent?: () => boolean
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   nextTick: () => Promise<void>
@@ -128,6 +154,9 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
+  if (deps.isDragCommitStillCurrent?.() === false) {
+    return
+  }
   const { effectiveExpandedSnapshot } = resolveProjectHierarchyTreeDragCommitExpandedSnapshot({
     commitResult: deps.commitResult,
     expandedSnapshot: deps.expandedSnapshot,
@@ -144,6 +173,9 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     treeData: deps.treeData
   })
+  if (deps.isDragCommitStillCurrent?.() === false) {
+    return
+  }
   touchProjectHierarchyTreePreservedScrollTop()
   const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(
     deps.treeData.value
@@ -154,10 +186,14 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     treeData: deps.treeData
   }, emptiedParentDocumentIds)
   await deps.reapplyLatentDescendantExpandState()
+  const isDragCommitStillCurrent = deps.isDragCommitStillCurrent
   await finalizeProjectHierarchyTreeDragCommitExpandState({
     clearDragSessionFlags: deps.clearDragSessionFlags,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    ...(isDragCommitStillCurrent === undefined
+      ? {}
+      : { isDragCommitStillCurrent }),
     expandedSnapshot: effectiveExpandedSnapshot,
     flushUiStatePersist: deps.flushUiStatePersist,
     nextTick: deps.nextTick,
@@ -166,6 +202,9 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     requestAnimationFrame: deps.requestAnimationFrame,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot
   })
+  if (deps.isDragCommitStillCurrent?.() === false) {
+    return
+  }
   if (deps.commitResult.committed) {
     syncProjectHierarchyTreeOpenSetToPersist({
       openNodeIds: deps.openNodeIds,

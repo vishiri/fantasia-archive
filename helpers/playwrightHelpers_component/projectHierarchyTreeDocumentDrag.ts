@@ -26,14 +26,18 @@ function resolveHierarchyTreeDocumentDragEndPoint (
   mode: T_hierarchyTreeDocumentDragMode
 ): { endX: number, endY: number } {
   if (mode === 'nest-into-target') {
+    const endX = targetBox.x + Math.floor(targetBox.width * 0.55)
+    const endY = targetBox.y + Math.max(12, Math.floor(targetBox.height * 0.78))
     return {
-      endX: targetBox.x + Math.floor(targetBox.width * 0.55),
-      endY: targetBox.y + Math.max(12, Math.floor(targetBox.height * 0.78))
+      endX,
+      endY
     }
   }
+  const endX = targetBox.x + 12
+  const endY = targetBox.y + 4
   return {
-    endX: targetBox.x + 12,
-    endY: targetBox.y + 4
+    endX,
+    endY
   }
 }
 

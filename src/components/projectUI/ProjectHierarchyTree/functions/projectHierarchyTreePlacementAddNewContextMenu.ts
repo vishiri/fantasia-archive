@@ -38,8 +38,9 @@ export function createResolveProjectHierarchyTreePlacementAddNewContextMenuRow (
       titlePluralTranslations: input.placement.titlePluralTranslations ?? {},
       titleSingularTranslations: input.placement.titleSingularTranslations ?? {}
     })
+    const icon = deps.addNewDocumentIcon
     return {
-      icon: deps.addNewDocumentIcon,
+      icon,
       label
     }
   }

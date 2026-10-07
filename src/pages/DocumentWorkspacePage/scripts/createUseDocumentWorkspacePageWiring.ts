@@ -24,21 +24,31 @@ function buildDocumentWorkspacePageApi (input: {
   statusFlagToggles: ReturnType<typeof wireDocumentWorkspacePageStatusFlagToggles>
   tagsField: ReturnType<typeof wireDocumentWorkspacePageTagsField>
 }): ReturnType<T_useDocumentWorkspacePageApi> {
-  const displayNameModel = input.coreModels.displayNameModel
-  const documentShowsEditFields = input.coreModels.documentShowsEditFields
-  const documentShowsPreview = input.coreModels.documentShowsPreview
-  const documentTab = input.coreModels.documentTab
-  const nameFieldLabel = input.coreModels.nameFieldLabel
-  const previewDisplayName = input.coreModels.previewDisplayName
+  const {
+    belongsUnderField,
+    colorPickers,
+    coreModels,
+    extraHtmlClassesField,
+    isCategoryToggle,
+    orderNumberField,
+    statusFlagToggles,
+    tagsField
+  } = input
+  const displayNameModel = coreModels.displayNameModel
+  const documentShowsEditFields = coreModels.documentShowsEditFields
+  const documentShowsPreview = coreModels.documentShowsPreview
+  const documentTab = coreModels.documentTab
+  const nameFieldLabel = coreModels.nameFieldLabel
+  const previewDisplayName = coreModels.previewDisplayName
 
   return {
-    ...input.belongsUnderField,
-    ...input.colorPickers,
-    ...input.isCategoryToggle,
-    ...input.orderNumberField,
-    ...input.extraHtmlClassesField,
-    ...input.statusFlagToggles,
-    ...input.tagsField,
+    ...belongsUnderField,
+    ...colorPickers,
+    ...isCategoryToggle,
+    ...orderNumberField,
+    ...extraHtmlClassesField,
+    ...statusFlagToggles,
+    ...tagsField,
     displayNameModel,
     documentShowsEditFields,
     documentShowsPreview,
@@ -66,6 +76,7 @@ export function createUseDocumentWorkspacePage (
       i18n: deps.i18n,
       navigateToWorkspaceHomeRoute: deps.navigateToWorkspaceHomeRoute,
       onMounted: deps.onMounted,
+      readActiveDocumentId: () => openedDocumentsStore.activeDocumentId,
       resolveOpenedDocumentDisplayNameFromTab: deps.resolveOpenedDocumentDisplayNameFromTab,
       resolveOpenedDocumentTabIsInEditMode: deps.resolveOpenedDocumentTabIsInEditMode,
       resolveOpenedDocumentTabIsInPreviewMode: deps.resolveOpenedDocumentTabIsInPreviewMode,

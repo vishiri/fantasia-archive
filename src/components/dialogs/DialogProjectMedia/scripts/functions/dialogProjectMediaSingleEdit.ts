@@ -150,6 +150,7 @@ export function bindDialogProjectMediaSingleEdit (
     computed: input.computed,
     dialogModel: input.dialogModel,
     isSingleEditDirty,
+    isSingleEditSlideOpen,
     listLoadGeneration: input.listLoadGeneration,
     listMediaItems: input.listMediaItems,
     loadListMedia: input.loadListMedia,

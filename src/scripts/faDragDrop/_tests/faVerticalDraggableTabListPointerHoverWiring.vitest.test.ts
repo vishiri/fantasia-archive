@@ -288,7 +288,7 @@ test('Test that clearPointerHover clears the hover id', () => {
  * createFaVerticalDraggableTabListPointerHoverWiring
  * Delayed resync must not call resolve after document is gone (Vitest 5 teardown).
  */
-test('Test that delayed hover restore no-ops when document is gone', () => {
+test('Test that delayed hover restore no-ops when document is gone', async () => {
   vi.useFakeTimers()
   const heldDocument = globalThis.document
   const resolveTabIdUnderPoint = vi.fn(() => 'world-x')
@@ -307,15 +307,16 @@ test('Test that delayed hover restore no-ops when document is gone', () => {
     configurable: true,
     value: undefined
   })
-  try {
+  const run = (async () => {
     vi.advanceTimersByTime(150)
     expect(resolveTabIdUnderPoint).not.toHaveBeenCalled()
-  } finally {
+  })()
+  await run.finally(() => {
     Object.defineProperty(globalThis, 'document', {
       configurable: true,
       value: heldDocument
     })
-  }
+  })
 })
 
 test('Test that cancelPointerHoverResync is a no-op without a pending timeout', () => {

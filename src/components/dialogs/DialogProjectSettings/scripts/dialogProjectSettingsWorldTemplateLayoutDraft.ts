@@ -2,12 +2,12 @@ import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleS
 import type {
   I_dialogProjectSettingsWorldTemplateLayoutDraft
 } from 'app/types/I_dialogProjectSettingsWorlds'
-import type { I_faProjectWorldTemplateLayoutForProjectSettings } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import {
-  normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder
+  normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder,
+  resolveDialogProjectSettingsWorldTemplateLayoutNextRootSortOrder
 } from './dialogProjectSettingsWorldTemplateLayoutRootOrder'
 import { normalizeFaProjectWorldTemplateGroupDisplayNameTranslations } from 'app/src/scripts/projectWorlds/faProjectWorldTemplateGroupDisplayName_manager'
 import {
@@ -27,82 +27,63 @@ import {
 
 export function createEmptyDialogProjectSettingsWorldTemplateLayoutDraft (
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
+  const groups: I_dialogProjectSettingsWorldTemplateLayoutDraft['groups'] = []
+  const placements: I_dialogProjectSettingsWorldTemplateLayoutDraft['placements'] = []
   return {
-    groups: [],
-    placements: []
-  }
-}
-
-export function mapDialogProjectSettingsWorldTemplateLayoutFromApi (
-  layout: I_faProjectWorldTemplateLayoutForProjectSettings
-): I_dialogProjectSettingsWorldTemplateLayoutDraft {
-  return {
-    groups: layout.groups.map((group) => ({
-      displayNameTranslations: normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
-        group.displayNameTranslations
-      ),
-      id: group.id,
-      rootSortOrder: group.rootSortOrder
-    })),
-    placements: layout.placements.map((placement) => ({
-      categoryCountInWorld: placement.categoryCountInWorld,
-      documentCountInWorld: placement.documentCountInWorld,
-      documentTemplateId: placement.documentTemplateId,
-      groupId: placement.groupId,
-      groupSortOrder: placement.groupSortOrder,
-      icon: placement.icon,
-      id: placement.id,
-      nicknamePluralTranslations: normalizeFaProjectWorldTemplatePlacementNicknameTranslations(
-        placement.nicknamePluralTranslations
-      ),
-      nicknameSingularTranslations: normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
-        placement.nicknameSingularTranslations
-      ),
-      rootSortOrder: placement.rootSortOrder,
-      templateDisplayName: placement.displayName,
-      worldAppendix: placement.worldAppendix
-    }))
+    groups,
+    placements
   }
 }
 
 export function mapDialogProjectSettingsWorldTemplateLayoutToSnapshot (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 ): I_faProjectWorldTemplateLayoutSnapshot {
-  return {
-    groups: layout.groups.map((group) => {
-      const displayNameTranslations = normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
-        group.displayNameTranslations
-      )
-      return {
-        displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
-        displayNameTranslations,
-        id: group.id,
-        rootSortOrder: group.rootSortOrder
-      }
-    }),
-    placements: layout.placements.map((placement) => {
-      const nicknamePluralTranslations = normalizeFaProjectWorldTemplatePlacementNicknameTranslations(
-        placement.nicknamePluralTranslations
-      )
-      const nicknameSingularTranslations = normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
-        placement.nicknameSingularTranslations
-      )
-      return {
-        documentTemplateId: placement.documentTemplateId,
-        groupId: placement.groupId,
-        groupSortOrder: placement.groupSortOrder,
-        id: placement.id,
-        nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
-          buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
-            nicknamePluralTranslations,
-            nicknameSingularTranslations
-          })
-        ),
+  const groups = layout.groups.map((group) => {
+    const displayNameTranslations = normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
+      group.displayNameTranslations
+    )
+    const displayName = resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations)
+    const id = group.id
+    const rootSortOrder = group.rootSortOrder
+    return {
+      displayName,
+      displayNameTranslations,
+      id,
+      rootSortOrder
+    }
+  })
+  const placements = layout.placements.map((placement) => {
+    const nicknamePluralTranslations = normalizeFaProjectWorldTemplatePlacementNicknameTranslations(
+      placement.nicknamePluralTranslations
+    )
+    const nicknameSingularTranslations = normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
+      placement.nicknameSingularTranslations
+    )
+    const documentTemplateId = placement.documentTemplateId
+    const groupId = placement.groupId
+    const groupSortOrder = placement.groupSortOrder
+    const id = placement.id
+    const nickname = resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+      buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
         nicknamePluralTranslations,
-        nicknameSingularTranslations,
-        rootSortOrder: placement.rootSortOrder
-      }
-    })
+        nicknameSingularTranslations
+      })
+    )
+    const rootSortOrder = placement.rootSortOrder
+    return {
+      documentTemplateId,
+      groupId,
+      groupSortOrder,
+      id,
+      nickname,
+      nicknamePluralTranslations,
+      nicknameSingularTranslations,
+      rootSortOrder
+    }
+  })
+  return {
+    groups,
+    placements
   }
 }
 
@@ -111,9 +92,7 @@ export function appendDialogProjectSettingsWorldTemplateGroupDraft (
   languageCode: T_faUserSettingsLanguageCode,
   defaultDisplayName: string
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
-  const nextRootOrder = layout.groups.length + layout.placements.filter(
-    (placement) => placement.groupId === null
-  ).length
+  const nextRootOrder = resolveDialogProjectSettingsWorldTemplateLayoutNextRootSortOrder(layout)
   return normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder({
     groups: [
       ...layout.groups,
@@ -134,19 +113,22 @@ export function renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslat
   groupId: string,
   displayNameTranslations: I_dialogProjectSettingsWorldTemplateLayoutDraft['groups'][number]['displayNameTranslations']
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
+  const groups = layout.groups.map((group) => {
+    if (group.id !== groupId) {
+      return group
+    }
+    const nextDisplayNameTranslations = normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
+      displayNameTranslations
+    )
+    return {
+      ...group,
+      displayNameTranslations: nextDisplayNameTranslations
+    }
+  })
+  const placements = layout.placements
   return {
-    groups: layout.groups.map((group) => {
-      if (group.id !== groupId) {
-        return group
-      }
-      return {
-        ...group,
-        displayNameTranslations: normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
-          displayNameTranslations
-        )
-      }
-    }),
-    placements: layout.placements
+    groups,
+    placements
   }
 }
 
@@ -161,24 +143,27 @@ export function renameDialogProjectSettingsWorldTemplatePlacementNicknameTransla
   const nicknameSingularTranslations = normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
     nicknameTranslations.singular
   )
-  return {
-    groups: layout.groups,
-    placements: layout.placements.map((placement) => {
-      if (placement.id !== placementId) {
-        return placement
-      }
-      return {
-        ...placement,
-        nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
-          buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
-            nicknamePluralTranslations,
-            nicknameSingularTranslations
-          })
-        ),
+  const groups = layout.groups
+  const placements = layout.placements.map((placement) => {
+    if (placement.id !== placementId) {
+      return placement
+    }
+    const nickname = resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+      buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
         nicknamePluralTranslations,
         nicknameSingularTranslations
-      }
-    })
+      })
+    )
+    return {
+      ...placement,
+      nickname,
+      nicknamePluralTranslations,
+      nicknameSingularTranslations
+    }
+  })
+  return {
+    groups,
+    placements
   }
 }
 
@@ -187,17 +172,19 @@ export function syncDialogProjectSettingsWorldTemplatePlacementTemplateDisplayNa
   documentTemplateId: string,
   templateDisplayName: string
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
+  const groups = layout.groups
+  const placements = layout.placements.map((placement) => {
+    if (placement.documentTemplateId !== documentTemplateId) {
+      return placement
+    }
+    return {
+      ...placement,
+      templateDisplayName
+    }
+  })
   return {
-    groups: layout.groups,
-    placements: layout.placements.map((placement) => {
-      if (placement.documentTemplateId !== documentTemplateId) {
-        return placement
-      }
-      return {
-        ...placement,
-        templateDisplayName
-      }
-    })
+    groups,
+    placements
   }
 }
 
@@ -212,9 +199,7 @@ export function appendDialogProjectSettingsWorldTemplatePlacementDraft (
     worldAppendix: string
   }
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
-  const rootCount = layout.groups.length + layout.placements.filter(
-    (placement) => placement.groupId === null
-  ).length
+  const rootCount = resolveDialogProjectSettingsWorldTemplateLayoutNextRootSortOrder(layout)
   return normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder({
     groups: layout.groups,
     placements: [

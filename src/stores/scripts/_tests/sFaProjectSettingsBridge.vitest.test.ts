@@ -1,6 +1,8 @@
 import { beforeEach, expect, test, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
+import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/functions/faActionUserCanceledError'
 
 const emptyRoot: I_faProjectSettingsRoot = {
   projectName: '',
@@ -25,7 +27,8 @@ const {
 
 vi.mock('quasar', () => {
   return {
-    Notify: { create: notifyCreateMock }
+    Notify: { create: notifyCreateMock },
+    copyToClipboard: vi.fn(async () => undefined)
   }
 })
 
@@ -42,6 +45,7 @@ vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
 })
 
 beforeEach(() => {
+  setActivePinia(createPinia())
   getProjectSettingsMock.mockReset()
   getProjectSettingsMock.mockResolvedValue({ ...emptyRoot })
   setProjectSettingsMock.mockReset()
@@ -99,6 +103,31 @@ test('Test that faProjectSettingsRefreshFromBridge applies root on success', asy
  * faProjectSettingsRefreshFromBridge
  * Throws loadError when getProjectSettings rejects.
  */
+test('Test that faProjectSettingsRefreshFromBridge ignores a read from an older project', async () => {
+  let resolveSettings: ((value: I_faProjectSettingsRoot) => void) | undefined
+  getProjectSettingsMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveSettings = resolve
+    })
+  })
+  const applyRoot = vi.fn()
+  const { faProjectSettingsRefreshFromBridge } = await import('../sFaProjectSettingsBridge')
+  const pending = faProjectSettingsRefreshFromBridge({ applyRoot })
+  await Promise.resolve()
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishSettings = resolveSettings
+  if (finishSettings === undefined) {
+    throw new Error('missing settings resolver')
+  }
+  finishSettings({
+    projectName: 'Stale',
+    schemaVersion: 1
+  })
+  await expect(pending).resolves.toBe(false)
+  expect(applyRoot).not.toHaveBeenCalled()
+})
+
 test('Test that faProjectSettingsRefreshFromBridge throws when getProjectSettings fails', async () => {
   getProjectSettingsMock.mockRejectedValueOnce(new Error('read failed'))
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
@@ -327,4 +356,89 @@ test('Test that faProjectSettingsPersistPatchFromStore wraps non-Error post-save
     })
   ).rejects.toThrow('read-back string failure')
   errorSpy.mockRestore()
+})
+
+function settingsPersistProject (id: string): {
+  filePath: string
+  id: string
+  name: string
+} {
+  const filePath = `C:\\${id}.faproject`
+  const name = id
+  return {
+    filePath,
+    id,
+    name
+  }
+}
+
+/**
+ * faProjectSettingsPersistPatchFromStore
+ * Skips setProjectSettings when the project epoch moved before the write.
+ */
+test('Test that faProjectSettingsPersistPatchFromStore skips the write when the project epoch moved', async () => {
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().setActiveProject(settingsPersistProject('project-a'))
+  const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+  S_FaActiveProject().setActiveProject(settingsPersistProject('project-b'))
+  const applyRoot = vi.fn()
+  const { faProjectSettingsPersistPatchFromStore } = await import('../sFaProjectSettingsBridge')
+  await expect(faProjectSettingsPersistPatchFromStore({
+    applyRoot,
+    epochAtStart,
+    patch: { projectName: 'Old' }
+  })).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(setProjectSettingsMock).not.toHaveBeenCalled()
+  expect(applyRoot).not.toHaveBeenCalled()
+})
+
+/**
+ * faProjectSettingsPersistPatchFromStore
+ * Skips setProjectSettings while a project open is in flight and the epoch has not moved.
+ */
+test('Test that faProjectSettingsPersistPatchFromStore skips the write while a project open is in flight', async () => {
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().setActiveProject(settingsPersistProject('project-a'))
+  const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  const applyRoot = vi.fn()
+  const { faProjectSettingsPersistPatchFromStore } = await import('../sFaProjectSettingsBridge')
+  await expect(faProjectSettingsPersistPatchFromStore({
+    applyRoot,
+    epochAtStart,
+    patch: { projectName: 'Old' }
+  })).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(setProjectSettingsMock).not.toHaveBeenCalled()
+  expect(applyRoot).not.toHaveBeenCalled()
+})
+
+/**
+ * faProjectSettingsPersistPatchFromStore
+ * Does not read back or apply settings when the project epoch moves during the write.
+ */
+test('Test that faProjectSettingsPersistPatchFromStore drops read-back when the project changes during the write', async () => {
+  let releaseWrite = (_saved: boolean): void => undefined
+  setProjectSettingsMock.mockImplementationOnce(() => {
+    return new Promise<boolean>((resolve) => {
+      releaseWrite = (saved) => {
+        resolve(saved)
+      }
+    })
+  })
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().setActiveProject(settingsPersistProject('project-a'))
+  const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+  const applyRoot = vi.fn()
+  const { faProjectSettingsPersistPatchFromStore } = await import('../sFaProjectSettingsBridge')
+  const pending = faProjectSettingsPersistPatchFromStore({
+    applyRoot,
+    epochAtStart,
+    patch: { projectName: 'Old' }
+  })
+  await vi.waitUntil(() => setProjectSettingsMock.mock.calls.length === 1)
+  S_FaActiveProject().setActiveProject(settingsPersistProject('project-b'))
+  releaseWrite(true)
+  await expect(pending).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(getProjectSettingsMock).not.toHaveBeenCalled()
+  expect(applyRoot).not.toHaveBeenCalled()
 })

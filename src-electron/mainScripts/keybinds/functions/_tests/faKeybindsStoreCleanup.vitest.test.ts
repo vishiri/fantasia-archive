@@ -30,3 +30,32 @@ test('buildCleanFaKeybindsRoot rewrites when override keys are unknown', () => {
   expect(next.schemaVersion).toBe(1)
   expect(next.overrides).toEqual({})
 })
+
+/**
+ * buildCleanFaKeybindsRoot
+ * Drops a known command whose stored chord is not a code plus modifier list.
+ */
+test('buildCleanFaKeybindsRoot rewrites when a known command chord is invalid', () => {
+  const commandId = FA_KEYBIND_COMMAND_IDS[0]
+  if (commandId === undefined) {
+    throw new Error('missing keybind command id')
+  }
+  const {
+    next,
+    shouldRewrite
+  } = buildCleanFaKeybindsRoot(
+    {
+      overrides: {
+        [commandId]: {
+          code: 'KeyK',
+          mods: ['nope']
+        }
+      },
+      schemaVersion: 1
+    } as unknown as Parameters<typeof buildCleanFaKeybindsRoot>[0],
+    FA_KEYBIND_COMMAND_IDS,
+    isFaKeybindCommandId
+  )
+  expect(shouldRewrite).toBe(true)
+  expect(next.overrides).toEqual({})
+})

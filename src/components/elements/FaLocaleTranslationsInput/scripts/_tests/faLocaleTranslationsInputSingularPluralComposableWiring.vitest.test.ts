@@ -141,6 +141,7 @@ test('Test that useFaLocaleTranslationsInputSingularPlural manager wires singula
   expect(api.resolvedValue.value.length).toBeGreaterThan(0)
 
   // Hit manager ResultAsync scheduleFaLocaleTranslationsMenuInputFocus wrapper
+  api.openTranslationsMenu()
   api.onTranslationsMenuShow()
   await Promise.resolve()
   await Promise.resolve()

@@ -62,23 +62,39 @@ export function createWindowNoteboardUse (deps: {
       noteboardStore.setWindowOpen(false)
     }
 
+    const {
+      FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+      FA_FLOATING_WINDOW_POP_TRANSITION_MS
+    } = deps
+    const documentNameClass = variant.documentNameClass
+    const {
+      frameRef,
+      h,
+      onFramePointerDown,
+      onResizePointerDown,
+      onTitlePointerDown,
+      titleShortFrameClass,
+      w,
+      x,
+      y
+    } = frame
     return {
-      FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: deps.FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
-      FA_FLOATING_WINDOW_POP_TRANSITION_MS: deps.FA_FLOATING_WINDOW_POP_TRANSITION_MS,
-      documentNameClass: variant.documentNameClass,
-      frameRef: frame.frameRef,
+      FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+      FA_FLOATING_WINDOW_POP_TRANSITION_MS,
+      documentNameClass,
+      frameRef,
       frameStyleWithDialogTransition,
-      h: frame.h,
+      h,
       onClose,
-      onFramePointerDown: frame.onFramePointerDown,
-      onResizePointerDown: frame.onResizePointerDown,
-      onTitlePointerDown: frame.onTitlePointerDown,
+      onFramePointerDown,
+      onResizePointerDown,
+      onTitlePointerDown,
       text,
-      titleShortFrameClass: frame.titleShortFrameClass,
-      w: frame.w,
+      titleShortFrameClass,
+      w,
       windowModel,
-      x: frame.x,
-      y: frame.y
+      x,
+      y
     }
   }
 }

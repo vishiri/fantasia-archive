@@ -92,9 +92,9 @@ test('Test that document options include categories and resolve icons', () => {
 
 /**
  * sortDialogQuickSearchDocumentWorldsBySortOrder / pickFirstDialogQuickSearchDocumentWorldId
- * Equal sortOrder ties break by id; empty list yields null.
+ * Equal sortOrder keeps list order; empty list yields null.
  */
-test('Test that world sort ties break by id and empty pick returns null', () => {
+test('Test that world sort keeps equal sortOrder list order and empty pick returns null', () => {
   expect(pickFirstDialogQuickSearchDocumentWorldId([])).toBeNull()
   const tied = [
     {
@@ -107,8 +107,8 @@ test('Test that world sort ties break by id and empty pick returns null', () => 
     }
   ]
   expect(sortDialogQuickSearchDocumentWorldsBySortOrder(tied).map((row) => row.id))
-    .toEqual(['world-a', 'world-b'])
-  expect(pickFirstDialogQuickSearchDocumentWorldId(tied)).toBe('world-a')
+    .toEqual(['world-b', 'world-a'])
+  expect(pickFirstDialogQuickSearchDocumentWorldId(tied)).toBe('world-b')
 })
 
 /**
@@ -210,4 +210,36 @@ test('Test that document options tie-break equal names and fall back empty names
   expect(options.map((row) => row.id)).toEqual(['doc-empty-name', 'doc-a', 'doc-c', 'doc-b'])
   expect(options[1]?.color).toBeUndefined()
   expect(options[0]?.name).toBe('doc-empty-name')
+})
+
+/**
+ * buildDialogQuickSearchDocumentDocumentOptions
+ * Equal name and sort keep older createdAt before id.
+ */
+test('Test that document options keep older createdAt before id when names and sort match', () => {
+  const options = buildDialogQuickSearchDocumentDocumentOptions({
+    documents: [
+      {
+        createdAtMs: 2000,
+        displayName: 'Same',
+        documentTextColor: null,
+        id: 'doc-aaa',
+        isCategory: false,
+        sortOrder: 0,
+        templateId: null
+      },
+      {
+        createdAtMs: 1000,
+        displayName: 'Same',
+        documentTextColor: null,
+        id: 'doc-zzz',
+        isCategory: false,
+        sortOrder: 0,
+        templateId: null
+      }
+    ],
+    resolveDocumentIcon: () => FA_DIALOG_QUICK_SEARCH_DOCUMENT_DEFAULT_ICON,
+    templatesById: new Map()
+  })
+  expect(options.map((row) => row.id)).toEqual(['doc-zzz', 'doc-aaa'])
 })

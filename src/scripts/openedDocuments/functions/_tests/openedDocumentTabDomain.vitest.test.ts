@@ -275,6 +275,63 @@ test('Test that resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges closes cle
   expect(result.shouldNavigateHome).toBe(false)
 })
 
+test('Test that resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges focuses the nearest tab on the right', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-a',
+      hasUnsavedChanges: false
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-b',
+      hasUnsavedChanges: false
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-c',
+      hasUnsavedChanges: true
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-d',
+      hasUnsavedChanges: true
+    }
+  ]
+
+  const result = resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges({
+    activeDocumentId: 'doc-b',
+    exceptDocumentId: null,
+    tabs
+  })
+
+  expect(result.nextTabs.map((tab) => tab.documentId)).toEqual(['doc-c', 'doc-d'])
+  expect(result.nextActiveDocumentId).toBe('doc-c')
+  expect(result.shouldNavigateHome).toBe(false)
+})
+
+test('Test that resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges focuses the nearest tab on the left', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-a',
+      hasUnsavedChanges: true
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-b',
+      hasUnsavedChanges: false
+    }
+  ]
+  const result = resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges({
+    activeDocumentId: 'doc-b',
+    exceptDocumentId: null,
+    tabs
+  })
+  expect(result.nextTabs.map((tab) => tab.documentId)).toEqual(['doc-a'])
+  expect(result.nextActiveDocumentId).toBe('doc-a')
+})
+
 test('Test that resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges is a no-op when every tab stays open', () => {
   const tabs = [
     {

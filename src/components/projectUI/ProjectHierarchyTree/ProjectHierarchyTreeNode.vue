@@ -125,18 +125,28 @@ const nodeRootClassList = computed(() => {
     props.node,
     props.activeDocumentId
   )
+  const nodeKind = props.node.nodeKind
+  const addNewDocument = nodeKind === 'addNewDocument'
+  const customDocumentAppearance = hasCustomDocumentAppearance.value
+  const customDocumentBackground = hasCustomDocumentBackground.value
+  const documentRow = nodeKind === 'document'
+  const group = nodeKind === 'group'
+  const documentTemplate = nodeKind === 'templatePlacement'
+  const tag = nodeKind === 'tag'
+  const tagWrapper = nodeKind === 'tagWrapper'
+  const world = nodeKind === 'world'
 
   return {
     'projectHierarchyTreeNode--activeTabDocument': showsActiveTabHighlight,
-    'projectHierarchyTreeNode--addNewDocument': props.node.nodeKind === 'addNewDocument',
-    'projectHierarchyTreeNode--customDocumentAppearance': hasCustomDocumentAppearance.value,
-    'projectHierarchyTreeNode--customDocumentBackground': hasCustomDocumentBackground.value,
-    'projectHierarchyTreeNode--document': props.node.nodeKind === 'document',
-    'projectHierarchyTreeNode--group': props.node.nodeKind === 'group',
-    'projectHierarchyTreeNode--documentTemplate': props.node.nodeKind === 'templatePlacement',
-    'projectHierarchyTreeNode--tag': props.node.nodeKind === 'tag',
-    'projectHierarchyTreeNode--tagWrapper': props.node.nodeKind === 'tagWrapper',
-    'projectHierarchyTreeNode--world': props.node.nodeKind === 'world'
+    'projectHierarchyTreeNode--addNewDocument': addNewDocument,
+    'projectHierarchyTreeNode--customDocumentAppearance': customDocumentAppearance,
+    'projectHierarchyTreeNode--customDocumentBackground': customDocumentBackground,
+    'projectHierarchyTreeNode--document': documentRow,
+    'projectHierarchyTreeNode--group': group,
+    'projectHierarchyTreeNode--documentTemplate': documentTemplate,
+    'projectHierarchyTreeNode--tag': tag,
+    'projectHierarchyTreeNode--tagWrapper': tagWrapper,
+    'projectHierarchyTreeNode--world': world
   }
 })
 
@@ -193,8 +203,9 @@ const nodeRootBackgroundStyle = computed(() => {
 
 const nodeLabelTextStyle = computed(() => {
   if (props.node.nodeKind === 'world') {
+    const color = resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
     return {
-      color: resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
+      color
     }
   }
 

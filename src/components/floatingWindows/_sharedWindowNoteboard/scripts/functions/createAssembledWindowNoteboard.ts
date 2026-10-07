@@ -21,13 +21,17 @@ export function createAssembledWindowNoteboard (input: {
 
   const useWindowNoteboardFramePersist = input.parts.createWindowNoteboardFramePersist({
     getNoteboardStore: deps.getNoteboardStore,
+    isProjectReplacementInFlight: deps.isProjectReplacementInFlight,
     persistFrameSilent: variant.persistFrameSilent,
+    readProjectContentEpoch: deps.readProjectContentEpoch,
     saveFailureActionId: variant.saveFailureActionId,
     useFaFloatingWindowFramePersist: deps.useFaFloatingWindowFramePersist
   })
 
   const useWindowNoteboardTextPersist = input.parts.createWindowNoteboardTextPersist({
     getNoteboardStore: deps.getNoteboardStore,
+    isProjectReplacementInFlight: deps.isProjectReplacementInFlight,
+    readProjectContentEpoch: deps.readProjectContentEpoch,
     saveFailureActionId: variant.saveFailureActionId,
     useFaFloatingWindowTextPersist: deps.useFaFloatingWindowTextPersist
   })

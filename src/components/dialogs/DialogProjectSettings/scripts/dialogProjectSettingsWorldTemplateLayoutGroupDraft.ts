@@ -27,9 +27,10 @@ export function removeDialogProjectSettingsWorldTemplateGroupDraft (
     .filter((group) => group.id !== groupId)
     .map((group) => {
       if (group.rootSortOrder > groupRootOrder) {
+        const rootSortOrder = group.rootSortOrder + rootOrderShiftAfterGroup
         return {
           ...group,
-          rootSortOrder: group.rootSortOrder + rootOrderShiftAfterGroup
+          rootSortOrder
         }
       }
       return group
@@ -48,10 +49,11 @@ export function removeDialogProjectSettingsWorldTemplateGroupDraft (
       return nextPlacement
     }
     if (placement.groupId === null && (placement.rootSortOrder ?? 0) > groupRootOrder) {
+      const shiftedRootSortOrder = (placement.rootSortOrder ?? 0) + rootOrderShiftAfterGroup
       return {
         ...placement,
         groupSortOrder: null,
-        rootSortOrder: (placement.rootSortOrder ?? 0) + rootOrderShiftAfterGroup
+        rootSortOrder: shiftedRootSortOrder
       }
     }
     return placement

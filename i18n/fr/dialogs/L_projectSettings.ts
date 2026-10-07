@@ -1,5 +1,6 @@
 export default {
   title: 'Paramètres du projet',
+  loadError: 'Impossible de charger les paramètres du projet.',
   closeButton: 'Fermer sans enregistrer',
   saveButton: 'Enregistrer les paramètres',
   saveWithoutClosingButton: 'Enregistrer sans fermer',

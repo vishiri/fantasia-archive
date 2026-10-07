@@ -96,6 +96,40 @@ test('Test that refreshAppStyling populates root and css from the IPC bridge', a
   expect(store.css).toBe(incoming.css)
 })
 
+test('Test that a refresh started first does not replace a later app styling save', async () => {
+  let releaseFirstGet: ((root: I_faAppStylingRoot) => void) | undefined
+  const firstGet = new Promise<I_faAppStylingRoot>((resolve) => {
+    releaseFirstGet = resolve
+  })
+  const saved: I_faAppStylingRoot = {
+    css: 'body { color: saved; }',
+    frame: null,
+    schemaVersion: 1
+  }
+  getAppStylingMock.mockImplementationOnce(() => firstGet)
+  getAppStylingMock.mockResolvedValueOnce(saved)
+
+  const refreshPromise = store.refreshAppStyling()
+  await vi.waitUntil(() => getAppStylingMock.mock.calls.length === 1)
+  const updatePromise = store.updateAppStyling({ css: saved.css })
+  const finishFirstGet = releaseFirstGet
+  if (finishFirstGet === undefined) {
+    throw new Error('missing app styling read resolver')
+  }
+  finishFirstGet({
+    css: 'body { color: stale; }',
+    frame: null,
+    schemaVersion: 1
+  })
+  const refreshed = await refreshPromise
+  const ok = await updatePromise
+
+  expect(refreshed).toBe(true)
+  expect(ok).toBe(true)
+  expect(store.css).toBe(saved.css)
+  expect(setAppStylingMock).toHaveBeenCalledWith({ css: saved.css })
+})
+
 /**
  * S_FaAppStyling / refreshAppStyling
  * No-op when the bridge method is missing; root and css remain at their initial values.
@@ -161,20 +195,34 @@ test('Test that updateAppStyling returns true and re-reads root after success', 
 
 /**
  * S_FaAppStyling / updateAppStyling
- * A successful save clears any in-editor live preview override so '#faUserCss' tracks persisted css only.
+ * A successful save clears the live preview when it still matches the saved CSS so '#faUserCss' tracks persisted css. A newer preview stays.
  */
 test('Test that updateAppStyling clears cssLivePreview after a successful save', async () => {
-  store.cssLivePreview = 'preview { color: red; }'
   const afterRoot: I_faAppStylingRoot = {
     css: 'a { color: blue; }',
     frame: null,
     schemaVersion: 1
   }
+  store.cssLivePreview = afterRoot.css
   getAppStylingMock.mockResolvedValueOnce(afterRoot)
 
   await store.updateAppStyling({ css: afterRoot.css })
 
   expect(store.cssLivePreview).toBeNull()
+})
+
+test('Test that updateAppStyling keeps cssLivePreview typed during a successful save', async () => {
+  const afterRoot: I_faAppStylingRoot = {
+    css: 'a { color: blue; }',
+    frame: null,
+    schemaVersion: 1
+  }
+  store.cssLivePreview = 'typed during save'
+  getAppStylingMock.mockResolvedValueOnce(afterRoot)
+
+  await store.updateAppStyling({ css: afterRoot.css })
+
+  expect(store.cssLivePreview).toBe('typed during save')
 })
 
 /**
@@ -322,6 +370,7 @@ test('Test that persistAppStylingPartialSilent updates root without notifying su
     frame: null,
     schemaVersion: 1
   }
+  store.css = merged.css
 
   await store.persistAppStylingPartialSilent({
     frame: merged.frame
@@ -332,6 +381,48 @@ test('Test that persistAppStylingPartialSilent updates root without notifying su
   expect(notifyCreateMock).not.toHaveBeenCalledWith(
     expect.objectContaining({ type: 'positive' })
   )
+})
+
+test('Test that frame-only persist keeps css typed during the round trip', async () => {
+  store.css = '.before{color:black}'
+  getAppStylingMock.mockImplementationOnce(async () => {
+    store.css = '.typed{color:red}'
+    return {
+      css: '',
+      frame: {
+        height: 300,
+        width: 400,
+        x: 1,
+        y: 2
+      },
+      schemaVersion: 1 as const
+    }
+  })
+  await store.persistAppStylingPartialSilent({
+    frame: {
+      height: 300,
+      width: 400,
+      x: 1,
+      y: 2
+    }
+  })
+  expect(store.css).toBe('.typed{color:red}')
+  expect(store.root?.css).toBe('.typed{color:red}')
+})
+
+test('Test that css persist keeps css typed during the round trip', async () => {
+  store.css = '.saved{color:black}'
+  getAppStylingMock.mockImplementationOnce(async () => {
+    store.css = '.typed{color:red}'
+    return {
+      css: '.saved{color:black}',
+      frame: null,
+      schemaVersion: 1 as const
+    }
+  })
+  await store.persistAppStylingPartialSilent({ css: '.saved{color:black}' })
+  expect(store.css).toBe('.typed{color:red}')
+  expect(store.root?.css).toBe('.typed{color:red}')
 })
 
 test('Test that persistAppStylingPartialSilent re-throws when setAppStyling rejects', async () => {

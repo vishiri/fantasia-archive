@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Project Media single-edit tab: heading Project Media - Single medium edit, stacked form when a row is loaded, Close and Save and close. Save and close stays disabled while no medium is loaded.'
+          'Project Media single-edit tab: heading Project Media - Single Medium Edit, stacked form when a row is loaded, Close and Save and Close. Save and Close stays disabled while no medium is loaded.'
       },
       story: {
         iframeHeight: '420px'

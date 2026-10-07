@@ -181,26 +181,75 @@ export function buildFaActionDefinitionHandlersDialogsOpens (
     ) => Promise<void>
     handleOpenQuickSearchDocumentDialog: () => Promise<void>
   } {
+  const handleOpenAboutFantasiaArchiveDialogBound = (): Promise<void> => {
+    return handleOpenAboutFantasiaArchiveDialog(deps)
+  }
+  const handleOpenActionMonitorDialogBound = (): Promise<void> => {
+    return handleOpenActionMonitorDialog(deps)
+  }
+  const handleOpenAdvancedSearchGuideDialogBound = (): Promise<void> => {
+    return handleOpenAdvancedSearchGuideDialog(deps)
+  }
+  const handleOpenAppSettingsDialogBound = (): Promise<void> => {
+    return handleOpenAppSettingsDialog(deps)
+  }
+  const handleOpenAppStylingWindowBound = (): Promise<void> => {
+    return handleOpenAppStylingWindow(deps)
+  }
+  const handleOpenChangelogDialogBound = (): Promise<void> => {
+    return handleOpenChangelogDialog(deps)
+  }
+  const handleOpenImportExportAppConfigDialogBound = (): Promise<void> => {
+    return handleOpenImportExportAppConfigDialog(deps)
+  }
+  const handleOpenKeybindSettingsDialogBound = (): Promise<void> => {
+    return handleOpenKeybindSettingsDialog(deps)
+  }
+  const handleOpenLicenseDialogBound = (): Promise<void> => {
+    return handleOpenLicenseDialog(deps)
+  }
+  const handleOpenNewProjectDialogBound = (): Promise<void> => {
+    return handleOpenNewProjectDialog(deps)
+  }
+  const handleOpenProjectMediaDialogBound = (
+    payload?: { initialPanel?: T_faProjectMediaPanel } | void
+  ): Promise<void> => {
+    return handleOpenProjectMediaDialog(deps, payload)
+  }
+  const handleOpenProjectSettingsDialogBound = (
+    payload?: { initialTab?: string } | void
+  ): Promise<void> => {
+    return handleOpenProjectSettingsDialog(deps, payload)
+  }
+  const handleOpenProjectStylingWindowBound = (): Promise<void> => {
+    return handleOpenProjectStylingWindow(deps)
+  }
+  const handleOpenQuickAddDocumentDialogBound = (): Promise<void> => {
+    return handleOpenQuickAddDocumentDialog(deps)
+  }
+  const handleOpenQuickSearchDocumentDialogBound = (): Promise<void> => {
+    return handleOpenQuickSearchDocumentDialog(deps)
+  }
+  const handleOpenTipsTricksTriviaDialogBound = (): Promise<void> => {
+    return handleOpenTipsTricksTriviaDialog(deps)
+  }
+
   return {
-    handleOpenKeybindSettingsDialog: () => handleOpenKeybindSettingsDialog(deps),
-    handleOpenAppSettingsDialog: () => handleOpenAppSettingsDialog(deps),
-    handleOpenProjectSettingsDialog: (payload?) => {
-      return handleOpenProjectSettingsDialog(deps, payload)
-    },
-    handleOpenAppStylingWindow: () => handleOpenAppStylingWindow(deps),
-    handleOpenProjectStylingWindow: () => handleOpenProjectStylingWindow(deps),
-    handleOpenAdvancedSearchGuideDialog: () => handleOpenAdvancedSearchGuideDialog(deps),
-    handleOpenChangelogDialog: () => handleOpenChangelogDialog(deps),
-    handleOpenLicenseDialog: () => handleOpenLicenseDialog(deps),
-    handleOpenAboutFantasiaArchiveDialog: () => handleOpenAboutFantasiaArchiveDialog(deps),
-    handleOpenTipsTricksTriviaDialog: () => handleOpenTipsTricksTriviaDialog(deps),
-    handleOpenActionMonitorDialog: () => handleOpenActionMonitorDialog(deps),
-    handleOpenImportExportAppConfigDialog: () => handleOpenImportExportAppConfigDialog(deps),
-    handleOpenNewProjectDialog: () => handleOpenNewProjectDialog(deps),
-    handleOpenQuickAddDocumentDialog: () => handleOpenQuickAddDocumentDialog(deps),
-    handleOpenProjectMediaDialog: (payload?) => {
-      return handleOpenProjectMediaDialog(deps, payload)
-    },
-    handleOpenQuickSearchDocumentDialog: () => handleOpenQuickSearchDocumentDialog(deps)
+    handleOpenAboutFantasiaArchiveDialog: handleOpenAboutFantasiaArchiveDialogBound,
+    handleOpenActionMonitorDialog: handleOpenActionMonitorDialogBound,
+    handleOpenAdvancedSearchGuideDialog: handleOpenAdvancedSearchGuideDialogBound,
+    handleOpenAppSettingsDialog: handleOpenAppSettingsDialogBound,
+    handleOpenAppStylingWindow: handleOpenAppStylingWindowBound,
+    handleOpenChangelogDialog: handleOpenChangelogDialogBound,
+    handleOpenImportExportAppConfigDialog: handleOpenImportExportAppConfigDialogBound,
+    handleOpenKeybindSettingsDialog: handleOpenKeybindSettingsDialogBound,
+    handleOpenLicenseDialog: handleOpenLicenseDialogBound,
+    handleOpenNewProjectDialog: handleOpenNewProjectDialogBound,
+    handleOpenProjectMediaDialog: handleOpenProjectMediaDialogBound,
+    handleOpenProjectSettingsDialog: handleOpenProjectSettingsDialogBound,
+    handleOpenProjectStylingWindow: handleOpenProjectStylingWindowBound,
+    handleOpenQuickAddDocumentDialog: handleOpenQuickAddDocumentDialogBound,
+    handleOpenQuickSearchDocumentDialog: handleOpenQuickSearchDocumentDialogBound,
+    handleOpenTipsTricksTriviaDialog: handleOpenTipsTricksTriviaDialogBound
   }
 }

@@ -1,4 +1,5 @@
 import type { I_faFloatingWindowPersistedRect } from 'app/types/I_faFloatingWindowPersistedRect'
+import type { I_faProjectContentEpochPersistGuards } from 'app/types/I_faProjectContentEpochPersistGuards'
 import type { I_faProjectStylingStylingWindowStore } from 'app/types/I_faStylingWindowStoreFacade'
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type {
@@ -16,6 +17,8 @@ export function createGetFaProjectStylingStore (deps: {
 
 export function createWindowProjectStylingFramePersist (deps: {
   getFaProjectStylingStore: () => I_faProjectStylingStylingWindowStore
+  isProjectReplacementInFlight: () => boolean
+  readProjectContentEpoch: () => number
   useFaFloatingWindowFramePersist: (opts: {
     debounceMs?: number
     failureActionId: T_faActionId
@@ -25,7 +28,7 @@ export function createWindowProjectStylingFramePersist (deps: {
     windowModel: Ref<boolean>
     x: Ref<number>
     y: Ref<number>
-  }) => void
+  } & I_faProjectContentEpochPersistGuards) => void
 }): (opts: {
     h: Ref<number>
     windowModel: Ref<boolean>
@@ -45,6 +48,7 @@ export function createWindowProjectStylingFramePersist (deps: {
     deps.useFaFloatingWindowFramePersist({
       failureActionId: 'reportProjectStylingSaveFailure',
       h: opts.h,
+      isProjectReplacementInFlight: deps.isProjectReplacementInFlight,
       persistFrame: async () => {
         await styling.persistProjectStylingPartialSilent({
           frame: {
@@ -55,6 +59,7 @@ export function createWindowProjectStylingFramePersist (deps: {
           }
         })
       },
+      readProjectContentEpoch: deps.readProjectContentEpoch,
       w: opts.w,
       windowModel: opts.windowModel,
       x: opts.x,

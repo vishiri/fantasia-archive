@@ -182,10 +182,15 @@ test('Test that setFaProjectDocumentTags creates tags and query helpers list mem
     result.items.map((item) => item.id).sort()
   )
 
+  db.prepare('UPDATE document_templates SET icon = ? WHERE id = ?').run(
+    'mdi-account',
+    seeded.templateId
+  )
   const underTag = listFaProjectDocumentsUnderTag(db, result.items[0]!.id)
   expect(underTag.items).toHaveLength(1)
   expect(underTag.items[0]?.documentId).toBe(seeded.documentId)
   expect(underTag.items[0]?.displayName).toBe('Hero')
+  expect(underTag.items[0]?.templateIcon).toBe('mdi-account')
   expect(getFaProjectTagById(db, result.items[0]!.id).name).toBe('Heroes')
 })
 
@@ -331,6 +336,13 @@ test('Test that reorderFaProjectDocumentsUnderTag updates sort_order and validat
   expect(() =>
     reorderFaProjectDocumentsUnderTag(db!, tagId, [seeded.documentId, 'missing-doc'])
   ).toThrow(/not under this tag/)
+  expect(() =>
+    reorderFaProjectDocumentsUnderTag(db!, tagId, [seeded.documentId, seeded.documentId])
+  ).toThrow(/must match current membership/)
+  expect(listFaProjectDocumentsUnderTag(db!, tagId).items.map((item) => item.documentId)).toEqual([
+    second.id,
+    seeded.documentId
+  ])
 })
 
 /**
@@ -441,6 +453,95 @@ test('Test that renameFaProjectTag renames in place or merges case-insensitive c
   expect(listFaProjectDocumentsUnderTag(db, heroesId).items).toHaveLength(2)
 
   expect(() => renameFaProjectTag(db!, heroesId, '  ')).toThrow(/must not be empty/)
+})
+
+/**
+ * renameFaProjectTag
+ * Tied source membership sort stays in document id order after merge.
+ */
+test('Test that renameFaProjectTag merge keeps tied source rows in document id order', () => {
+  db = openTagsTestDb()
+  const seeded = seedWorldDoc(db, 'Realm', 'Keeper')
+  const laterId = createFaProjectDocument(db, {
+    id: 'doc-zzz',
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Later',
+    sortOrder: 1
+  }).id
+  const earlierId = createFaProjectDocument(db, {
+    id: 'doc-aaa',
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Earlier',
+    sortOrder: 2
+  }).id
+  const sourceTags = setFaProjectDocumentTags(db, laterId, [{
+    id: 'source',
+    name: 'Source',
+    isNew: true
+  }])
+  const sourceId = sourceTags.items[0]!.id
+  setFaProjectDocumentTags(db, earlierId, [{
+    id: sourceId,
+    name: 'Source'
+  }])
+  db.prepare('UPDATE document_tags SET sort_order = 0 WHERE tag_id = ?').run(sourceId)
+  const targetTags = setFaProjectDocumentTags(db, seeded.documentId, [{
+    id: 'target',
+    name: 'Target',
+    isNew: true
+  }])
+  const targetId = targetTags.items[0]!.id
+  renameFaProjectTag(db, sourceId, 'target')
+  expect(listFaProjectDocumentsUnderTag(db, targetId).items.map((item) => item.documentId)).toEqual([
+    seeded.documentId,
+    earlierId,
+    laterId
+  ])
+})
+
+/**
+ * listFaProjectDocumentsUnderTag
+ * Equal tag sort and name stay in document creation order, then id.
+ */
+test('Test that listFaProjectDocumentsUnderTag orders equal sort and name by created time', () => {
+  db = openTagsTestDb()
+  const seeded = seedWorldDoc(db, 'Realm', 'Keeper')
+  const laterId = createFaProjectDocument(db, {
+    id: 'doc-aaa',
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Same',
+    sortOrder: 1
+  }).id
+  const earlierId = createFaProjectDocument(db, {
+    id: 'doc-zzz',
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Same',
+    sortOrder: 2
+  }).id
+  const tags = setFaProjectDocumentTags(db, laterId, [{
+    id: 'shared',
+    name: 'Shared',
+    isNew: true
+  }])
+  const tagId = tags.items[0]!.id
+  setFaProjectDocumentTags(db, earlierId, [{
+    id: tagId,
+    name: 'Shared'
+  }])
+  db.prepare('UPDATE document_tags SET sort_order = 0 WHERE tag_id = ?').run(tagId)
+  db.prepare('UPDATE documents SET created_at_ms = ? WHERE id = ?').run(2000, laterId)
+  db.prepare('UPDATE documents SET created_at_ms = ? WHERE id = ?').run(1000, earlierId)
+  const items = listFaProjectDocumentsUnderTag(db, tagId).items
+  expect(items.map((item) => item.documentId)).toEqual([earlierId, laterId])
+  expect(items.map((item) => item.createdAtMs)).toEqual([1000, 2000])
 })
 
 /**

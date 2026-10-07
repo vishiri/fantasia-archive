@@ -13,7 +13,11 @@ type T_mainLayoutNoteboardHydrateDeps = {
     setWindowOpen: (open: boolean) => void
     text: string
   }) => void
-  S_FaActiveProject: () => { hasActiveProject: boolean }
+  S_FaActiveProject: () => {
+    hasActiveProject: boolean
+    isProjectReplacementInFlight: () => boolean
+    readProjectContentEpoch: () => number
+  }
   S_FaAppNoteboard: () => T_faNoteboardAutoOpenWindowStore & {
     refreshNoteboard: () => Promise<boolean>
   }
@@ -69,8 +73,16 @@ export async function hydrateMainLayoutProjectSurfacesWithAutoOpen (
   await deps.S_FaRecentProjects().refreshRecentProjects()
   await deps.hydrateFromBridgeOrReport(async () => {
     const projectNoteboardStore = deps.S_FaProjectNoteboard()
+    const activeProject = deps.S_FaActiveProject()
+    const epochAtStart = activeProject.readProjectContentEpoch()
     const projectHydrated = await projectNoteboardStore.refreshProjectNoteboard()
-    if (!projectHydrated || !deps.S_FaActiveProject().hasActiveProject) {
+    if (!projectHydrated || !activeProject.hasActiveProject) {
+      return
+    }
+    if (activeProject.isProjectReplacementInFlight()) {
+      return
+    }
+    if (activeProject.readProjectContentEpoch() !== epochAtStart) {
       return
     }
     deps.maybeAutoOpenFilledNoteboard({

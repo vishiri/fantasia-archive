@@ -5,6 +5,7 @@ export default {
   saveErrorEmptyDraft: 'Document name cannot be empty.',
   saveErrorMissingTab: 'Document is no longer open.',
   saveSuccess: 'Document successfully saved.',
+  deleteError: 'Could not delete the document.',
   deleteSuccess: 'Document successfully deleted.',
   unnamedDocumentFallback: 'Unnamed - {templateSingular}'
 }

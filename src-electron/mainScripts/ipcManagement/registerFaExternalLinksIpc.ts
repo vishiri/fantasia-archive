@@ -1,4 +1,5 @@
 import { ipcMain, shell } from 'electron'
+import { ResultAsync } from 'neverthrow'
 
 import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { assertMainWindowSender } from 'app/src-electron/mainScripts/ipcManagement/assertMainWindowSenderWiring'
@@ -32,10 +33,12 @@ export function registerFaExternalLinksIpc (): void {
         return
       }
 
-      try {
-        await shell.openExternal(url)
-      } catch (error: unknown) {
-        console.error('[faExternalLinks] openExternal failed', error)
+      const opened = await ResultAsync.fromPromise(
+        shell.openExternal(url),
+        (error: unknown) => error
+      )
+      if (opened.isErr()) {
+        console.error('[faExternalLinks] openExternal failed', opened.error)
       }
     }
   )

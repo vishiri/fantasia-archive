@@ -57,10 +57,12 @@ function readPersistedFrame (db: Database): I_faProjectNoteboardRoot['frame'] {
  */
 export function readFaProjectNoteboardRoot (db: Database): I_faProjectNoteboardRoot {
   const textRaw = readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.content)
+  const frame = readPersistedFrame(db)
+  const text = textRaw === undefined ? '' : textRaw
   return {
-    frame: readPersistedFrame(db),
+    frame,
     schemaVersion: 1,
-    text: textRaw === undefined ? '' : textRaw
+    text
   }
 }
 

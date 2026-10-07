@@ -21,6 +21,9 @@ test('Test that coerceFaProjectWorldColorPaletteForStorage returns empty for bla
  */
 test('Test that coerceFaProjectWorldColorPaletteForStorage normalizes valid palette segments', () => {
   expect(coerceFaProjectWorldColorPaletteForStorage('#aabbcc;#112233', 2000)).toBe('#AABBCC;#112233')
+  expect(coerceFaProjectWorldColorPaletteForStorage('#abc', 2000)).toBe('#AABBCC')
+  expect(coerceFaProjectWorldColorPaletteForStorage('#112233;#abc', 2000)).toBe('#112233;#AABBCC')
+  expect(coerceFaProjectWorldColorPaletteForStorage('#aabbcc;#abc', 2000)).toBe('#AABBCC')
 })
 
 /**

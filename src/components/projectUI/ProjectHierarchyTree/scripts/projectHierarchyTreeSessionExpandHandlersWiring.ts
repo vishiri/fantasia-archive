@@ -186,14 +186,25 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
     onNodeOpenIconPointerDown: expandOpenHandlersWiring.onNodeOpenIconPointerDown
   })
 
+  const {
+    onNodeOpen,
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown
+  } = expandOpenHandlersWiring
+  const {
+    onNonWorldOpenIconClick,
+    onNonWorldOpenIconPointerDown,
+    onWorldNodeRowClick,
+    onWorldNodeRowPointerDown
+  } = expandRowClickRouting
   return {
     onNodeClose,
-    onNodeOpen: expandOpenHandlersWiring.onNodeOpen,
-    onNodeOpenIconClick: expandOpenHandlersWiring.onNodeOpenIconClick,
-    onNodeOpenIconPointerDown: expandOpenHandlersWiring.onNodeOpenIconPointerDown,
-    onNonWorldOpenIconClick: expandRowClickRouting.onNonWorldOpenIconClick,
-    onNonWorldOpenIconPointerDown: expandRowClickRouting.onNonWorldOpenIconPointerDown,
-    onWorldNodeRowClick: expandRowClickRouting.onWorldNodeRowClick,
-    onWorldNodeRowPointerDown: expandRowClickRouting.onWorldNodeRowPointerDown
+    onNodeOpen,
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown,
+    onNonWorldOpenIconClick,
+    onNonWorldOpenIconPointerDown,
+    onWorldNodeRowClick,
+    onWorldNodeRowPointerDown
   }
 }

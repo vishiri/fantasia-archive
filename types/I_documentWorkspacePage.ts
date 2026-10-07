@@ -65,7 +65,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
-    onAppendToWorldPalette: (colorPalette: string) => void
+    onAppendToWorldPalette: (colorPalette: string, worldId: string) => void
     textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
@@ -112,6 +112,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
     findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
     hydrationComplete: { value: boolean }
     navigateToWorkspaceHomeRoute: () => Promise<void>
+    readActiveDocumentId: () => string | null
     onMounted: (hook: () => void) => void
     routeParams: {
       documentId?: string | string[]
@@ -191,7 +192,7 @@ export type T_useDocumentWorkspacePageApi = () => {
   extraHtmlClassesFieldReadOnly: I_computedRef<boolean>
   extraHtmlClassesModel: I_computedRef<string>
   workspacePageExtraHtmlClassList: I_computedRef<string[]>
-  onAppendToWorldPalette: (colorPalette: string) => void
+  onAppendToWorldPalette: (colorPalette: string, worldId: string) => void
   onTagsRequestOptions: () => void
   previewDisplayName: I_computedRef<string>
   tagsFieldDescription: I_computedRef<string>

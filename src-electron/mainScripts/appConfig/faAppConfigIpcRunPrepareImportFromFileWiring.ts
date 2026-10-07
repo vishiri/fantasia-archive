@@ -6,6 +6,17 @@ import { tryStageAppImportFromUnzippedEntries } from 'app/src-electron/mainScrip
 import { FA_APP_CONFIG_MAX_FILE_BYTES } from 'app/src-electron/shared/faAppConfigConstants'
 import type { I_faAppConfigPrepareResult } from 'app/types/I_faAppConfigDomain'
 
+function faAppConfigPrepareErrorResult (err: Error): I_faAppConfigPrepareResult {
+  const errorMessage = err.message
+  const errorName = err.name
+  const outcome = 'error' as const
+  return {
+    errorMessage,
+    errorName,
+    outcome
+  }
+}
+
 /**
  * Reads a .faconfig from disk, validates, and stages a session for a later apply.
  */
@@ -23,11 +34,7 @@ export async function runPrepareImportFromFaconfigFilePath (
       err,
       filePath
     })
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+    return faAppConfigPrepareErrorResult(err)
   }
 
   const fstat = statResult.value
@@ -51,11 +58,7 @@ export async function runPrepareImportFromFaconfigFilePath (
       err,
       filePath
     })
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+    return faAppConfigPrepareErrorResult(err)
   }
 
   const buf = readResult.value
@@ -77,11 +80,7 @@ export async function runPrepareImportFromFaconfigFilePath (
     const e = unzippedResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faAppConfig] unzip failed', err)
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+    return faAppConfigPrepareErrorResult(err)
   }
 
   const unzipped = unzippedResult.value

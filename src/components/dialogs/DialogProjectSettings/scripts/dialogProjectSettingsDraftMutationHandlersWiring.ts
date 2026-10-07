@@ -103,17 +103,25 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     })
   }
 
+  const {
+    addWorld,
+    removeWorld,
+    updateWorldColor,
+    updateWorldColorPalette,
+    updateWorldDisplayNameTranslations,
+    updateWorldTemplateLayout
+  } = worldHandlers
   return {
     addDocumentTemplate,
-    addWorld: worldHandlers.addWorld,
+    addWorld,
     removeDocumentTemplate,
-    removeWorld: worldHandlers.removeWorld,
+    removeWorld,
     updateDocumentTemplateIcon,
     updateDocumentTemplateTitleTranslations,
     updateDocumentTemplateWorldAppendixTranslations,
-    updateWorldColor: worldHandlers.updateWorldColor,
-    updateWorldColorPalette: worldHandlers.updateWorldColorPalette,
-    updateWorldDisplayNameTranslations: worldHandlers.updateWorldDisplayNameTranslations,
-    updateWorldTemplateLayout: worldHandlers.updateWorldTemplateLayout
+    updateWorldColor,
+    updateWorldColorPalette,
+    updateWorldDisplayNameTranslations,
+    updateWorldTemplateLayout
   }
 }

@@ -33,14 +33,16 @@ export async function setFaProjectDocumentTagsForRenderer (
       [input.documentId]: items
     }
     overrides.documentTagsByDocumentId = nextDocumentTags
+    const copiedItems = [...items]
     return {
-      items: [...items]
+      items: copiedItems
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.setDocumentTags !== 'function') {
+    const emptyItems: I_faProjectSetDocumentTagsResult['items'] = []
     return {
-      items: []
+      items: emptyItems
     }
   }
   return await api.setDocumentTags(input)
@@ -97,17 +99,21 @@ export async function renameFaProjectTagForRenderer (
           if (ref.id !== input.tagId) {
             return ref
           }
+          const id = clash.id
+          const name = clash.name
           return {
-            id: clash.id,
-            name: clash.name
+            id,
+            name
           }
         })
       }
       overridesRecord.documentTagsByDocumentId = docTagsMap
+      const mergedFromTagId = input.tagId
+      const tag = clash
       return {
         merged: true,
-        mergedFromTagId: input.tagId,
-        tag: clash
+        mergedFromTagId,
+        tag
       }
     }
     const renamed: I_faProjectTag = {
@@ -168,9 +174,10 @@ export async function deleteFaProjectTagForRenderer (
     overridesRecord.documentTagsByDocumentId = docTagsMap
     if (overridesRecord.workspaceHierarchyLayoutWorlds !== undefined) {
       overridesRecord.workspaceHierarchyLayoutWorlds = overridesRecord.workspaceHierarchyLayoutWorlds.map((world) => {
+        const tags = (world.tags ?? []).filter((tag) => tag.id !== input.tagId)
         return {
           ...world,
-          tags: (world.tags ?? []).filter((tag) => tag.id !== input.tagId)
+          tags
         }
       })
     }

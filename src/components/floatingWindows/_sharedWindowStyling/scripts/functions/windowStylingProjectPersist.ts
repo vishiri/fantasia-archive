@@ -29,30 +29,99 @@ export function createClearProjectStylingLivePreviewAndRefreshFromKv (deps: {
   }
 }
 
-export function createWindowProjectStylingCssPersist (deps: {
+type T_windowProjectStylingCssPersistDeps = {
+  ResultAsync: {
+    fromPromise: <T, E>(
+      promise: Promise<T>,
+      onError: (error: unknown) => E
+    ) => {
+      match: <A>(ok: (value: T) => A, err: (error: E) => A) => A | Promise<A>
+    }
+  }
   createDebounced: <T extends (...args: never[]) => void>(
     fn: T,
     waitMs: number
-  ) => T & { flush: () => void }
+  ) => T & { cancel: () => void, flush: () => void }
   getFaProjectStylingStore: () => I_faProjectStylingStylingWindowStore
+  isProjectReplacementInFlight?: () => boolean
+  readProjectContentEpoch?: () => number
+  registerBeforeProjectReplacement: (flush: () => Promise<void>) => void
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   watch: T_vueWatch
-}): (opts: { css: Ref<string>; windowModel: Ref<boolean> }) => void {
+}
+
+function projectStylingCssScheduledPersistSkipped (input: {
+  cssEpochAtSchedule: number | undefined
+  ignoreReplacementFlight: boolean
+  isProjectReplacementInFlight: (() => boolean) | undefined
+  readProjectContentEpoch: (() => number) | undefined
+}): boolean {
+  if (!input.ignoreReplacementFlight && input.isProjectReplacementInFlight?.() === true) {
+    return true
+  }
+  if (
+    input.ignoreReplacementFlight ||
+    input.cssEpochAtSchedule === undefined ||
+    input.readProjectContentEpoch === undefined
+  ) {
+    return false
+  }
+  return input.readProjectContentEpoch() !== input.cssEpochAtSchedule
+}
+
+export function createWindowProjectStylingCssPersist (
+  deps: T_windowProjectStylingCssPersistDeps
+): (opts: { css: Ref<string>; windowModel: Ref<boolean> }) => void {
   return function useWindowProjectStylingCssPersist (opts: {
     css: Ref<string>
     windowModel: Ref<boolean>
   }): void {
     const styling = deps.getFaProjectStylingStore()
+    let cssPersistInFlight: Promise<void> | null = null
+    let cssEpochAtSchedule: number | undefined
 
-    async function persistCssNow (): Promise<void> {
+    async function runPersistCss (): Promise<void> {
+      const saved = await deps.ResultAsync.fromPromise(
+        styling.persistProjectStylingPartialSilent({ css: opts.css.value }),
+        (error: unknown) => error
+      )
+      const message = await saved.match(
+        () => null,
+        (error) => error instanceof Error ? error.message : String(error)
+      )
+      if (message !== null) {
+        void deps.runFaAction('reportProjectStylingSaveFailure', { message })
+      }
+    }
+
+    async function persistCssNow (options?: {
+      ignoreReplacementFlight?: boolean
+    }): Promise<void> {
+      const pendingPersist = cssPersistInFlight
+      if (pendingPersist !== null) {
+        await pendingPersist
+      }
       if (!opts.windowModel.value) {
         return
       }
+      const ignoreReplacementFlight = options?.ignoreReplacementFlight === true
+      const cssPersistSkipped = projectStylingCssScheduledPersistSkipped({
+        cssEpochAtSchedule,
+        ignoreReplacementFlight,
+        isProjectReplacementInFlight: deps.isProjectReplacementInFlight,
+        readProjectContentEpoch: deps.readProjectContentEpoch
+      })
+      if (cssPersistSkipped) {
+        return
+      }
+      const write = runPersistCss()
+      cssPersistInFlight = write
       try {
-        await styling.persistProjectStylingPartialSilent({ css: opts.css.value })
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        void deps.runFaAction('reportProjectStylingSaveFailure', { message })
+        await write
+      } finally {
+        if (cssPersistInFlight === write) {
+          cssPersistInFlight = null
+        }
       }
     }
 
@@ -60,13 +129,28 @@ export function createWindowProjectStylingCssPersist (deps: {
       void persistCssNow()
     }, 380)
 
+    function scheduleCssPersist (): void {
+      const readEpoch = deps.readProjectContentEpoch
+      if (readEpoch !== undefined) {
+        cssEpochAtSchedule = readEpoch()
+      }
+      schedulePersist()
+    }
+
+    deps.registerBeforeProjectReplacement(async () => {
+      schedulePersist.cancel()
+      await persistCssNow({
+        ignoreReplacementFlight: true
+      })
+    })
+
     deps.watch(
       opts.css,
       () => {
         if (!opts.windowModel.value) {
           return
         }
-        schedulePersist()
+        scheduleCssPersist()
       }
     )
 

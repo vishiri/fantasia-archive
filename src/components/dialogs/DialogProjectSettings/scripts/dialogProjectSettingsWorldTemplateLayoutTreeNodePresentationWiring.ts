@@ -39,6 +39,58 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring = {
   showPlacementNicknameHoverTooltip: ComputedRef<boolean>
 }
 
+function assembleDialogProjectSettingsWorldTemplateLayoutTreeNodePresentation (input: {
+  displayIconName: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['displayIconName']
+  editTooltipText: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['editTooltipText']
+  hoverTooltipWiring: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring>
+  missingTranslationsWarningWiring: ReturnType<
+    typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring
+  >
+  nodeRootClassList: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['nodeRootClassList']
+  nodeTestLocator: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['nodeTestLocator']
+  placementNicknameHoverTooltipOffset: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['placementNicknameHoverTooltipOffset']
+  removeDisabled: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['removeDisabled']
+  removeTooltipText: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['removeTooltipText']
+  rowHasValidationError: T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring['rowHasValidationError']
+}): T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring {
+  const {
+    missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText,
+    showMissingTranslationsWarning
+  } = input.missingTranslationsWarningWiring
+  const {
+    placementNicknameHoverTooltipNicknameLine,
+    placementNicknameHoverTooltipOriginalNameLine,
+    placementNicknameHoverTooltipTestText,
+    showPlacementNicknameHoverTooltip
+  } = input.hoverTooltipWiring
+  const displayIconName = input.displayIconName
+  const editTooltipText = input.editTooltipText
+  const nodeRootClassList = input.nodeRootClassList
+  const nodeTestLocator = input.nodeTestLocator
+  const placementNicknameHoverTooltipOffset = input.placementNicknameHoverTooltipOffset
+  const removeDisabled = input.removeDisabled
+  const removeTooltipText = input.removeTooltipText
+  const rowHasValidationError = input.rowHasValidationError
+  return {
+    displayIconName,
+    editTooltipText,
+    missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText,
+    nodeRootClassList,
+    nodeTestLocator,
+    placementNicknameHoverTooltipNicknameLine,
+    placementNicknameHoverTooltipOffset,
+    placementNicknameHoverTooltipOriginalNameLine,
+    placementNicknameHoverTooltipTestText,
+    removeDisabled,
+    removeTooltipText,
+    rowHasValidationError,
+    showMissingTranslationsWarning,
+    showPlacementNicknameHoverTooltip
+  }
+}
+
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring (deps: {
   computed: typeof import('vue').computed
   i18n: {
@@ -125,21 +177,16 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
     readNode: () => deps.props.node
   })
 
-  return {
+  return assembleDialogProjectSettingsWorldTemplateLayoutTreeNodePresentation({
     displayIconName,
     editTooltipText,
-    missingTranslationsWarningTestLocator: missingTranslationsWarningWiring.missingTranslationsWarningTestLocator,
-    missingTranslationsWarningTooltipText: missingTranslationsWarningWiring.missingTranslationsWarningTooltipText,
+    hoverTooltipWiring,
+    missingTranslationsWarningWiring,
     nodeRootClassList,
     nodeTestLocator,
-    placementNicknameHoverTooltipNicknameLine: hoverTooltipWiring.placementNicknameHoverTooltipNicknameLine,
     placementNicknameHoverTooltipOffset,
-    placementNicknameHoverTooltipOriginalNameLine: hoverTooltipWiring.placementNicknameHoverTooltipOriginalNameLine,
-    placementNicknameHoverTooltipTestText: hoverTooltipWiring.placementNicknameHoverTooltipTestText,
     removeDisabled,
     removeTooltipText,
-    rowHasValidationError,
-    showMissingTranslationsWarning: missingTranslationsWarningWiring.showMissingTranslationsWarning,
-    showPlacementNicknameHoverTooltip: hoverTooltipWiring.showPlacementNicknameHoverTooltip
-  }
+    rowHasValidationError
+  })
 }

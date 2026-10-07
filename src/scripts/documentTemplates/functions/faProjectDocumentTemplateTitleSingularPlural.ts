@@ -7,9 +7,11 @@ export function buildFaProjectDocumentTemplateTitleSingularPluralTranslations (i
   titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
   titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
 }): I_faLocaleSingularPluralTranslations {
+  const plural = input.titlePluralTranslations
+  const singular = input.titleSingularTranslations
   return {
-    plural: input.titlePluralTranslations,
-    singular: input.titleSingularTranslations
+    plural,
+    singular
   }
 }
 
@@ -34,9 +36,11 @@ export function createNormalizeFaProjectDocumentTemplateTitleSingularPluralTrans
       titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
       titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
     } {
+    const titlePluralTranslations = deps.normalizePlural(input.titlePluralTranslations)
+    const titleSingularTranslations = deps.normalizeSingular(input.titleSingularTranslations)
     return {
-      titlePluralTranslations: deps.normalizePlural(input.titlePluralTranslations),
-      titleSingularTranslations: deps.normalizeSingular(input.titleSingularTranslations)
+      titlePluralTranslations,
+      titleSingularTranslations
     }
   }
 }

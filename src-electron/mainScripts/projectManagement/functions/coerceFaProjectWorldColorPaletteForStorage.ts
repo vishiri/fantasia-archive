@@ -1,4 +1,23 @@
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
+const HEX_COLOR_SHORT = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/
+
+/**
+ * Normalizes one palette segment to uppercase #RRGGBB. #RGB expands. Other text returns null.
+ */
+function resolveFaProjectWorldPaletteSegmentHex (part: string): string | null {
+  const trimmed = part.trim()
+  if (HEX_COLOR_SEGMENT.test(trimmed)) {
+    return trimmed.toUpperCase()
+  }
+  const shortMatch = HEX_COLOR_SHORT.exec(trimmed)
+  if (shortMatch === null) {
+    return null
+  }
+  const red = shortMatch[1] ?? ''
+  const green = shortMatch[2] ?? ''
+  const blue = shortMatch[3] ?? ''
+  return `#${red}${red}${green}${green}${blue}${blue}`.toUpperCase()
+}
 
 /**
  * True when the palette contains the same #RRGGBB value more than once (case-insensitive).
@@ -78,10 +97,10 @@ export function coerceFaProjectWorldColorPaletteForStorage (
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const upper = resolveFaProjectWorldPaletteSegmentHex(part)
+    if (upper === null) {
       return ''
     }
-    const upper = part.toUpperCase()
     const key = upper.toLowerCase()
     if (seen.has(key)) {
       continue

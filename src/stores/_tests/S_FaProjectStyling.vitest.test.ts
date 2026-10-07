@@ -29,7 +29,8 @@ const {
 
 vi.mock('quasar', () => {
   return {
-    Notify: { create: notifyCreateMock }
+    Notify: { create: notifyCreateMock },
+    copyToClipboard: vi.fn(async () => undefined)
   }
 })
 
@@ -94,6 +95,31 @@ test('Test that refreshProjectStyling returns false when getProjectStyling is no
   expect(ok).toBe(false)
 })
 
+test('Test that refreshProjectStyling ignores a read from an older project', async () => {
+  let resolveStyling: ((value: I_faProjectStylingRoot) => void) | undefined
+  getProjectStylingMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveStyling = resolve
+    })
+  })
+  const pending = store.refreshProjectStyling()
+  const { S_FaActiveProject } = await import('../S_FaActiveProject')
+  await vi.waitUntil(() => getProjectStylingMock.mock.calls.length === 1)
+  S_FaActiveProject().clearActiveProject()
+  const finishStyling = resolveStyling
+  if (finishStyling === undefined) {
+    throw new Error('missing styling resolver')
+  }
+  finishStyling({
+    css: 'body{color:stale}',
+    frame: null,
+    schemaVersion: 1
+  })
+  await expect(pending).resolves.toBe(false)
+  expect(store.css).toBe('')
+  expect(store.root).toBeNull()
+})
+
 test('Test that refreshProjectStyling mirrors css from the bridge', async () => {
   getProjectStylingMock.mockResolvedValueOnce({
     ...emptyRoot,
@@ -102,6 +128,36 @@ test('Test that refreshProjectStyling mirrors css from the bridge', async () => 
   const ok = await store.refreshProjectStyling()
   expect(ok).toBe(true)
   expect(store.css).toBe('body{color:red}')
+})
+
+test('Test that a refresh started first does not replace a later project styling save', async () => {
+  let releaseFirstGet: ((root: I_faProjectStylingRoot) => void) | undefined
+  const firstGet = new Promise<I_faProjectStylingRoot>((resolve) => {
+    releaseFirstGet = resolve
+  })
+  getProjectStylingMock.mockImplementationOnce(() => firstGet)
+  getProjectStylingMock.mockResolvedValueOnce({
+    ...emptyRoot,
+    css: 'saved'
+  })
+
+  const refreshPromise = store.refreshProjectStyling()
+  await vi.waitUntil(() => getProjectStylingMock.mock.calls.length === 1)
+  const persistPromise = store.persistProjectStylingPartialSilent({ css: 'saved' })
+  const finishFirstGet = releaseFirstGet
+  if (finishFirstGet === undefined) {
+    throw new Error('missing project styling read resolver')
+  }
+  finishFirstGet({
+    ...emptyRoot,
+    css: 'stale'
+  })
+  const refreshed = await refreshPromise
+  await persistPromise
+
+  expect(refreshed).toBe(true)
+  expect(store.css).toBe('saved')
+  expect(setProjectStylingMock).toHaveBeenCalledWith({ css: 'saved' })
 })
 
 test('Test that persistProjectStylingPartialSilent updates root after a successful round trip', async () => {
@@ -140,6 +196,52 @@ test('Test that css-only persist keeps in-memory css when read-back css still em
   expect(store.css).toBe('.draft{display:block}')
   expect(store.root?.css).toBe('.draft{display:block}')
   expect(store.root?.frame).toEqual(framePatch.frame)
+})
+
+test('Test that frame-only persist keeps css typed during the round trip', async () => {
+  store.applyRoot({
+    ...emptyRoot,
+    css: '.draft{display:block}',
+    frame: null
+  })
+  const framePatch = {
+    frame: {
+      height: 400,
+      width: 400,
+      x: 12,
+      y: 48
+    }
+  } as const satisfies I_faProjectStylingPatch
+  getProjectStylingMock.mockImplementationOnce(async () => {
+    store.css = '.typed{color:red}'
+    return {
+      ...emptyRoot,
+      css: '',
+      frame: framePatch.frame
+    }
+  })
+  await store.persistProjectStylingPartialSilent(framePatch)
+  expect(store.css).toBe('.typed{color:red}')
+  expect(store.root?.css).toBe('.typed{color:red}')
+})
+
+test('Test that css persist keeps css typed during the round trip', async () => {
+  store.applyRoot({
+    ...emptyRoot,
+    css: '.saved{color:black}',
+    frame: null
+  })
+  getProjectStylingMock.mockImplementationOnce(async () => {
+    store.css = '.typed{color:red}'
+    return {
+      ...emptyRoot,
+      css: '.saved{color:black}',
+      frame: null
+    }
+  })
+  await store.persistProjectStylingPartialSilent({ css: '.saved{color:black}' })
+  expect(store.css).toBe('.typed{color:red}')
+  expect(store.root?.css).toBe('.typed{color:red}')
 })
 
 test('Test that persistProjectStylingPartialSilent skips read-back when setProjectStyling resolves false', async () => {
@@ -236,7 +338,7 @@ test('Test that savePersistedCssFromEditor returns false when setProjectStyling 
 })
 
 test('Test that savePersistedCssFromEditor applies root, clears live preview, and notifies on success', async () => {
-  store.setCssLivePreview('live')
+  store.setCssLivePreview('ok')
   getProjectStylingMock.mockResolvedValueOnce({
     ...emptyRoot,
     css: 'ok'
@@ -250,6 +352,17 @@ test('Test that savePersistedCssFromEditor applies root, clears live preview, an
     message: 'globalFunctionality.faProjectStyling.saveSuccess',
     type: 'positive'
   })
+})
+
+test('Test that savePersistedCssFromEditor keeps a live preview typed during save', async () => {
+  store.setCssLivePreview('typed during save')
+  getProjectStylingMock.mockResolvedValueOnce({
+    ...emptyRoot,
+    css: 'ok'
+  })
+  const ok = await store.savePersistedCssFromEditor('ok')
+  expect(ok).toBe(true)
+  expect(store.cssLivePreview).toBe('typed during save')
 })
 
 test('Test that savePersistedCssFromEditor throws when persisted css mismatches', async () => {
@@ -287,4 +400,124 @@ test('Test that savePersistedCssFromEditor wraps non-Error from getProjectStylin
   getProjectStylingMock.mockRejectedValueOnce(null)
   vi.spyOn(console, 'error').mockImplementation(() => undefined)
   await expect(store.savePersistedCssFromEditor('x')).rejects.toThrow('null')
+})
+
+test('Test that a project styling save does not write after the project changes', async () => {
+  let releaseRefresh: ((root: I_faProjectStylingRoot) => void) | undefined
+  getProjectStylingMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  const refreshPromise = store.refreshProjectStyling()
+  await vi.waitUntil(() => getProjectStylingMock.mock.calls.length === 1)
+  const savePromise = store.savePersistedCssFromEditor('body{color:old}')
+  await Promise.resolve()
+  await Promise.resolve()
+  const { S_FaActiveProject } = await import('../S_FaActiveProject')
+  const { FaActionUserCanceledError } = await import(
+    'app/src/scripts/actionManager/functions/faActionUserCanceledError'
+  )
+  S_FaActiveProject().clearActiveProject()
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing styling refresh resolver')
+  }
+  finishRefresh({
+    ...emptyRoot,
+    css: 'fresh'
+  })
+  await expect(savePromise).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  await expect(refreshPromise).resolves.toBe(false)
+  expect(setProjectStylingMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+  expect(store.css).toBe('')
+})
+
+test('Test that a project styling save does not write while a project open is in flight', async () => {
+  let releaseRefresh: ((root: I_faProjectStylingRoot) => void) | undefined
+  getProjectStylingMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  const refreshPromise = store.refreshProjectStyling()
+  await vi.waitUntil(() => getProjectStylingMock.mock.calls.length === 1)
+  const savePromise = store.savePersistedCssFromEditor('body{color:old}')
+  await Promise.resolve()
+  await Promise.resolve()
+  const { S_FaActiveProject } = await import('../S_FaActiveProject')
+  const { FaActionUserCanceledError } = await import(
+    'app/src/scripts/actionManager/functions/faActionUserCanceledError'
+  )
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing styling refresh resolver')
+  }
+  finishRefresh({
+    ...emptyRoot,
+    css: 'fresh'
+  })
+  await expect(savePromise).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  await expect(refreshPromise).resolves.toBe(true)
+  expect(setProjectStylingMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
+test('Test that a silent project styling persist does not write after the project changes', async () => {
+  let releaseRefresh: ((root: I_faProjectStylingRoot) => void) | undefined
+  getProjectStylingMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  const refreshPromise = store.refreshProjectStyling()
+  await vi.waitUntil(() => getProjectStylingMock.mock.calls.length === 1)
+  const persistPromise = store.persistProjectStylingPartialSilent({ css: 'old' })
+  await Promise.resolve()
+  await Promise.resolve()
+  const { S_FaActiveProject } = await import('../S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing styling refresh resolver')
+  }
+  finishRefresh({
+    ...emptyRoot,
+    css: 'fresh'
+  })
+  await expect(persistPromise).resolves.toBeUndefined()
+  await expect(refreshPromise).resolves.toBe(false)
+  expect(setProjectStylingMock).not.toHaveBeenCalled()
+  expect(store.css).toBe('')
+})
+
+test('Test that savePersistedCssFromEditor skips read-back when the project changes during the write', async () => {
+  let releaseWrite: ((saved: boolean) => void) | undefined
+  setProjectStylingMock.mockImplementationOnce(() => {
+    return new Promise<boolean>((resolve) => {
+      releaseWrite = resolve
+    })
+  })
+  store.applyRoot({
+    ...emptyRoot,
+    css: 'kept'
+  })
+  const pending = store.savePersistedCssFromEditor('body{color:old}')
+  await vi.waitUntil(() => setProjectStylingMock.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('../S_FaActiveProject')
+  const { FaActionUserCanceledError } = await import(
+    'app/src/scripts/actionManager/functions/faActionUserCanceledError'
+  )
+  S_FaActiveProject().clearActiveProject()
+  const finishWrite = releaseWrite
+  if (finishWrite === undefined) {
+    throw new Error('missing styling write resolver')
+  }
+  finishWrite(true)
+  await expect(pending).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(getProjectStylingMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+  expect(store.css).toBe('kept')
 })

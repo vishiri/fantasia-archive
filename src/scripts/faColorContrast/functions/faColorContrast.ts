@@ -29,10 +29,13 @@ export function parseFaColorContrastHexToRgb (hexColor: string): I_faColorContra
   if (Number.isNaN(value)) {
     return null
   }
+  const blue = value & 255
+  const green = (value >> 8) & 255
+  const red = (value >> 16) & 255
   return {
-    b: value & 255,
-    g: (value >> 8) & 255,
-    r: (value >> 16) & 255
+    b: blue,
+    g: green,
+    r: red
   }
 }
 

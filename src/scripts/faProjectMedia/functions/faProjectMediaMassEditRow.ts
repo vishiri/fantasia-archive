@@ -50,14 +50,6 @@ function pathAfterHost (href: string): string {
   return afterScheme.slice(firstSlash + 1)
 }
 
-function decodePathSegment (segment: string): string {
-  try {
-    return decodeURIComponent(segment)
-  } catch {
-    return segment
-  }
-}
-
 function stripLastSuffix (segment: string): string {
   const lastDot = segment.lastIndexOf('.')
   if (lastDot <= 0) {
@@ -69,7 +61,10 @@ function stripLastSuffix (segment: string): string {
 /**
  * Last URL path segment after query/hash; last suffix dropped; no segment → empty.
  */
-export function resolveFaProjectMediaDisplayNameFromUrl (rawUrl: string): string {
+export function resolveFaProjectMediaDisplayNameFromUrl (
+  rawUrl: string,
+  decodeSegment: (segment: string) => string
+): string {
   const noHash = rawUrl.split('#')[0] ?? rawUrl
   const noQuery = noHash.split('?')[0] ?? noHash
   const path = pathAfterHost(noQuery)
@@ -82,16 +77,17 @@ export function resolveFaProjectMediaDisplayNameFromUrl (rawUrl: string): string
   if (segment.length === 0) {
     return emptyDisplayName
   }
-  const decoded = decodePathSegment(segment)
+  const decoded = decodeSegment(segment)
   return stripLastSuffix(decoded)
 }
 
 export function createFaProjectMediaMassEditRowFromOnlineUrl (deps: {
   createId: () => string
+  decodeSegment: (segment: string) => string
   url: string
 }): I_faProjectMediaMassEditRow {
   const id = deps.createId()
-  const displayName = resolveFaProjectMediaDisplayNameFromUrl(deps.url)
+  const displayName = resolveFaProjectMediaDisplayNameFromUrl(deps.url, deps.decodeSegment)
   const type = mediaTypeExternal
   const internalType = internalTypeLinkedOutside
   const externalType = externalTypeLinked
@@ -117,6 +113,7 @@ export function createFaProjectMediaMassEditRowFromOnlineUrl (deps: {
 
 export function createFaProjectMediaMassEditRowsFromOnlineUrlsDraft (deps: {
   createId: () => string
+  decodeSegment: (segment: string) => string
   draft: string
 }): I_faProjectMediaMassEditRow[] {
   const urls = splitFaProjectMediaOnlineUrlDraftLines(deps.draft)
@@ -124,6 +121,7 @@ export function createFaProjectMediaMassEditRowsFromOnlineUrlsDraft (deps: {
   for (const url of urls) {
     rows.push(createFaProjectMediaMassEditRowFromOnlineUrl({
       createId: deps.createId,
+      decodeSegment: deps.decodeSegment,
       url
     }))
   }

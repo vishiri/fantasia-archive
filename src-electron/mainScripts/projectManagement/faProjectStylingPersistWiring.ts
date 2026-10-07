@@ -57,10 +57,13 @@ function readPersistedFrame (db: Database): I_faProjectStylingRoot['frame'] {
  */
 export function readFaProjectStylingRoot (db: Database): I_faProjectStylingRoot {
   const cssRaw = readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.content)
+  const css = cssRaw === undefined ? '' : cssRaw
+  const frame = readPersistedFrame(db)
+  const schemaVersion = 1
   return {
-    css: cssRaw === undefined ? '' : cssRaw,
-    frame: readPersistedFrame(db),
-    schemaVersion: 1
+    css,
+    frame,
+    schemaVersion
   }
 }
 

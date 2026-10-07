@@ -49,9 +49,10 @@ export function resolveProjectHierarchyTreeDocumentAppearanceChrome (
   if (baseChrome === undefined && statusLabelColor === undefined) {
     return undefined
   }
+  const color = baseChrome?.color ?? statusLabelColor
   return {
     ...baseChrome,
-    color: baseChrome?.color ?? statusLabelColor
+    color
   }
 }
 

@@ -1,4 +1,5 @@
 import { app, net, protocol } from 'electron'
+import { Result, ResultAsync } from 'neverthrow'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -40,6 +41,28 @@ export function isFaAppProtocolPathWithinRendererRoot (
 
 let registeredAsPrivileged = false
 let handlerInstalled = false
+
+function decodeFaAppProtocolRequestUrl (rawUrl: string): URL | null {
+  const parsed = Result.fromThrowable(
+    () => new URL(rawUrl),
+    (error): unknown => error
+  )()
+  if (parsed.isErr()) {
+    return null
+  }
+  return parsed.value
+}
+
+function decodeFaAppProtocolPathname (pathname: string): string | null {
+  const decoded = Result.fromThrowable(
+    () => decodeURIComponent(pathname),
+    (error): unknown => error
+  )()
+  if (decoded.isErr()) {
+    return null
+  }
+  return decoded.value
+}
 
 /**
  * Resolves the on-disk renderer root the privileged protocol should serve. After Quasar bundles
@@ -88,13 +111,19 @@ export function installFaAppProtocolHandler (): void {
   const rendererRoot = path.resolve(resolveRendererRoot())
 
   protocol.handle(FA_APP_PROTOCOL_SCHEME, (request) => {
-    const url = new URL(request.url)
+    const url = decodeFaAppProtocolRequestUrl(request.url)
+    if (url === null) {
+      return new Response('Bad Request', { status: 400 })
+    }
 
     if (url.host !== FA_APP_PROTOCOL_HOST) {
       return new Response('Forbidden', { status: 403 })
     }
 
-    const rawPath = decodeURIComponent(url.pathname)
+    const rawPath = decodeFaAppProtocolPathname(url.pathname)
+    if (rawPath === null) {
+      return new Response('Bad Request', { status: 400 })
+    }
     // Strip leading slashes so 'path.join' resolves relative to 'rendererRoot' instead of escaping it.
     const normalized = rawPath.replace(/^\/+/, '')
     const resolved = path.resolve(rendererRoot, normalized || 'index.html')
@@ -113,9 +142,15 @@ export function installFaAppProtocolHandler (): void {
  */
 export function setupFaAppProtocol (): void {
   registerFaAppProtocolAsPrivileged()
-  app.whenReady().then(() => {
-    installFaAppProtocolHandler()
-  }).catch((error: unknown) => {
-    console.error('[faAppProtocol] failed to install app:// handler', error)
-  })
+  void ResultAsync.fromPromise(
+    app.whenReady().then(() => {
+      installFaAppProtocolHandler()
+    }),
+    (error): unknown => error
+  ).match(
+    () => undefined,
+    (error) => {
+      console.error('[faAppProtocol] failed to install app:// handler', error)
+    }
+  )
 }

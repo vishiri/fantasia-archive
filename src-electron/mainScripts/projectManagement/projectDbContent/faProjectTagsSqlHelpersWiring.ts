@@ -12,12 +12,17 @@ export const FA_PROJECT_TAG_ENTITY_LABEL = 'Tag'
 export const FA_PROJECT_TAG_DOCUMENT_ENTITY_LABEL = 'Document'
 
 export function mapFaProjectTagRow (row: I_faSqlTagRow): I_faProjectTag {
+  const id = row.id
+  const worldId = row.world_id
+  const name = row.name
+  const createdAtMs = row.created_at_ms
+  const updatedAtMs = row.updated_at_ms
   return {
-    id: row.id,
-    worldId: row.world_id,
-    name: row.name,
-    createdAtMs: row.created_at_ms,
-    updatedAtMs: row.updated_at_ms
+    id,
+    worldId,
+    name,
+    createdAtMs,
+    updatedAtMs
   }
 }
 

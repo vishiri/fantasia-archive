@@ -188,21 +188,51 @@ export function mapFaProjectHierarchyDocumentToTreeChild (
   document: I_faProjectDocument,
   hasChildren: boolean
 ): I_faProjectHierarchyTreeDocumentChild {
+  const {
+    documentBackgroundColor,
+    documentTextColor,
+    displayName,
+    id,
+    isCategory,
+    isDead,
+    isFinished,
+    isMinor,
+    parentDocumentId,
+    sortOrder,
+    treeOrderNumber
+  } = document
+  const placementId = document.placementId ?? ''
   return {
-    documentBackgroundColor: document.documentBackgroundColor,
-    documentTextColor: document.documentTextColor,
-    displayName: document.displayName,
+    documentBackgroundColor,
+    documentTextColor,
+    displayName,
     hasChildren,
-    id: document.id,
-    isCategory: document.isCategory,
-    isDead: document.isDead,
-    isFinished: document.isFinished,
-    isMinor: document.isMinor,
-    parentDocumentId: document.parentDocumentId,
-    placementId: document.placementId ?? '',
-    sortOrder: document.sortOrder,
-    treeOrderNumber: document.treeOrderNumber
+    id,
+    isCategory,
+    isDead,
+    isFinished,
+    isMinor,
+    parentDocumentId,
+    placementId,
+    sortOrder,
+    treeOrderNumber
   }
+}
+
+function indexDocumentHasSamePlacementChild (
+  index: ReturnType<typeof createFaProjectHierarchyDocumentIndex>,
+  document: I_faProjectDocument
+): boolean {
+  for (const child of index.byId.values()) {
+    if (child.parentDocumentId !== document.id) {
+      continue
+    }
+    if (child.placementId !== document.placementId) {
+      continue
+    }
+    return true
+  }
+  return false
 }
 
 function listDocumentsInBucket (
@@ -234,7 +264,7 @@ export function listFaProjectHierarchyDocumentIndexPlacementChildren (
   const parentDocumentId = input.parentDocumentId ?? null
   const documents = listDocumentsInBucket(index, input.placementId, parentDocumentId)
   return documents.map((document) => {
-    const childCount = index.childCountByParentId.get(document.id) ?? 0
-    return mapFaProjectHierarchyDocumentToTreeChild(document, childCount > 0)
+    const hasChildren = indexDocumentHasSamePlacementChild(index, document)
+    return mapFaProjectHierarchyDocumentToTreeChild(document, hasChildren)
   })
 }

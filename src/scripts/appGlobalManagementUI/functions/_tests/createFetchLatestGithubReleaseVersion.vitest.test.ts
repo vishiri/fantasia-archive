@@ -4,6 +4,12 @@ import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 
 import { createFetchLatestGithubReleaseVersion } from '../createFetchLatestGithubReleaseVersion'
 
+const releaseErrorMessages = {
+  emptyAfterStrip: () => 'GitHub latest release tag_name was empty after strip.',
+  missingTagName: () => 'GitHub latest release missing tag_name.',
+  responseNotObject: () => 'GitHub latest release response was not an object.'
+}
+
 const ResultAsyncStub = {
   fromPromise: <T>(promise: Promise<T>, mapError: (cause: unknown) => Error) => {
     return promise.then(
@@ -34,6 +40,7 @@ test('Test that createFetchLatestGithubReleaseVersion strips tag_name from JSON'
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson: async () => ({ tag_name: 'v2.5.0' }),
     latestApiUrl: 'https://example.test/latest',
+    releaseErrorMessages,
     stripFaSemverVersion: (raw) => raw.replace(/^v/i, '')
   })
 
@@ -50,6 +57,7 @@ test('Test that createFetchLatestGithubReleaseVersion errors without tag_name', 
   const api = createFetchLatestGithubReleaseVersion({
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson: async () => ({}),
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: (raw) => raw
   })
@@ -66,6 +74,7 @@ test('Test that createFetchLatestGithubReleaseVersion errors on non-string tag_n
   const api = createFetchLatestGithubReleaseVersion({
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson: async () => ({ tag_name: 42 }),
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: (raw) => raw
   })
@@ -85,6 +94,7 @@ test('Test that createFetchLatestGithubReleaseVersion maps fetch failures to err
     fetchLatestReleaseJson: async () => {
       throw new Error('network down')
     },
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: (raw) => raw
   })
@@ -103,6 +113,7 @@ test('Test that createFetchLatestGithubReleaseVersion requests the configured UR
   const api = createFetchLatestGithubReleaseVersion({
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson,
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/configured',
     stripFaSemverVersion: (raw) => raw
   })
@@ -119,6 +130,7 @@ test('Test that createFetchLatestGithubReleaseVersion errors on non-object body'
   const api = createFetchLatestGithubReleaseVersion({
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson: async () => 'nope',
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: (raw) => raw
   })
@@ -136,6 +148,7 @@ test('Test that createFetchLatestGithubReleaseVersion errors when strip empties 
   const api = createFetchLatestGithubReleaseVersion({
     ResultAsync: ResultAsyncStub,
     fetchLatestReleaseJson: async () => ({ tag_name: 'v' }),
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: () => ''
   })
@@ -155,6 +168,7 @@ test('Test that createFetchLatestGithubReleaseVersion maps non-Error causes', as
     fetchLatestReleaseJson: async () => {
       return await Promise.reject('plain-string-fail')
     },
+    releaseErrorMessages,
     latestApiUrl: 'https://example.test/latest',
     stripFaSemverVersion: (raw) => raw
   })

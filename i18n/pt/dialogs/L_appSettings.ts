@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Configurações',
+  loadError: 'Não foi possível carregar as configurações.',
   saveButton: 'Salvar configurações',
   closeButton: 'Fechar sem salvar',
   settingsSearchPlaceholder: 'Pesquise as configurações...',

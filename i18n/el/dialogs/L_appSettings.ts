@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Ρυθμίσεις',
+  loadError: 'Δεν ήταν δυνατή η φόρτωση των ρυθμίσεων.',
   saveButton: 'Αποθήκευση ρυθμίσεων',
   closeButton: 'Κλείσιμο χωρίς αποθήκευση',
   settingsSearchPlaceholder: 'Αναζήτηση στις ρυθμίσεις...',

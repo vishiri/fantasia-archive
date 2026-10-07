@@ -16,16 +16,19 @@ export {
   normalizeOpenedDocumentParentIdFromDb
 } from './functions/openedDocumentNullableStringFromDb'
 export {
+  openedDocumentExtraClassesDraftExceedsStorage,
   resolveOpenedDocumentExtraClassesDraftForPersist,
   resolveDocumentWorkspacePageExtraHtmlClassList
 } from './functions/openedDocumentExtraClasses'
 export {
+  remapOpenedDocumentTabParentAfterDeletedDocument,
   resolveOpenedDocumentParentIdDraftForPersist,
   resolveOpenedDocumentParentMoveAppendSortOrder
 } from './functions/openedDocumentParentId'
 export {
   mapOpenedDocumentSavedTagsToDraft,
   mapOpenedDocumentTagsDraftToSetInput,
+  openedDocumentSavedTagIdSetsDiffer,
   resolveOpenedDocumentTagsFingerprint
 } from './functions/openedDocumentTagsDomain'
 export {
@@ -36,7 +39,8 @@ export {
   computeOpenedDocumentHasUnsavedChanges,
   normalizeOpenedDocumentTabAppearanceColors,
   recomputeOpenedDocumentTabHasUnsavedChanges,
-  resolveOpenedDocumentAppearanceColorDraftForPersist
+  resolveOpenedDocumentAppearanceColorDraftForPersist,
+  resolveOpenedDocumentHydrateUnsavedDraft
 } from './openedDocumentTabAppearanceWiring'
 export {
   appendOpenedDocumentTabToRight,
@@ -74,6 +78,7 @@ export {
 export {
   isFaDocumentTreeOrderNumberEmpty,
   normalizeOpenedDocumentTreeOrderNumberFromDb,
+  openedDocumentTreeOrderNumberDraftExceedsStorage,
   resolveFaDocumentTreeOrderNumberBadgeLabel,
   resolveOpenedDocumentTreeOrderNumberDraftForPersist
 } from './functions/openedDocumentTreeOrderNumber'
@@ -85,3 +90,7 @@ export {
 } from './functions/openedDocumentWorkspaceKeybindGuards'
 export { resolveCopyOfDocumentDisplayName } from './functions/resolveCopyOfDocumentDisplayName'
 export { resolveHierarchyTreeDocumentOpenEditSteps } from './functions/resolveHierarchyTreeDocumentOpenEditSteps'
+export {
+  resolveHierarchyTreeDocumentOpenMetaFromNode,
+  resolveOpenedDocumentTreeOpenMetaForSeed
+} from './functions/openedDocumentTreeOpenMeta'

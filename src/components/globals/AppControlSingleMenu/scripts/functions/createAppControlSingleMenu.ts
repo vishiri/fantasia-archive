@@ -45,28 +45,34 @@ function createAppControlSingleMenuSubmenuHover (deps: T_createAppControlSingleM
     }, APP_CONTROL_SINGLE_MENU_SUBMENU_HOVER_LEAVE_MS)
   }
 
-  return {
-    onRootMenuHide: () => {
-      clearHideTimer()
-      openSubmenuRowIndex.value = null
-    },
-    onSubmenuActivatorEnter: (index) => {
+  function onRootMenuHide (): void {
+    clearHideTimer()
+    openSubmenuRowIndex.value = null
+  }
+
+  function onSubmenuActivatorEnter (index: number): void {
+    clearHideTimer()
+    openSubmenuRowIndex.value = index
+  }
+
+  function onSubmenuModelUpdate (index: number, shown: boolean): void {
+    if (shown) {
       clearHideTimer()
       openSubmenuRowIndex.value = index
-    },
+      return
+    }
+    if (openSubmenuRowIndex.value === index) {
+      openSubmenuRowIndex.value = null
+    }
+  }
+
+  return {
+    onRootMenuHide,
+    onSubmenuActivatorEnter,
     onSubmenuActivatorLeave: scheduleHide,
     onSubmenuContentEnter: clearHideTimer,
     onSubmenuContentLeave: scheduleHide,
-    onSubmenuModelUpdate: (index, shown) => {
-      if (shown) {
-        clearHideTimer()
-        openSubmenuRowIndex.value = index
-        return
-      }
-      if (openSubmenuRowIndex.value === index) {
-        openSubmenuRowIndex.value = null
-      }
-    },
+    onSubmenuModelUpdate,
     openSubmenuRowIndex
   }
 }
@@ -77,6 +83,22 @@ function trimmedSecondaryHintText (hint: string | undefined): string | null {
     return null
   }
   return trimmed
+}
+
+function runAppControlMenuItemTrigger (menuItem: {
+  conditions?: boolean | undefined
+  trigger?: ((...args: unknown[]) => void) | undefined
+  triggerArguments?: unknown[] | undefined
+}): void {
+  if (menuItem.conditions === false || menuItem.trigger === undefined) {
+    return
+  }
+  const triggerArguments = menuItem.triggerArguments
+  if (triggerArguments !== undefined) {
+    menuItem.trigger(...triggerArguments)
+    return
+  }
+  menuItem.trigger()
 }
 
 interface I_useAppControlSingleMenuReturn {
@@ -95,6 +117,11 @@ interface I_useAppControlSingleMenuReturn {
   onSubmenuContentLeave: () => void
   onSubmenuModelUpdate: (index: number, shown: boolean) => void
   openSubmenuRowIndex: I_ref<number | null>
+  runAppControlMenuItemTrigger: (menuItem: {
+    conditions?: boolean | undefined
+    trigger?: ((...args: unknown[]) => void) | undefined
+    triggerArguments?: unknown[] | undefined
+  }) => void
   trimmedSecondaryHintText: (hint: string | undefined) => string | null
 }
 
@@ -127,22 +154,34 @@ function useAppControlSingleMenu (
   }
 
   const componentData = deps.computed(() => props.dataInput)
+  const appControlShouldShowSeparatorAltBeforeItem = deps.appControlShouldShowSeparatorAltBeforeItem
+  const hasProperDataInput = deps.computed(() => {
+    return !!(componentData.value.title && componentData.value.data)
+  })
+  const menuData = deps.computed(() => componentData.value.data)
+  const menuTitle = deps.computed(() => componentData.value.title)
+  const {
+    onRootMenuHide,
+    onSubmenuContentEnter,
+    onSubmenuContentLeave,
+    onSubmenuModelUpdate,
+    openSubmenuRowIndex
+  } = submenuHover
 
   return {
-    appControlShouldShowSeparatorAltBeforeItem: deps.appControlShouldShowSeparatorAltBeforeItem,
-    hasProperDataInput: deps.computed(() => {
-      return !!(componentData.value.title && componentData.value.data)
-    }),
+    appControlShouldShowSeparatorAltBeforeItem,
+    hasProperDataInput,
     keybindHintLabel,
-    menuData: deps.computed(() => componentData.value.data),
-    menuTitle: deps.computed(() => componentData.value.title),
+    menuData,
+    menuTitle,
     onMenuRowMouseEnter,
     onMenuRowMouseLeave,
-    onRootMenuHide: submenuHover.onRootMenuHide,
-    onSubmenuContentEnter: submenuHover.onSubmenuContentEnter,
-    onSubmenuContentLeave: submenuHover.onSubmenuContentLeave,
-    onSubmenuModelUpdate: submenuHover.onSubmenuModelUpdate,
-    openSubmenuRowIndex: submenuHover.openSubmenuRowIndex,
+    onRootMenuHide,
+    onSubmenuContentEnter,
+    onSubmenuContentLeave,
+    onSubmenuModelUpdate,
+    openSubmenuRowIndex,
+    runAppControlMenuItemTrigger,
     trimmedSecondaryHintText
   }
 }
@@ -152,9 +191,18 @@ export function createAppControlSingleMenu (deps: T_createAppControlSingleMenuDe
   createAppControlSingleMenuSubmenuHover: () => ReturnType<typeof createAppControlSingleMenuSubmenuHover>
   useAppControlSingleMenu: (props: { dataInput: I_appMenuList }) => I_useAppControlSingleMenuReturn
 } {
+  const createAppControlSingleMenuSubmenuHoverBound = (): ReturnType<typeof createAppControlSingleMenuSubmenuHover> => {
+    return createAppControlSingleMenuSubmenuHover(deps)
+  }
+  const useAppControlSingleMenuBound = (
+    props: { dataInput: I_appMenuList }
+  ): I_useAppControlSingleMenuReturn => {
+    return useAppControlSingleMenu(deps, props)
+  }
+
   return {
     APP_CONTROL_SINGLE_MENU_SUBMENU_HOVER_LEAVE_MS,
-    createAppControlSingleMenuSubmenuHover: () => createAppControlSingleMenuSubmenuHover(deps),
-    useAppControlSingleMenu: (props) => useAppControlSingleMenu(deps, props)
+    createAppControlSingleMenuSubmenuHover: createAppControlSingleMenuSubmenuHoverBound,
+    useAppControlSingleMenu: useAppControlSingleMenuBound
   }
 }

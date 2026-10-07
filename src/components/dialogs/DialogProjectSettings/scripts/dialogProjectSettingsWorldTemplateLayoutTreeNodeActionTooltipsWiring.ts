@@ -4,6 +4,28 @@ import type { QTooltip } from 'quasar'
 
 import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/functions/faQTooltipDelay'
 
+type T_placementNicknameHoverRevealState = {
+  serial: number
+  timerId: ReturnType<typeof setTimeout> | undefined
+}
+
+function clearPlacementNicknameHoverRevealTimer (
+  state: T_placementNicknameHoverRevealState
+): void {
+  if (state.timerId === undefined) {
+    return
+  }
+  clearTimeout(state.timerId)
+  state.timerId = undefined
+}
+
+function cancelPlacementNicknameHoverReveal (
+  state: T_placementNicknameHoverRevealState
+): void {
+  state.serial += 1
+  clearPlacementNicknameHoverRevealTimer(state)
+}
+
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
   armEditTooltip: () => void
   armPlacementNicknameHoverTooltip: () => void
@@ -32,14 +54,9 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   const removeTooltipHoverEnabled = ref(true)
   const placementNicknameHoverTooltipEnabled = ref(true)
 
-  let placementNicknameHoverRevealTimerId: ReturnType<typeof setTimeout> | undefined
-
-  function clearPlacementNicknameHoverRevealTimer (): void {
-    if (placementNicknameHoverRevealTimerId === undefined) {
-      return
-    }
-    clearTimeout(placementNicknameHoverRevealTimerId)
-    placementNicknameHoverRevealTimerId = undefined
+  const placementNicknameHoverRevealState: T_placementNicknameHoverRevealState = {
+    serial: 0,
+    timerId: undefined
   }
 
   function dismissEditTooltip (): void {
@@ -53,7 +70,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   }
 
   function suppressPlacementNicknameHoverTooltip (): void {
-    clearPlacementNicknameHoverRevealTimer()
+    cancelPlacementNicknameHoverReveal(placementNicknameHoverRevealState)
     placementNicknameHoverTooltipRef.value?.hide()
     placementNicknameHoverTooltipEnabled.value = false
   }
@@ -75,10 +92,15 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
       return
     }
     armPlacementNicknameHoverTooltip()
-    clearPlacementNicknameHoverRevealTimer()
-    placementNicknameHoverRevealTimerId = setTimeout(() => {
-      placementNicknameHoverRevealTimerId = undefined
+    clearPlacementNicknameHoverRevealTimer(placementNicknameHoverRevealState)
+    placementNicknameHoverRevealState.serial += 1
+    const revealSerial = placementNicknameHoverRevealState.serial
+    placementNicknameHoverRevealState.timerId = setTimeout(() => {
+      placementNicknameHoverRevealState.timerId = undefined
       void nextTick(() => {
+        if (revealSerial !== placementNicknameHoverRevealState.serial) {
+          return
+        }
         if (!placementNicknameHoverTooltipEnabled.value) {
           return
         }
@@ -88,12 +110,12 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   }
 
   function hidePlacementNicknameHoverTooltip (): void {
-    clearPlacementNicknameHoverRevealTimer()
+    cancelPlacementNicknameHoverReveal(placementNicknameHoverRevealState)
     placementNicknameHoverTooltipRef.value?.hide()
   }
 
   deps?.onBeforeUnmount?.(() => {
-    clearPlacementNicknameHoverRevealTimer()
+    cancelPlacementNicknameHoverReveal(placementNicknameHoverRevealState)
   })
 
   const armEditTooltipBinding = armEditTooltip

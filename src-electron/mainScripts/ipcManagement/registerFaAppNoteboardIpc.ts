@@ -13,10 +13,13 @@ let registered = false
 
 function noteboardSnapshot (): I_faAppNoteboardRoot {
   const s = getFaAppNoteboard().store
+  const frame = s.frame
+  const schemaVersion = s.schemaVersion
+  const text = s.text
   return {
-    frame: s.frame,
-    schemaVersion: s.schemaVersion,
-    text: s.text
+    frame,
+    schemaVersion,
+    text
   }
 }
 

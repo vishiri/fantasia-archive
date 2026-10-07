@@ -90,8 +90,9 @@ function useDialogActionMonitorTableLayout (
     if (px === null) {
       return undefined
     }
+    const maxHeight = `${String(px)}px`
     return {
-      maxHeight: `${String(px)}px`
+      maxHeight
     }
   })
   return {
@@ -198,19 +199,35 @@ export function createDialogActionMonitor (deps: T_createDialogActionMonitorDeps
   const buildDialogActionMonitorColumns = (): T_dialogActionMonitorTableColumn[] => {
     return deps.buildDialogActionMonitorColumns(t)
   }
-
-  return {
-    buildDialogActionMonitorColumns,
-    buildDialogActionMonitorStatusBadgeForUi,
-    copyDialogActionMonitorRowToClipboard: (row) => copyDialogActionMonitorRowToClipboard(deps, row),
-    formatDialogActionMonitorActionKindForUi,
-    resolveDialogComponentStore,
-    useDialogActionMonitor: (props) => useDialogActionMonitor(
+  const copyDialogActionMonitorRowToClipboardBound = (
+    row: I_faActionHistoryEntry
+  ): Promise<void> => {
+    return copyDialogActionMonitorRowToClipboard(deps, row)
+  }
+  const useDialogActionMonitorBound = (props: {
+    directInput?: T_dialogName | undefined
+    directHistorySnapshot?: I_faActionHistoryEntry[] | undefined
+  }): ReturnType<typeof useDialogActionMonitor> => {
+    return useDialogActionMonitor(
       deps,
       props,
       resolveDialogComponentStore,
       buildDialogActionMonitorColumns
-    ),
-    useDialogActionMonitorTableLayout: (dialogModel) => useDialogActionMonitorTableLayout(deps, dialogModel)
+    )
+  }
+  const useDialogActionMonitorTableLayoutBound = (
+    dialogModel: I_ref<boolean>
+  ): ReturnType<typeof useDialogActionMonitorTableLayout> => {
+    return useDialogActionMonitorTableLayout(deps, dialogModel)
+  }
+
+  return {
+    buildDialogActionMonitorColumns,
+    buildDialogActionMonitorStatusBadgeForUi,
+    copyDialogActionMonitorRowToClipboard: copyDialogActionMonitorRowToClipboardBound,
+    formatDialogActionMonitorActionKindForUi,
+    resolveDialogComponentStore,
+    useDialogActionMonitor: useDialogActionMonitorBound,
+    useDialogActionMonitorTableLayout: useDialogActionMonitorTableLayoutBound
   }
 }

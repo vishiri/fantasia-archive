@@ -1,4 +1,5 @@
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
+import type { I_faProjectContentEpochPersistGuards } from 'app/types/I_faProjectContentEpochPersistGuards'
 import type { T_useFaFloatingWindowFrameInjected } from 'app/types/I_useFaFloatingWindowFrameInjected'
 import type { I_faWindowNoteboardVariantConfig } from 'app/types/I_faWindowNoteboardVariantConfig'
 import type { I_faWindowNoteboardComposable } from 'app/types/I_faWindowAppNoteboardComposable'
@@ -27,7 +28,9 @@ type T_useWindowNoteboard = (props: { directInput?: T_dialogName | undefined }) 
 export type T_faWindowNoteboardFactoryParts = {
   createWindowNoteboardFramePersist: (deps: {
     getNoteboardStore: () => StoreGeneric
+    isProjectReplacementInFlight: (() => boolean) | undefined
     persistFrameSilent: I_faWindowNoteboardVariantConfig['persistFrameSilent']
+    readProjectContentEpoch: (() => number) | undefined
     saveFailureActionId: T_faActionId
     useFaFloatingWindowFramePersist: (opts: {
       debounceMs?: number | undefined
@@ -38,10 +41,12 @@ export type T_faWindowNoteboardFactoryParts = {
       windowModel: I_ref<boolean>
       x: I_ref<number>
       y: I_ref<number>
-    }) => void
+    } & I_faProjectContentEpochPersistGuards) => void
   }) => T_useWindowNoteboardFramePersist
   createWindowNoteboardTextPersist: (deps: {
     getNoteboardStore: () => StoreGeneric
+    isProjectReplacementInFlight: (() => boolean) | undefined
+    readProjectContentEpoch: (() => number) | undefined
     saveFailureActionId: T_faActionId
     useFaFloatingWindowTextPersist: (opts: {
       debounceMs?: number | undefined
@@ -49,7 +54,7 @@ export type T_faWindowNoteboardFactoryParts = {
       persistText: () => Promise<void>
       text: I_ref<string>
       windowModel: I_ref<boolean>
-    }) => void
+    } & I_faProjectContentEpochPersistGuards) => void
   }) => T_useWindowNoteboardTextPersist
   createWindowNoteboardUse: (deps: {
     FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: Record<string, string | boolean>
@@ -80,7 +85,9 @@ export type T_faWindowNoteboardFactoryDeps = {
   FA_FLOATING_WINDOW_POP_TRANSITION_MS: number
   computed: <T>(getter: () => T) => ComputedRef<T>
   getNoteboardStore: () => StoreGeneric
+  isProjectReplacementInFlight?: () => boolean
   onMounted: (hook: () => void) => void
+  readProjectContentEpoch?: () => number
   storeToRefs: T_piniaStoreToRefs
   useFaFloatingWindowFrame: T_useFaFloatingWindowFrameInjected
   useFaFloatingWindowFramePersist: (opts: {
@@ -92,14 +99,14 @@ export type T_faWindowNoteboardFactoryDeps = {
     windowModel: I_ref<boolean>
     x: I_ref<number>
     y: I_ref<number>
-  }) => void
+  } & I_faProjectContentEpochPersistGuards) => void
   useFaFloatingWindowTextPersist: (opts: {
     debounceMs?: number | undefined
     failureActionId: T_faActionId
     persistText: () => Promise<void>
     text: I_ref<string>
     windowModel: I_ref<boolean>
-  }) => void
+  } & I_faProjectContentEpochPersistGuards) => void
   variant: I_faWindowNoteboardVariantConfig
   watch: (
     source: () => unknown,

@@ -7,9 +7,11 @@ export function buildFaProjectWorldTemplatePlacementNicknameSingularPluralTransl
   nicknamePluralTranslations: I_faProjectWorldTemplatePlacementNicknameTranslations
   nicknameSingularTranslations: I_faProjectWorldTemplatePlacementNicknameSingularTranslations
 }): I_faLocaleSingularPluralTranslations {
+  const plural = input.nicknamePluralTranslations
+  const singular = input.nicknameSingularTranslations
   return {
-    plural: input.nicknamePluralTranslations,
-    singular: input.nicknameSingularTranslations
+    plural,
+    singular
   }
 }
 
@@ -34,9 +36,11 @@ export function createNormalizeFaProjectWorldTemplatePlacementNicknameSingularPl
       nicknamePluralTranslations: I_faProjectWorldTemplatePlacementNicknameTranslations
       nicknameSingularTranslations: I_faProjectWorldTemplatePlacementNicknameSingularTranslations
     } {
+    const nicknamePluralTranslations = deps.normalizePlural(input.nicknamePluralTranslations)
+    const nicknameSingularTranslations = deps.normalizeSingular(input.nicknameSingularTranslations)
     return {
-      nicknamePluralTranslations: deps.normalizePlural(input.nicknamePluralTranslations),
-      nicknameSingularTranslations: deps.normalizeSingular(input.nicknameSingularTranslations)
+      nicknamePluralTranslations,
+      nicknameSingularTranslations
     }
   }
 }

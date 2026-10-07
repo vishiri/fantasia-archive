@@ -1,7 +1,23 @@
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import type { I_faFloatingWindowPersistedRect } from 'app/types/I_faFloatingWindowPersistedRect'
 import type { I_UseFaFloatingWindowFrameOptions } from 'app/types/I_useFaFloatingWindowFrameOptions'
 import type { T_registerFaFloatingWindowFrameOpenLayoutWatchDeps } from 'app/types/I_registerFaFloatingWindowFrameOpenLayoutWatch'
+
+import { persistedFloatingWindowFramesAreEquivalent } from './faFloatingWindowPersistedGeometry_manager'
+
+function persistedFrameGeometryUnchanged (
+  previousFrame: unknown,
+  nextFrame: unknown
+): boolean {
+  if (nextFrame === null || nextFrame === undefined) {
+    return previousFrame === null || previousFrame === undefined
+  }
+  return persistedFloatingWindowFramesAreEquivalent(
+    previousFrame,
+    nextFrame as I_faFloatingWindowPersistedRect
+  )
+}
 
 export function registerFaFloatingWindowFrameOpenLayoutWatch (
   deps: T_registerFaFloatingWindowFrameOpenLayoutWatchDeps,
@@ -78,8 +94,11 @@ export function registerFaFloatingWindowFrameOpenLayoutWatch (
   if (persistedFrameRef !== undefined) {
     deps.watch(
       persistedFrameRef,
-      async () => {
+      async (nextFrame: unknown, previousFrame?: unknown) => {
         if (!visible.value) {
+          return
+        }
+        if (persistedFrameGeometryUnchanged(previousFrame, nextFrame)) {
           return
         }
         await layoutFromPersistedStorageOrViewportCenter()

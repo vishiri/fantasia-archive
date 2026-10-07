@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { FA_USER_SETTINGS_APP_THEME_VALUES } from 'app/types/faUserSettingsAppThemeRegistry'
@@ -32,15 +33,6 @@ const faUserSettingsPatchShape = Object.fromEntries(
 ) as unknown as z.ZodRawShape
 
 export const faUserSettingsPatchSchema = z.object(faUserSettingsPatchShape).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses and returns a 'Partial<I_faUserSettings>' from an IPC payload.

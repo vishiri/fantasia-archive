@@ -8,8 +8,13 @@ export async function buildTemporaryDocumentParentResolveDocumentIds (deps: {
   startDocumentId: string
 }): Promise<string[]> {
   const chain: string[] = []
+  const visited = new Set<string>()
   let currentDocumentId: string | null = deps.startDocumentId
   while (currentDocumentId !== null) {
+    if (visited.has(currentDocumentId)) {
+      break
+    }
+    visited.add(currentDocumentId)
     chain.push(currentDocumentId)
     const document = await deps.getDocumentById(currentDocumentId)
     currentDocumentId = document.parentDocumentId ?? null

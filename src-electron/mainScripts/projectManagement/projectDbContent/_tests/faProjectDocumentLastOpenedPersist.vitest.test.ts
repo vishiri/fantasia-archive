@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3'
-import { afterEach, expect, test } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
 
 import { applyFaProjectContentSchemaV1 } from '../../faProjectDbContentSchemaV1Wiring'
 import {
@@ -16,6 +16,7 @@ import { listFaProjectDocumentLastOpened } from '../faProjectDocumentLastOpenedQ
 let db: Database | null = null
 
 afterEach(() => {
+  vi.restoreAllMocks()
   db?.close()
   db = null
 })
@@ -79,6 +80,24 @@ test('Test that recordFaProjectDocumentLastOpened keeps only the newest max rows
   for (const keptId of ids.slice(5)) {
     expect(listedIds.has(keptId)).toBe(true)
   }
+})
+
+/**
+ * recordFaProjectDocumentLastOpened
+ * A repeat open in the same millisecond becomes the newest row.
+ */
+test('Test that recordFaProjectDocumentLastOpened puts a repeat open first when timestamps match', () => {
+  db = openLastOpenedTestDb()
+  const ids = seedWorldAndDocuments(db, 2)
+  const earlierId = ids[0]!
+  const laterId = ids[1]!
+  vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000)
+  recordFaProjectDocumentLastOpened(db, earlierId)
+  recordFaProjectDocumentLastOpened(db, laterId)
+  recordFaProjectDocumentLastOpened(db, earlierId)
+
+  const listed = listFaProjectDocumentLastOpened(db)
+  expect(listed.items.map((item) => item.documentId)).toEqual([earlierId, laterId])
 })
 
 /**

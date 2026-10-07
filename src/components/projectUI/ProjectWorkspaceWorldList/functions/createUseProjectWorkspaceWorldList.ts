@@ -11,8 +11,9 @@ export function createUseProjectWorkspaceWorldList (deps: {
   return function useProjectWorkspaceWorldList () {
     const { worldListItems } = deps.storeToRefs(deps.S_FaProjectWorkspaceWorlds())!
 
+    const items = worldListItems!
     return {
-      worldListItems: worldListItems!
+      worldListItems: items
     }
   }
 }

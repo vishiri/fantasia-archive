@@ -13,16 +13,18 @@ export function createWaitForProjectHierarchyTreeDragModelSettle (deps: {
   }> {
     for (let attempts = 0; attempts < maxAttempts; attempts += 1) {
       if (deps.readModelSettled()) {
+        const settledAttempts = attempts + 1
         return {
-          attempts: attempts + 1,
+          attempts: settledAttempts,
           settled: true
         }
       }
       await deps.nextTick()
     }
+    const settled = deps.readModelSettled()
     return {
       attempts: maxAttempts,
-      settled: deps.readModelSettled()
+      settled
     }
   }
 }

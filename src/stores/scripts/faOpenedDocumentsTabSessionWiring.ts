@@ -35,9 +35,10 @@ export function resolveFaOpenedDocumentOpenFromTree (deps: {
     }
   }
   deps.activeDocumentId.value = deps.documentId
+  const navigateDocumentId = deps.documentId
   return {
     shouldNavigate: true,
-    navigateDocumentId: deps.documentId
+    navigateDocumentId
   }
 }
 
@@ -50,9 +51,21 @@ export function removeFaOpenedDocumentTabAtIndex (deps: {
     nextActiveDocumentId: string | null
     shouldNavigateHome: boolean
   } {
+  const removedTab = deps.tabs.value[deps.removedIndex]
+  const removedDocumentId = removedTab?.documentId
   deps.lastRemovedIndex.value = deps.removedIndex
   const nextTabs = removeOpenedDocumentTabAtIndex(deps.tabs.value, deps.removedIndex)
   deps.tabs.value = nextTabs
+  const removedWasActive = removedDocumentId !== undefined &&
+    deps.activeDocumentId.value === removedDocumentId
+  if (!removedWasActive) {
+    const nextActiveDocumentId = deps.activeDocumentId.value
+    const shouldNavigateHome = false
+    return {
+      nextActiveDocumentId,
+      shouldNavigateHome
+    }
+  }
   const focusIndex = resolveOpenedDocumentTabFocusIndexAfterClose(
     deps.removedIndex,
     nextTabs.length
@@ -72,9 +85,10 @@ export function removeFaOpenedDocumentTabAtIndex (deps: {
       shouldNavigateHome: true
     }
   }
-  deps.activeDocumentId.value = nextTab.documentId
+  const nextActiveDocumentId = nextTab.documentId
+  deps.activeDocumentId.value = nextActiveDocumentId
   return {
-    nextActiveDocumentId: nextTab.documentId,
+    nextActiveDocumentId,
     shouldNavigateHome: false
   }
 }

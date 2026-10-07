@@ -42,6 +42,50 @@ function readFaProjectPlacementRow (
   return row
 }
 
+function mergeFaProjectHierarchyCrossParentSiblingOrder (
+  existingDestinationIds: readonly string[],
+  orderedDocumentIds: readonly string[]
+): string[] {
+  const orderedSet = new Set(orderedDocumentIds)
+  const existingIndex = new Map<string, number>()
+  existingDestinationIds.forEach((id, index) => {
+    existingIndex.set(id, index)
+  })
+  const merged: string[] = []
+  const seen = new Set<string>()
+  let missingCursor = 0
+  for (const orderedId of orderedDocumentIds) {
+    const anchorIndex = existingIndex.get(orderedId)
+    if (anchorIndex !== undefined) {
+      while (missingCursor < anchorIndex) {
+        const missingId = existingDestinationIds[missingCursor]
+        missingCursor += 1
+        if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+          continue
+        }
+        merged.push(missingId)
+        seen.add(missingId)
+      }
+      missingCursor = anchorIndex + 1
+    }
+    if (seen.has(orderedId)) {
+      continue
+    }
+    merged.push(orderedId)
+    seen.add(orderedId)
+  }
+  while (missingCursor < existingDestinationIds.length) {
+    const missingId = existingDestinationIds[missingCursor]
+    missingCursor += 1
+    if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+      continue
+    }
+    merged.push(missingId)
+    seen.add(missingId)
+  }
+  return merged
+}
+
 function compactFaProjectHierarchyDocumentSiblingSortOrders (
   db: Database,
   placementId: string,
@@ -122,6 +166,10 @@ export function reindexFaProjectHierarchyDocumentSiblings (
       }
     }
   }
+  const destinationIds = existingRows.map((row) => row.id)
+  const orderedIdsForSort = previousParentDocumentId === input.parentDocumentId
+    ? orderedUniqueIds
+    : mergeFaProjectHierarchyCrossParentSiblingOrder(destinationIds, orderedUniqueIds)
   const nowMs = Date.now()
   const updateStmt = db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ?, ` +
@@ -129,7 +177,7 @@ export function reindexFaProjectHierarchyDocumentSiblings (
       'updated_at_ms = ? WHERE id = ?'
   )
   const runReindex = db.transaction(() => {
-    orderedUniqueIds.forEach((documentId, sortOrder) => {
+    orderedIdsForSort.forEach((documentId, sortOrder) => {
       updateStmt.run(input.parentDocumentId, sortOrder, nowMs, documentId)
     })
   })

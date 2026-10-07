@@ -1,6 +1,6 @@
 import type { T_createUseDocumentWorkspacePageDeps } from 'app/types/I_documentWorkspacePage'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
-import type { I_computedRef } from 'app/types/I_vueCompositionShims'
+import type { I_computedRef, I_writableComputedRef } from 'app/types/I_vueCompositionShims'
 
 export function createDocumentWorkspacePageExtraHtmlClassesField (deps: {
   computed: T_createUseDocumentWorkspacePageDeps['computed']
@@ -13,7 +13,7 @@ export function createDocumentWorkspacePageExtraHtmlClassesField (deps: {
     extraHtmlClassesFieldDescription: I_computedRef<string>
     extraHtmlClassesFieldLabel: I_computedRef<string>
     extraHtmlClassesFieldReadOnly: I_computedRef<boolean>
-    extraHtmlClassesModel: I_computedRef<string>
+    extraHtmlClassesModel: I_writableComputedRef<string>
     workspacePageExtraHtmlClassList: I_computedRef<string[]>
   } {
   const extraHtmlClassesFieldLabel = deps.computed(() => {
@@ -40,7 +40,7 @@ export function createDocumentWorkspacePageExtraHtmlClassesField (deps: {
       if (deps.routeDocumentId.value.length === 0 || extraHtmlClassesFieldReadOnly.value) {
         return
       }
-      deps.updateExtraClassesDraft(deps.routeDocumentId.value, value.trim())
+      deps.updateExtraClassesDraft(deps.routeDocumentId.value, value)
     }
   })
 

@@ -1,8 +1,9 @@
 import { z } from 'zod'
 
 import {
-  faProjectContentDisplayNameSchema,
   faProjectContentIdSchema,
+  parseFaProjectContentDroppedRecord,
+  parseFaProjectContentIdPayload,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
@@ -13,12 +14,18 @@ import type {
   I_faProjectMediaUpsertItem
 } from 'app/types/I_faProjectMediaDomain'
 
+const faProjectMediaDisplayNameSchema = z
+  .string()
+  .min(1, 'display name is required')
+  .transform((value) => value.trim())
+  .refine((value) => value.length > 0, 'display name is empty after trim')
+
 export const faProjectMediaCreateInputSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema
+  displayName: faProjectMediaDisplayNameSchema
 }).strict()
 
 export const faProjectMediaPatchSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema.optional()
+  displayName: faProjectMediaDisplayNameSchema.optional()
 }).strict()
 
 export const faProjectMediaIdPayloadSchema = z.object({
@@ -32,12 +39,11 @@ export function parseFaProjectMediaCreateInput (
 }
 
 export function parseFaProjectMediaPatch (payload: unknown): I_faProjectMediaPatch {
-  const parsed = faProjectMediaPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectMediaPatch
+  return parseFaProjectContentDroppedRecord(faProjectMediaPatchSchema, payload)
 }
 
 export function parseFaProjectMediaIdPayload (payload: unknown): string {
-  return faProjectMediaIdPayloadSchema.parse(parseFaProjectContentPlainRecord(payload)).id
+  return parseFaProjectContentIdPayload(faProjectMediaIdPayloadSchema, payload)
 }
 
 export const faProjectMediaUpdatePayloadSchema = z.object({
@@ -49,9 +55,11 @@ export function parseFaProjectMediaUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectMediaPatch } {
   const parsed = faProjectMediaUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const id = parsed.id
+  const patch = dropUndefinedRecordValues(parsed.patch) as I_faProjectMediaPatch
   return {
-    id: parsed.id,
-    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectMediaPatch
+    id,
+    patch
   }
 }
 
@@ -75,7 +83,7 @@ export function parseFaProjectMediaPersistedRow (payload: unknown): I_faProjectM
 
 export const faProjectMediaUpsertItemSchema = z.object({
   id: faProjectContentIdSchema,
-  displayName: faProjectContentDisplayNameSchema,
+  displayName: faProjectMediaDisplayNameSchema,
   type: z.enum(['external', 'internal']),
   internalType: z.enum(['', 'embedded', 'linked_outside', 'linked_in_project']),
   externalType: z.enum(['', 'embed', 'linked']),

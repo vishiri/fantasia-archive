@@ -4,6 +4,9 @@ import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerD
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeDocumentSortBucket } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { FaActionUserCanceledError } from './functions/faActionUserCanceledError'
+
+import { captureFaHierarchyTreeSortStep } from 'app/src/scripts/actionManager/faHierarchyTreeSortStepCaptureWiring'
 import {
   listFaProjectPlacementDocumentChildrenForRenderer,
   reindexFaProjectDocumentSiblingsForRenderer
@@ -18,10 +21,44 @@ import {
   runProjectHierarchyTreeDocumentSort
 } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentSortRun'
 import { sortProjectHierarchyTreeTagDocumentChildren } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeTagDocumentSort'
+import {
+  enqueueFaHierarchyTreeDocumentSort,
+  resolveFaHierarchyTreeDocumentSortQueueKey
+} from './faHierarchyTreeDocumentSortQueueWiring'
 
 type T_sortHierarchyTreeDocumentsHandlerDeps = {
   S_FaProjectHierarchyTree: () => {
     refreshHierarchyTreeNodes: (nodeIds: string[]) => void
+  }
+  isProjectReplacementInFlight?: () => boolean
+  readProjectContentEpoch?: () => number
+}
+
+function hierarchySortEpochMoved (
+  epochAtStart: number | undefined,
+  readProjectContentEpoch: (() => number) | undefined,
+  isProjectReplacementInFlight?: () => boolean
+): boolean {
+  if (isProjectReplacementInFlight?.() === true) {
+    return true
+  }
+  if (epochAtStart === undefined || readProjectContentEpoch === undefined) {
+    return false
+  }
+  return readProjectContentEpoch() !== epochAtStart
+}
+
+function throwIfHierarchySortEpochMoved (
+  epochAtStart: number | undefined,
+  readProjectContentEpoch: (() => number) | undefined,
+  isProjectReplacementInFlight?: () => boolean
+): void {
+  if (hierarchySortEpochMoved(
+    epochAtStart,
+    readProjectContentEpoch,
+    isProjectReplacementInFlight
+  )) {
+    throw new FaActionUserCanceledError()
   }
 }
 
@@ -46,24 +83,29 @@ function resolveSortRootBucket (
     return null
   }
   if (payload.nodeKind === 'templatePlacement') {
+    const placementId = payload.placementId
     return {
       parentDocumentId: null,
-      placementId: payload.placementId
+      placementId
     }
   }
   const documentId = payload.documentId
   if (documentId === null || documentId === undefined || documentId.trim().length === 0) {
     return null
   }
+  const placementId = payload.placementId
   return {
     parentDocumentId: documentId,
-    placementId: payload.placementId
+    placementId
   }
 }
 
 async function runSortHierarchyTreeDocumentsUnderTag (
   payload: I_faActionPayloadMap['sortHierarchyTreeDocuments'],
-  refreshHierarchyTreeNodes: (nodeIds: string[]) => void
+  refreshHierarchyTreeNodes: (nodeIds: string[]) => void,
+  epochAtStart: number | undefined,
+  readProjectContentEpoch: (() => number) | undefined,
+  isProjectReplacementInFlight?: () => boolean
 ): Promise<T_faActionHandlerContinuation | void> {
   const tagId = payload.tagId
   if (
@@ -73,6 +115,7 @@ async function runSortHierarchyTreeDocumentsUnderTag (
   ) {
     return
   }
+  const payloadPreview = `${payload.scope}:${payload.key}:${payload.direction}:tag`
   const overrides = getFaComponentTestingProjectContentOverrides()
   const api = window.faContentBridgeAPIs?.projectContent
   if (
@@ -84,10 +127,16 @@ async function runSortHierarchyTreeDocumentsUnderTag (
   ) {
     throw new Error('Project hierarchy under-tag sort bridge is unavailable')
   }
+  if (hierarchySortEpochMoved(epochAtStart, readProjectContentEpoch, isProjectReplacementInFlight)) {
+    return
+  }
   const listed = await listFaProjectDocumentsUnderTagForRenderer({ tagId })
+  if (hierarchySortEpochMoved(epochAtStart, readProjectContentEpoch, isProjectReplacementInFlight)) {
+    return
+  }
   if (listed.items.length === 0) {
     return {
-      payloadPreview: `${payload.scope}:${payload.key}:${payload.direction}:tag`
+      payloadPreview
     }
   }
   const ordered = sortProjectHierarchyTreeTagDocumentChildren(
@@ -96,13 +145,19 @@ async function runSortHierarchyTreeDocumentsUnderTag (
     payload.direction
   )
   const orderedDocumentIds = ordered.map((item) => item.documentId)
+  if (hierarchySortEpochMoved(epochAtStart, readProjectContentEpoch, isProjectReplacementInFlight)) {
+    return
+  }
   await reorderFaProjectDocumentsUnderTagForRenderer({
     orderedDocumentIds,
     tagId
   })
+  if (hierarchySortEpochMoved(epochAtStart, readProjectContentEpoch, isProjectReplacementInFlight)) {
+    return
+  }
   refreshHierarchyTreeNodes([tagId])
   return {
-    payloadPreview: `${payload.scope}:${payload.key}:${payload.direction}:tag`
+    payloadPreview
   }
 }
 
@@ -113,15 +168,19 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
       payload: I_faActionPayloadMap['sortHierarchyTreeDocuments']
     ) => Promise<T_faActionHandlerContinuation | void>
   } {
-  async function handleSortHierarchyTreeDocuments (
+  async function executeSortHierarchyTreeDocuments (
     payload: I_faActionPayloadMap['sortHierarchyTreeDocuments']
   ): Promise<T_faActionHandlerContinuation | void> {
+    const epochAtStart = deps.readProjectContentEpoch?.()
     if (payload.nodeKind === 'tag') {
       return await runSortHierarchyTreeDocumentsUnderTag(
         payload,
         (nodeIds) => {
           deps.S_FaProjectHierarchyTree().refreshHierarchyTreeNodes(nodeIds)
-        }
+        },
+        epochAtStart,
+        deps.readProjectContentEpoch,
+        deps.isProjectReplacementInFlight
       )
     }
     const root = resolveSortRootBucket(payload)
@@ -133,13 +192,20 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
     }
     const sortResult = await ResultAsync.fromPromise(
       runProjectHierarchyTreeDocumentSort({
+        captureError: captureFaHierarchyTreeSortStep,
         direction: payload.direction,
         key: payload.key,
-        listPlacementDocumentChildren: (listInput) => {
-          return listFaProjectPlacementDocumentChildrenForRenderer(listInput)
+        listPlacementDocumentChildren: async (listInput) => {
+          throwIfHierarchySortEpochMoved(epochAtStart, deps.readProjectContentEpoch, deps.isProjectReplacementInFlight)
+          const listed = await listFaProjectPlacementDocumentChildrenForRenderer(listInput)
+          throwIfHierarchySortEpochMoved(epochAtStart, deps.readProjectContentEpoch, deps.isProjectReplacementInFlight)
+          return listed
         },
-        reindexDocumentSiblingsInHierarchy: (reindexInput) => {
-          return reindexFaProjectDocumentSiblingsForRenderer(reindexInput)
+        reindexDocumentSiblingsInHierarchy: async (reindexInput) => {
+          throwIfHierarchySortEpochMoved(epochAtStart, deps.readProjectContentEpoch, deps.isProjectReplacementInFlight)
+          const reindexed = await reindexFaProjectDocumentSiblingsForRenderer(reindexInput)
+          throwIfHierarchySortEpochMoved(epochAtStart, deps.readProjectContentEpoch, deps.isProjectReplacementInFlight)
+          return reindexed
         },
         root,
         scope: payload.scope
@@ -148,6 +214,9 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
     )
     if (sortResult.isErr()) {
       const error = sortResult.error
+      if (error instanceof FaActionUserCanceledError) {
+        return
+      }
       if (hasSortCompletedBuckets(error)) {
         const partialTreeNodeIds = error.completedBuckets.map(
           resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId
@@ -158,12 +227,25 @@ export function createFaActionDefinitionHandlersHierarchyTreeSortActions (
       }
       throw error
     }
+    if (hierarchySortEpochMoved(epochAtStart, deps.readProjectContentEpoch, deps.isProjectReplacementInFlight)) {
+      return
+    }
     const buckets = sortResult.value
     const treeNodeIds = buckets.map(resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId)
     deps.S_FaProjectHierarchyTree().refreshHierarchyTreeNodes(treeNodeIds)
+    const payloadPreview = `${payload.scope}:${payload.key}:${payload.direction}`
     return {
-      payloadPreview: `${payload.scope}:${payload.key}:${payload.direction}`
+      payloadPreview
     }
+  }
+
+  async function handleSortHierarchyTreeDocuments (
+    payload: I_faActionPayloadMap['sortHierarchyTreeDocuments']
+  ): Promise<T_faActionHandlerContinuation | void> {
+    const queueKey = resolveFaHierarchyTreeDocumentSortQueueKey(payload)
+    return await enqueueFaHierarchyTreeDocumentSort(queueKey, () => {
+      return executeSortHierarchyTreeDocuments(payload)
+    })
   }
 
   return {

@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, nextTick, ref, watch, type Ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { I_faProjectDocument } from 'app/types/I_faProjectDocumentDomain'
@@ -62,13 +62,17 @@ import { createProjectHierarchyTreeDnDWiring } from '../projectHierarchyTreeDnDW
 import { createProjectHierarchyTreeDnDHandlers } from '../projectHierarchyTreeDnDHandlersWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from '../projectHierarchyTreeDnDScheduleWiring'
 import {
+  beginProjectHierarchyTreeDragSessionSerial,
+  reindexHierarchySiblingsThenSyncOpenedParent
+} from '../projectHierarchyTreeDnDCommitGateWiring'
+import {
   openProjectHierarchyTreeNestParentAfterDragDrop
 } from '../projectHierarchyTreeExpandDomWiring'
 import { createProjectHierarchyTreeDragCancelWiring } from '../projectHierarchyTreeDnDSessionStateWiring'
 import { isProjectHierarchyTreeDragExpandUiFrozen } from '../../functions/projectHierarchyTreeDragExpandFreeze'
 import {
   remountProjectHierarchyTreeAndRestoreExpandedSnapshot
-} from '../projectHierarchyTreeDnDSessionStateWiring'
+} from '../projectHierarchyTreeDnDRemountWiring'
 import {
   collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom
 } from '../projectHierarchyTreeExpandDomWiring'
@@ -462,7 +466,9 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
     treeData: tree
   })
   expect([...openNodeIds.value].sort()).toEqual(['group-1', 'placement-1'])
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'], {
+    allowEmpty: true
+  })
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed keeps tagWrapper children and descendant open ids', () => {
@@ -539,7 +545,9 @@ test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids wh
     treeData: tree
   })
   expect([...openNodeIds.value]).toEqual([])
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith([])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith([], {
+    allowEmpty: true
+  })
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids for add-new rows', () => {
@@ -596,7 +604,9 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
     treeData: tree
   })
   expect([...openNodeIds.value].sort()).toEqual(['placement-1', 'world-1'])
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'placement-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'placement-1'], {
+    allowEmpty: true
+  })
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids when template placement collapses', () => {
@@ -612,7 +622,9 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
     treeData: tree
   })
   expect([...openNodeIds.value].sort()).toEqual(['doc-a', 'doc-b', 'group-1', 'world-1'])
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'group-1', 'doc-a', 'doc-b'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'group-1', 'doc-a', 'doc-b'], {
+    allowEmpty: true
+  })
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids when document collapses', () => {
@@ -666,7 +678,9 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
     'group-1',
     'placement-1',
     'doc-child'
-  ])
+  ], {
+    allowEmpty: true
+  })
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed evicts canonical treeData node when stale reference is passed', () => {
@@ -1467,27 +1481,75 @@ test('Test that createProjectHierarchyTreeDragCancelWiring finishes cancelled dr
   }
   expect(removeEventListenerSpy).toHaveBeenCalled()
   expect(resyncTreeDataFromLayout).toHaveBeenCalled()
-  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1'], undefined)
+  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1'], expect.objectContaining({
+    isStillCurrent: expect.any(Function)
+  }))
   expect(dragExpandUiFrozen.value).toBe(false)
   expect(clearDragSessionFlags).toHaveBeenCalled()
   removeEventListenerSpy.mockRestore()
   vi.useRealTimers()
 })
 
-test('Test that createProjectHierarchyTreeDragCancelWiring restores empty snapshot when drag snapshot missing', async () => {
-  vi.useFakeTimers()
+test('Test that a superseded hierarchy drag cancel does not unfreeze or restore expand state', async () => {
+  const clearDragSessionFlags = vi.fn()
   const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const dragExpandPostCommitGuard = ref(true)
+  const dragExpandUiFrozen = ref(true)
+  beginProjectHierarchyTreeDragSessionSerial(dragExpandUiFrozen)
   const wiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
-    dragExpandedSnapshot: () => null,
+    clearDragSessionFlags,
+    dragExpandPostCommitGuard,
+    dragExpandUiFrozen,
     restoreExpandedSnapshot
   }))
   wiring.finishDragSessionWithoutCommit()
+  beginProjectHierarchyTreeDragSessionSerial(dragExpandUiFrozen)
+  dragExpandUiFrozen.value = true
+  dragExpandPostCommitGuard.value = true
   await vi.advanceTimersByTimeAsync(500)
   for (let tick = 0; tick < 8; tick += 1) {
     await Promise.resolve()
   }
-  expect(restoreExpandedSnapshot).toHaveBeenCalledWith([], undefined)
-  vi.useRealTimers()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+  expect(dragExpandUiFrozen.value).toBe(true)
+  expect(dragExpandPostCommitGuard.value).toBe(true)
+  expect(clearDragSessionFlags).not.toHaveBeenCalled()
+})
+
+test('Test that restoreProjectHierarchyTreeExpandedSnapshot skips a stale expand write', async () => {
+  const openNodeIds = ref(new Set<string>(['live']))
+  let stillCurrent = true
+  await restoreProjectHierarchyTreeExpandedSnapshot(buildRestoreExpandedSnapshotTestDeps({
+    openNodeIds,
+    restoreOptions: {
+      isStillCurrent: () => stillCurrent
+    },
+    runDeferredLazyLoadBatch: async (runBatch) => {
+      await runBatch()
+      openNodeIds.value = new Set(['newer-drag'])
+      stillCurrent = false
+    }
+  }))
+  expect([...openNodeIds.value]).toEqual(['newer-drag'])
+})
+
+test('Test that createProjectHierarchyTreeDragCancelWiring skips tree restore when drag snapshot missing', () => {
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  const clearDragSessionFlags = vi.fn()
+  const dragExpandUiFrozen = ref(true)
+  const wiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
+    clearDragSessionFlags,
+    dragExpandUiFrozen,
+    dragExpandedSnapshot: () => null,
+    resyncTreeDataFromLayout,
+    restoreExpandedSnapshot
+  }))
+  wiring.finishDragSessionWithoutCommit()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(clearDragSessionFlags).toHaveBeenCalledTimes(1)
+  expect(dragExpandUiFrozen.value).toBe(false)
 })
 
 test('Test that createProjectHierarchyTreeDragCancelWiring skips finish after committed drop', () => {
@@ -1501,6 +1563,7 @@ test('Test that createProjectHierarchyTreeDragCancelWiring skips finish after co
 })
 
 test('Test that createProjectHierarchyTreeDragCancelWiring handles pointerup and escape', async () => {
+  vi.useFakeTimers()
   const dragDropCommitted = ref(false)
   const resyncTreeDataFromLayout = vi.fn()
   const wiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
@@ -1508,11 +1571,11 @@ test('Test that createProjectHierarchyTreeDragCancelWiring handles pointerup and
     resyncTreeDataFromLayout
   }))
   wiring.onWindowPointerUpDuringDrag()
-  await Promise.resolve()
+  await vi.advanceTimersByTimeAsync(50)
   expect(resyncTreeDataFromLayout).toHaveBeenCalledTimes(1)
   dragDropCommitted.value = true
   wiring.onWindowPointerUpDuringDrag()
-  await Promise.resolve()
+  await vi.advanceTimersByTimeAsync(50)
   expect(resyncTreeDataFromLayout).toHaveBeenCalledTimes(1)
   dragDropCommitted.value = false
   wiring.onWindowKeydownDuringDrag({
@@ -1522,20 +1585,8 @@ test('Test that createProjectHierarchyTreeDragCancelWiring handles pointerup and
   wiring.onWindowKeydownDuringDrag({
     key: 'Escape'
   } as KeyboardEvent)
-  expect(resyncTreeDataFromLayout).toHaveBeenCalledTimes(2)
-})
-
-test('Test that createProjectHierarchyTreeDragCancelWiring logs pointerup nextTick failures', async () => {
-  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-  const wiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
-    nextTick: async () => {
-      throw new Error('tick failed')
-    }
-  }))
-  wiring.onWindowPointerUpDuringDrag()
-  await vi.runAllTimersAsync()
-  expect(errorSpy).toHaveBeenCalled()
-  errorSpy.mockRestore()
+  expect(resyncTreeDataFromLayout).toHaveBeenCalledTimes(1)
+  vi.useRealTimers()
 })
 
 test('Test that createProjectHierarchyTreeDnDWiring attaches drag cancel listeners on document drag', () => {
@@ -1564,6 +1615,49 @@ test('Test that createProjectHierarchyTreeDnDWiring rejects model updates while 
   expect(treeData.value.length).toBe(initialLength)
 })
 
+test('Test that an uncommitted hierarchy drag end restores expand state and unfreezes once', async () => {
+  resetProjectHierarchyTreeScrollPreserveForTests()
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const dragExpandUiFrozen = ref(false)
+  const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+    callback(performance.now())
+    return 0
+  })
+  const run = (async () => {
+    const wiring = createProjectHierarchyTreeDnDWiring(buildProjectHierarchyTreeDnDWiringTestDeps({
+      dragExpandUiFrozen,
+      nextTick: async () => undefined,
+      openNodeIds: ref(new Set(['world-1'])),
+      restoreExpandedSnapshot,
+      treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+    }))
+    wiring.onBeforeDragStart({
+      data: buildDocumentNode()
+    })
+    expect(dragExpandUiFrozen.value).toBe(true)
+    wiring.onTreeDragEndCleanup()
+    wiring.onTreeDragEndCleanup()
+    await vi.advanceTimersByTimeAsync(500)
+    for (let tick = 0; tick < 8; tick += 1) {
+      await Promise.resolve()
+    }
+    expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(1)
+    expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1'], expect.objectContaining({
+      isStillCurrent: expect.any(Function)
+    }))
+    expect(dragExpandUiFrozen.value).toBe(false)
+    await vi.waitFor(() => {
+      expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(false)
+    })
+    wiring.onUnmountedCleanup()
+  })()
+  await run.finally(() => {
+    rafSpy.mockRestore()
+    vi.useRealTimers()
+    resetProjectHierarchyTreeScrollPreserveForTests()
+  })
+})
+
 test('Test that createProjectHierarchyTreeDnDWiring dragend skips cancel cleanup after committed drop', () => {
   const removeSpy = vi.spyOn(window, 'removeEventListener')
   const dragCommitPending = ref(true)
@@ -1590,7 +1684,7 @@ test('Test that createProjectHierarchyTreeDnDWiring Escape cancel uses session r
   })
   const restoreExpandedSnapshot = vi.fn(async () => undefined)
   const resyncTreeDataFromLayout = vi.fn()
-  try {
+  const run = (async () => {
     const wiring = createProjectHierarchyTreeDnDWiring(buildProjectHierarchyTreeDnDWiringTestDeps({
       nextTick: async () => undefined,
       resyncTreeDataFromLayout,
@@ -1611,11 +1705,12 @@ test('Test that createProjectHierarchyTreeDnDWiring Escape cancel uses session r
       expect(isProjectHierarchyTreeScrollPreserveActive()).toBe(false)
     })
     wiring.onUnmountedCleanup()
-  } finally {
+  })()
+  await run.finally(() => {
     rafSpy.mockRestore()
     vi.useRealTimers()
     resetProjectHierarchyTreeScrollPreserveForTests()
-  }
+  })
 })
 
 test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branches', () => {
@@ -1722,9 +1817,10 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
   expect(removeDragCancelListeners).not.toHaveBeenCalled()
   dragDropCommitted.value = false
   handlers.onTreeDragEndCleanup()
-  expect(removeDragCancelListeners).toHaveBeenCalled()
+  expect(dragExpandedSnapshot.current).toEqual(['world-1'])
   handlers.onUnmountedCleanup()
   expect(clearDragSessionFlags).toHaveBeenCalled()
+  resetProjectHierarchyTreeScrollPreserveForTests()
 })
 
 test('Test that scheduleProjectHierarchyTreeDragCommit runs commit chain', async () => {
@@ -1749,6 +1845,215 @@ test('Test that scheduleProjectHierarchyTreeDragCommit runs commit chain', async
   expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(1)
   expect(dragExpandUiFrozen.value).toBe(false)
   expect(clearDragSessionFlags).toHaveBeenCalled()
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit ignores an older finish after a newer drop', async () => {
+  const dragCommitPending = ref(true)
+  const dragCommitScheduled = ref(false)
+  const clearDragSessionFlags = vi.fn(() => {
+    dragCommitPending.value = false
+  })
+  let releaseFirstRestore: (() => void) | undefined
+  let restoreCalls = 0
+  const restoreExpandedSnapshot = vi.fn(() => {
+    restoreCalls += 1
+    if (restoreCalls === 1) {
+      return new Promise<void>((resolve) => {
+        releaseFirstRestore = resolve
+      })
+    }
+    return Promise.resolve()
+  })
+  const deps = buildScheduleDragCommitTestDeps({
+    clearDragSessionFlags,
+    dragCommitPending,
+    dragCommitScheduled,
+    restoreExpandedSnapshot
+  })
+  scheduleProjectHierarchyTreeDragCommit(deps)
+  await vi.runAllTimersAsync()
+  expect(releaseFirstRestore).toBeTypeOf('function')
+  expect(clearDragSessionFlags).not.toHaveBeenCalled()
+  scheduleProjectHierarchyTreeDragCommit(deps)
+  await vi.runAllTimersAsync()
+  expect(clearDragSessionFlags).toHaveBeenCalledTimes(1)
+  const restoresAfterNewerDrop = restoreExpandedSnapshot.mock.calls.length
+  releaseFirstRestore?.()
+  await vi.runAllTimersAsync()
+  expect(restoreExpandedSnapshot.mock.calls.length).toBe(restoresAfterNewerDrop)
+  expect(clearDragSessionFlags).toHaveBeenCalledTimes(1)
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit skips persist after the project changes', async () => {
+  const clearDragSessionFlags = vi.fn()
+  const reindexDocumentSiblingsInHierarchy = vi.fn(async () => undefined)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const refreshLayout = vi.fn(async () => undefined)
+  const dragExpandUiFrozen = ref(true)
+  const dragExpandPostCommitGuard = ref(true)
+  let epoch = 1
+  scheduleProjectHierarchyTreeDragCommit(buildScheduleDragCommitTestDeps({
+    clearDragSessionFlags,
+    dragExpandPostCommitGuard,
+    dragExpandUiFrozen,
+    nextTick: async () => {
+      epoch = 2
+    },
+    readProjectContentEpoch: () => epoch,
+    refreshLayout,
+    reindexDocumentSiblingsInHierarchy,
+    restoreExpandedSnapshot
+  }))
+  await vi.runAllTimersAsync()
+  expect(reindexDocumentSiblingsInHierarchy).not.toHaveBeenCalled()
+  expect(refreshLayout).not.toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+  expect(dragExpandUiFrozen.value).toBe(false)
+  expect(dragExpandPostCommitGuard.value).toBe(false)
+  expect(clearDragSessionFlags).toHaveBeenCalled()
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit stops when a newer drop starts during settle', async () => {
+  const dragCommitPending = ref(true)
+  const dragCommitScheduled = ref(false)
+  const suppressTreeEmit = ref(true)
+  let ticks = 0
+  let rescheduled = false
+  const deps = buildScheduleDragCommitTestDeps({
+    dragCommitPending,
+    dragCommitScheduled,
+    nextTick: async () => {
+      ticks += 1
+      if (ticks < 3) {
+        return
+      }
+      suppressTreeEmit.value = false
+      if (rescheduled || dragCommitScheduled.value) {
+        return
+      }
+      rescheduled = true
+      scheduleProjectHierarchyTreeDragCommit(deps)
+    },
+    suppressTreeEmit
+  })
+  scheduleProjectHierarchyTreeDragCommit(deps)
+  await vi.runAllTimersAsync()
+  expect(rescheduled).toBe(true)
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit stops after persist when the project open starts', async () => {
+  let flightChecks = 0
+  const clearDragSessionFlags = vi.fn()
+  scheduleProjectHierarchyTreeDragCommit(buildScheduleDragCommitTestDeps({
+    clearDragSessionFlags,
+    isProjectReplacementInFlight: () => {
+      flightChecks += 1
+      return flightChecks >= 2
+    },
+    readProjectContentEpoch: () => 1
+  }))
+  await vi.runAllTimersAsync()
+  expect(flightChecks).toBeGreaterThanOrEqual(2)
+  expect(clearDragSessionFlags).toHaveBeenCalled()
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit stops after persist when a newer drop started', async () => {
+  const dragCommitPending = ref(true)
+  const dragCommitScheduled = ref(false)
+  let rescheduled = false
+  const deps = buildScheduleDragCommitTestDeps({
+    dragCommitPending,
+    dragCommitScheduled,
+    draggedDocumentId: () => 'doc-a',
+    readDragSiblingOrderSnapshot: () => {
+      return {
+        orderedDocumentIds: ['doc-a'],
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        treeNodeId: 'node-1'
+      }
+    },
+    refreshLayout: async () => {
+      if (rescheduled || dragCommitScheduled.value) {
+        return
+      }
+      rescheduled = true
+      scheduleProjectHierarchyTreeDragCommit(deps)
+    }
+  })
+  scheduleProjectHierarchyTreeDragCommit(deps)
+  await vi.runAllTimersAsync()
+  expect(rescheduled).toBe(true)
+})
+
+test('Test that scheduleProjectHierarchyTreeDragCommit skips persist while a project open is in flight', async () => {
+  const clearDragSessionFlags = vi.fn()
+  const reindexDocumentSiblingsInHierarchy = vi.fn(async () => undefined)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const dragExpandUiFrozen = ref(true)
+  scheduleProjectHierarchyTreeDragCommit(buildScheduleDragCommitTestDeps({
+    clearDragSessionFlags,
+    dragExpandUiFrozen,
+    isProjectReplacementInFlight: () => true,
+    readProjectContentEpoch: () => 1,
+    reindexDocumentSiblingsInHierarchy,
+    restoreExpandedSnapshot
+  }))
+  await vi.runAllTimersAsync()
+  expect(reindexDocumentSiblingsInHierarchy).not.toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+  expect(dragExpandUiFrozen.value).toBe(false)
+  expect(clearDragSessionFlags).toHaveBeenCalled()
+})
+
+test('Test that reindexHierarchySiblingsThenSyncOpenedParent skips the tab sync while a project open is in flight', async () => {
+  const syncOpenedParent = vi.fn()
+  let resolveReindex: ((value: string) => void) | undefined
+  const pending = reindexHierarchySiblingsThenSyncOpenedParent({
+    epochAtStart: 1,
+    isProjectReplacementInFlight: () => true,
+    movedDocumentId: 'doc-1',
+    parentDocumentId: 'parent-2',
+    readProjectContentEpoch: () => 1,
+    reindex: () => {
+      return new Promise<string>((resolve) => {
+        resolveReindex = resolve
+      })
+    },
+    syncOpenedParent
+  })
+  resolveReindex?.('moved')
+  await expect(pending).resolves.toBe('moved')
+  expect(syncOpenedParent).not.toHaveBeenCalled()
+})
+
+test('Test that reindexHierarchySiblingsThenSyncOpenedParent skips the tab sync after the project changes', async () => {
+  const syncOpenedParent = vi.fn()
+  const result = await reindexHierarchySiblingsThenSyncOpenedParent({
+    epochAtStart: 1,
+    isProjectReplacementInFlight: () => false,
+    movedDocumentId: 'doc-1',
+    parentDocumentId: 'parent-2',
+    readProjectContentEpoch: () => 2,
+    reindex: async () => 'moved',
+    syncOpenedParent
+  })
+  expect(result).toBe('moved')
+  expect(syncOpenedParent).not.toHaveBeenCalled()
+})
+
+test('Test that reindexHierarchySiblingsThenSyncOpenedParent syncs the open tab after reindex', async () => {
+  const syncOpenedParent = vi.fn()
+  await reindexHierarchySiblingsThenSyncOpenedParent({
+    epochAtStart: 4,
+    isProjectReplacementInFlight: () => false,
+    movedDocumentId: 'doc-1',
+    parentDocumentId: null,
+    readProjectContentEpoch: () => 4,
+    reindex: async () => 'moved',
+    syncOpenedParent
+  })
+  expect(syncOpenedParent).toHaveBeenCalledWith('doc-1', null)
 })
 
 test('Test that scheduleProjectHierarchyTreeDragCommit skips refresh for same-bucket sibling reorder', async () => {
@@ -1925,6 +2230,56 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle ignores empty reveal pa
   expect(revealPendingPath).not.toHaveBeenCalled()
 })
 
+test('Test that an older hierarchy reveal does not clear a newer pending path', async () => {
+  let releaseFirstReveal: () => void = () => undefined
+  const firstRevealGate = new Promise<void>((resolve) => {
+    releaseFirstReveal = resolve
+  })
+  let revealCalls = 0
+  const revealPendingPath = vi.fn(async () => {
+    revealCalls += 1
+    if (revealCalls === 1) {
+      await firstRevealGate
+    }
+  })
+  const clearPendingRevealPath = vi.fn()
+  const pendingRevealPath = ref<string[]>([])
+  const { watch: watchLifecycle } = await import('vue')
+  wireProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: null,
+      hasActiveProject: false
+    }),
+    clearPendingRevealPath,
+    flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
+    hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
+    shouldDeferWorldsExpandRestore: () => false,
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    openNodeIds: ref(new Set<string>()),
+    pendingRevealPath,
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
+    revealPendingPath,
+    teardown: vi.fn(),
+    treeData: ref([]),
+    watch: watchLifecycle,
+    worlds: ref([])
+  })
+  pendingRevealPath.value = ['world-a']
+  await nextTick()
+  pendingRevealPath.value = ['world-b']
+  await nextTick()
+  await Promise.resolve()
+  releaseFirstReveal()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(clearPendingRevealPath).toHaveBeenCalledTimes(1)
+})
+
 test('Test that session handlers ignore expand events while drag expand UI is frozen', async () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = tree[0]!.children[0]!
@@ -2036,6 +2391,38 @@ test('Test that runProjectHierarchyTreePostDragExpandCloseGuard suppresses close
     treeData
   })
   expect(markNodeClosed).toHaveBeenCalledWith('placement-1', placement)
+})
+
+test('Test that a superseded hierarchy drag commit does not unfreeze or restore expand state', async () => {
+  const dragExpandPostCommitGuard = ref(true)
+  const dragExpandUiFrozen = ref(true)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const reapplyLatentDescendantExpandState = vi.fn(async () => undefined)
+  const reapplyHeTreeOpenState = vi.fn()
+  let stillCurrent = true
+  reapplyLatentDescendantExpandState.mockImplementation(async () => {
+    stillCurrent = false
+  })
+  await finalizeProjectHierarchyTreeDragCommitExpandState({
+    clearDragSessionFlags: vi.fn(),
+    dragExpandPostCommitGuard,
+    dragExpandUiFrozen,
+    expandedSnapshot: ['world-1'],
+    flushUiStatePersist: vi.fn(),
+    isDragCommitStillCurrent: () => stillCurrent,
+    nextTick: async () => undefined,
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState,
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 1
+    },
+    restoreExpandedSnapshot
+  })
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+  expect(reapplyHeTreeOpenState).not.toHaveBeenCalled()
+  expect(dragExpandUiFrozen.value).toBe(true)
+  expect(dragExpandPostCommitGuard.value).toBe(true)
 })
 
 test('Test that finalizeProjectHierarchyTreeDragCommitExpandState restores expand snapshot', async () => {
@@ -3154,7 +3541,9 @@ test('Test that syncProjectHierarchyTreeOpenSetToPersist queues latent descendan
     queuePersistExpandedNodeIds,
     treeData
   })
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'], {
+    allowEmpty: true
+  })
 })
 
 test('Test that syncProjectHierarchyTreeOpenSetToPersist queues expanded ids', () => {
@@ -3166,7 +3555,9 @@ test('Test that syncProjectHierarchyTreeOpenSetToPersist queues expanded ids', (
     queuePersistExpandedNodeIds,
     treeData
   })
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'], {
+    allowEmpty: true
+  })
 })
 
 test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async () => {
@@ -3372,6 +3763,41 @@ test('Test that revealProjectHierarchyTreePendingPath scrolls focused row into v
   expect(row.scrollIntoView).toHaveBeenCalled()
 })
 
+test('Test that a superseded hierarchy reveal does not scroll to the old hit', async () => {
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const row = document.createElement('div')
+  row.setAttribute('data-test-hierarchy-node-id', 'doc-old')
+  row.scrollIntoView = vi.fn()
+  tree.appendChild(row)
+  host.appendChild(tree)
+  let livePath = ['doc-old']
+  const markNodeOpen = vi.fn()
+  const openNodeAndParents = vi.fn()
+  await revealProjectHierarchyTreePendingPath({
+    getPendingRevealPath: () => livePath,
+    getTreeRef: () => ({
+      closeAll: vi.fn(),
+      openNodeAndParents
+    }),
+    getTreeScrollHost: () => host,
+    loadChildrenAlongRevealPath: async () => {
+      livePath = ['doc-new']
+    },
+    markNodeOpen,
+    nextTick: async () => undefined,
+    requestAnimationFrame: (callback: () => void) => {
+      callback()
+      return 1
+    },
+    treeData: ref([])
+  })
+  expect(row.scrollIntoView).not.toHaveBeenCalled()
+  expect(markNodeOpen).not.toHaveBeenCalled()
+  expect(openNodeAndParents).not.toHaveBeenCalled()
+})
+
 test('Test that createProjectHierarchyTreeDnDWiring ignores document nodes without documentId', () => {
   const isTreeDragActive = ref(false)
   const dragExpandUiFrozen = ref(false)
@@ -3402,6 +3828,7 @@ test('Test that createProjectHierarchyTreeDnDWiring ignores non-document drag st
   expect(isTreeDragActive.value).toBe(false)
   wiring.onTreeDataUpdate([])
   wiring.onTreeDragEndCleanup()
+  resetProjectHierarchyTreeScrollPreserveForTests()
 })
 
 test('Test that createUseProjectHierarchyTree composes hierarchy session wiring', async () => {

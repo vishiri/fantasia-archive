@@ -206,6 +206,38 @@ test('Test that S_FaProjectHierarchyTree refreshLayout keeps prior worlds when b
   expect(store.treeData[0]?.id).toBe('world-1')
 })
 
+test('Test that S_FaProjectHierarchyTree refreshLayout ignores a layout read from an older project', async () => {
+  let resolveLayout: ((value: { worlds: never[] }) => void) | undefined
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-a',
+    name: 'A'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshLayout()
+  expect(store.worlds[0]?.id).toBe('world-1')
+  listWorkspaceHierarchyLayoutMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveLayout = resolve
+    })
+  })
+  const pending = store.refreshLayout()
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishLayout = resolveLayout
+  if (finishLayout === undefined) {
+    throw new Error('missing layout resolver')
+  }
+  finishLayout({ worlds: [] })
+  await pending
+  expect(store.worlds[0]?.id).toBe('world-1')
+})
+
 /**
  * S_FaProjectHierarchyTree refreshUiState resets when no project is active.
  */
@@ -235,6 +267,122 @@ test('Test that S_FaProjectHierarchyTree refreshUiState loads persisted UI state
   expect(store.uiState.scrollTopPx).toBe(24)
 })
 
+test('Test that S_FaProjectHierarchyTree refreshUiState ignores a read from an older project', async () => {
+  let resolveUiState: ((value: {
+    expandedNodeIds: string[]
+    schemaVersion: 1
+    scrollTopPx: number
+  }) => void) | undefined
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-a',
+    name: 'A'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1'])
+  getHierarchyTreeUiStateMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUiState = resolve
+    })
+  })
+  const pending = store.refreshUiState()
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishUiState = resolveUiState
+  if (finishUiState === undefined) {
+    throw new Error('missing ui state resolver')
+  }
+  finishUiState({
+    expandedNodeIds: ['stale-node'],
+    schemaVersion: 1,
+    scrollTopPx: 99
+  })
+  await pending
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1'])
+  expect(store.uiState.scrollTopPx).toBe(24)
+})
+
+test('Test that a hierarchy UI refresh does not replace a later expand save', async () => {
+  let resolveUiState: ((value: {
+    expandedNodeIds: string[]
+    schemaVersion: 1
+    scrollTopPx: number
+  }) => void) | undefined
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  getHierarchyTreeUiStateMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUiState = resolve
+    })
+  })
+  const pending = store.refreshUiState()
+  await Promise.resolve()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  store.flushUiStatePersist()
+  const finishUiState = resolveUiState
+  if (finishUiState === undefined) {
+    throw new Error('missing ui state resolver')
+  }
+  finishUiState({
+    expandedNodeIds: ['stale-node'],
+    schemaVersion: 1,
+    scrollTopPx: 99
+  })
+  await pending
+  await vi.runAllTimersAsync()
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1', 'group-1'])
+  expect(store.uiState.scrollTopPx).toBe(24)
+})
+
+test('Test that a hierarchy UI refresh keeps an expand queued during the read', async () => {
+  let resolveUiState: ((value: {
+    expandedNodeIds: string[]
+    schemaVersion: 1
+    scrollTopPx: number
+  }) => void) | undefined
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  getHierarchyTreeUiStateMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUiState = resolve
+    })
+  })
+  const pending = store.refreshUiState()
+  await Promise.resolve()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  store.queuePersistScrollTopPx(40)
+  const finishUiState = resolveUiState
+  if (finishUiState === undefined) {
+    throw new Error('missing ui state resolver')
+  }
+  finishUiState({
+    expandedNodeIds: ['stale-node'],
+    schemaVersion: 1,
+    scrollTopPx: 99
+  })
+  await pending
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1', 'group-1'])
+  expect(store.uiState.scrollTopPx).toBe(40)
+})
+
 /**
  * S_FaProjectHierarchyTree persists expanded node ids debounced.
  */
@@ -252,7 +400,7 @@ test('Test that S_FaProjectHierarchyTree persists expanded node ids debounced', 
   await vi.runAllTimersAsync()
   expect(setHierarchyTreeUiStateMock).toHaveBeenCalledWith({
     expandedNodeIds: ['world-1', 'group-1'],
-    scrollTopPx: 24
+    expandedNodeIdsBaseJson: '["world-1"]'
   })
 })
 
@@ -272,9 +420,154 @@ test('Test that S_FaProjectHierarchyTree persists scroll offset debounced', asyn
   store.flushUiStatePersist()
   await vi.runAllTimersAsync()
   expect(setHierarchyTreeUiStateMock).toHaveBeenCalledWith({
-    expandedNodeIds: ['world-1'],
     scrollTopPx: 88
   })
+})
+
+/**
+ * A refresh that lands after a queued expand drops that stale patch.
+ */
+test('Test that a hierarchy expand persist drops a patch overwritten by a newer UI refresh', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  store.queuePersistExpandedNodeIds(['stale-world'])
+  await store.refreshUiState()
+  setHierarchyTreeUiStateMock.mockClear()
+  store.flushUiStatePersist()
+  await vi.runAllTimersAsync()
+  expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1'])
+})
+
+/**
+ * An empty expand list must not replace a loaded non-empty list unless the caller collapsed.
+ */
+test('Test that a hierarchy expand persist ignores an empty list over a loaded snapshot', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  setHierarchyTreeUiStateMock.mockClear()
+  store.queuePersistExpandedNodeIds([])
+  store.flushUiStatePersist()
+  await vi.runAllTimersAsync()
+  expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1'])
+})
+
+/**
+ * A real collapse may persist an empty expand list.
+ */
+test('Test that a hierarchy expand persist allows an empty list from a collapse', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  setHierarchyTreeUiStateMock.mockClear()
+  store.queuePersistExpandedNodeIds([], {
+    allowEmpty: true
+  })
+  store.flushUiStatePersist()
+  await vi.runAllTimersAsync()
+  expect(setHierarchyTreeUiStateMock).toHaveBeenCalledWith({
+    expandedNodeIds: [],
+    expandedNodeIdsBaseJson: '["world-1"]'
+  })
+})
+
+/**
+ * Project-switch flush must not rewrite expand ids the store never changed.
+ */
+test('Test that a hierarchy project-switch flush skips an unchanged expand list', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  setHierarchyTreeUiStateMock.mockClear()
+  await store.flushUiStatePersistBeforeProjectReplacement()
+  expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1'])
+})
+
+/**
+ * A scroll patch must still carry an expand change that debounce replaced.
+ */
+test('Test that a hierarchy scroll persist keeps a dirty expand list', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  store.queuePersistScrollTopPx(88)
+  store.flushUiStatePersist()
+  await vi.runAllTimersAsync()
+  expect(setHierarchyTreeUiStateMock).toHaveBeenCalledWith({
+    expandedNodeIds: ['world-1', 'group-1'],
+    expandedNodeIdsBaseJson: '["world-1"]',
+    scrollTopPx: 88
+  })
+})
+
+/**
+ * S_FaProjectHierarchyTree waits out an in-flight UI write before the project-switch flush.
+ */
+test('Test that S_FaProjectHierarchyTree flushUiStatePersistBeforeProjectReplacement waits for an in-flight UI write', async () => {
+  let resolveWrite: ((value: boolean) => void) | undefined
+  setHierarchyTreeUiStateMock.mockImplementationOnce(() => new Promise<boolean>((resolve) => {
+    resolveWrite = resolve
+  }))
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  await vi.advanceTimersByTimeAsync(150)
+  expect(setHierarchyTreeUiStateMock).toHaveBeenCalledTimes(1)
+
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1', 'placement-1'])
+  let replacementDone = false
+  const replacement = store.flushUiStatePersistBeforeProjectReplacement().then(() => {
+    replacementDone = true
+  })
+  await Promise.resolve()
+  expect(replacementDone).toBe(false)
+  expect(setHierarchyTreeUiStateMock).toHaveBeenCalledTimes(1)
+
+  resolveWrite?.(true)
+  await replacement
+
+  expect(replacementDone).toBe(true)
+  expect(setHierarchyTreeUiStateMock).toHaveBeenCalledTimes(2)
+  expect(setHierarchyTreeUiStateMock).toHaveBeenLastCalledWith({
+    expandedNodeIds: ['world-1', 'group-1', 'placement-1'],
+    expandedNodeIdsBaseJson: '["world-1","group-1"]'
+  })
+  expect(store.uiState.expandedNodeIds).toEqual(['world-1', 'group-1', 'placement-1'])
 })
 
 /**
@@ -294,6 +587,90 @@ test('Test that S_FaProjectHierarchyTree skips persist when values are unchanged
   store.flushUiStatePersist()
   await vi.runAllTimersAsync()
   expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+})
+
+/**
+ * S_FaProjectHierarchyTree
+ * A queued expand must not be written after the project epoch moves.
+ */
+test('Test that a hierarchy UI persist does not write expand state after the project changes', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-a',
+    name: 'A'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  setHierarchyTreeUiStateMock.mockClear()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  store.flushUiStatePersist()
+  await vi.runAllTimersAsync()
+  expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+})
+
+/**
+ * S_FaProjectHierarchyTree
+ * An expand queued while a project switch is in flight must not be written.
+ */
+test('Test that a hierarchy UI persist does not write expand state during a project switch', async () => {
+  await import('../S_FaOpenedDocuments')
+  await import('../S_FaProjectSidebar')
+  await import('app/src/scripts/floatingWindows/faProjectReplacementPersistHooksWiring')
+  let releaseOpen: ((value: { outcome: 'canceled' }) => void) | undefined
+  const projectManagement = window.faContentBridgeAPIs?.projectManagement
+  if (projectManagement === undefined) {
+    throw new Error('missing project management bridge')
+  }
+  Object.assign(projectManagement, {
+    openProject: () => {
+      return new Promise((resolve) => {
+        releaseOpen = resolve
+      })
+    }
+  })
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-a',
+    name: 'A'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshUiState()
+  let openFailure: unknown = null
+  const opening = S_FaActiveProject().openProjectFromKnownPath('C:\\b.faproject').then(
+    () => undefined,
+    (error: unknown) => {
+      openFailure = error
+    }
+  )
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    if (releaseOpen !== undefined || openFailure !== null) {
+      break
+    }
+    await Promise.resolve()
+    await vi.advanceTimersByTimeAsync(0)
+  }
+  if (openFailure !== null) {
+    throw openFailure
+  }
+  const finishOpen = releaseOpen
+  if (finishOpen === undefined) {
+    throw new Error('missing open resolver')
+  }
+  setHierarchyTreeUiStateMock.mockClear()
+  store.queuePersistExpandedNodeIds(['world-1', 'group-1'])
+  await vi.advanceTimersByTimeAsync(200)
+  expect(setHierarchyTreeUiStateMock).not.toHaveBeenCalled()
+  finishOpen({
+    outcome: 'canceled'
+  })
+  await opening
 })
 
 /**
@@ -436,7 +813,7 @@ test('Test that S_FaProjectHierarchyTree refreshLayout re-fetches after concurre
   await Promise.all([first, second])
   expect(listWorkspaceHierarchyLayoutMock).toHaveBeenCalledTimes(2)
   expect(store.worlds[0]?.placements).toHaveLength(1)
-  expect(store.layoutRefreshGeneration).toBe(2)
+  expect(store.layoutRefreshGeneration).toBe(1)
 })
 
 /**
@@ -534,6 +911,70 @@ test('Test that S_FaProjectHierarchyTree patchWorldColorPaletteInLayout updates 
   expect(store.worlds[0]?.colorPalette).toBe('#aabbcc,#ddeeff')
   store.patchWorldColorPaletteInLayout('world-missing', '#000000')
   expect(store.worlds[0]?.colorPalette).toBe('#aabbcc,#ddeeff')
+})
+
+test('Test that a layout refresh does not replace a later world palette patch', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshLayout()
+  let resolveLayout: (value: Awaited<ReturnType<typeof listWorkspaceHierarchyLayoutMock>>) => void = () => undefined
+  const layoutPromise = new Promise<Awaited<ReturnType<typeof listWorkspaceHierarchyLayoutMock>>>((resolve) => {
+    resolveLayout = resolve
+  })
+  listWorkspaceHierarchyLayoutMock.mockReturnValueOnce(layoutPromise)
+  const pending = store.refreshLayout()
+  await Promise.resolve()
+  store.patchWorldColorPaletteInLayout('world-1', '#aabbcc')
+  resolveLayout({
+    worlds: [
+      {
+        color: '#00ff00',
+        colorPalette: '',
+        displayName: 'World Renamed',
+        groups: [],
+        id: 'world-1',
+        placements: [],
+        sortOrder: 0
+      }
+    ]
+  })
+  await pending
+  expect(store.worlds[0]?.color).toBe('#00ff00')
+  expect(store.worlds[0]?.colorPalette).toBe('#aabbcc')
+  expect(store.worlds[0]?.displayName).toBe('World Renamed')
+  expect(store.worlds[0]?.placements).toEqual([])
+})
+
+test('Test that a layout refresh started after a world palette patch uses the bridge palette', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshLayout()
+  store.patchWorldColorPaletteInLayout('world-1', '#aabbcc')
+  listWorkspaceHierarchyLayoutMock.mockResolvedValueOnce({
+    worlds: [
+      {
+        color: '#ff0000',
+        colorPalette: '#112233',
+        displayName: 'World One',
+        groups: [],
+        id: 'world-1',
+        placements: [],
+        sortOrder: 0
+      }
+    ]
+  })
+  await store.refreshLayout()
+  expect(store.worlds[0]?.colorPalette).toBe('#112233')
 })
 
 const sampleIndexDocument = {
@@ -708,6 +1149,47 @@ test('Test that S_FaProjectHierarchyTree shares in-flight document dump loads', 
     parentDocumentId: null,
     placementId: 'placement-1'
   }).map((item) => item.id)).toEqual(['doc-1'])
+})
+
+test('Test that a document index load does not replace a later indexed document', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  const indexedSidekick = {
+    ...sampleIndexDocument,
+    displayName: 'Sidekick',
+    id: 'doc-2',
+    sortOrder: 1
+  }
+  let resolveDump: ((value: { items: typeof sampleIndexDocument[] }) => void) | undefined
+  let listCalls = 0
+  listDocumentsMock.mockImplementation(() => {
+    listCalls += 1
+    if (listCalls === 1) {
+      return new Promise((resolve) => {
+        resolveDump = resolve
+      })
+    }
+    return Promise.resolve({
+      items: [sampleIndexDocument, indexedSidekick]
+    })
+  })
+  const pending = store.ensureDocumentIndexLoaded()
+  await Promise.resolve()
+  store.upsertIndexedDocument(indexedSidekick)
+  resolveDump?.({
+    items: [sampleIndexDocument]
+  })
+  await pending
+  expect(listDocumentsMock).toHaveBeenCalledTimes(2)
+  expect(store.listIndexedPlacementChildren({
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  }).map((item) => item.id)).toEqual(['doc-1', 'doc-2'])
 })
 
 /**

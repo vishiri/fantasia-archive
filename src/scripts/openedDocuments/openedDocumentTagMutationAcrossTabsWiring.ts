@@ -20,22 +20,22 @@ export function applyOpenedDocumentTagRenameAcrossTabs (input: {
     ? input.mergedFromTagId
     : input.survivingTagId
   return input.tabs.map((tab) => {
+    const renameInput = {
+      sourceTagId,
+      survivingTagId: input.survivingTagId,
+      survivingTagName: input.survivingTagName
+    }
+    const savedTags = savedTagsAfterRename(tab, renameInput)
+    const tagsDraft = tagsDraftAfterRename(tab, renameInput)
     const nextTab = {
       ...tab,
-      savedTags: rewriteTagRefListForRename(tab.savedTags ?? [], {
-        sourceTagId,
-        survivingTagId: input.survivingTagId,
-        survivingTagName: input.survivingTagName
-      }),
-      tagsDraft: rewriteTagListForRename(tab.tagsDraft ?? [], {
-        sourceTagId,
-        survivingTagId: input.survivingTagId,
-        survivingTagName: input.survivingTagName
-      })
+      savedTags,
+      tagsDraft
     }
+    const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
     return {
       ...nextTab,
-      hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+      hasUnsavedChanges
     }
   })
 }
@@ -48,16 +48,67 @@ export function applyOpenedDocumentTagDeleteAcrossTabs (input: {
   tabs: readonly I_faOpenedDocumentTab[]
 }): I_faOpenedDocumentTab[] {
   return input.tabs.map((tab) => {
+    const savedTags = savedTagsAfterDelete(tab, input.deletedTagId)
+    const tagsDraft = tagsDraftAfterDelete(tab, input.deletedTagId)
     const nextTab = {
       ...tab,
-      savedTags: (tab.savedTags ?? []).filter((tag) => tag.id !== input.deletedTagId),
-      tagsDraft: (tab.tagsDraft ?? []).filter((tag) => tag.id !== input.deletedTagId)
+      savedTags,
+      tagsDraft
     }
+    const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
     return {
       ...nextTab,
-      hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+      hasUnsavedChanges
     }
   })
+}
+
+function savedTagsAfterRename (
+  tab: I_faOpenedDocumentTab,
+  input: {
+    sourceTagId: string
+    survivingTagId: string
+    survivingTagName: string
+  }
+): I_faProjectDocumentTagRef[] | undefined {
+  if (tab.savedTags === undefined) {
+    return undefined
+  }
+  return rewriteTagRefListForRename(tab.savedTags, input)
+}
+
+function tagsDraftAfterRename (
+  tab: I_faOpenedDocumentTab,
+  input: {
+    sourceTagId: string
+    survivingTagId: string
+    survivingTagName: string
+  }
+): I_faProjectDocumentTagAssignmentInput[] | undefined {
+  if (tab.tagsDraft === undefined) {
+    return undefined
+  }
+  return rewriteTagListForRename(tab.tagsDraft, input)
+}
+
+function savedTagsAfterDelete (
+  tab: I_faOpenedDocumentTab,
+  deletedTagId: string
+): I_faProjectDocumentTagRef[] | undefined {
+  if (tab.savedTags === undefined) {
+    return undefined
+  }
+  return tab.savedTags.filter((tag) => tag.id !== deletedTagId)
+}
+
+function tagsDraftAfterDelete (
+  tab: I_faOpenedDocumentTab,
+  deletedTagId: string
+): I_faProjectDocumentTagAssignmentInput[] | undefined {
+  if (tab.tagsDraft === undefined) {
+    return undefined
+  }
+  return tab.tagsDraft.filter((tag) => tag.id !== deletedTagId)
 }
 
 function rewriteTagListForRename (

@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+import { Result } from 'neverthrow'
 
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 import { DIALOG_ACTION_MONITOR_COLUMN_NAMES } from 'app/types/I_dialogActionMonitorUi'
@@ -13,6 +14,13 @@ import {
 } from '../functions/dialogActionMonitorTableModel'
 
 const actionMonitorTableTestTranslate = (key: string): string => key
+
+function parseActionMonitorClipboardPayload (raw: string): unknown {
+  return Result.fromThrowable(
+    () => JSON.parse(raw) as unknown,
+    () => undefined
+  )().unwrapOr(undefined)
+}
 
 /**
  * buildDialogActionMonitorColumns
@@ -170,7 +178,7 @@ test('Test that buildDialogActionMonitorRowClipboardJson includes parsed payload
     status: 'success',
     uid: 'uid-success'
   }
-  const json = buildDialogActionMonitorRowClipboardJson(entry)
+  const json = buildDialogActionMonitorRowClipboardJson(entry, parseActionMonitorClipboardPayload)
   const parsed = JSON.parse(json) as Record<string, unknown>
   expect(parsed.uid).toBe('uid-success')
   expect(parsed.id).toBe('languageSwitch')
@@ -191,7 +199,7 @@ test('Test that buildDialogActionMonitorRowClipboardJson omits payload field whe
     status: 'queued',
     uid: 'no-payload'
   }
-  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry)) as Record<string, unknown>
+  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry, parseActionMonitorClipboardPayload)) as Record<string, unknown>
   expect(parsed.payload).toBeUndefined()
   expect(parsed.payloadPreview).toBeUndefined()
 })
@@ -205,7 +213,7 @@ test('Test that buildDialogActionMonitorRowClipboardJson keeps payloadPreview wh
     status: 'queued',
     uid: 'broken-payload'
   }
-  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry)) as Record<string, unknown>
+  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry, parseActionMonitorClipboardPayload)) as Record<string, unknown>
   expect(parsed.payload).toBeUndefined()
   expect(parsed.payloadPreview).toBe('not-json')
 })
@@ -219,7 +227,7 @@ test('Test that buildDialogActionMonitorRowClipboardJson treats empty payloadPre
     status: 'queued',
     uid: 'empty-payload'
   }
-  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry)) as Record<string, unknown>
+  const parsed = JSON.parse(buildDialogActionMonitorRowClipboardJson(entry, parseActionMonitorClipboardPayload)) as Record<string, unknown>
   expect(parsed.payload).toBeUndefined()
   expect('payloadPreview' in parsed).toBe(false)
 })

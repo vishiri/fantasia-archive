@@ -2,11 +2,6 @@ import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjec
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
-const EMPTY_WORLD_TEMPLATE_LAYOUT: I_dialogProjectSettingsWorldDraft['templateLayout'] = {
-  groups: [],
-  placements: []
-}
-
 export function appendDialogProjectSettingsWorldDraft (
   worlds: I_dialogProjectSettingsWorldDraft[],
   languageCode: T_faUserSettingsLanguageCode,
@@ -24,7 +19,10 @@ export function appendDialogProjectSettingsWorldDraft (
       displayNameTranslations,
       documentCount: 0,
       id,
-      templateLayout: EMPTY_WORLD_TEMPLATE_LAYOUT
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ]
 }

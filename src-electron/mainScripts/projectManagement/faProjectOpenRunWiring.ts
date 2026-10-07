@@ -48,10 +48,12 @@ function readFaProjectActiveSnapshotForReuse (
     mirroredPath !== null && mirroredPath.length > 0
       ? mirroredPath
       : preferredFilePath
+  const id = readFaProjectStoredProjectUuid(activeDbHandle)
+  const name = readFaProjectStoredDisplayName(activeDbHandle)
   return {
     filePath,
-    id: readFaProjectStoredProjectUuid(activeDbHandle),
-    name: readFaProjectStoredDisplayName(activeDbHandle)
+    id,
+    name
   }
 }
 
@@ -62,11 +64,14 @@ function normalizeFaProjectOpenFailure (e: unknown): Error {
   if (typeof e === 'string') {
     return new Error(e)
   }
-  try {
-    return new Error(JSON.stringify(e))
-  } catch {
-    return new Error('Unexpected failure opening project')
+  const serialized = Result.fromThrowable(
+    () => JSON.stringify(e),
+    () => undefined
+  )()
+  if (serialized.isOk()) {
+    return new Error(serialized.value)
   }
+  return new Error('Unexpected failure opening project')
 }
 
 function closeOpenAttemptDb (db: Database | null): void {
@@ -81,13 +86,21 @@ function closeOpenAttemptDb (db: Database | null): void {
   )()
 }
 
+function faProjectOpenErrorResult (
+  errorMessage: string,
+  errorName: string
+): I_faProjectOpenResult {
+  const outcome = 'error' as const
+  return {
+    errorMessage,
+    errorName,
+    outcome
+  }
+}
+
 function ipcParseFailureResult (e: unknown): I_faProjectOpenResult {
   if (e instanceof TypeError) {
-    return {
-      errorMessage: e.message,
-      errorName: e.name,
-      outcome: 'error'
-    }
+    return faProjectOpenErrorResult(e.message, e.name)
   }
   if (e instanceof ZodError) {
     const first = e.issues[0]
@@ -99,11 +112,7 @@ function ipcParseFailureResult (e: unknown): I_faProjectOpenResult {
     }
   }
   const err = e instanceof Error ? e : new Error(String(e))
-  return {
-    errorMessage: err.message,
-    errorName: err.name,
-    outcome: 'error'
-  }
+  return faProjectOpenErrorResult(err.message, err.name)
 }
 
 function attemptOpenReplaceFaProject (
@@ -148,12 +157,14 @@ export async function runFaProjectOpenFromIpc (
   event: IpcMainInvokeEvent,
   raw: unknown
 ): Promise<I_faProjectOpenResult> {
-  let parsed: ReturnType<typeof parseFaProjectOpenInput>
-  try {
-    parsed = parseFaProjectOpenInput(raw)
-  } catch (e: unknown) {
-    return ipcParseFailureResult(e)
+  const parsedResult = Result.fromThrowable(
+    () => parseFaProjectOpenInput(raw),
+    (error: unknown) => error
+  )()
+  if (parsedResult.isErr()) {
+    return ipcParseFailureResult(parsedResult.error)
   }
+  const parsed = parsedResult.value
 
   const target = await resolveFaProjectOpenTargetPath(event, parsed)
   if ('canceled' in target && target.canceled) {
@@ -209,11 +220,14 @@ export async function runFaProjectOpenFromIpc (
     ) {
       removeRecentProjectEntryByPath(filePath)
     }
+    const errorMessage = err.message
+    const errorName = err.name
+    const outcome = 'error' as const
     return {
       attemptedFilePath: filePath,
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
+      errorMessage,
+      errorName,
+      outcome
     }
   }
 
@@ -222,8 +236,10 @@ export async function runFaProjectOpenFromIpc (
     name: opened.value.name
   })
 
+  const outcome = 'opened' as const
+  const project = opened.value
   return {
-    outcome: 'opened',
-    project: opened.value
+    outcome,
+    project
   }
 }

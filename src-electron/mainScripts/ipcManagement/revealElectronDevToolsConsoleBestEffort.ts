@@ -1,5 +1,7 @@
 import type { WebContents } from 'electron'
 
+import { ResultAsync } from 'neverthrow'
+
 const DWC_POLL_MS = 50
 const DWC_ATTEMPTS = 16
 
@@ -9,6 +11,7 @@ function delayMs (ms: number): Promise<void> {
   })
 }
 
+// DevTools frontend realm. This string cannot import 'neverthrow', so try stays inside the script.
 const REVEAL_CONSOLE_SCRIPT = `Boolean((function () {
   try {
     if (typeof UI !== 'undefined' && UI.inspectorView && typeof UI.inspectorView.showPanel === 'function') {
@@ -37,8 +40,11 @@ export async function revealElectronDevToolsConsoleBestEffort (wc: WebContents):
       await delayMs(DWC_POLL_MS)
       continue
     }
-    const ok = await dwc.executeJavaScript(REVEAL_CONSOLE_SCRIPT).catch((): boolean => false)
-    if (ok === true) {
+    const revealed = await ResultAsync.fromPromise(
+      dwc.executeJavaScript(REVEAL_CONSOLE_SCRIPT),
+      () => false
+    )
+    if (revealed.isOk() && revealed.value === true) {
       return true
     }
     await delayMs(DWC_POLL_MS)

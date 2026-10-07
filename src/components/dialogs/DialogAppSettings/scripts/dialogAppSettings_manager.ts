@@ -1,4 +1,5 @@
 import { computed, onMounted, ref, toRaw, watch } from 'vue'
+import { Notify } from 'quasar'
 import { Result } from 'neverthrow'
 
 import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
@@ -28,6 +29,14 @@ const dialogAppSettingsApi = createDialogAppSettings({
   onMounted,
   ref,
   registerComponentDialogStackGuard,
+  reportAppSettingsLoadFailure: () => {
+    Notify.create({
+      faSkipNotifyConsoleLog: true,
+      group: false,
+      message: i18n.global.t('dialogs.appSettings.loadError'),
+      type: 'negative'
+    })
+  },
   Result,
   runFaActionAwait,
   toRaw,

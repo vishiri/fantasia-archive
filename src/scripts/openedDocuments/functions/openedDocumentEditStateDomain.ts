@@ -22,9 +22,10 @@ export function resolveOpenedDocumentTabIsInEditMode (editState: boolean): boole
 export function normalizeOpenedDocumentTabEditState (
   tab: I_faOpenedDocumentTab
 ): I_faOpenedDocumentTab {
+  const editState = tab.editState ?? false
   return {
     ...tab,
-    editState: tab.editState ?? false
+    editState
   }
 }
 

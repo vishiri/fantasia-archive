@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive الإعدادات',
+  loadError: 'تعذر تحميل الإعدادات.',
   saveButton: 'حفظ الإعدادات',
   closeButton: 'إغلاق بدون حفظ',
   settingsSearchPlaceholder: 'بحث في الإعدادات...',

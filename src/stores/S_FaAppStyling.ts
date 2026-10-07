@@ -22,6 +22,16 @@ export const S_FaAppStyling = defineStore('S_FaAppStyling', () => {
   const root: Ref<I_faAppStylingRoot | null> = ref(null)
   const css: Ref<string> = ref('')
   const cssLivePreview: Ref<string | null> = ref(null)
+  let appStylingIoTail: Promise<void> = Promise.resolve()
+
+  function enqueueAppStylingIo<T> (work: () => Promise<T>): Promise<T> {
+    const run = appStylingIoTail.then(work)
+    appStylingIoTail = run.then(
+      () => undefined,
+      () => undefined
+    )
+    return run
+  }
 
   function setRoot (next: I_faAppStylingRoot): void {
     root.value = next
@@ -40,25 +50,26 @@ export const S_FaAppStyling = defineStore('S_FaAppStyling', () => {
    * @returns true when the bridge returned a root and 'setRoot' ran; false when the API is missing or the read failed.
    */
   async function refreshAppStyling (): Promise<boolean> {
-    return faAppStylingRefreshFromBridge({ setRoot })
+    return await enqueueAppStylingIo(() => faAppStylingRefreshFromBridge({ setRoot }))
   }
 
   /**
    * Writes a partial patch (for example floating window frame only) without success Notify; syncs 'root' after a successful read-back.
    */
   async function persistAppStylingPartialSilent (patch: I_faAppStylingPatch): Promise<void> {
-    await faAppStylingPersistPartialSilent({
+    await enqueueAppStylingIo(() => faAppStylingPersistPartialSilent({
       patch,
+      readCurrentCss: () => css.value,
       setRoot
-    })
+    }))
   }
 
   async function updateAppStyling (patch: I_faAppStylingPatch): Promise<boolean> {
-    return faAppStylingUpdateWithUserNotify({
+    return await enqueueAppStylingIo(() => faAppStylingUpdateWithUserNotify({
       cssLivePreview,
       patch,
       setRoot
-    })
+    }))
   }
 
   const clearCssLivePreviewOut = clearCssLivePreview

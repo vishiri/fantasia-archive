@@ -149,21 +149,23 @@ test('Test that app window does not start if another instance is already running
   }
 
   vi.stubEnv('TEST_ENV', 'components')
-  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
+  expect(preventSecondaryAppInstance()).toBe(true)
   expect(appMock.requestSingleInstanceLock).not.toHaveBeenCalled()
 
   vi.unstubAllEnvs()
   appMock.requestSingleInstanceLock.mockReturnValueOnce(false)
-  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
+  expect(preventSecondaryAppInstance()).toBe(false)
   expect(appMock.quit).toHaveBeenCalledOnce()
 
+  assignAppWindowRefForTesting(appWindowMock as unknown as BrowserWindow)
   appMock.requestSingleInstanceLock.mockReturnValueOnce(true)
-  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
+  expect(preventSecondaryAppInstance()).toBe(true)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
 
   appEventHandlers['second-instance']!()
   expect(appWindowMock.restore).toHaveBeenCalledOnce()
   expect(appWindowMock.focus).toHaveBeenCalledOnce()
+  assignAppWindowRefForTesting(undefined)
 })
 
 /**
@@ -172,7 +174,7 @@ test('Test that app window does not start if another instance is already running
  */
 test('Test that preventSecondaryAppInstance skips lock when TEST_ENV is e2e', () => {
   vi.stubEnv('TEST_ENV', 'e2e')
-  preventSecondaryAppInstance({} as unknown as BrowserWindow)
+  expect(preventSecondaryAppInstance()).toBe(true)
   expect(appMock.requestSingleInstanceLock).not.toHaveBeenCalled()
 })
 
@@ -186,21 +188,31 @@ test('Test that second-instance focuses without restore when window is not minim
     restore: vi.fn(),
     focus: vi.fn()
   }
-  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
+  assignAppWindowRefForTesting(appWindowMock as unknown as BrowserWindow)
+  expect(preventSecondaryAppInstance()).toBe(true)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
   appEventHandlers['second-instance']!()
   expect(appWindowMock.restore).not.toHaveBeenCalled()
   expect(appWindowMock.focus).toHaveBeenCalledOnce()
+  assignAppWindowRefForTesting(undefined)
 })
 
 /**
  * preventSecondaryAppInstance
  * second-instance handler does nothing when the registered window reference was undefined.
  */
-test('Test that second-instance handler no-ops when preventSecondaryAppInstance was given undefined', () => {
-  preventSecondaryAppInstance(undefined)
+test('Test that second-instance handler no-ops when the main window is not assigned yet', () => {
+  assignAppWindowRefForTesting(undefined)
+  expect(preventSecondaryAppInstance()).toBe(true)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
   expect(() => appEventHandlers['second-instance']!()).not.toThrow()
+})
+
+test('Test that mainWindowCreation quits before creating a window when the instance lock is lost', async () => {
+  appMock.requestSingleInstanceLock.mockReturnValueOnce(false)
+  await mainWindowCreation()
+  expect(appMock.quit).toHaveBeenCalledOnce()
+  expect(BrowserWindowMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -294,6 +306,8 @@ test('Test that the main window is created successfully', async () => {
   const foreignHttpsRetryEvent = { preventDefault: vi.fn() }
   willNavigateHandlers[0]!(foreignHttpsRetryEvent, 'https://example.com/retry')
   expect(foreignHttpsRetryEvent.preventDefault).toHaveBeenCalledOnce()
+  await Promise.resolve()
+  await Promise.resolve()
   await Promise.resolve()
   await Promise.resolve()
   expect(consoleErrorSpy).toHaveBeenCalledWith(

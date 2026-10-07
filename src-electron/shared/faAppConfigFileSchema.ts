@@ -97,18 +97,24 @@ export function parseFaKeybindsRootFile (raw: unknown): I_faKeybindsRoot {
 
 export function parseFaAppNoteboardRootFile (raw: unknown): I_faAppNoteboardRoot {
   const n = faAppNoteboardRootFileSchema.parse(raw)
+  const frame = n.frame === undefined ? null : n.frame
+  const schemaVersion = 1 as const
+  const text = n.text
   return {
-    frame: n.frame === undefined ? null : n.frame,
-    schemaVersion: 1 as const,
-    text: n.text
+    frame,
+    schemaVersion,
+    text
   }
 }
 
 export function parseFaAppStylingRootFile (raw: unknown): I_faAppStylingRoot {
   const n = faAppStylingRootFileSchema.parse(raw)
+  const css = n.css
+  const frame = n.frame === undefined ? null : n.frame
+  const schemaVersion = 1 as const
   return {
-    css: n.css,
-    frame: n.frame === undefined ? null : n.frame,
-    schemaVersion: 1 as const
+    css,
+    frame,
+    schemaVersion
   }
 }

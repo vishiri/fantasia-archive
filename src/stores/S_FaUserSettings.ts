@@ -28,6 +28,16 @@ import { didObjectPatchPersist } from './functions/faPersistPatchVerify'
 export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   const settings: Ref<I_faUserSettings | null> = ref(null)
   const appSettingsDialogPreview: Ref<Partial<I_faUserSettings> | null> = ref(null)
+  let settingsIoTail: Promise<void> = Promise.resolve()
+
+  function enqueueSettingsIo<T> (work: () => Promise<T>): Promise<T> {
+    const run = settingsIoTail.then(work)
+    settingsIoTail = run.then(
+      () => undefined,
+      () => undefined
+    )
+    return run
+  }
 
   function resolveEffectiveAppTheme (): string {
     const previewTheme = appSettingsDialogPreview.value?.appTheme
@@ -77,7 +87,7 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     applyEffectiveDocumentEffects()
   }
 
-  async function refreshSettings (): Promise<void> {
+  async function loadSettingsFromBridge (): Promise<void> {
     settings.value = await window.faContentBridgeAPIs.faUserSettings.getSettings()
     const s = settings.value
     if (s !== null && s.languageCode !== undefined && isFaUserSettingsLanguageCode(s.languageCode)) {
@@ -86,7 +96,11 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     applyEffectiveDocumentEffects()
   }
 
-  async function persistSettingsPatch (
+  async function refreshSettings (): Promise<void> {
+    await enqueueSettingsIo(loadSettingsFromBridge)
+  }
+
+  async function writeSettingsPatch (
     updateObject: Partial<I_faUserSettings>
   ): Promise<I_faUserSettings> {
     const setResult = await ResultAsync.fromPromise(
@@ -120,6 +134,22 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     return retrievedSettings
   }
 
+  async function persistSettingsPatch (
+    updateObject: Partial<I_faUserSettings>
+  ): Promise<I_faUserSettings> {
+    return await enqueueSettingsIo(() => writeSettingsPatch(updateObject))
+  }
+
+  async function toggleHideHierarchyTreeSilently (): Promise<void> {
+    await enqueueSettingsIo(async () => {
+      const currentValue = settings.value?.hideHierarchyTree ?? false
+      const nextHideHierarchyTree = !currentValue
+      await writeSettingsPatch({
+        hideHierarchyTree: nextHideHierarchyTree
+      })
+    })
+  }
+
   async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {
     await persistSettingsPatch(updateObject)
     Notify.create({
@@ -133,13 +163,15 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     await persistSettingsPatch(updateObject)
   }
 
+  const publishedAppSettingsDialogPreview = readonly(appSettingsDialogPreview)
   return {
-    appSettingsDialogPreview: readonly(appSettingsDialogPreview),
+    appSettingsDialogPreview: publishedAppSettingsDialogPreview,
     clearAppSettingsDialogPreview,
     patchSettingsSilently,
     settings,
     refreshSettings,
     setAppSettingsDialogPreview,
+    toggleHideHierarchyTreeSilently,
     updateSettings
   }
 })

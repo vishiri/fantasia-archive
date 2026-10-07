@@ -22,6 +22,90 @@ function emptyBaselines () {
  * hydrateDialogProjectSettingsDrafts
  * Uses direct snapshots when provided and fetches only missing draft slices.
  */
+test('Test that hydrateDialogProjectSettingsDrafts drops drafts after the project changes', async () => {
+  let resolveWorlds: ((value: I_dialogProjectSettingsWorldDraft[]) => void) | undefined
+  let epoch = 1
+  const fetchWorlds = vi.fn(() => {
+    return new Promise<I_dialogProjectSettingsWorldDraft[]>((resolve) => {
+      resolveWorlds = resolve
+    })
+  })
+  const localSettings = ref<I_faProjectSettingsRoot | null>(null)
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
+  const pending = hydrateDialogProjectSettingsDrafts({
+    faProjectDocumentTemplatesFetchFreshForDialog: vi.fn(async () => []),
+    faProjectSettingsFetchFreshForDialog: vi.fn(async () => ({
+      projectName: 'Stale',
+      schemaVersion: 1 as const
+    })),
+    faProjectWorldsFetchFreshForDialog: fetchWorlds,
+    getCurrentLanguageCode: () => 'en-US',
+    readProjectContentEpoch: () => epoch
+  }, {
+    ...emptyBaselines(),
+    localDocumentTemplates,
+    localSettings,
+    localWorlds,
+    props: {}
+  })
+  await vi.waitUntil(() => fetchWorlds.mock.calls.length === 1)
+  epoch = 2
+  const finishWorlds = resolveWorlds
+  if (finishWorlds === undefined) {
+    throw new Error('missing worlds resolver')
+  }
+  finishWorlds([])
+  await pending
+  expect(localSettings.value).toBeNull()
+  expect(localWorlds.value).toBeNull()
+  expect(localDocumentTemplates.value).toBeNull()
+})
+
+test('Test that hydrateDialogProjectSettingsDrafts keeps a name edited during the read', async () => {
+  let resolveSettings: ((value: I_faProjectSettingsRoot) => void) | undefined
+  const fetchSettings = vi.fn(() => {
+    return new Promise<I_faProjectSettingsRoot>((resolve) => {
+      resolveSettings = resolve
+    })
+  })
+  const localSettings = ref<I_faProjectSettingsRoot | null>({
+    projectName: 'Visible',
+    schemaVersion: 1
+  })
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
+  const baselines = emptyBaselines()
+  const pending = hydrateDialogProjectSettingsDrafts({
+    faProjectDocumentTemplatesFetchFreshForDialog: vi.fn(async () => []),
+    faProjectSettingsFetchFreshForDialog: fetchSettings,
+    faProjectWorldsFetchFreshForDialog: vi.fn(async () => []),
+    getCurrentLanguageCode: () => 'en-US'
+  }, {
+    ...baselines,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds,
+    props: {}
+  })
+  await vi.waitUntil(() => fetchSettings.mock.calls.length === 1)
+  localSettings.value = {
+    projectName: 'Typed during hydrate',
+    schemaVersion: 1
+  }
+  const finishSettings = resolveSettings
+  if (finishSettings === undefined) {
+    throw new Error('missing settings resolver')
+  }
+  finishSettings({
+    projectName: 'From Db',
+    schemaVersion: 1
+  })
+  await pending
+  expect(localSettings.value?.projectName).toBe('Typed during hydrate')
+  expect(baselines.baselineSettings.value).toBeNull()
+})
+
 test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with bridge fetches', async () => {
   const fetchSettings = vi.fn(async () => ({
     projectName: 'Fetched',

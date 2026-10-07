@@ -160,12 +160,13 @@ export function createProjectHierarchyTreeNodeDisplayBindings (deps: {
     }
     const documentCount = node.documentCount ?? 0
     const categoryCount = node.categoryCount ?? 0
+    const display = deps.resolvePlacementCountDisplayForCounts({
+      categoryCount,
+      documentCount
+    })
     return {
       categoryCount,
-      display: deps.resolvePlacementCountDisplayForCounts({
-        categoryCount,
-        documentCount
-      }),
+      display,
       documentCount
     }
   }

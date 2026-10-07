@@ -10,12 +10,14 @@ const markWelcomeScreenAutoLoadBootAttemptedMock = vi.fn()
 const markWelcomeScreenAutoLoadBootCompletionMock = vi.fn()
 const waitForSkipWelcomeScreenBridgeWhenElectronMock = vi.fn(async () => undefined)
 const refreshUserSettingsBeforeSkipWelcomeScreenOnLaunchMock = vi.fn(async () => undefined)
+const hasActiveProjectMock = vi.fn(() => false)
 
 function buildApi () {
   return createRendererAppInternals({
     applyFaI18nLocaleFromLanguageCode: vi.fn(),
     applyFaUserSettingsLanguageSelection: vi.fn(async () => undefined),
     getPlaywrightTestEnv: getPlaywrightTestEnvMock,
+    hasActiveProject: hasActiveProjectMock,
     isFantasiaStorybookCanvas: () => false,
     markWelcomeScreenAutoLoadBootAttempted: markWelcomeScreenAutoLoadBootAttemptedMock,
     markWelcomeScreenAutoLoadBootCompletion: markWelcomeScreenAutoLoadBootCompletionMock,
@@ -39,6 +41,8 @@ beforeEach(() => {
   shouldRunStartupUpdateCheckMock.mockReturnValue(true)
   markWelcomeScreenAutoLoadBootAttemptedMock.mockReset()
   markWelcomeScreenAutoLoadBootCompletionMock.mockReset()
+  hasActiveProjectMock.mockReset()
+  hasActiveProjectMock.mockReturnValue(false)
 })
 
 /**
@@ -62,6 +66,17 @@ test('Test that runAppStartupRouting fires tips and startup update check', async
  * runAppStartupRouting
  * Still fires update check when skip-welcome succeeds.
  */
+test('Test that runAppStartupRouting skips tips when a project is already open', async () => {
+  hasActiveProjectMock.mockReturnValue(true)
+  const api = buildApi()
+
+  await api.runAppStartupRouting({ push: vi.fn() }, undefined, undefined)
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('checkForAppUpdates', { source: 'startup' })
+  })
+  expect(runFaActionMock).not.toHaveBeenCalledWith('showStartupTipsNotification', undefined)
+})
+
 test('Test that runAppStartupRouting fires update check when skip welcome succeeds', async () => {
   tryRunSkipWelcomeScreenOnLaunchMock.mockResolvedValueOnce(true)
   const api = buildApi()

@@ -144,8 +144,9 @@ export function useDialogKeybindSettingsTableChrome (
     if (px === null) {
       return undefined
     }
+    const maxHeight = `${String(px)}px`
     return {
-      maxHeight: `${String(px)}px`
+      maxHeight
     }
   })
   return {

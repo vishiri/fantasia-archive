@@ -10,8 +10,45 @@ import { readDialogProjectSettingsWorldColorPaletteEntryHexList } from './functi
 import {
   createDialogProjectSettingsWorldColorPaletteEditorEmit,
   createDialogProjectSettingsWorldColorPaletteEditorSwatchMutations,
+  readDialogProjectSettingsWorldColorPaletteSerializedEntries,
   registerDialogProjectSettingsWorldColorPaletteEditorWatch
 } from './dialogProjectSettingsWorldColorPaletteEditorUseHelpers'
+
+function createDialogProjectSettingsWorldColorPaletteEditorRootClassList (
+  deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
+  draggingEntryId: { value: string | null }
+) {
+  return deps.computed(() => {
+    const listDragging = draggingEntryId.value !== null
+    return {
+      'dialogProjectSettingsWorldColorPalette--listDragging': listDragging
+    }
+  })
+}
+
+function createDialogProjectSettingsWorldColorPaletteEditorDragHandlers (
+  deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
+  draggingEntryId: { value: string | null },
+  colorPaletteEntries: { value: I_dialogProjectSettingsWorldColorPaletteEntry[] },
+  emitColorPaletteFromEntries: (entries: I_dialogProjectSettingsWorldColorPaletteEntry[]) => void
+) {
+  const onDragStart = (event: SortableEvent): void => {
+    draggingEntryId.value = deps.readFaSortableDragItemDataAttribute(
+      event.item,
+      'data-test-palette-entry-id'
+    )
+    deps.applyFaVerticalDraggableTabsDocumentDragCursor()
+  }
+  const onDragEnd = (): void => {
+    draggingEntryId.value = null
+    deps.clearFaVerticalDraggableTabsDocumentDragCursor()
+    emitColorPaletteFromEntries(colorPaletteEntries.value)
+  }
+  return {
+    onDragEnd,
+    onDragStart
+  }
+}
 
 export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
@@ -22,7 +59,7 @@ export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
 ): I_dialogProjectSettingsWorldColorPaletteEditorApi {
   const colorPaletteEntries = deps.ref<I_dialogProjectSettingsWorldColorPaletteEntry[]>([])
   const draggingEntryId = deps.ref<string | null>(null)
-  const openSwatchIndex = deps.ref<number | null>(null)
+  const openSwatchEntryId = deps.ref<string | null>(null)
 
   const emitColorPaletteUpdate = (value: string): void => {
     emit('update:colorPalette', value)
@@ -46,7 +83,7 @@ export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
 
   const isAddDisabled = deps.computed(() => {
     return deps.wouldFaProjectWorldColorPaletteExceedMaxLength(
-      props.colorPalette,
+      readDialogProjectSettingsWorldColorPaletteSerializedEntries(deps, colorPaletteEntries.value),
       deps.appendDefaultHex,
       deps.paletteMaxLength
     )
@@ -58,9 +95,7 @@ export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
     return deps.parseFaProjectWorldColorPaletteToHexList(props.colorPalette)
   })
 
-  const editorRootClassList = deps.computed(() => ({
-    'dialogProjectSettingsWorldColorPalette--listDragging': draggingEntryId.value !== null
-  }))
+  const editorRootClassList = createDialogProjectSettingsWorldColorPaletteEditorRootClassList(deps, draggingEntryId)
 
   function onAddColor (): void {
     if (isAddDisabled.value) {
@@ -74,44 +109,45 @@ export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
     emitColorPaletteFromEntries(nextEntries)
   }
 
-  function setOpenSwatchIndex (index: number | null): void {
-    openSwatchIndex.value = index
+  function setOpenSwatchEntryId (entryId: string | null): void {
+    openSwatchEntryId.value = entryId
   }
 
   const swatchMutations = createDialogProjectSettingsWorldColorPaletteEditorSwatchMutations(deps, {
     colorPaletteEntries,
     emitColorPaletteFromEntries,
-    openSwatchIndex,
-    setOpenSwatchIndex
+    openSwatchEntryId,
+    setOpenSwatchEntryId
   })
 
-  const onDragStart = (event: SortableEvent): void => {
-    draggingEntryId.value = deps.readFaSortableDragItemDataAttribute(
-      event.item,
-      'data-test-palette-entry-id'
-    )
-    deps.applyFaVerticalDraggableTabsDocumentDragCursor()
-  }
-
-  const onDragEnd = (): void => {
-    draggingEntryId.value = null
-    deps.clearFaVerticalDraggableTabsDocumentDragCursor()
-    emitColorPaletteFromEntries(colorPaletteEntries.value)
-  }
+  const {
+    onDragEnd,
+    onDragStart
+  } = createDialogProjectSettingsWorldColorPaletteEditorDragHandlers(
+    deps,
+    draggingEntryId,
+    colorPaletteEntries,
+    emitColorPaletteFromEntries
+  )
 
   const onSwatchColorUpdate = swatchMutations.onSwatchColorUpdate
   const onSwatchDelete = swatchMutations.onSwatchDelete
   const onSwatchDuplicate = swatchMutations.onSwatchDuplicate
   const wouldSwatchDuplicateExceedMaxLength = swatchMutations.wouldSwatchDuplicateExceedMaxLength
+  const {
+    VueDraggable,
+    faVerticalDraggableTabsSortableDragOptions,
+    hideNativeSortableDragGhost
+  } = deps
 
   return {
-    VueDraggable: deps.VueDraggable,
+    VueDraggable,
     colorPaletteEntries,
     duplicateHexKeys,
     draggingEntryId,
     editorRootClassList,
-    faVerticalDraggableTabsSortableDragOptions: deps.faVerticalDraggableTabsSortableDragOptions,
-    hideNativeSortableDragGhost: deps.hideNativeSortableDragGhost,
+    faVerticalDraggableTabsSortableDragOptions,
+    hideNativeSortableDragGhost,
     isAddDisabled,
     isListDragging,
     onAddColor,
@@ -120,9 +156,9 @@ export function useDialogProjectSettingsWorldColorPaletteEditorRuntime (
     onSwatchColorUpdate,
     onSwatchDelete,
     onSwatchDuplicate,
-    openSwatchIndex,
+    openSwatchEntryId,
     worldPickerPalette,
-    setOpenSwatchIndex,
+    setOpenSwatchEntryId,
     wouldSwatchDuplicateExceedMaxLength
   }
 }

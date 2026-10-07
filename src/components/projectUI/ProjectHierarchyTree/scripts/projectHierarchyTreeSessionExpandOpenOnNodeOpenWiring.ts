@@ -95,10 +95,8 @@ export function createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler (de
       })
     })()
     expandOpenInFlight.set(nodeId, expandOpenWork)
-    try {
-      await expandOpenWork
-    } finally {
+    await expandOpenWork.finally(() => {
       expandOpenInFlight.delete(nodeId)
-    }
+    })
   }
 }

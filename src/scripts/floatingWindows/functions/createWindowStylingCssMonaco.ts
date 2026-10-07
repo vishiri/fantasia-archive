@@ -39,8 +39,9 @@ export function createWindowStylingCssMonaco (deps: {
     configureWindowStylingMonacoEnvironment(deps)
   }
 
+  const monaco = deps.monaco
   return {
     configureMonacoEnvironment,
-    monaco: deps.monaco
+    monaco
   }
 }

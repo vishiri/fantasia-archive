@@ -1,5 +1,6 @@
 export default {
   title: 'Параметри проекту',
+  loadError: 'Не вдалося завантажити параметри проекту.',
   closeButton: 'Закрити без збереження',
   saveButton: 'Зберегти налаштування',
   saveWithoutClosingButton: 'Зберегти без закриття',

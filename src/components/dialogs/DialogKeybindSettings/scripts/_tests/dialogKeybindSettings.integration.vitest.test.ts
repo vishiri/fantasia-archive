@@ -301,6 +301,46 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
   expect(workingOverrides.value).toEqual({})
 })
 
+test('createDialogKeybindSettingsSync onSaveMain keeps a chord edited during save', async () => {
+  setActivePinia(createPinia())
+  runFaActionAwaitMock.mockReset()
+  let finishSave: ((ok: boolean) => void) | undefined
+  const pendingSave = new Promise<boolean>((resolve) => {
+    finishSave = resolve
+  })
+  runFaActionAwaitMock.mockReturnValueOnce(pendingSave)
+  const keybindsStore = S_FaKeybinds()
+  const workingOverrides = ref<I_faKeybindsRoot['overrides']>({
+    openAppSettings: {
+      code: 'KeyY',
+      mods: ['ctrl']
+    }
+  })
+  const baselineOverrides = ref<I_faKeybindsRoot['overrides']>({})
+  const { onSaveMain } = createDialogKeybindSettingsSync({
+    baselineOverrides,
+    filter: ref(''),
+    keybindsStore,
+    workingOverrides
+  })
+  const savePromise = onSaveMain()
+  workingOverrides.value = {
+    openAppSettings: {
+      code: 'KeyX',
+      mods: ['alt']
+    }
+  }
+  const finish = finishSave
+  if (finish === undefined) {
+    throw new Error('missing save resolver')
+  }
+  finish(true)
+  const ok = await savePromise
+  expect(ok).toBe(false)
+  expect(workingOverrides.value.openAppSettings?.code).toBe('KeyX')
+  expect(baselineOverrides.value.openAppSettings?.code).toBe('KeyY')
+})
+
 /**
  * runDialogKeybindSettingsOpen
  * Awaits refresh then opens the dialog model.
@@ -322,6 +362,45 @@ test('runDialogKeybindSettingsOpen sets model true after refresh resolves', asyn
   expect(documentName.value).toBe('KeybindSettings')
   expect(initializeForOpen).toHaveBeenCalledOnce()
   expect(dialogModel.value).toBe(true)
+})
+
+test('runDialogKeybindSettingsOpen ignores a refresh from an older open', async () => {
+  let resolveFirstRefresh: (() => void) | undefined
+  const pendingFirstRefresh = new Promise<void>((resolve) => {
+    resolveFirstRefresh = resolve
+  })
+  const dialogModel = ref(false)
+  const documentName = ref<T_dialogName>('AboutFantasiaArchive')
+  const initializeForOpen = vi.fn()
+  const refreshKeybinds = vi.fn()
+    .mockImplementationOnce(() => pendingFirstRefresh)
+    .mockImplementationOnce(async () => undefined)
+  runDialogKeybindSettingsOpen({
+    dialogModel,
+    documentName,
+    initializeForOpen,
+    keybindsStore: {
+      refreshKeybinds
+    } as unknown as ReturnType<typeof S_FaKeybinds>
+  })
+  runDialogKeybindSettingsOpen({
+    dialogModel,
+    documentName,
+    initializeForOpen,
+    keybindsStore: {
+      refreshKeybinds
+    } as unknown as ReturnType<typeof S_FaKeybinds>
+  })
+  await flushPromises()
+  expect(initializeForOpen).toHaveBeenCalledOnce()
+  expect(dialogModel.value).toBe(true)
+  const finishFirstRefresh = resolveFirstRefresh
+  if (finishFirstRefresh === undefined) {
+    throw new Error('missing keybind refresh resolver')
+  }
+  finishFirstRefresh()
+  await flushPromises()
+  expect(initializeForOpen).toHaveBeenCalledOnce()
 })
 
 test('runDialogKeybindSettingsOpen leaves dialog closed when refresh rejects', async () => {
@@ -1166,6 +1245,55 @@ test('setupDialogKeybindSettingsDialogRouting registers when Pinia is inactive f
       props: {}
     })
   }).not.toThrow()
+})
+
+test('runDialogKeybindCaptureKeydown ignores IME composition keydowns', () => {
+  const captureOpen = ref(true)
+  const pendingChord = ref<I_faChordSerialized | null>(null)
+  const composing = new KeyboardEvent('keydown', {
+    code: 'KeyA',
+    ctrlKey: true,
+    isComposing: true,
+    key: 'a'
+  })
+  runDialogKeybindCaptureKeydown(composing, {
+    captureBaselineChord: ref(null),
+    captureError: ref(false),
+    captureErrorMessage: ref(''),
+    captureInfoMessage: ref(''),
+    captureLabel: ref(''),
+    captureOpen,
+    editingCommandId: ref<T_faKeybindCommandId | null>('openAppSettings'),
+    pendingChord,
+    platform: computed(() => 'win32' as NodeJS.Platform),
+    t: tStub,
+    workingOverrides: ref({})
+  })
+  expect(pendingChord.value).toBeNull()
+  expect(captureOpen.value).toBe(true)
+  expect(composing.defaultPrevented).toBe(false)
+
+  const imeKeyCode = new KeyboardEvent('keydown', {
+    code: 'KeyA',
+    ctrlKey: true,
+    key: 'Process'
+  })
+  Object.defineProperty(imeKeyCode, 'keyCode', { value: 229 })
+  runDialogKeybindCaptureKeydown(imeKeyCode, {
+    captureBaselineChord: ref(null),
+    captureError: ref(false),
+    captureErrorMessage: ref(''),
+    captureInfoMessage: ref(''),
+    captureLabel: ref(''),
+    captureOpen,
+    editingCommandId: ref<T_faKeybindCommandId | null>('openAppSettings'),
+    pendingChord,
+    platform: computed(() => 'win32' as NodeJS.Platform),
+    t: tStub,
+    workingOverrides: ref({})
+  })
+  expect(pendingChord.value).toBeNull()
+  expect(captureOpen.value).toBe(true)
 })
 
 test('runDialogKeybindCaptureKeydown skips conflict lookup when editingCommandId is null', () => {

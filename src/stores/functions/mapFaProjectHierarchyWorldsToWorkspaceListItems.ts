@@ -10,9 +10,11 @@ export function mapFaProjectHierarchyWorldsToWorkspaceListItems (
   }>
 ): I_faProjectWorkspaceWorldListItem[] {
   return worlds.map((world) => {
+    const displayName = world.displayName
+    const id = world.id
     return {
-      displayName: world.displayName,
-      id: world.id
+      displayName,
+      id
     }
   })
 }

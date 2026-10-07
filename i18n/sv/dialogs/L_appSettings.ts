@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Inställningar',
+  loadError: 'Det gick inte att läsa in inställningarna.',
   saveButton: 'Spara inställningar',
   closeButton: 'Stäng utan att spara',
   settingsSearchPlaceholder: 'Sök i inställningarna...',

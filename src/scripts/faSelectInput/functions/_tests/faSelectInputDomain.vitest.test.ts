@@ -106,6 +106,27 @@ test('Test that filterFaSelectInputOptionsByQuery matches FA 1.0 multi-word quer
     id: '4',
     name: 'Eldritch Dialogs'
   })
+  expect(filterFaSelectInputOptionsByQuery('red red', [
+    {
+      id: 'repeat',
+      name: 'Red Red'
+    },
+    {
+      id: 'once',
+      name: 'Red Blue'
+    }
+  ])).toEqual([
+    {
+      id: 'repeat',
+      name: 'Red Red'
+    }
+  ])
+  expect(filterFaSelectInputOptionsByQuery('zzz apple pie', [
+    {
+      id: 'pie',
+      name: 'apple pie'
+    }
+  ])).toEqual([])
 })
 
 /**
@@ -264,6 +285,7 @@ test('Test that clearFaSelectInputIsNewFlags strips isNew for matching ids', () 
       id: 'a',
       name: 'A',
       isNew: true,
+      color: '#112233',
       documentType: 'tpl',
       icon: 'mdi-a',
       otherType: 'documentTemplate'
@@ -279,6 +301,7 @@ test('Test that clearFaSelectInputIsNewFlags strips isNew for matching ids', () 
     {
       id: 'a',
       name: 'A',
+      color: '#112233',
       documentType: 'tpl',
       icon: 'mdi-a',
       otherType: 'documentTemplate'

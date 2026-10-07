@@ -3,8 +3,9 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from '../projectHierarchyTreeSyncMapperWiring'
 import { createProjectHierarchyTreeAddNewDocumentNode } from '../projectHierarchyTreeAddNewDocumentNode'
+import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from '../projectHierarchyTreeSyncMapperWiring'
+import { createProjectHierarchyTreeTagAddDocumentClickHandler } from '../projectHierarchyTreeTagAddDocumentWiring'
 
 function createAddNewNode (): I_faProjectHierarchyTreeHeTreeNode {
   return createProjectHierarchyTreeAddNewDocumentNode({
@@ -36,10 +37,37 @@ test('Test that add-new left click creates temporary document with leftNavigate'
     displayName: 'New character',
     openMode: 'leftNavigate',
     parentDocumentId: null,
+    placementId: 'placement-1',
     templateId: 'template-1',
     worldId: 'world-1'
   })
   expect(event.stopPropagation).toHaveBeenCalled()
+})
+
+test('Test that a second add-new left click is ignored while the first create runs', async () => {
+  await Promise.resolve()
+  await Promise.resolve()
+  let releaseCreate: (() => void) | undefined
+  const createGate = new Promise<string>((resolve) => {
+    releaseCreate = () => {
+      resolve('temp-doc-1')
+    }
+  })
+  const createTemporaryDocument = vi.fn(() => createGate)
+  const handlers = createProjectHierarchyTreeAddNewDocumentClickHandlers({
+    createTemporaryDocument,
+    resolvePreferredLanguageCode: () => 'en-US'
+  })
+  handlers.onAddNewDocumentRowClick(createAddNewNode())
+  handlers.onAddNewDocumentRowClick(createAddNewNode())
+  await Promise.resolve()
+  expect(createTemporaryDocument).toHaveBeenCalledTimes(1)
+  const finishCreate = releaseCreate
+  if (finishCreate === undefined) {
+    throw new Error('missing create resolver')
+  }
+  finishCreate()
+  await createGate
 })
 
 test('Test that add-new middle click creates temporary document with middleBackground', async () => {
@@ -58,6 +86,7 @@ test('Test that add-new middle click creates temporary document with middleBackg
     displayName: 'New character',
     openMode: 'middleBackground',
     parentDocumentId: null,
+    placementId: 'placement-1',
     templateId: 'template-1',
     worldId: 'world-1'
   })
@@ -96,6 +125,7 @@ test('Test that template placement middle click creates temporary document with 
     displayName: 'New building',
     openMode: 'middleBackground',
     parentDocumentId: null,
+    placementId: 'placement-1',
     templateId: 'template-1',
     worldId: 'world-1'
   })
@@ -150,4 +180,70 @@ test('Test that add-new aux click ignores non-middle mouse buttons', () => {
     stopPropagation: vi.fn()
   } as unknown as MouseEvent)
   expect(createTemporaryDocument).not.toHaveBeenCalled()
+})
+
+test('Test that a tag add is not blocked by an in-flight add-new on the same placement', async () => {
+  await Promise.resolve()
+  await Promise.resolve()
+  let releaseCreate: (() => void) | undefined
+  const createGate = new Promise<string>((resolve) => {
+    releaseCreate = () => {
+      resolve('temp-doc')
+    }
+  })
+  const createTemporaryDocument = vi.fn(() => createGate)
+  const handlers = createProjectHierarchyTreeAddNewDocumentClickHandlers({
+    createTemporaryDocument,
+    resolvePreferredLanguageCode: () => 'en-US'
+  })
+  let tagId = 'tag-1'
+  const placement: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-account',
+    id: 'placement-1',
+    label: 'Characters',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    titlePluralTranslations: { 'en-US': 'Characters' },
+    titleSingularTranslations: { 'en-US': 'Character' },
+    worldColor: '#336699',
+    worldId: 'world-1'
+  }
+  const onTagAdd = createProjectHierarchyTreeTagAddDocumentClickHandler({
+    createTemporaryDocument,
+    resolvePreferredLanguageCode: () => 'en-US',
+    resolveTagContextMenuAnchor: () => ({
+      children: [],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: false,
+      icon: 'mdi-tag',
+      id: tagId,
+      label: tagId,
+      nodeKind: 'tag',
+      placementId: null,
+      tagId,
+      worldColor: '#000',
+      worldId: 'world-1'
+    }),
+    treeData: [placement]
+  })
+  handlers.onAddNewDocumentRowClick(createAddNewNode())
+  onTagAdd('placement-1')
+  onTagAdd('placement-1')
+  tagId = 'tag-2'
+  onTagAdd('placement-1')
+  expect(createTemporaryDocument).toHaveBeenCalledTimes(3)
+  const finishCreate = releaseCreate
+  if (finishCreate === undefined) {
+    throw new Error('missing create resolver')
+  }
+  finishCreate()
+  await createGate
 })

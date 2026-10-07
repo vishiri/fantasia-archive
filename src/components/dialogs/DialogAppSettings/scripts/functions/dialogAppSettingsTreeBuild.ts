@@ -98,8 +98,9 @@ function buildAppSettingsSelectOptions (
   }
 
   return appThemeValues.map((themeValue) => {
+    const label = translate.t(`dialogs.appSettings.appOptions.${settingKey}.values.${themeValue}`)
     return {
-      label: translate.t(`dialogs.appSettings.appOptions.${settingKey}.values.${themeValue}`),
+      label,
       value: themeValue
     }
   })

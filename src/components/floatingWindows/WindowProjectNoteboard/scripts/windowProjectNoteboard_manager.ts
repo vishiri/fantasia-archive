@@ -9,6 +9,7 @@ import {
   useFaFloatingWindowTextPersist
 } from 'app/src/scripts/floatingWindows/floatingWindows_manager'
 import { createWindowNoteboard } from 'app/src/components/floatingWindows/_sharedWindowNoteboard/scripts/windowNoteboard_manager'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 
 const windowProjectNoteboardApi = createWindowNoteboard({
@@ -16,7 +17,9 @@ const windowProjectNoteboardApi = createWindowNoteboard({
   FA_FLOATING_WINDOW_POP_TRANSITION_MS,
   computed,
   getNoteboardStore: () => S_FaProjectNoteboard(),
+  isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
   onMounted,
+  readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
   storeToRefs,
   useFaFloatingWindowFrame,
   useFaFloatingWindowFramePersist,

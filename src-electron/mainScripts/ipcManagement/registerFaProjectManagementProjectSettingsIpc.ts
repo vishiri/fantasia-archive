@@ -20,9 +20,11 @@ const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_SETTINGS: I_faProjectSettingsRoot =
 function duplicateFaProjectSettingsSnapshot (
   next: I_faProjectSettingsRoot
 ): I_faProjectSettingsRoot {
+  const projectName = next.projectName
+  const schemaVersion = next.schemaVersion
   return {
-    projectName: next.projectName,
-    schemaVersion: next.schemaVersion
+    projectName,
+    schemaVersion
   }
 }
 

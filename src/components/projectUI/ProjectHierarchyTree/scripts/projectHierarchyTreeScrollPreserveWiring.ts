@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 import {
   readProjectHierarchyTreeScrollTopPx,
@@ -33,10 +35,12 @@ function waitProjectHierarchyTreeAnimationFrame (
     const onFrame = (): void => {
       resolve()
     }
-    try {
-      requestAnimationFrameFn(onFrame)
-    } catch {
-      // Bare window.requestAnimationFrame loses `this` when passed as a value → Illegal invocation.
+    // Bare window.requestAnimationFrame loses `this` when passed as a value → Illegal invocation.
+    const scheduled = Result.fromThrowable(
+      () => requestAnimationFrameFn(onFrame),
+      () => undefined
+    )()
+    if (scheduled.isErr()) {
       window.requestAnimationFrame(onFrame)
     }
   })
@@ -111,11 +115,9 @@ export async function runWithPreservedProjectHierarchyTreeScrollTop (deps: {
     return
   }
   projectHierarchyTreeScrollPreserveDepth += 1
-  try {
-    await runWithPreservedProjectHierarchyTreeScrollTopBody(deps)
-  } finally {
+  await runWithPreservedProjectHierarchyTreeScrollTopBody(deps).finally(() => {
     projectHierarchyTreeScrollPreserveDepth -= 1
-  }
+  })
 }
 
 async function runWithPreservedProjectHierarchyTreeScrollTopBody (deps: {
@@ -184,16 +186,7 @@ async function runWithPreservedProjectHierarchyTreeScrollTopBody (deps: {
     })
   }
 
-  try {
-    await deps.run()
-    await settleProjectHierarchyTreePreservedScroll({
-      nextTick: deps.nextTick,
-      requestAnimationFrame: deps.requestAnimationFrame,
-      settleFrameCount,
-      stickScrollToLiveContainer,
-      ...(deps.getTreeRef === undefined ? {} : { getTreeRef: deps.getTreeRef })
-    })
-  } finally {
+  const releaseScrollPreserve = (): void => {
     mutationObserver?.disconnect()
     stickScrollToLiveContainer()
     syncProjectHierarchyTreeVirtualListToLockedScroll(deps)
@@ -202,4 +195,15 @@ async function runWithPreservedProjectHierarchyTreeScrollTopBody (deps: {
     boundContainer = null
     projectHierarchyTreeScrollPreserveTouch = null
   }
+
+  await (async () => {
+    await deps.run()
+    await settleProjectHierarchyTreePreservedScroll({
+      nextTick: deps.nextTick,
+      requestAnimationFrame: deps.requestAnimationFrame,
+      settleFrameCount,
+      stickScrollToLiveContainer,
+      ...(deps.getTreeRef === undefined ? {} : { getTreeRef: deps.getTreeRef })
+    })
+  })().finally(releaseScrollPreserve)
 }

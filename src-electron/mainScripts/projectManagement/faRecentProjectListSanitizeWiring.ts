@@ -1,3 +1,4 @@
+import { Result } from 'neverthrow'
 import fs from 'node:fs'
 
 import { parseFaRecentProjectListStored } from 'app/src-electron/shared/faRecentProjectListStoredSchema'
@@ -10,17 +11,20 @@ import {
 } from './functions/faRecentProjectListSanitize'
 import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 
+function entryRowExistsAsFile (filePath: string): boolean {
+  const checked = Result.fromThrowable(() => {
+    if (!fs.existsSync(filePath)) {
+      return false
+    }
+    return fs.statSync(filePath).isFile()
+  }, () => false)()
+  return checked.unwrapOr(false)
+}
+
 function entryRowsExistAsFiles (rows: readonly I_faRecentProjectEntry[]): I_faRecentProjectEntry[] {
   const out: I_faRecentProjectEntry[] = []
   for (const row of rows) {
-    try {
-      if (!fs.existsSync(row.filePath)) {
-        continue
-      }
-      if (!fs.statSync(row.filePath).isFile()) {
-        continue
-      }
-    } catch {
+    if (!entryRowExistsAsFile(row.filePath)) {
       continue
     }
     out.push(row)

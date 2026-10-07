@@ -142,7 +142,7 @@ function appendHeTreeGroupNodesToReverseMap (
         icon: prior?.icon ?? child.icon,
         id: prior?.id ?? child.id,
         nicknamePluralTranslations: prior?.nicknamePluralTranslations ?? child.nicknamePluralTranslations,
-        nicknameSingularTranslations: {},
+        nicknameSingularTranslations: prior?.nicknameSingularTranslations ?? child.nicknameSingularTranslations,
         rootSortOrder: null,
         templateDisplayName: prior?.templateDisplayName ?? child.templateDisplayName,
         worldAppendix: prior?.worldAppendix ?? child.worldAppendix
@@ -181,7 +181,7 @@ function appendHeTreeRootTemplateNodesToReverseMap (
       icon: prior?.icon ?? node.icon,
       id: prior?.id ?? node.id,
       nicknamePluralTranslations: prior?.nicknamePluralTranslations ?? node.nicknamePluralTranslations,
-      nicknameSingularTranslations: {},
+      nicknameSingularTranslations: prior?.nicknameSingularTranslations ?? node.nicknameSingularTranslations,
       rootSortOrder: rootIndex,
       templateDisplayName: prior?.templateDisplayName ?? node.templateDisplayName,
       worldAppendix: prior?.worldAppendix ?? node.worldAppendix
@@ -214,9 +214,11 @@ function mapHeTreeNodeToGroupsAndPlacements (
   appendHeTreeGroupNodesToReverseMap(nodes, groupNodes, state)
   appendHeTreeRootTemplateNodesToReverseMap(nodes, rootTemplateNodes, state)
 
+  const groups = state.groups
+  const placements = state.placements
   return {
-    groups: state.groups,
-    placements: state.placements
+    groups,
+    placements
   }
 }
 

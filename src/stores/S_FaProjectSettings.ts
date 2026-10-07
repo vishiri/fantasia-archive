@@ -17,6 +17,16 @@ import {
  */
 export const S_FaProjectSettings = defineStore('S_FaProjectSettings', () => {
   const root: Ref<I_faProjectSettingsRoot | null> = ref(null)
+  let projectSettingsIoTail: Promise<void> = Promise.resolve()
+
+  function enqueueProjectSettingsIo<T> (work: () => Promise<T>): Promise<T> {
+    const run = projectSettingsIoTail.then(work)
+    projectSettingsIoTail = run.then(
+      () => undefined,
+      () => undefined
+    )
+    return run
+  }
 
   function applyRoot (next: I_faProjectSettingsRoot): void {
     root.value = next
@@ -26,13 +36,25 @@ export const S_FaProjectSettings = defineStore('S_FaProjectSettings', () => {
    * @returns false when preload bridge misses 'getProjectSettings'.
    */
   async function refreshProjectSettings (): Promise<boolean> {
-    return faProjectSettingsRefreshFromBridge({ applyRoot })
+    return await enqueueProjectSettingsIo(() => faProjectSettingsRefreshFromBridge({ applyRoot }))
   }
 
-  async function updateProjectSettings (patch: I_faProjectSettingsPatch): Promise<void> {
-    await faProjectSettingsPersistPatchFromStore({
-      applyRoot,
-      patch
+  async function updateProjectSettings (
+    patch: I_faProjectSettingsPatch,
+    epochAtStart?: number
+  ): Promise<void> {
+    await enqueueProjectSettingsIo(() => {
+      if (epochAtStart === undefined) {
+        return faProjectSettingsPersistPatchFromStore({
+          applyRoot,
+          patch
+        })
+      }
+      return faProjectSettingsPersistPatchFromStore({
+        applyRoot,
+        epochAtStart,
+        patch
+      })
     })
   }
 

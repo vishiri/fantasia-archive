@@ -19,6 +19,7 @@ function buildApi (overrides: Partial<Parameters<typeof createCheckForAppUpdates
     },
     getHideMascot: async () => false,
     getLocalVersion: async () => '2.4.16',
+    getInstalledVersionUnreadableMessage: () => 'Could not read the installed app version.',
     isFaRemoteSemverNewer,
     setUpdateNotifyDismiss,
     showAlreadyNewestVersionNotification,
@@ -175,6 +176,55 @@ test('Test that createCheckForAppUpdates throws for menu when local version blan
 
 /**
  * createCheckForAppUpdates
+ * A slower earlier check does not toast after a newer check already finished.
+ */
+test('Test that createCheckForAppUpdates ignores a stale check after a newer one', async () => {
+  let releaseSlowFetch: ((value: {
+    error: Error
+    isErr: () => boolean
+    value: string
+  }) => void) | undefined
+  let fetches = 0
+  const {
+    api,
+    showAlreadyNewestVersionNotification,
+    showAppUpdateAvailableNotification
+  } = buildApi({
+    fetchLatestGithubReleaseVersion: () => {
+      fetches += 1
+      if (fetches === 1) {
+        return new Promise((resolve) => {
+          releaseSlowFetch = resolve
+        })
+      }
+      return Promise.resolve({
+        error: new Error('unused'),
+        isErr: () => false,
+        value: '2.4.16'
+      })
+    }
+  })
+
+  const firstCheck = api.checkForAppUpdates('startup')
+  await Promise.resolve()
+  await api.checkForAppUpdates('menu')
+  const finishSlowFetch = releaseSlowFetch
+  if (finishSlowFetch === undefined) {
+    throw new Error('slow update check was not started')
+  }
+  finishSlowFetch({
+    error: new Error('unused'),
+    isErr: () => false,
+    value: '9.0.0'
+  })
+  await firstCheck
+
+  expect(showAlreadyNewestVersionNotification).toHaveBeenCalledOnce()
+  expect(showAppUpdateAvailableNotification).not.toHaveBeenCalled()
+})
+
+/**
+ * createCheckForAppUpdates
  * Stores dismiss callback from update notify onShown.
  */
 test('Test that createCheckForAppUpdates stores dismiss from update notify onShown', async () => {
@@ -192,4 +242,45 @@ test('Test that createCheckForAppUpdates stores dismiss from update notify onSho
   await api.checkForAppUpdates('startup')
 
   expect(setUpdateNotifyDismiss).toHaveBeenCalledWith(dismiss)
+})
+
+test('Test that createCheckForAppUpdates ignores a local version read from an older check', async () => {
+  let releaseLocal: ((value: string) => void) | undefined
+  const pendingLocal = new Promise<string>((resolve) => {
+    releaseLocal = resolve
+  })
+  const { api, showAppUpdateAvailableNotification } = buildApi({
+    getLocalVersion: () => pendingLocal
+  })
+  const firstCheck = api.checkForAppUpdates('startup')
+  const secondCheck = api.checkForAppUpdates('menu')
+  const finishLocal = releaseLocal
+  if (finishLocal === undefined) {
+    throw new Error('missing local version resolver')
+  }
+  finishLocal('2.4.16')
+  await firstCheck
+  await secondCheck
+  expect(showAppUpdateAvailableNotification).toHaveBeenCalledOnce()
+})
+
+test('Test that createCheckForAppUpdates ignores a hide-mascot read from an older check', async () => {
+  let releaseHide: ((value: boolean) => void) | undefined
+  const pendingHide = new Promise<boolean>((resolve) => {
+    releaseHide = resolve
+  })
+  const { api, showAppUpdateAvailableNotification } = buildApi({
+    getHideMascot: () => pendingHide
+  })
+  const firstCheck = api.checkForAppUpdates('startup')
+  await Promise.resolve()
+  const secondCheck = api.checkForAppUpdates('startup')
+  const finishHide = releaseHide
+  if (finishHide === undefined) {
+    throw new Error('missing hide mascot resolver')
+  }
+  finishHide(false)
+  await firstCheck
+  await secondCheck
+  expect(showAppUpdateAvailableNotification).toHaveBeenCalledOnce()
 })

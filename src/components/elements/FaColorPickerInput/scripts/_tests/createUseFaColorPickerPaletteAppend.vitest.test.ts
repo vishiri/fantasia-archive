@@ -38,7 +38,7 @@ const usePaletteAppend = createUseFaColorPickerPaletteAppend(paletteAppendFactor
  * Emits the next palette string in draft mode without persisting.
  */
 test('Test that createUseFaColorPickerPaletteAppend emits draft palette updates', async () => {
-  const emitted: string[] = []
+  const emitted: Array<{ colorPalette: string, worldId: string }> = []
   const props = reactive({
     modelValue: '#112233',
     paletteAppend: {
@@ -48,8 +48,11 @@ test('Test that createUseFaColorPickerPaletteAppend emits draft palette updates'
   })
   const api = usePaletteAppend(
     props,
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     },
     () => props.modelValue
   )
@@ -59,7 +62,10 @@ test('Test that createUseFaColorPickerPaletteAppend emits draft palette updates'
 
   await api.onPaletteAppendClick()
 
-  expect(emitted).toEqual(['#445566;#112233'])
+  expect(emitted).toEqual([{
+    colorPalette: '#445566;#112233',
+    worldId: ''
+  }])
 })
 
 /**
@@ -101,7 +107,7 @@ test('Test that createUseFaColorPickerPaletteAppend persists palette updates', a
     persistWorldColorPalette,
     refreshProjectWorldColorPalette
   })
-  const emitted: string[] = []
+  const emitted: Array<{ colorPalette: string, worldId: string }> = []
   const props = reactive({
     modelValue: '#aabbcc',
     paletteAppend: {
@@ -112,8 +118,11 @@ test('Test that createUseFaColorPickerPaletteAppend persists palette updates', a
   })
   const api = usePersistAppend(
     props,
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     },
     () => props.modelValue,
     refreshProjectWorldColorPalette
@@ -123,7 +132,89 @@ test('Test that createUseFaColorPickerPaletteAppend persists palette updates', a
 
   expect(persistWorldColorPalette).toHaveBeenCalledWith('world-1', '#112233;#AABBCC')
   expect(refreshProjectWorldColorPalette).toHaveBeenCalled()
-  expect(emitted).toEqual(['#112233;#AABBCC'])
+  expect(emitted).toEqual([{
+    colorPalette: '#112233;#AABBCC',
+    worldId: 'world-1'
+  }])
+})
+
+/**
+ * createUseFaColorPickerPaletteAppend
+ * A second append for the same world waits and extends the palette the first save wrote.
+ */
+test('Test that createUseFaColorPickerPaletteAppend chains persist appends for one world', async () => {
+  let releaseFirstPersist: () => void = () => undefined
+  const firstPersist = new Promise<boolean>((resolve) => {
+    releaseFirstPersist = () => {
+      resolve(true)
+    }
+  })
+  let persistCallCount = 0
+  const persistWorldColorPalette = vi.fn((_worldId: string, _colorPalette: string) => {
+    persistCallCount += 1
+    if (persistCallCount === 1) {
+      return firstPersist
+    }
+    return Promise.resolve(true)
+  })
+  const usePersistAppend = createUseFaColorPickerPaletteAppend({
+    ...paletteAppendFactoryDeps,
+    persistWorldColorPalette
+  })
+  const propsA = reactive({
+    modelValue: '#aabbcc',
+    paletteAppend: {
+      mode: 'persist' as const,
+      worldColorPalette: '#112233',
+      worldId: 'world-queue'
+    }
+  })
+  const propsB = reactive({
+    modelValue: '#445566',
+    paletteAppend: {
+      mode: 'persist' as const,
+      worldColorPalette: '#112233',
+      worldId: 'world-queue'
+    }
+  })
+  const applySavedPalette = (colorPalette: string): void => {
+    propsA.paletteAppend = {
+      ...propsA.paletteAppend,
+      worldColorPalette: colorPalette
+    }
+    propsB.paletteAppend = {
+      ...propsB.paletteAppend,
+      worldColorPalette: colorPalette
+    }
+  }
+  const apiA = usePersistAppend(
+    propsA,
+    (colorPalette) => {
+      applySavedPalette(colorPalette)
+    },
+    () => propsA.modelValue
+  )
+  const apiB = usePersistAppend(
+    propsB,
+    (colorPalette) => {
+      applySavedPalette(colorPalette)
+    },
+    () => propsB.modelValue
+  )
+
+  const firstClick = apiA.onPaletteAppendClick()
+  const secondClick = apiB.onPaletteAppendClick()
+  await Promise.resolve()
+  releaseFirstPersist()
+  await firstClick
+  await secondClick
+
+  expect(persistWorldColorPalette).toHaveBeenNthCalledWith(1, 'world-queue', '#112233;#AABBCC')
+  expect(persistWorldColorPalette).toHaveBeenNthCalledWith(
+    2,
+    'world-queue',
+    '#112233;#AABBCC;#445566'
+  )
 })
 
 /**
@@ -221,10 +312,32 @@ test('Test that createUseFaColorPickerPaletteAppend no-ops on blocked clicks', a
   await api.onPaletteAppendClick()
   expect(emitted).toHaveLength(0)
 
-  const persistWorldColorPalette = vi.fn(async () => false)
-  const useFailedPersist = createUseFaColorPickerPaletteAppend({
+  const persistWorldColorPalette = vi.fn(async () => {
+    throw new Error('palette-write-fail')
+  })
+  const useThrowingPersist = createUseFaColorPickerPaletteAppend({
     ...paletteAppendFactoryDeps,
     persistWorldColorPalette
+  })
+  const throwingProps = reactive({
+    modelValue: '#112233',
+    paletteAppend: {
+      mode: 'persist' as const,
+      worldColorPalette: '',
+      worldId: 'world-1'
+    }
+  })
+  const throwingApi = useThrowingPersist(
+    throwingProps,
+    () => undefined,
+    () => throwingProps.modelValue
+  )
+  await expect(throwingApi.onPaletteAppendClick()).rejects.toThrow('palette-write-fail')
+
+  const failedPersistWorldColorPalette = vi.fn(async () => false)
+  const useFailedPersist = createUseFaColorPickerPaletteAppend({
+    ...paletteAppendFactoryDeps,
+    persistWorldColorPalette: failedPersistWorldColorPalette
   })
   const persistProps = reactive({
     modelValue: '#aabbcc',

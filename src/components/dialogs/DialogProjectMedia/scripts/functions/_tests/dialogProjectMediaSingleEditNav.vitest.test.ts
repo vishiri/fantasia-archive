@@ -131,6 +131,7 @@ test('Test that tryOpenFaProjectMediaSingleEditSlideNeighbor opens only a clean 
   tryOpenFaProjectMediaSingleEditSlideNeighbor({
     draft,
     isDirty: { value: true } as I_computedRef<boolean>,
+    isSlideOpen: createRef(true),
     listMediaItems: createRef(items),
     openSlide,
     step: 1
@@ -139,6 +140,16 @@ test('Test that tryOpenFaProjectMediaSingleEditSlideNeighbor opens only a clean 
   tryOpenFaProjectMediaSingleEditSlideNeighbor({
     draft,
     isDirty: { value: false } as I_computedRef<boolean>,
+    isSlideOpen: createRef(false),
+    listMediaItems: createRef(items),
+    openSlide,
+    step: 1
+  })
+  expect(openSlide).not.toHaveBeenCalled()
+  tryOpenFaProjectMediaSingleEditSlideNeighbor({
+    draft,
+    isDirty: { value: false } as I_computedRef<boolean>,
+    isSlideOpen: createRef(true),
     listMediaItems: createRef(items),
     openSlide,
     step: 1
@@ -147,6 +158,7 @@ test('Test that tryOpenFaProjectMediaSingleEditSlideNeighbor opens only a clean 
   tryOpenFaProjectMediaSingleEditSlideNeighbor({
     draft,
     isDirty: { value: false } as I_computedRef<boolean>,
+    isSlideOpen: createRef(true),
     listMediaItems: createRef(items),
     openSlide,
     step: -1
@@ -190,6 +202,7 @@ test('Test that bindFaProjectMediaSingleEditSlideNav disables ends and dirty', (
         return isDirty.value
       }
     } as I_computedRef<boolean>,
+    isSlideOpen: createRef(true),
     listMediaItems,
     openSlide
   })

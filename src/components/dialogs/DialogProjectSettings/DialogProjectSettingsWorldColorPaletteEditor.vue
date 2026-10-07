@@ -26,12 +26,12 @@
         :index="index"
         :is-being-dragged="entry.id === draggingEntryId"
         :is-list-dragging="isListDragging"
-        :picker-open="openSwatchIndex === index"
+        :picker-open="openSwatchEntryId === entry.id"
         :world-picker-palette="worldPickerPalette"
         @delete="onSwatchDelete(entry.id)"
         @duplicate="onSwatchDuplicate(entry.id)"
-        @picker-close="setOpenSwatchIndex(null)"
-        @picker-open="setOpenSwatchIndex(index)"
+        @picker-close="setOpenSwatchEntryId(null)"
+        @picker-open="setOpenSwatchEntryId(entry.id)"
         @update:hex="onSwatchColorUpdate(entry.id, $event)"
       />
     </component>
@@ -80,9 +80,9 @@ const {
   onSwatchColorUpdate,
   onSwatchDelete,
   onSwatchDuplicate,
-  openSwatchIndex,
+  openSwatchEntryId,
   worldPickerPalette,
-  setOpenSwatchIndex,
+  setOpenSwatchEntryId,
   wouldSwatchDuplicateExceedMaxLength
 } = useDialogProjectSettingsWorldColorPaletteEditor(props, emit)
 </script>

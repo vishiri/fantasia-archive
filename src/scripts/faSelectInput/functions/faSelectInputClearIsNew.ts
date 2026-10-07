@@ -57,6 +57,9 @@ function omitIsNewFromFaSelectInputObjectItem (
     name: item.name
   }
 
+  if (item.color !== undefined) {
+    nextItem.color = item.color
+  }
   if (item.documentType !== undefined) {
     nextItem.documentType = item.documentType
   }

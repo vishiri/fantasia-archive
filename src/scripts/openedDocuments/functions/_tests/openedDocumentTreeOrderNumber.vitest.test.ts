@@ -6,6 +6,7 @@ import {
   isFaDocumentTreeOrderNumberEmpty,
   normalizeOpenedDocumentTreeOrderNumberFromDb,
   resolveFaDocumentTreeOrderNumberBadgeLabel,
+  openedDocumentTreeOrderNumberDraftExceedsStorage,
   resolveOpenedDocumentTreeOrderNumberDraftForPersist
 } from '../openedDocumentTreeOrderNumber'
 
@@ -32,6 +33,14 @@ test('Test that resolveOpenedDocumentTreeOrderNumberDraftForPersist maps blank d
   expect(resolveOpenedDocumentTreeOrderNumberDraftForPersist('abc')).toBe(
     FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
   )
+})
+
+test('Test that openedDocumentTreeOrderNumberDraftExceedsStorage rejects integers JavaScript cannot store exactly', () => {
+  expect(openedDocumentTreeOrderNumberDraftExceedsStorage('')).toBe(false)
+  expect(openedDocumentTreeOrderNumberDraftExceedsStorage('7.9')).toBe(false)
+  expect(openedDocumentTreeOrderNumberDraftExceedsStorage('9007199254740991')).toBe(false)
+  expect(openedDocumentTreeOrderNumberDraftExceedsStorage('9007199254740993')).toBe(true)
+  expect(openedDocumentTreeOrderNumberDraftExceedsStorage('1e20')).toBe(true)
 })
 
 test('Test that resolveFaDocumentTreeOrderNumberBadgeLabel returns null for empty values', () => {

@@ -161,7 +161,7 @@ test('Test that DialogNewProject treats enter on blank name like a gated create 
   })
   await flushPromises()
 
-  await w.get('.dialog-new-project-qinput-mock').trigger('keyup.enter')
+  await w.get('.dialog-new-project-qinput-mock').trigger('keydown.enter')
   await flushPromises()
 
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()

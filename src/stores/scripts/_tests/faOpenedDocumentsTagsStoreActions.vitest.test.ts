@@ -2,10 +2,13 @@
 import { expect, test, vi } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
   applyFaOpenedDocumentTagsDraft,
-  persistFaOpenedDocumentTagsAfterSave
+  persistFaOpenedDocumentTagsAfterSave,
+  reconcileOpenedDocumentTabTagsOnHydrate,
+  resolveOpenedDocumentTagRefreshNodeIdsAfterSave
 } from '../faOpenedDocumentsTagsStoreActions'
 
 function buildTab (): I_faOpenedDocumentTab {
@@ -128,9 +131,9 @@ test('Test that persistFaOpenedDocumentTagsAfterSave aligns draft with saved tag
 
 /**
  * persistFaOpenedDocumentTagsAfterSave
- * Treats missing tagsDraft as an empty list when calling setDocumentTags.
+ * Skips setDocumentTags when tags were never loaded.
  */
-test('Test that persistFaOpenedDocumentTagsAfterSave treats missing tagsDraft as empty', async () => {
+test('Test that persistFaOpenedDocumentTagsAfterSave skips when tags were not loaded', async () => {
   const setDocumentTags = vi.fn(async () => ({
     items: []
   }))
@@ -148,12 +151,8 @@ test('Test that persistFaOpenedDocumentTagsAfterSave treats missing tagsDraft as
   const tab = buildTab()
   delete (tab as { tagsDraft?: unknown }).tagsDraft
   const next = await persistFaOpenedDocumentTagsAfterSave(tab, 'doc-1')
-  expect(setDocumentTags).toHaveBeenCalledWith({
-    documentId: 'doc-1',
-    tags: []
-  })
-  expect(next.tagsDraft).toEqual([])
-  expect(next.savedTags).toEqual([])
+  expect(setDocumentTags).not.toHaveBeenCalled()
+  expect(next).toBe(tab)
 })
 
 /**
@@ -212,4 +211,171 @@ test('Test that persistFaOpenedDocumentTagsAfterSave uses overrides when present
   }])
   expect(next.hasUnsavedChanges).toBe(false)
   setFaComponentTestingProjectContentOverrides(null)
+})
+
+test('Test that reconcileOpenedDocumentTabTagsOnHydrate reloads tags hidden by an empty snapshot', async () => {
+  const listDocumentTags = vi.fn(async () => ({
+    items: [{
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  }))
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTags
+        }
+      }
+    },
+    writable: true
+  })
+  const next = await reconcileOpenedDocumentTabTagsOnHydrate(buildTab())
+  expect(listDocumentTags).toHaveBeenCalledWith({ documentId: 'doc-1' })
+  expect(next.savedTags).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+  expect(next.tagsDraft).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+})
+
+test('Test that reconcileOpenedDocumentTabTagsOnHydrate reloads tags when the draft was never loaded', async () => {
+  const listDocumentTags = vi.fn(async () => ({
+    items: [{
+      id: 'tag-db',
+      name: 'Database'
+    }]
+  }))
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTags
+        }
+      }
+    },
+    writable: true
+  })
+  const tab = buildTab()
+  tab.savedTags = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  tab.tagsDraft = undefined
+  const next = await reconcileOpenedDocumentTabTagsOnHydrate(tab)
+  expect(listDocumentTags).toHaveBeenCalledWith({ documentId: 'doc-1' })
+  expect(next.savedTags).toEqual([{
+    id: 'tag-db',
+    name: 'Database'
+  }])
+  expect(next.tagsDraft).toEqual([{
+    id: 'tag-db',
+    name: 'Database'
+  }])
+})
+
+test('Test that reconcileOpenedDocumentTabTagsOnHydrate keeps an unsaved tag draft', async () => {
+  const listDocumentTags = vi.fn(async () => ({
+    items: [{
+      id: 'tag-db',
+      name: 'Database'
+    }]
+  }))
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTags
+        }
+      }
+    },
+    writable: true
+  })
+  const tab = buildTab()
+  tab.savedTags = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  tab.tagsDraft = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }, {
+    id: 'tag-2',
+    name: 'Villains'
+  }]
+  const next = await reconcileOpenedDocumentTabTagsOnHydrate(tab)
+  expect(listDocumentTags).not.toHaveBeenCalled()
+  expect(next.tagsDraft).toEqual(tab.tagsDraft)
+  expect(next.savedTags).toEqual(tab.savedTags)
+})
+
+test('Test that reconcileOpenedDocumentTabTagsOnHydrate keeps snapshot tags when list API is missing', async () => {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {}
+      }
+    },
+    writable: true
+  })
+  const tab = buildTab()
+  tab.savedTags = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  tab.tagsDraft = [{
+    id: 'tag-1',
+    name: 'Heroes'
+  }]
+  const next = await reconcileOpenedDocumentTabTagsOnHydrate(tab)
+  expect(next.savedTags).toEqual(tab.savedTags)
+  expect(next.tagsDraft).toEqual(tab.tagsDraft)
+})
+
+test('Test that reconcileOpenedDocumentTabTagsOnHydrate keeps snapshot tags when the list fails', async () => {
+  const listDocumentTags = vi.fn(async () => {
+    throw new Error('list-fail')
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTags
+        }
+      }
+    },
+    writable: true
+  })
+  const tab = buildTab()
+  const next = await reconcileOpenedDocumentTabTagsOnHydrate(tab)
+  expect(next.savedTags).toEqual(tab.savedTags)
+  expect(next.tagsDraft).toEqual(tab.tagsDraft)
+})
+
+test('Test that resolveOpenedDocumentTagRefreshNodeIdsAfterSave reloads a newly saved tag', () => {
+  const loadedTag = {
+    children: [],
+    childrenLoaded: true,
+    id: 'tag-node-saved',
+    nodeKind: 'tag',
+    tagId: 'tag-saved'
+  } as unknown as I_faProjectHierarchyTreeHeTreeNode
+  expect(resolveOpenedDocumentTagRefreshNodeIdsAfterSave(
+    [loadedTag],
+    [],
+    ['tag-saved']
+  )).toEqual(['tag-node-saved'])
+  expect(resolveOpenedDocumentTagRefreshNodeIdsAfterSave(
+    [loadedTag],
+    ['tag-saved'],
+    ['tag-saved']
+  )).toBeNull()
 })

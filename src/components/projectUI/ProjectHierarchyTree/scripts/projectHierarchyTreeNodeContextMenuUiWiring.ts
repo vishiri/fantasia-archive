@@ -24,12 +24,14 @@ export function resolveProjectHierarchyTreeNodeContextMenuPointerAnchorStyle (
       width: '0'
     }
   }
+  const left = `${position.left}px`
+  const top = `${position.top}px`
   return {
     height: '1px',
-    left: `${position.left}px`,
+    left,
     pointerEvents: 'none',
     position: 'fixed',
-    top: `${position.top}px`,
+    top,
     width: '1px'
   }
 }
@@ -86,6 +88,9 @@ export function createProjectHierarchyTreeNodeContextMenuUiWiring (deps: {
     onHide()
   }
 
+  const onSubmenuActivatorLeave = submenuHover.onSubmenuActivatorLeave
+  const onSubmenuContentEnter = submenuHover.onSubmenuContentEnter
+  const onSubmenuContentLeave = submenuHover.onSubmenuContentLeave
   return {
     isAddToTagSubmenuOpen,
     isSortBySubmenuOpen,
@@ -95,9 +100,9 @@ export function createProjectHierarchyTreeNodeContextMenuUiWiring (deps: {
     onRootMenuHide,
     onSortBySubmenuActivatorEnter,
     onSortBySubmenuModelUpdate,
-    onSubmenuActivatorLeave: submenuHover.onSubmenuActivatorLeave,
-    onSubmenuContentEnter: submenuHover.onSubmenuContentEnter,
-    onSubmenuContentLeave: submenuHover.onSubmenuContentLeave,
+    onSubmenuActivatorLeave,
+    onSubmenuContentEnter,
+    onSubmenuContentLeave,
     pointerAnchorRef,
     resolveSortByItemDetailDirection,
     resolveSortByItemDetailScope,

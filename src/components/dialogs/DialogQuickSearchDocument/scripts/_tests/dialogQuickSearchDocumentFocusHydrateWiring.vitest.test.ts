@@ -194,6 +194,125 @@ test('Test that hydrateDialogQuickSearchDocumentDocuments clears without world i
   expect(documents.value).toEqual([])
 })
 
+test('Test that hydrateDialogQuickSearchDocumentDocuments clears the previous world before the next list returns', async () => {
+  let resolveDocuments: ((value: I_dialogQuickSearchDocumentDocumentSource[]) => void) | undefined
+  const documents = ref<I_dialogQuickSearchDocumentDocumentSource[]>([{
+    displayName: 'From A',
+    documentTextColor: null,
+    id: 'doc-a',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }])
+  const pending = hydrateDialogQuickSearchDocumentDocuments(makeDeps({
+    loadDocumentsForWorld: () => {
+      return new Promise((resolve) => {
+        resolveDocuments = resolve
+      })
+    }
+  }), {
+    documents,
+    selectedWorldId: ref('world-a')
+  })
+  await Promise.resolve()
+  const finishDocuments = resolveDocuments
+  if (finishDocuments === undefined) {
+    throw new Error('missing documents resolver')
+  }
+  finishDocuments([{
+    displayName: 'Still A',
+    documentTextColor: null,
+    id: 'doc-a2',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }])
+  await pending
+  expect(documents.value.map((row) => row.id)).toEqual(['doc-a2'])
+  void hydrateDialogQuickSearchDocumentDocuments(makeDeps({
+    loadDocumentsForWorld: () => new Promise(() => undefined)
+  }), {
+    documents,
+    selectedWorldId: ref('world-b')
+  })
+  await Promise.resolve()
+  expect(documents.value).toEqual([])
+})
+
+test('Test that hydrateDialogQuickSearchDocumentDocuments drops a list after the world changes', async () => {
+  let resolveDocuments: ((value: I_dialogQuickSearchDocumentDocumentSource[]) => void) | undefined
+  const selectedWorldId = ref<string | null>('world-a')
+  const documents = ref<I_dialogQuickSearchDocumentDocumentSource[]>([])
+  const pending = hydrateDialogQuickSearchDocumentDocuments(makeDeps({
+    loadDocumentsForWorld: () => {
+      return new Promise((resolve) => {
+        resolveDocuments = resolve
+      })
+    }
+  }), {
+    documents,
+    selectedWorldId
+  })
+  await Promise.resolve()
+  selectedWorldId.value = 'world-b'
+  const finishDocuments = resolveDocuments
+  if (finishDocuments === undefined) {
+    throw new Error('missing documents resolver')
+  }
+  finishDocuments([{
+    displayName: 'From A',
+    documentTextColor: null,
+    id: 'doc-a',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }])
+  await pending
+  expect(documents.value).toEqual([])
+})
+
+test('Test that hydrateDialogQuickSearchDocumentDocuments ignores an older list for the same world', async () => {
+  let resolveSlow: ((value: I_dialogQuickSearchDocumentDocumentSource[]) => void) | undefined
+  const documents = ref<I_dialogQuickSearchDocumentDocumentSource[]>([])
+  const selectedWorldId = ref<string | null>('world-a')
+  const freshDocument: I_dialogQuickSearchDocumentDocumentSource = {
+    displayName: 'Fresh',
+    documentTextColor: null,
+    id: 'doc-fresh',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }
+  const slow = hydrateDialogQuickSearchDocumentDocuments(makeDeps({
+    loadDocumentsForWorld: () => new Promise((resolve) => {
+      resolveSlow = resolve
+    })
+  }), {
+    documents,
+    selectedWorldId
+  })
+  await hydrateDialogQuickSearchDocumentDocuments(makeDeps({
+    loadDocumentsForWorld: async () => [freshDocument]
+  }), {
+    documents,
+    selectedWorldId
+  })
+  const finishSlow = resolveSlow
+  if (finishSlow === undefined) {
+    throw new Error('missing documents resolver')
+  }
+  finishSlow([{
+    displayName: 'Stale',
+    documentTextColor: null,
+    id: 'doc-stale',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }])
+  await slow
+  expect(documents.value).toEqual([freshDocument])
+})
+
 /**
  * hydrateDialogQuickSearchDocumentSources
  * Seeds worlds, templates, and documents for the picked world.
@@ -229,6 +348,7 @@ test('Test that hydrateDialogQuickSearchDocumentSources seeds worlds then docume
   })
   await hydrateDialogQuickSearchDocumentSources(deps, {
     documents,
+    focusGeneration: ref(1),
     selectedDocumentId,
     selectedWorldId,
     templateIconsById,
@@ -239,4 +359,71 @@ test('Test that hydrateDialogQuickSearchDocumentSources seeds worlds then docume
   expect(worlds.value).toHaveLength(1)
   expect(templateIconsById.value.get('tpl-hero')?.icon).toBe('mdi-account')
   expect(documents.value.map((row) => row.id)).toEqual(['doc-a'])
+})
+
+/**
+ * hydrateDialogQuickSearchDocumentSources
+ * A superseded open must not replace worlds or clear the document the newer open already showed.
+ */
+test('Test that hydrateDialogQuickSearchDocumentSources drops worlds after focus generation changes', async () => {
+  let resolveSavedWorld: ((value: string | null) => void) | undefined
+  const pendingSavedWorld = new Promise<string | null>((resolve) => {
+    resolveSavedWorld = resolve
+  })
+  const focusGeneration = ref(1)
+  const selectedDocumentId = ref<string | null>('keep-doc')
+  const selectedWorldId = ref<string | null>('keep-world')
+  const templateIconsById = ref(new Map<string, { icon: string, id: string }>())
+  const worlds = ref<I_dialogQuickSearchDocumentWorldSource[]>([{
+    color: '#111',
+    displayNameTranslations: { 'en-US': 'Keep' },
+    id: 'keep-world',
+    sortOrder: 0
+  }])
+  const documents = ref<I_dialogQuickSearchDocumentDocumentSource[]>([{
+    displayName: 'Keep',
+    documentTextColor: null,
+    id: 'keep-doc',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }])
+  const loadDocumentsForWorld = vi.fn(async () => [])
+  const pending = hydrateDialogQuickSearchDocumentSources(makeDeps({
+    loadDocumentsForWorld,
+    loadQuickSearchDocumentSources: async () => ({
+      templates: [{
+        icon: 'mdi-file',
+        id: 'tpl-stale'
+      }],
+      worlds: [{
+        color: '#abc',
+        displayNameTranslations: { 'en-US': 'Stale' },
+        id: 'stale-world',
+        sortOrder: 0
+      }]
+    }),
+    pickFirstWorldId: () => 'stale-world',
+    readLastSelectedWorldId: () => pendingSavedWorld
+  }), {
+    documents,
+    focusGeneration,
+    selectedDocumentId,
+    selectedWorldId,
+    templateIconsById,
+    worlds
+  })
+  await Promise.resolve()
+  focusGeneration.value = 2
+  const finishSavedWorld = resolveSavedWorld
+  if (finishSavedWorld === undefined) {
+    throw new Error('missing saved world resolver')
+  }
+  finishSavedWorld('stale-world')
+  await pending
+  expect(loadDocumentsForWorld).not.toHaveBeenCalled()
+  expect(selectedDocumentId.value).toBe('keep-doc')
+  expect(selectedWorldId.value).toBe('keep-world')
+  expect(worlds.value.map((world) => world.id)).toEqual(['keep-world'])
+  expect(documents.value.map((row) => row.id)).toEqual(['keep-doc'])
 })

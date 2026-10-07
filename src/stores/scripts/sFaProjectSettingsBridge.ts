@@ -5,9 +5,26 @@ import type {
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/functions/faActionUserCanceledError'
 import { propagateFaProjectSettingsToAppConsumers } from 'app/src/scripts/projectManagement/projectManagement_manager'
 
 import { didObjectPatchPersist } from '../functions/faPersistPatchVerify'
+
+async function assertFaProjectSettingsPersistEpoch (
+  epochAtStart: number | undefined
+): Promise<void> {
+  if (epochAtStart === undefined) {
+    return
+  }
+  const activeProjectModule = await import('app/src/stores/S_FaActiveProject')
+  const activeProject = activeProjectModule.S_FaActiveProject()
+  if (activeProject.isProjectReplacementInFlight()) {
+    throw new FaActionUserCanceledError()
+  }
+  if (activeProject.readProjectContentEpoch() !== epochAtStart) {
+    throw new FaActionUserCanceledError()
+  }
+}
 
 /**
  * Hydrates canonical project settings from SQLite via the preload bridge.
@@ -19,10 +36,15 @@ export async function faProjectSettingsRefreshFromBridge (opts: {
   if (typeof api?.getProjectSettings !== 'function') {
     return false
   }
+  const activeProject = await import('app/src/stores/S_FaActiveProject')
+  const epochAtStart = activeProject.S_FaActiveProject().readProjectContentEpoch()
   const readResult = await ResultAsync.fromPromise(
     api.getProjectSettings(),
     (error): unknown => error
   )
+  if (activeProject.S_FaActiveProject().readProjectContentEpoch() !== epochAtStart) {
+    return false
+  }
   if (readResult.isErr()) {
     console.error('[S_FaProjectSettings] getProjectSettings failed', readResult.error)
     throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.loadError'))
@@ -56,6 +78,7 @@ export async function faProjectSettingsFetchFreshForDialog (): Promise<I_faProje
  */
 export async function faProjectSettingsPersistPatchFromStore (opts: {
   applyRoot: (next: I_faProjectSettingsRoot) => void
+  epochAtStart?: number
   patch: I_faProjectSettingsPatch
 }): Promise<void> {
   const api = window.faContentBridgeAPIs?.projectManagement
@@ -66,6 +89,7 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
     throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.bridgeMissing'))
   }
 
+  await assertFaProjectSettingsPersistEpoch(opts.epochAtStart)
   const writeResult = await ResultAsync.fromPromise(
     api.setProjectSettings(opts.patch),
     (error): unknown => error
@@ -79,6 +103,7 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
     throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
   }
 
+  await assertFaProjectSettingsPersistEpoch(opts.epochAtStart)
   const afterSaveResult = await ResultAsync.fromPromise(
     api.getProjectSettings(),
     (error): unknown => error
@@ -90,6 +115,7 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
   }
   const retrieved = afterSaveResult.value
 
+  await assertFaProjectSettingsPersistEpoch(opts.epochAtStart)
   if (!didObjectPatchPersist(
     opts.patch as Partial<import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsRoot>,
     retrieved

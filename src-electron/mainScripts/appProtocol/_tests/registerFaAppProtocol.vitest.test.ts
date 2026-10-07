@@ -163,6 +163,21 @@ test('Test that installFaAppProtocolHandler refuses mismatched app protocol host
 
 /**
  * installFaAppProtocolHandler
+ * Lone percent signs throw from decodeURIComponent; the handler answers 400 instead.
+ */
+test('Test that installFaAppProtocolHandler rejects malformed percent-encoding', async () => {
+  const mod = await import('../registerFaAppProtocolWiring')
+  mod.installFaAppProtocolHandler()
+
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
+  const response = await handler({ url: 'app://./%' })
+
+  expect(response.status).toBe(400)
+  expect(netFetchMock).not.toHaveBeenCalled()
+})
+
+/**
+ * installFaAppProtocolHandler
  * Defaults to serving index.html when the URL has no pathname.
  */
 test('Test that installFaAppProtocolHandler defaults missing pathname to index.html', async () => {
@@ -174,6 +189,30 @@ test('Test that installFaAppProtocolHandler defaults missing pathname to index.h
 
   expect(netFetchMock).toHaveBeenCalledTimes(1)
   expect(String(netFetchMock.mock.calls[0]!?.[0]!).endsWith('/index.html')).toBe(true)
+})
+
+/**
+ * installFaAppProtocolHandler
+ * A request URL that the URL constructor rejects answers 400.
+ */
+test('Test that installFaAppProtocolHandler rejects an unparsable request url', async () => {
+  const mod = await import('../registerFaAppProtocolWiring')
+  mod.installFaAppProtocolHandler()
+
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
+  const response = await handler({ url: 'not a url' })
+
+  expect(response.status).toBe(400)
+  expect(netFetchMock).not.toHaveBeenCalled()
+})
+
+/**
+ * isFaAppProtocolPathWithinRendererRoot
+ * The renderer root itself is inside the allowed tree.
+ */
+test('Test that isFaAppProtocolPathWithinRendererRoot accepts the renderer root path', async () => {
+  const mod = await import('../registerFaAppProtocolWiring')
+  expect(mod.isFaAppProtocolPathWithinRendererRoot('C:\\fa-renderer', 'C:\\fa-renderer')).toBe(true)
 })
 
 /**

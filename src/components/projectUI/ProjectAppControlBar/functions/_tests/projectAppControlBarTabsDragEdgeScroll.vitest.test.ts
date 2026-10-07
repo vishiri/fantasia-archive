@@ -106,3 +106,69 @@ test('Test that resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec re
     scrollWidth: 200
   })).toBeNull()
 })
+
+test('Test that overlapping edge zones follow the closer edge', () => {
+  const closerToRight = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
+    clientWidth: 80,
+    contentLeft: 0,
+    contentRight: 80,
+    maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
+    pointerClientX: 50,
+    scrollLeft: 40,
+    scrollSensitivityPx: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
+    scrollWidth: 400
+  })
+  const closerToLeft = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
+    clientWidth: 80,
+    contentLeft: 0,
+    contentRight: 80,
+    maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
+    pointerClientX: 28,
+    scrollLeft: 40,
+    scrollSensitivityPx: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
+    scrollWidth: 400
+  })
+  const deadCenter = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
+    clientWidth: 80,
+    contentLeft: 0,
+    contentRight: 80,
+    maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
+    pointerClientX: 40,
+    scrollLeft: 40,
+    scrollSensitivityPx: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
+    scrollWidth: 400
+  })
+
+  expect(closerToRight).not.toBeNull()
+  expect(closerToRight as number).toBeGreaterThan(0)
+  expect(closerToLeft).not.toBeNull()
+  expect(closerToLeft as number).toBeLessThan(0)
+  expect(deadCenter).toBeNull()
+})
+
+test('Test that resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec scrolls rtl overflow both ways', () => {
+  const towardInlineEnd = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
+    clientWidth: 200,
+    contentLeft: 100,
+    contentRight: 300,
+    direction: 'rtl',
+    maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
+    pointerClientX: 100,
+    scrollLeft: 0,
+    scrollSensitivityPx: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
+    scrollWidth: 800
+  })
+  const towardInlineStart = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
+    clientWidth: 200,
+    contentLeft: 100,
+    contentRight: 300,
+    direction: 'rtl',
+    maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
+    pointerClientX: 320,
+    scrollLeft: -40,
+    scrollSensitivityPx: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
+    scrollWidth: 800
+  })
+  expect(towardInlineEnd).toBe(-PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC)
+  expect(towardInlineStart).toBe(PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC)
+})

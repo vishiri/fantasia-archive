@@ -83,11 +83,13 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAtDragStart (input: {
       preferredNodeId
     )
   }
+  const orderSource = picked.orderSource
+  const orderedDocumentIds = picked.orderedDocumentIds
   return {
     domOrderedDocumentIds,
     getDataOrderedDocumentIds,
-    orderSource: picked.orderSource,
-    orderedDocumentIds: picked.orderedDocumentIds,
+    orderSource,
+    orderedDocumentIds,
     treeDataOrderedDocumentIds
   }
 }
@@ -145,11 +147,13 @@ export function resolveProjectHierarchyTreeDragSiblingOrderAfterDrop (input: {
       orderedDocumentIds: getDataOrderedDocumentIds
     }
   ])
+  const orderSource = picked.orderSource
+  const orderedDocumentIds = picked.orderedDocumentIds
   return {
     computedOrderedDocumentIds,
     domOrderedDocumentIds,
-    orderSource: picked.orderSource,
-    orderedDocumentIds: picked.orderedDocumentIds,
+    orderSource,
+    orderedDocumentIds,
     parentStatsOrderedDocumentIds
   }
 }
@@ -172,12 +176,16 @@ function buildDragSiblingOrderSnapshot (input: {
   const parentDocumentId = resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId({
     treeDataParentDocumentId: treeDataSnapshot.parentDocumentId
   })
+  const orderedDocumentIds = input.orderedDocumentIds
+  const placementId = treeDataSnapshot.placementId
+  const tagId = treeDataSnapshot.tagId ?? null
+  const treeNodeId = treeDataSnapshot.treeNodeId ?? preferredNodeId
   return {
-    orderedDocumentIds: input.orderedDocumentIds,
+    orderedDocumentIds,
     parentDocumentId,
-    placementId: treeDataSnapshot.placementId,
-    tagId: treeDataSnapshot.tagId ?? null,
-    treeNodeId: treeDataSnapshot.treeNodeId ?? preferredNodeId
+    placementId,
+    tagId,
+    treeNodeId
   }
 }
 
@@ -241,11 +249,15 @@ export function syncProjectHierarchyTreeSiblingOrderAfterDrop (input: {
       treeData: input.treeData
     })
   input.setDragSiblingOrderSnapshot(snapshot)
+  const computedOrderedDocumentIds = resolved.computedOrderedDocumentIds
+  const domOrderedDocumentIds = resolved.domOrderedDocumentIds
+  const orderSource = resolved.orderSource
+  const parentStatsOrderedDocumentIds = resolved.parentStatsOrderedDocumentIds
   return {
-    computedOrderedDocumentIds: resolved.computedOrderedDocumentIds,
-    domOrderedDocumentIds: resolved.domOrderedDocumentIds,
-    orderSource: resolved.orderSource,
-    parentStatsOrderedDocumentIds: resolved.parentStatsOrderedDocumentIds,
+    computedOrderedDocumentIds,
+    domOrderedDocumentIds,
+    orderSource,
+    parentStatsOrderedDocumentIds,
     patched,
     snapshot
   }

@@ -32,3 +32,21 @@ export function buildProjectHierarchyTreeRevealPathFromSearchHit (
 
   return path
 }
+
+/**
+ * True when both reveal paths list the same node ids in the same order.
+ */
+export function projectHierarchyTreeRevealPathsMatch (
+  left: readonly string[],
+  right: readonly string[]
+): boolean {
+  if (left.length !== right.length) {
+    return false
+  }
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) {
+      return false
+    }
+  }
+  return true
+}

@@ -37,8 +37,9 @@ I_faProjectHierarchyTreeWorkspaceLayoutResult
   const overrides = getFaComponentTestingProjectContentOverrides()
   const worlds = overrides?.workspaceHierarchyLayoutWorlds
   if (worlds !== undefined) {
+    const clonedWorlds = cloneWorldLayout(worlds)
     return {
-      worlds: cloneWorldLayout(worlds)
+      worlds: clonedWorlds
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
@@ -57,14 +58,17 @@ export async function listFaProjectTagsForWorldForRenderer (
   const overrides = getFaComponentTestingProjectContentOverrides()
   const map = overrides?.tagsByWorldId
   if (map !== undefined) {
+    const sourceItems = map[input.worldId] ?? []
+    const items = [...sourceItems]
     return {
-      items: [...(map[input.worldId] ?? [])]
+      items
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listTagsForWorld !== 'function') {
+    const items: I_faProjectTagListResult['items'] = []
     return {
-      items: []
+      items
     }
   }
   return await api.listTagsForWorld(input)
@@ -79,14 +83,17 @@ export async function listFaProjectTagsWithDocumentCountsForWorldForRenderer (
   const overrides = getFaComponentTestingProjectContentOverrides()
   const map = overrides?.tagsWithCountsByWorldId
   if (map !== undefined) {
+    const sourceItems = map[input.worldId] ?? []
+    const items = [...sourceItems]
     return {
-      items: [...(map[input.worldId] ?? [])]
+      items
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listTagsWithDocumentCountsForWorld !== 'function') {
+    const items: I_faProjectListTagsWithDocumentCountsForWorldResult['items'] = []
     return {
-      items: []
+      items
     }
   }
   return await api.listTagsWithDocumentCountsForWorld(input)
@@ -101,14 +108,17 @@ export async function listFaProjectDocumentTagsForRenderer (
   const overrides = getFaComponentTestingProjectContentOverrides()
   if (overrides !== null) {
     const map = overrides.documentTagsByDocumentId
+    const sourceItems = map?.[input.documentId] ?? []
+    const items = [...sourceItems]
     return {
-      items: [...(map?.[input.documentId] ?? [])]
+      items
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listDocumentTags !== 'function') {
+    const items: I_faProjectDocumentTagRef[] = []
     return {
-      items: []
+      items
     }
   }
   return await api.listDocumentTags(input)
@@ -123,14 +133,17 @@ export async function listFaProjectDocumentsUnderTagForRenderer (
   const overrides = getFaComponentTestingProjectContentOverrides()
   const map = overrides?.documentsUnderTagByTagId
   if (map !== undefined) {
+    const sourceItems = map[input.tagId] ?? []
+    const items = [...sourceItems]
     return {
-      items: [...(map[input.tagId] ?? [])]
+      items
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listDocumentsUnderTag !== 'function') {
+    const items: I_faProjectListDocumentsUnderTagResult['items'] = []
     return {
-      items: []
+      items
     }
   }
   return await api.listDocumentsUnderTag(input)

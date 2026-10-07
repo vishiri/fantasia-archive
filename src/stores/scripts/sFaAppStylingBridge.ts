@@ -8,7 +8,11 @@ import type {
 } from 'app/types/I_faAppStylingDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import { didCssPatchPersist } from '../functions/faPersistPatchVerify'
+import {
+  didCssPatchPersist,
+  shouldClearCssLivePreviewAfterSave
+} from '../functions/faPersistPatchVerify'
+import { mergeProjectStylingRootAfterSilentPersist } from '../functions/faProjectStylingPersistMerge'
 
 export async function faAppStylingRefreshFromBridge (opts: {
   setRoot: (next: I_faAppStylingRoot) => void
@@ -32,8 +36,10 @@ export async function faAppStylingRefreshFromBridge (opts: {
 
 export async function faAppStylingPersistPartialSilent (opts: {
   patch: I_faAppStylingPatch
+  readCurrentCss: () => string
   setRoot: (next: I_faAppStylingRoot) => void
 }): Promise<void> {
+  const cssAtStart = opts.readCurrentCss()
   const api = window.faContentBridgeAPIs?.faAppStyling
   if (typeof api?.setAppStyling !== 'function') {
     throw new Error(i18n.global.t('globalFunctionality.faAppStyling.loadError'))
@@ -58,7 +64,13 @@ export async function faAppStylingPersistPartialSilent (opts: {
     console.error('[S_FaAppStyling] getAppStyling after silent partial failed', error)
     throw error instanceof Error ? error : new Error(String(error))
   }
-  opts.setRoot(afterSaveResult.value)
+  const currentCss = opts.readCurrentCss()
+  opts.setRoot(mergeProjectStylingRootAfterSilentPersist(
+    afterSaveResult.value,
+    opts.patch,
+    currentCss,
+    cssAtStart
+  ))
 }
 
 export async function faAppStylingUpdateWithUserNotify (opts: {
@@ -106,7 +118,9 @@ export async function faAppStylingUpdateWithUserNotify (opts: {
 
   opts.setRoot(retrieved)
 
-  opts.cssLivePreview.value = null
+  if (shouldClearCssLivePreviewAfterSave(opts.cssLivePreview.value, opts.patch.css)) {
+    opts.cssLivePreview.value = null
+  }
 
   Notify.create({
     group: false,

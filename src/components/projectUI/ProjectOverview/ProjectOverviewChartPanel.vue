@@ -163,12 +163,14 @@ const apexChartOptions = computed(() => {
   )
     ? chartOptions.chart as Record<string, unknown>
     : {}
+  const height = props.chartHeightPx
+  const chart = {
+    ...previousChart,
+    height
+  }
   return {
     ...chartOptions,
-    chart: {
-      ...previousChart,
-      height: props.chartHeightPx
-    }
+    chart
   }
 })
 

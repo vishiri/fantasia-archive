@@ -8,7 +8,12 @@ import { resolveProjectHierarchyTreeSearchLayout } from '../../functions/resolve
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { createUseProjectHierarchyTreeSearchDebounced } from '../projectHierarchyTreeSearchDebouncedWiring'
 
-const runProjectHierarchyTreeSearchQuery = vi.fn(async () => undefined)
+const runProjectHierarchyTreeSearchQuery = vi.fn(async (
+  _query: string,
+  _hierarchyStore: unknown,
+  _isCurrentQuery?: (issuedQuery: string) => boolean,
+  _readProjectContentEpoch?: () => number
+) => undefined)
 
 beforeEach(() => {
   runProjectHierarchyTreeSearchQuery.mockClear()
@@ -33,6 +38,7 @@ test('Test that createUseProjectHierarchyTreeSearchDebounced debounces search qu
     ref,
     resolveProjectHierarchyTreeSearchLayout,
     runProjectHierarchyTreeSearchQuery,
+    readProjectContentEpoch: () => 0,
     S_FaProjectSidebar: () => ({
       liveWidthPx: ref(400)
     }) as never,
@@ -48,7 +54,24 @@ test('Test that createUseProjectHierarchyTreeSearchDebounced debounces search qu
   const api = useDebounced()
   api.searchQuery.value = 'hero'
   await vi.advanceTimersByTimeAsync(60)
-  expect(runProjectHierarchyTreeSearchQuery).toHaveBeenCalledWith('hero', hierarchyStore)
+  expect(runProjectHierarchyTreeSearchQuery).toHaveBeenCalledWith(
+    'hero',
+    hierarchyStore,
+    expect.any(Function),
+    expect.any(Function),
+    expect.objectContaining({
+      current: 0
+    })
+  )
+  const isCurrentQuery = runProjectHierarchyTreeSearchQuery.mock.calls[0]?.[2] as
+    | ((issuedQuery: string) => boolean)
+    | undefined
+  if (isCurrentQuery === undefined) {
+    throw new Error('missing current-query check')
+  }
+  expect(isCurrentQuery('hero')).toBe(true)
+  api.searchQuery.value = 'villain'
+  expect(isCurrentQuery('hero')).toBe(false)
   api.searchQuery.value = '   '
   await vi.advanceTimersByTimeAsync(60)
   expect(clearSearch).toHaveBeenCalled()

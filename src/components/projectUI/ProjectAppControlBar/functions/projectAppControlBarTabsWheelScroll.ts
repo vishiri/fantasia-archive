@@ -13,30 +13,60 @@ export function resolveProjectAppControlBarTabsHorizontalWheelDelta (input: {
 }
 
 /**
+ * scrollLeft range for overflow tabs. RTL uses the CSSOM range 0 down to -extent.
+ */
+export function resolveProjectAppControlBarTabsScrollLeftBounds (input: {
+  clientWidth: number
+  direction?: 'ltr' | 'rtl'
+  scrollWidth: number
+}): {
+  maxScrollLeft: number
+  minScrollLeft: number
+} | null {
+  const extent = input.scrollWidth - input.clientWidth
+  if (extent <= 0) {
+    return null
+  }
+  if (input.direction === 'rtl') {
+    const maxScrollLeft = 0
+    const minScrollLeft = -extent
+    return {
+      maxScrollLeft,
+      minScrollLeft
+    }
+  }
+  const maxScrollLeft = extent
+  const minScrollLeft = 0
+  return {
+    maxScrollLeft,
+    minScrollLeft
+  }
+}
+
+/**
  * Next scrollLeft after applying wheel delta, or null when overflow tabs cannot move.
+ * Positive delta moves toward the inline end (left in RTL).
  */
 export function resolveProjectAppControlBarTabsWheelScrollLeft (input: {
   clientWidth: number
   delta: number
+  direction?: 'ltr' | 'rtl'
   scrollLeft: number
   scrollWidth: number
 }): number | null {
-  const maxScroll = input.scrollWidth - input.clientWidth
-  if (maxScroll <= 0) {
+  const bounds = resolveProjectAppControlBarTabsScrollLeftBounds(input)
+  if (bounds === null || input.delta === 0) {
     return null
   }
-  if (input.delta === 0) {
-    return null
-  }
-
+  const signedDelta = input.direction === 'rtl' ? -input.delta : input.delta
+  const unclampedScrollLeft = input.scrollLeft + signedDelta
   const nextScrollLeft = Math.min(
-    maxScroll,
-    Math.max(0, input.scrollLeft + input.delta)
+    bounds.maxScrollLeft,
+    Math.max(bounds.minScrollLeft, unclampedScrollLeft)
   )
   if (nextScrollLeft === input.scrollLeft) {
     return null
   }
-
   return nextScrollLeft
 }
 
@@ -46,12 +76,16 @@ export function resolveProjectAppControlBarTabsWheelScrollLeft (input: {
  */
 export function resolveProjectAppControlBarTabsIsScrolledToInlineEnd (input: {
   clientWidth: number
+  direction?: 'ltr' | 'rtl'
   scrollLeft: number
   scrollWidth: number
 }): boolean {
-  const maxScroll = input.scrollWidth - input.clientWidth
-  if (maxScroll <= 0) {
+  const bounds = resolveProjectAppControlBarTabsScrollLeftBounds(input)
+  if (bounds === null) {
     return true
   }
-  return input.scrollLeft >= maxScroll - 1
+  if (input.direction === 'rtl') {
+    return input.scrollLeft <= bounds.minScrollLeft + 1
+  }
+  return input.scrollLeft >= bounds.maxScrollLeft - 1
 }

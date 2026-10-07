@@ -5,6 +5,7 @@ import { createFaUserSettingsStoreApi } from './functions/faUserSettingsStoreApi
 import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { migrateLegacyFaUserSettingsKeys } from 'app/src-electron/shared/faUserSettingsLegacyKeyMigrate'
 import { isFaUserSettingsAppTheme } from 'app/types/faUserSettingsAppThemeRegistry'
+import { isFaUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_USER_SETTINGS_DEFAULTS } from './faUserSettingsDefaults'
 
 const faUserSettingsStoreApi = createFaUserSettingsStoreApi({
@@ -13,6 +14,7 @@ const faUserSettingsStoreApi = createFaUserSettingsStoreApi({
   createLazySingleton,
   defaults: FA_USER_SETTINGS_DEFAULTS,
   isFaUserSettingsAppTheme,
+  isFaUserSettingsLanguageCode,
   migrateLegacyFaUserSettingsKeys,
   storeName: 'faUserSettings'
 })

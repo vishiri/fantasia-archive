@@ -1,3 +1,4 @@
+import { Result } from 'neverthrow'
 import { z } from 'zod'
 
 import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
@@ -20,13 +21,17 @@ const faOpenedDocumentTabSchema = z.object({
     z.string().min(1).max(64),
     z.null()
   ]).optional(),
+  placementId: z.union([
+    z.string().min(1).max(64),
+    z.null()
+  ]).optional(),
   temporaryParentResolveDocumentIds: z.array(
     z.string().min(1).max(64)
   ).optional(),
-  tabLabel: z.string().max(512),
+  tabLabel: z.string(),
   templateIcon: z.string().max(128),
-  displayNameDraft: z.string().max(512),
-  savedDisplayName: z.string().max(512),
+  displayNameDraft: z.string(),
+  savedDisplayName: z.string(),
   documentTextColorDraft: z.string().max(7).optional(),
   savedDocumentTextColor: z.string().max(7).optional(),
   documentBackgroundColorDraft: z.string().max(7).optional(),
@@ -39,20 +44,20 @@ const faOpenedDocumentTabSchema = z.object({
   savedIsMinor: z.boolean().optional(),
   isDeadDraft: z.boolean().optional(),
   savedIsDead: z.boolean().optional(),
-  parentDocumentIdDraft: z.string().max(64).optional(),
+  parentDocumentIdDraft: z.string().optional(),
   savedParentDocumentId: z.string().max(64).optional(),
-  treeOrderNumberDraft: z.string().max(32).optional(),
+  treeOrderNumberDraft: z.string().optional(),
   savedTreeOrderNumber: z.number().optional(),
-  extraClassesDraft: z.string().max(512).optional(),
-  savedExtraClasses: z.string().max(512).optional(),
+  extraClassesDraft: z.string().optional(),
+  savedExtraClasses: z.string().optional(),
   tagsDraft: z.array(z.object({
     id: z.string().min(1).max(64),
-    name: z.string().max(512),
+    name: z.string(),
     isNew: z.boolean().optional()
   }).strict()).optional(),
   savedTags: z.array(z.object({
     id: z.string().min(1).max(64),
-    name: z.string().max(512)
+    name: z.string()
   }).strict()).optional(),
   hasUnsavedChanges: z.boolean(),
   editState: z.boolean().default(false)
@@ -96,13 +101,16 @@ export const faOpenedDocumentsSnapshotSchema = z.union([
 function normalizeParsedOpenedDocumentsSnapshot (
   snapshot: I_faOpenedDocumentsSnapshot
 ): I_faOpenedDocumentsSnapshot {
+  const activeDocumentId = snapshot.activeDocumentId
+  const schemaVersion = FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION
+  const tabs = snapshot.tabs
+    .map(normalizeOpenedDocumentTabPersistenceState)
+    .map(normalizeOpenedDocumentTabAppearanceColors)
+    .map(normalizeOpenedDocumentTabEditState)
   return {
-    activeDocumentId: snapshot.activeDocumentId,
-    schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
-    tabs: snapshot.tabs
-      .map(normalizeOpenedDocumentTabPersistenceState)
-      .map(normalizeOpenedDocumentTabAppearanceColors)
-      .map(normalizeOpenedDocumentTabEditState)
+    activeDocumentId,
+    schemaVersion,
+    tabs
   }
 }
 
@@ -112,13 +120,15 @@ function normalizeParsedOpenedDocumentsSnapshot (
 export function parseFaOpenedDocumentsSnapshotJson (
   raw: string
 ): I_faOpenedDocumentsSnapshot {
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw)
-  } catch {
+  const parsed = Result.fromThrowable(
+    () => JSON.parse(raw) as unknown,
+    () => undefined
+  )().unwrapOr(undefined)
+  if (parsed === undefined) {
+    const tabs: I_faOpenedDocumentsSnapshot['tabs'] = []
     return {
       ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
-      tabs: []
+      tabs
     }
   }
   const validated = faOpenedDocumentsSnapshotSchema.parse(parsed) as I_faOpenedDocumentsSnapshot

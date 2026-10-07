@@ -52,13 +52,19 @@ export function createDialogKeybindSettingsSync (
   }
 
   async function onSaveMain (): Promise<boolean> {
+    const savedOverrides = cloneOverridesPlain(workingOverrides.value)
     const ok = await deps.runFaActionAwait('saveKeybindSettings', {
-      overrides: cloneOverridesPlain(workingOverrides.value)
+      overrides: savedOverrides
     })
-    if (ok) {
-      syncWorkingFromStore()
+    if (!ok) {
+      return false
     }
-    return ok
+    if (areFaJsonSnapshotsEqual(workingOverrides.value, savedOverrides)) {
+      syncWorkingFromStore()
+      return true
+    }
+    baselineOverrides.value = savedOverrides
+    return false
   }
 
   return {
@@ -130,24 +136,50 @@ export function useDialogKeybindSettingsFromDeps (
     s.capture.removeCaptureListener()
   })
 
+  const {
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    onCaptureClear,
+    onCaptureSet,
+    onOpenCapture,
+    pendingChord
+  } = s.capture
+  const {
+    filter,
+    isDirty,
+    workingOverrides
+  } = s
+  const {
+    initializeForOpen,
+    onCloseMain,
+    onSaveMain
+  } = s.sync
+  const {
+    tableColumns,
+    tableRows
+  } = s.table
   return {
-    captureActionName: s.capture.captureActionName,
-    captureError: s.capture.captureError,
-    captureErrorMessage: s.capture.captureErrorMessage,
-    captureInfoMessage: s.capture.captureInfoMessage,
-    captureLabel: s.capture.captureLabel,
-    captureOpen: s.capture.captureOpen,
-    filter: s.filter,
-    initializeForOpen: s.sync.initializeForOpen,
-    isDirty: s.isDirty,
-    onCaptureClear: s.capture.onCaptureClear,
-    onCaptureSet: s.capture.onCaptureSet,
-    onCloseMain: s.sync.onCloseMain,
-    onOpenCapture: s.capture.onOpenCapture,
-    onSaveMain: s.sync.onSaveMain,
-    pendingChord: s.capture.pendingChord,
-    tableColumns: s.table.tableColumns,
-    tableRows: s.table.tableRows,
-    workingOverrides: s.workingOverrides
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    filter,
+    initializeForOpen,
+    isDirty,
+    onCaptureClear,
+    onCaptureSet,
+    onCloseMain,
+    onOpenCapture,
+    onSaveMain,
+    pendingChord,
+    tableColumns,
+    tableRows,
+    workingOverrides
   }
 }

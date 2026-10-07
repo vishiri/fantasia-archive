@@ -7,6 +7,46 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import { resolveProjectHierarchyTreeTagRenameMergeConflict } from '../functions/projectHierarchyTreeTagNodes'
 import { persistProjectHierarchyTreeTagRename } from './projectHierarchyTreeTagRenamePersistWiring'
 
+function confirmProjectHierarchyTreeTagRename (
+  deps: {
+    applyOpenedDocumentTabs: (tabs: I_faOpenedDocumentTab[]) => void
+    getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
+    refreshHierarchyTreeNodes: (nodeIds: string[]) => void
+    refreshLayout: () => Promise<void>
+    resyncTreeDataFromLayout: () => void
+    treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  },
+  confirm: {
+    canConfirm: boolean
+    nameDraft: string
+    onDismiss: () => void
+    readNameDraft: () => string
+    readTagId: () => string | null
+    tagId: string | null
+  }
+): void {
+  if (!confirm.canConfirm || confirm.tagId === null) {
+    return
+  }
+  const newName = confirm.nameDraft.trim()
+  const tagId = confirm.tagId
+  const shouldKeepOpen = (): boolean => {
+    return confirm.readTagId() === tagId && confirm.readNameDraft().trim() !== newName
+  }
+  void persistProjectHierarchyTreeTagRename({
+    applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: deps.getOpenedDocumentTabs,
+    getTreeData: () => deps.treeData.value,
+    newName,
+    onDismiss: confirm.onDismiss,
+    refreshHierarchyTreeNodes: deps.refreshHierarchyTreeNodes,
+    refreshLayout: deps.refreshLayout,
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+    shouldKeepOpen,
+    tagId
+  })
+}
+
 export function createProjectHierarchyTreeTagRenameDialogWiring (deps: {
   applyOpenedDocumentTabs: (tabs: I_faOpenedDocumentTab[]) => void
   getOpenedDocumentTabs: () => readonly I_faOpenedDocumentTab[]
@@ -84,18 +124,12 @@ export function createProjectHierarchyTreeTagRenameDialogWiring (deps: {
   }
 
   function onConfirmRenameTag (): void {
-    if (!renameTagCanConfirm.value || renameTagId.value === null) {
-      return
-    }
-    void persistProjectHierarchyTreeTagRename({
-      applyOpenedDocumentTabs: deps.applyOpenedDocumentTabs,
-      getOpenedDocumentTabs: deps.getOpenedDocumentTabs,
-      getTreeData: () => deps.treeData.value,
-      newName: renameTagNameDraft.value.trim(),
+    confirmProjectHierarchyTreeTagRename(deps, {
+      canConfirm: renameTagCanConfirm.value,
+      nameDraft: renameTagNameDraft.value,
       onDismiss: onDismissRenameTagDialog,
-      refreshHierarchyTreeNodes: deps.refreshHierarchyTreeNodes,
-      refreshLayout: deps.refreshLayout,
-      resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+      readNameDraft: () => renameTagNameDraft.value,
+      readTagId: () => renameTagId.value,
       tagId: renameTagId.value
     })
   }

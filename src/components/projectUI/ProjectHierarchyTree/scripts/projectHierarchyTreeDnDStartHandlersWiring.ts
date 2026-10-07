@@ -10,6 +10,7 @@ import { collectExpandedNodeIdsFromTree } from '../functions/projectHierarchyTre
 import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 import { readProjectHierarchyTreeScrollTopPx } from '../functions/projectHierarchyTreeScrollPreserve'
+import { beginProjectHierarchyTreeDragSessionSerial } from './projectHierarchyTreeDnDCommitGateWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderSnapshot } from './projectHierarchyTreeDnDOrderSupportWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderAtDragStart } from './projectHierarchyTreeDnDOrderResolveWiring'
 import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDnDSessionStateWiring'
@@ -141,6 +142,7 @@ export function runProjectHierarchyTreeBeforeDragStart (deps: {
   if (stat.data.nodeKind !== 'document' || stat.data.documentId === null) {
     return
   }
+  beginProjectHierarchyTreeDragSessionSerial(deps.dragExpandUiFrozen)
   deps.documentRowDragHoldWiring.markDragStartedFromHold()
   deps.documentRowExpandClickGesture.markDragStartedForGesture()
   deps.draggedDocumentId.set(stat.data.documentId)

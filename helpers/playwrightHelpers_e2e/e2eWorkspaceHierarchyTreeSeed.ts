@@ -86,11 +86,13 @@ export async function e2eSeedHierarchyPlacementWithDocuments (
         id: createdDocument.id
       })
     }
+    const templateId = template.id
+    const worldId = world.id
     return {
       documents: createdDocuments,
       placementId,
-      templateId: template.id,
-      worldId: world.id
+      templateId,
+      worldId
     }
   }, input)
 }

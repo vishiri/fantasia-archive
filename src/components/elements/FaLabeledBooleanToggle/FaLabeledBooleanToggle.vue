@@ -17,6 +17,7 @@
         >{{ title }}</span>
         <FaHelpTooltipIcon
           class="faLabeledBooleanToggle__helpIcon q-ml-md"
+          :aria-label="description"
           :data-test-tooltip-text="description"
         >
           <q-tooltip>

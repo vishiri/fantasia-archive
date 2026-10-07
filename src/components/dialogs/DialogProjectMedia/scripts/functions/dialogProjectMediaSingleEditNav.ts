@@ -65,11 +65,12 @@ export function resolveFaProjectMediaSlideNeighborItem (input: {
 export function tryOpenFaProjectMediaSingleEditSlideNeighbor (input: {
   draft: I_ref<I_faProjectMediaMassEditRow | null>
   isDirty: I_computedRef<boolean>
+  isSlideOpen: I_ref<boolean>
   listMediaItems: I_ref<I_faProjectMedia[]>
   openSlide: (item: I_faProjectMedia) => void
   step: -1 | 1
 }): void {
-  if (input.isDirty.value) {
+  if (!input.isSlideOpen.value || input.isDirty.value) {
     return
   }
   const neighbor = resolveFaProjectMediaSlideNeighborItem({
@@ -90,6 +91,7 @@ export function bindFaProjectMediaSingleEditSlideNav (input: {
   computed: <T>(getter: () => T) => I_computedRef<T>
   draft: I_ref<I_faProjectMediaMassEditRow | null>
   isDirty: I_computedRef<boolean>
+  isSlideOpen: I_ref<boolean>
   listMediaItems: I_ref<I_faProjectMedia[]>
   openSlide: (item: I_faProjectMedia) => void
 }): {
@@ -124,6 +126,7 @@ export function bindFaProjectMediaSingleEditSlideNav (input: {
     tryOpenFaProjectMediaSingleEditSlideNeighbor({
       draft: input.draft,
       isDirty: input.isDirty,
+      isSlideOpen: input.isSlideOpen,
       listMediaItems: input.listMediaItems,
       openSlide: input.openSlide,
       step: -1
@@ -133,6 +136,7 @@ export function bindFaProjectMediaSingleEditSlideNav (input: {
     tryOpenFaProjectMediaSingleEditSlideNeighbor({
       draft: input.draft,
       isDirty: input.isDirty,
+      isSlideOpen: input.isSlideOpen,
       listMediaItems: input.listMediaItems,
       openSlide: input.openSlide,
       step: 1
@@ -181,6 +185,7 @@ export function wireDialogProjectMediaSingleEditPersistence (input: {
   computed: I_bindDialogProjectMediaSingleEditInput['computed']
   dialogModel: I_bindDialogProjectMediaSingleEditInput['dialogModel']
   isSingleEditDirty: I_computedRef<boolean>
+  isSingleEditSlideOpen: I_ref<boolean>
   listLoadGeneration: I_bindDialogProjectMediaSingleEditInput['listLoadGeneration']
   listMediaItems: I_bindDialogProjectMediaSingleEditInput['listMediaItems']
   loadListMedia: I_bindDialogProjectMediaSingleEditInput['loadListMedia']
@@ -228,6 +233,7 @@ export function wireDialogProjectMediaSingleEditPersistence (input: {
     computed: input.computed,
     draft: input.singleEditDraft,
     isDirty: input.isSingleEditDirty,
+    isSlideOpen: input.isSingleEditSlideOpen,
     listMediaItems: input.listMediaItems,
     openSlide: input.openSingleEditSlide
   })

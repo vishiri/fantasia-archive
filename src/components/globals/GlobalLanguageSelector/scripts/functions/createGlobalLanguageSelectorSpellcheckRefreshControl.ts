@@ -29,6 +29,22 @@ export function createGlobalLanguageSelectorSpellcheckRefreshControl (deps: {
       tooltipAutoOpenTimerId = undefined
     }
 
+    let disposed = false
+
+    function armTooltipAutoOpen (): void {
+      if (disposed || !props.show) {
+        return
+      }
+      clearTooltipAutoOpenTimer()
+      tooltipAutoOpenTimerId = setTimeout(() => {
+        tooltipAutoOpenTimerId = undefined
+        if (disposed || !props.show) {
+          return
+        }
+        tooltipOpen.value = true
+      }, spellcheckRefreshPopTransitionMs + spellcheckRefreshTooltipAutoOpenBufferMs)
+    }
+
     deps.watch(
       () => props.show,
       (visible) => {
@@ -38,15 +54,13 @@ export function createGlobalLanguageSelectorSpellcheckRefreshControl (deps: {
           return
         }
         void deps.nextTick(() => {
-          tooltipAutoOpenTimerId = setTimeout(() => {
-            tooltipAutoOpenTimerId = undefined
-            tooltipOpen.value = true
-          }, spellcheckRefreshPopTransitionMs + spellcheckRefreshTooltipAutoOpenBufferMs)
+          armTooltipAutoOpen()
         })
       }
     )
 
     deps.onBeforeUnmount(() => {
+      disposed = true
       clearTooltipAutoOpenTimer()
     })
 

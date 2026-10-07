@@ -12,7 +12,11 @@ import {
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
   FA_PROJECT_TABLE_WORLDS
 } from '../functions/faProjectDbSchemaDdl'
-import type { I_faProjectHierarchyTreeWorkspaceLayoutResult } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeWorkspaceGroup,
+  I_faProjectHierarchyTreeWorkspaceLayoutResult,
+  I_faProjectHierarchyTreeWorkspacePlacement
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { I_faSqlWorldRow } from 'app/types/I_faProjectContentRowMap'
 import type {
   I_faSqlWorldTemplateGroupRow,
@@ -31,6 +35,65 @@ function readFaProjectGroupHasPlacements (
     )
     .get(groupId) as { ok: number } | undefined
   return row !== undefined
+}
+
+function mapFaProjectHierarchyTreeWorkspaceGroup (
+  db: Database,
+  groupRow: I_faSqlWorldTemplateGroupRow
+): I_faProjectHierarchyTreeWorkspaceGroup {
+  const id = groupRow.id
+  const worldId = groupRow.world_id
+  const displayName = groupRow.display_name
+  const rootSortOrder = groupRow.root_sort_order
+  const hasChildren = readFaProjectGroupHasPlacements(db, groupRow.id)
+  return {
+    id,
+    worldId,
+    displayName,
+    rootSortOrder,
+    hasChildren
+  }
+}
+
+function mapFaProjectHierarchyTreeWorkspacePlacement (
+  db: Database,
+  placementRow: I_faSqlWorldTemplatePlacementJoinRow,
+  placementCounts: ReturnType<typeof listFaProjectPlacementCategoryDocumentCounts>
+): I_faProjectHierarchyTreeWorkspacePlacement {
+  const counts = placementCounts.get(placementRow.id)
+  const id = placementRow.id
+  const worldId = placementRow.world_id
+  const documentTemplateId = placementRow.document_template_id
+  const groupId = placementRow.group_id
+  const rootSortOrder = placementRow.root_sort_order
+  const groupSortOrder = placementRow.group_sort_order
+  const displayName = placementRow.display_name
+  const nickname = placementRow.nickname
+  const icon = placementRow.icon
+  const documentCount = counts?.documentCount ?? 0
+  const categoryCount = counts?.categoryCount ?? 0
+  const titlePluralTranslations = parseFaProjectDocumentTemplateTitleTranslationsJson(
+    placementRow.title_translations_json
+  )
+  const titleSingularTranslations = parseFaProjectDocumentTemplateTitleSingularTranslationsJson(
+    placementRow.title_singular_translations_json
+  )
+  return {
+    id,
+    worldId,
+    documentTemplateId,
+    groupId,
+    rootSortOrder,
+    groupSortOrder,
+    displayName,
+    nickname,
+    icon,
+    hasChildren: true,
+    documentCount,
+    categoryCount,
+    titlePluralTranslations,
+    titleSingularTranslations
+  }
 }
 
 /**
@@ -73,40 +136,25 @@ export function listFaProjectWorkspaceHierarchyLayout (
       .all(world.id) as I_faSqlWorldTemplatePlacementJoinRow[]
 
     const placementCounts = listFaProjectPlacementCategoryDocumentCounts(db, world.id)
-
+    const id = world.id
+    const displayName = world.displayName
+    const sortOrder = world.sortOrder
+    const color = world.color
+    const colorPalette = world.colorPalette
+    const groups = groupRows.map((groupRow) => {
+      return mapFaProjectHierarchyTreeWorkspaceGroup(db, groupRow)
+    })
+    const placements = placementRows.map((placementRow) => {
+      return mapFaProjectHierarchyTreeWorkspacePlacement(db, placementRow, placementCounts)
+    })
     return {
-      id: world.id,
-      displayName: world.displayName,
-      sortOrder: world.sortOrder,
-      color: world.color,
-      colorPalette: world.colorPalette,
-      groups: groupRows.map((groupRow) => ({
-        id: groupRow.id,
-        worldId: groupRow.world_id,
-        displayName: groupRow.display_name,
-        rootSortOrder: groupRow.root_sort_order,
-        hasChildren: readFaProjectGroupHasPlacements(db, groupRow.id)
-      })),
-      placements: placementRows.map((placementRow) => ({
-        id: placementRow.id,
-        worldId: placementRow.world_id,
-        documentTemplateId: placementRow.document_template_id,
-        groupId: placementRow.group_id,
-        rootSortOrder: placementRow.root_sort_order,
-        groupSortOrder: placementRow.group_sort_order,
-        displayName: placementRow.display_name,
-        nickname: placementRow.nickname,
-        icon: placementRow.icon,
-        hasChildren: true,
-        documentCount: placementCounts.get(placementRow.id)?.documentCount ?? 0,
-        categoryCount: placementCounts.get(placementRow.id)?.categoryCount ?? 0,
-        titlePluralTranslations: parseFaProjectDocumentTemplateTitleTranslationsJson(
-          placementRow.title_translations_json
-        ),
-        titleSingularTranslations: parseFaProjectDocumentTemplateTitleSingularTranslationsJson(
-          placementRow.title_singular_translations_json
-        )
-      }))
+      id,
+      displayName,
+      sortOrder,
+      color,
+      colorPalette,
+      groups,
+      placements
     }
   })
 

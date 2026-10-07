@@ -9,19 +9,32 @@ import type {
 export function mapFaProjectMediaToMassEditRow (
   item: I_faProjectMedia
 ): I_faProjectMediaMassEditRow {
+  const {
+    createdAtMs,
+    displayName,
+    externalEmbed,
+    externalLink,
+    externalType,
+    id,
+    internalEmbed,
+    internalLink,
+    internalType,
+    type,
+    updatedAtMs
+  } = item
   return {
-    createdAtMs: item.createdAtMs,
-    displayName: item.displayName,
-    externalEmbed: item.externalEmbed,
-    externalLink: item.externalLink,
-    externalType: item.externalType,
-    id: item.id,
-    internalEmbed: item.internalEmbed,
-    internalLink: item.internalLink,
-    internalType: item.internalType,
+    createdAtMs,
+    displayName,
+    externalEmbed,
+    externalLink,
+    externalType,
+    id,
+    internalEmbed,
+    internalLink,
+    internalType,
     isNew: false,
-    type: item.type,
-    updatedAtMs: item.updatedAtMs
+    type,
+    updatedAtMs
   }
 }
 

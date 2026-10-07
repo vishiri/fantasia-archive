@@ -3,8 +3,15 @@ import { expect, test } from 'vitest'
 import {
   mapOpenedDocumentSavedTagsToDraft,
   mapOpenedDocumentTagsDraftToSetInput,
+  openedDocumentSavedTagIdSetsDiffer,
   resolveOpenedDocumentTagsFingerprint
 } from '../openedDocumentTagsDomain'
+
+test('openedDocumentSavedTagIdSetsDiffer ignores order and catches membership changes', () => {
+  expect(openedDocumentSavedTagIdSetsDiffer(['b', 'a'], ['a', 'b'])).toBe(false)
+  expect(openedDocumentSavedTagIdSetsDiffer([], ['tag-late'])).toBe(true)
+  expect(openedDocumentSavedTagIdSetsDiffer(['tag-old'], [])).toBe(true)
+})
 
 test('resolveOpenedDocumentTagsFingerprint is stable across order', () => {
   const left = resolveOpenedDocumentTagsFingerprint([

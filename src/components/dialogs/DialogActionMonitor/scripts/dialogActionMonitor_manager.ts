@@ -5,7 +5,7 @@ import { useDialogKeybindSettingsTableLayout } from 'app/src/components/dialogs/
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { copyToClipboard, Notify } from 'quasar'
 import { computed, onMounted, ref, watch } from 'vue'
-import { ResultAsync } from 'neverthrow'
+import { Result, ResultAsync } from 'neverthrow'
 
 import {
   isDialogActionMonitorDirectInput,
@@ -21,16 +21,21 @@ import { createDialogActionMonitor } from './functions/createDialogActionMonitor
 
 const dialogActionMonitorApi = createDialogActionMonitor({
   buildDialogActionMonitorColumns: buildDialogActionMonitorColumnsImpl,
-  buildDialogActionMonitorRowClipboardJson,
+  buildDialogActionMonitorRowClipboardJson: (entry) => buildDialogActionMonitorRowClipboardJson(
+    entry,
+    (raw) => Result.fromThrowable(
+      () => JSON.parse(raw) as unknown,
+      () => undefined
+    )().unwrapOr(undefined)
+  ),
   buildDialogActionMonitorStatusBadge,
   copyToClipboard,
   formatDialogActionMonitorActionKind,
   getDialogComponentStore: (): { dialogToOpen?: unknown; dialogUUID?: unknown } | null => {
-    try {
-      return S_DialogComponent() as { dialogToOpen?: unknown; dialogUUID?: unknown }
-    } catch {
-      return null
-    }
+    return Result.fromThrowable(
+      () => S_DialogComponent() as { dialogToOpen?: unknown; dialogUUID?: unknown },
+      () => null
+    )().unwrapOr(null)
   },
   i18n,
   isDialogActionMonitorDirectInput,

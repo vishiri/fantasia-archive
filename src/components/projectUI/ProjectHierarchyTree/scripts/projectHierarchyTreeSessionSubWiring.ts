@@ -2,7 +2,9 @@ import type { Ref, watch as WatchFn } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode, I_faProjectHierarchyTreeUiState, I_faProjectHierarchyTreeWorkspaceWorld, I_faProjectHierarchyTreeDocumentChild } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring, createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import { reindexFaProjectDocumentSiblingsForRenderer } from 'app/src/scripts/componentTesting/faComponentTestingProjectContentDocumentIndexWiring'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
+import { reindexHierarchySiblingsThenSyncOpenedParent } from './projectHierarchyTreeDnDCommitGateWiring'
 import { createProjectHierarchyTreeBeforeDragOpenWiring, createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
 import { createProjectHierarchyTreeLazyLoadSessionWiring } from './projectHierarchyTreeLazyLoadSessionWiring'
 import { createProjectHierarchyTreeOpenIconExpandAnimationWiring } from './projectHierarchyTreeExpandDomWiring'
@@ -10,7 +12,10 @@ import { createProjectHierarchyTreeSyncWiring } from './projectHierarchyTreeSync
 
 type T_hierarchyStore = {
   flushUiStatePersist: () => void
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  queuePersistExpandedNodeIds: (
+    expandedNodeIds: string[],
+    options?: { allowEmpty?: boolean }
+  ) => void
   queuePersistScrollTopPx: (scrollTopPx: number) => void
   refreshLayout: () => Promise<void>
 }
@@ -138,10 +143,11 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: T_sessionSubWi
     'projectHierarchyTree--listDragging': deps.isTreeDragActive.value
   }))
   const treeStyle = deps.computed(() => ({ height: '100%' }))
+  const forceResyncTreeDataFromLayout = syncWiring.forceResyncTreeDataFromLayout
   return {
     beforeDragOpenWiring,
     dndWiring,
-    forceResyncTreeDataFromLayout: syncWiring.forceResyncTreeDataFromLayout,
+    forceResyncTreeDataFromLayout,
     lazyLoadWiring,
     openIconExpandAnimationWiring,
     runDeferredLazyLoadBatch,
@@ -167,7 +173,10 @@ type T_sessionDnDSubDeps = {
   getTreeScrollHost: () => HTMLElement | null
   hierarchyStore: {
     flushUiStatePersist: () => void
-    queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+    queuePersistExpandedNodeIds: (
+      expandedNodeIds: string[],
+      options?: { allowEmpty?: boolean }
+    ) => void
     refreshLayout: () => Promise<void>
   }
   isTreeDragActive: Ref<boolean>
@@ -208,20 +217,30 @@ export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDn
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
     reindexDocumentSiblingsInHierarchy: async (input) => {
-      const result = await reindexFaProjectDocumentSiblingsForRenderer(input) as I_faProjectHierarchyTreeDocumentChild
-      S_FaOpenedDocuments().syncOpenedDocumentParentFromHierarchy(
-        input.movedDocumentId,
-        input.parentDocumentId
-      )
-      return result
+      const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+      return await reindexHierarchySiblingsThenSyncOpenedParent({
+        epochAtStart,
+        isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+        movedDocumentId: input.movedDocumentId,
+        parentDocumentId: input.parentDocumentId,
+        readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
+        reindex: async () => {
+          return await reindexFaProjectDocumentSiblingsForRenderer(input) as I_faProjectHierarchyTreeDocumentChild
+        },
+        syncOpenedParent: (documentId, parentDocumentId) => {
+          S_FaOpenedDocuments().syncOpenedDocumentParentFromHierarchy(documentId, parentDocumentId)
+        }
+      })
     },
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: (expandedNodeIds) => {
+    queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
+    isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+    readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
     refreshLayout: deps.hierarchyStore.refreshLayout,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,

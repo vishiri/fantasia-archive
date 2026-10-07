@@ -36,6 +36,8 @@ vi.mock('app/src/components/other/SplashControls/scripts/functions/resolveSplash
   }
 })
 
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+
 import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
 
 beforeEach(() => {
@@ -90,6 +92,41 @@ test('Test that SplashControlsResumeDropdown primary segment calls welcome auto-
   await w.get('[data-test-locator="splashPage-btn-resume-latest"]').trigger('click')
 
   expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledOnce()
+  w.unmount()
+})
+
+/**
+ * SplashControlsResumeDropdown
+ * A session with only a blank path is not a current project.
+ */
+test('Test that SplashControlsResumeDropdown treats a blank active path as latest resume', async () => {
+  openWelcomeScreenAutoLoadProjectMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockResolvedValue(false)
+  runFaActionMock.mockReset()
+
+  S_FaActiveProject().setActiveProject({
+    filePath: '   ',
+    id: 'id-blank',
+    name: 'Blank'
+  })
+
+  const w = mount(SplashControlsResumeDropdown, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const resumeBtn = w.get('[data-test-locator="splashPage-btn-resume-latest"]')
+  expect(resumeBtn.attributes('label')).toBe('splashPage.resumeLatestProject')
+  await resumeBtn.trigger('click')
+  expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledOnce()
+  expect(runFaActionMock).not.toHaveBeenCalled()
+
+  S_FaActiveProject().clearActiveProject()
   w.unmount()
 })
 

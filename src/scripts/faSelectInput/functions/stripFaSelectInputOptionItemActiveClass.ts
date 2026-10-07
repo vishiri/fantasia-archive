@@ -76,11 +76,12 @@ export function bindFaSelectInputOptionItemActivateProps <
     onClick(evt)
   }
 
-  return {
+  const bound = {
     ...rest,
     onClick,
     onKeydown
-  } as Omit<T, 'activeClass' | 'onClick' | 'onKeydown'> & {
+  }
+  return bound as Omit<T, 'activeClass' | 'onClick' | 'onKeydown'> & {
     onClick: T_faSelectInputOptionItemClick
     onKeydown: T_faSelectInputOptionItemKeydown
   }

@@ -31,8 +31,25 @@ export function resolveProjectOverviewTemplatePluralLabel (
   if (en) {
     return en
   }
-  for (const value of Object.values(map)) {
-    const trimmed = value.trim()
+  return resolveProjectOverviewFallbackTranslation(map, preferredLanguageCode)
+}
+
+/**
+ * After preferred and en-US, use language-code order.
+ * Matches locale translation fallback. JSON key order must not win.
+ */
+function resolveProjectOverviewFallbackTranslation (
+  map: Record<string, string>,
+  preferredLanguageCode: string
+): string {
+  const sortedCodes = Object.keys(map).sort((left, right) => {
+    return left.localeCompare(right)
+  })
+  for (const languageCode of sortedCodes) {
+    if (languageCode === preferredLanguageCode || languageCode === 'en-US') {
+      continue
+    }
+    const trimmed = map[languageCode]?.trim() ?? ''
     if (trimmed.length > 0) {
       return trimmed
     }
@@ -68,13 +85,7 @@ function buildCountLookup (
 function sortTemplatesBySortOrder (
   templates: readonly I_faProjectDocumentDistributionTemplateCategory[]
 ): I_faProjectDocumentDistributionTemplateCategory[] {
-  return [...templates].sort((left, right) => {
-    const bySortOrder = left.sortOrder - right.sortOrder
-    if (bySortOrder !== 0) {
-      return bySortOrder
-    }
-    return left.templateId.localeCompare(right.templateId)
-  })
+  return [...templates].sort((left, right) => left.sortOrder - right.sortOrder)
 }
 
 function sortWorldsBySortOrder (
@@ -86,6 +97,7 @@ function sortWorldsBySortOrder (
 /**
  * Builds Apex stacked-bar categories + per-world series from distribution IPC payload.
  * Template categories follow Project Settings document-template sort_order.
+ * Equal sort_order keeps the query order (created_at_ms, then id).
  */
 export function buildProjectOverviewStackedChartModel (input: {
   distribution: I_faProjectDocumentDistributionResult
@@ -124,9 +136,10 @@ export function buildProjectOverviewStackedChartModel (input: {
     }
   })
 
+  const totalDocumentCount = input.distribution.totalDocumentCount
   return {
     categories,
     series,
-    totalDocumentCount: input.distribution.totalDocumentCount
+    totalDocumentCount
   }
 }

@@ -19,10 +19,14 @@ vi.mock('better-sqlite3', () => {
 
 import {
   closeFaProjectActiveDatabase,
+  discardFaProjectCreateBackupFile,
+  faProjectCreateStagingFilePath,
   getFaProjectActiveDatabase,
   getFaProjectLastKnownActiveProjectFilePath,
   openFaProjectDatabase,
+  promoteFaProjectCreateStagingFile,
   replaceFaProjectActiveDatabase,
+  restoreFaProjectCreateBackupFile,
   unlinkFaProjectFileIfExists
 } from '../faProjectActiveDatabaseWiring'
 
@@ -34,7 +38,10 @@ afterEach(() => {
   for (const p of tracked) {
     void Result.fromThrowable(
       (): void => {
-        fs.unlinkSync(p)
+        fs.rmSync(p, {
+          force: true,
+          recursive: true
+        })
       },
       (): undefined => undefined
     )()
@@ -73,6 +80,47 @@ test('unlinkFaProjectFileIfExists removes an existing file', () => {
 test('unlinkFaProjectFileIfExists does nothing when the file is missing', () => {
   const p = path.join(os.tmpdir(), `fa-missing-${Date.now()}.faproject`)
   unlinkFaProjectFileIfExists(p)
+})
+
+test('promoteFaProjectCreateStagingFile replaces an existing project and keeps the backup', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-promote-'))
+  tracked.push(dir)
+  const target = path.join(dir, 'realm.faproject')
+  const staging = faProjectCreateStagingFilePath(target)
+  fs.writeFileSync(target, 'old')
+  fs.writeFileSync(staging, 'new')
+  promoteFaProjectCreateStagingFile(staging, target)
+  expect(fs.readFileSync(target, 'utf8')).toBe('new')
+  expect(fs.existsSync(staging)).toBe(false)
+  expect(fs.readFileSync(`${target}.creating-bak`, 'utf8')).toBe('old')
+  discardFaProjectCreateBackupFile(target)
+  expect(fs.existsSync(`${target}.creating-bak`)).toBe(false)
+})
+
+test('restoreFaProjectCreateBackupFile puts the previous project back', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-restore-'))
+  tracked.push(dir)
+  const target = path.join(dir, 'realm.faproject')
+  const staging = faProjectCreateStagingFilePath(target)
+  fs.writeFileSync(target, 'old')
+  fs.writeFileSync(staging, 'new')
+  promoteFaProjectCreateStagingFile(staging, target)
+  restoreFaProjectCreateBackupFile(target)
+  expect(fs.readFileSync(target, 'utf8')).toBe('old')
+  expect(fs.existsSync(`${target}.creating-bak`)).toBe(false)
+})
+
+test('promoteFaProjectCreateStagingFile keeps the existing project when staging is missing', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-promote-miss-'))
+  tracked.push(dir)
+  const target = path.join(dir, 'realm.faproject')
+  const staging = faProjectCreateStagingFilePath(target)
+  fs.writeFileSync(target, 'old')
+  expect(() => {
+    promoteFaProjectCreateStagingFile(staging, target)
+  }).toThrow()
+  expect(fs.readFileSync(target, 'utf8')).toBe('old')
+  expect(fs.existsSync(`${target}.creating-bak`)).toBe(false)
 })
 
 const FA_TEST_PROJECT_A = 'D:\\test\\a.faproject'

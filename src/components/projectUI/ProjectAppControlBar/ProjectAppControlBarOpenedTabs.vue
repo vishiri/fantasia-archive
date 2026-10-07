@@ -196,6 +196,7 @@ function getOpenedDocumentTabs (): readonly I_faOpenedDocumentTab[] {
 
 const {
   onTabsDragEnd,
+  onTabsDragStart: markOpenedTabsDragActive,
   sortableTabs
 } = useProjectAppControlBarOpenedTabsSortable({
   getOpenedDocumentTabs,
@@ -214,6 +215,7 @@ function setOpenedTabsNativeSortableDragGhost (dataTransfer: DataTransfer): void
 }
 
 function onTabsDragStart (event: unknown): void {
+  markOpenedTabsDragActive()
   applyFaVerticalDraggableTabsDocumentDragCursor()
   let initialPointerClientX: number | undefined
   if (

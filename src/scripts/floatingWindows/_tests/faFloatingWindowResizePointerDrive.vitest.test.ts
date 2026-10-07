@@ -120,6 +120,66 @@ test('Test that FaFloatingWindowResizePointerSession dispose calls cancelAnimati
   expect(window.cancelAnimationFrame).toHaveBeenCalledWith(42)
 })
 
+test('Test that a newer resize drops a pending frame from the previous pointer', () => {
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
+  const frames: FrameRequestCallback[] = []
+  vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
+    frames.push(fn)
+    return 7
+  })
+  const x = ref(100)
+  const y = ref(100)
+  const w = ref(400)
+  const h = ref(300)
+  const session = new FaFloatingWindowResizePointerSession(
+    testLayout,
+    x,
+    y,
+    w,
+    h,
+    () => undefined,
+    ref(false)
+  )
+  const target = fakeTarget()
+  const down = new PointerEvent('pointerdown', {
+    bubbles: true,
+    button: 0,
+    clientX: 100,
+    clientY: 100,
+    pointerId: 1
+  })
+  Object.defineProperty(down, 'currentTarget', {
+    value: target,
+    enumerable: true
+  })
+  session.onResizePointerDown('e', down)
+  window.dispatchEvent(new PointerEvent('pointermove', {
+    bubbles: true,
+    clientX: 180,
+    clientY: 100,
+    pointerId: 1
+  }))
+  const pendingFrame = frames[0]
+  const secondDown = new PointerEvent('pointerdown', {
+    bubbles: true,
+    button: 0,
+    clientX: 100,
+    clientY: 100,
+    pointerId: 2
+  })
+  Object.defineProperty(secondDown, 'currentTarget', {
+    value: target,
+    enumerable: true
+  })
+  session.onResizePointerDown('e', secondDown)
+  if (pendingFrame === undefined) {
+    throw new Error('missing resize frame')
+  }
+  pendingFrame(0)
+  expect(w.value).toBe(400)
+  session.dispose()
+})
+
 /**
  * FaFloatingWindowResizePointerSession
  * Second pointermove before rAF runs does not schedule again; flush uses the latest pointer.

@@ -548,6 +548,56 @@ test('Test that persistProjectHierarchyTreeDraggedDocumentMove reindexes sibling
   })
 })
 
+test('Test that persistProjectHierarchyTreeDraggedDocumentMove keeps a root snapshot parent when treeData still nests the document', async () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')
+  expect(placement).not.toBeNull()
+  if (placement === null) {
+    return
+  }
+  const nested = buildDocumentNode({
+    documentId: 'doc-c',
+    id: 'doc-c',
+    label: 'Doc C'
+  })
+  const parentDocument = buildDocumentNode({
+    children: [nested],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent',
+    label: 'Parent'
+  })
+  placement.children = [parentDocument]
+  placement.childrenLoaded = true
+  const reindexDocumentSiblingsInHierarchy = vi.fn(async () => undefined)
+  const result = await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId: 'doc-c',
+    dragCommitSuppressWaitAttempts: 0,
+    dragCommitSuppressWaitReady: true,
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-c'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    modelSettleAttempts: 0,
+    reindexDocumentSiblingsInHierarchy,
+    refreshLayout: vi.fn(async () => undefined),
+    resyncTreeDataFromLayout: vi.fn(),
+    suppressTreeEmit: false,
+    treeData
+  })
+  expect(result.committed).toBe(true)
+  expect(result.nestParentDocumentId).toBeNull()
+  expect(result.reloadChildrenNodeId).toBe('placement-1')
+  expect(reindexDocumentSiblingsInHierarchy).toHaveBeenCalledWith({
+    movedDocumentId: 'doc-c',
+    orderedDocumentIds: ['doc-c'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+})
+
 test('Test that clone loaded node for publish deep-clones nested loaded children', () => {
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
@@ -828,6 +878,56 @@ test('Test that resolveProjectHierarchyTreeDragCommitOrderFallback uses parentSt
   expect(fallback.commitSnapshot?.orderedDocumentIds).toEqual(['doc-b', 'doc-a'])
 })
 
+test('Test that drag commit order fallback keeps tag identity when parentStats rebuilds the snapshot', () => {
+  dragContextState.startInfo = undefined
+  dragContextState.targetInfo = undefined
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const docA = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'doc-a'
+  })
+  const docB = buildDocumentNode({
+    documentId: 'doc-b',
+    id: 'doc-b'
+  })
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 1,
+    parent: {
+      children: [
+        {
+          data: docB
+        },
+        {
+          data: docA
+        }
+      ],
+      data: findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+    },
+    tree: {}
+  }
+  const fallback = resolveProjectHierarchyTreeDragCommitOrderFallback({
+    dragSiblingOrderAtDragStart: ['doc-a', 'doc-b'],
+    draggedDocumentId: 'doc-a',
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    treeData,
+    treeDataSnapshot: {
+      orderedDocumentIds: ['doc-a', 'doc-b'],
+      parentDocumentId: null,
+      placementId: '',
+      tagId: 'tag-1',
+      treeNodeId: 'tag-1__doc__doc-a'
+    }
+  })
+  dragContextState.startInfo = undefined
+  dragContextState.targetInfo = undefined
+  expect(fallback.orderSource).toBe('parentStats')
+  expect(fallback.commitSnapshot?.orderedDocumentIds).toEqual(['doc-b', 'doc-a'])
+  expect(fallback.commitSnapshot?.tagId).toBe('tag-1')
+  expect(fallback.commitSnapshot?.treeNodeId).toBe('tag-1__doc__doc-a')
+})
+
 test('Test that resolveProjectHierarchyTreeDragCommitOrderFallback uses getData when dom and stats missing', () => {
   dragContextState.startInfo = undefined
   dragContextState.targetInfo = undefined
@@ -905,6 +1005,94 @@ test('Test that prepareProjectHierarchyTreeDragCommitOrderSnapshot uses fallback
   })
   expect(snapshot).not.toBeNull()
   expect(setSnapshot).toHaveBeenCalled()
+})
+
+test('Test that drag commit order fallback keeps the main-tree sibling order when a tag copy comes first', () => {
+  const tagCopyA: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-a',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-tag',
+    id: 'tag-1__doc__doc-a',
+    label: 'A',
+    nodeKind: 'document',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const tagCopyB: I_faProjectHierarchyTreeHeTreeNode = {
+    ...tagCopyA,
+    documentId: 'doc-b',
+    id: 'tag-1__doc__doc-b',
+    label: 'B'
+  }
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagCopyB, tagCopyA],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const mainA = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'doc-a',
+    label: 'A'
+  })
+  const mainB = buildDocumentNode({
+    documentId: 'doc-b',
+    id: 'doc-b',
+    label: 'B'
+  })
+  const placement: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [mainA, mainB],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'tpl-1',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-home',
+    id: 'placement-1',
+    label: 'Buildings',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const treeData = [tagNode, placement]
+  const treeDataSnapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
+    treeData,
+    'doc-a',
+    'doc-a'
+  )
+  const fallback = resolveProjectHierarchyTreeDragCommitOrderFallback({
+    dragSiblingOrderAtDragStart: null,
+    draggedDocumentId: 'doc-a',
+    getTreeRef: () => ({
+      closeAll: () => undefined,
+      getData: () => treeData,
+      openNodeAndParents: () => undefined
+    }),
+    getTreeScrollHost: () => null,
+    preferredNodeId: 'doc-a',
+    treeData,
+    treeDataSnapshot
+  })
+  expect(treeDataSnapshot?.orderedDocumentIds).toEqual(['doc-a', 'doc-b'])
+  expect(fallback.orderSource).toBe('getData')
+  expect(fallback.commitSnapshot?.orderedDocumentIds).toEqual(['doc-a', 'doc-b'])
+  expect(placement.children.map((row) => row.documentId)).toEqual(['doc-a', 'doc-b'])
+  expect(tagNode.children.map((row) => row.documentId)).toEqual(['doc-b', 'doc-a'])
 })
 
 test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist closes emptied parents outside snapshot', async () => {

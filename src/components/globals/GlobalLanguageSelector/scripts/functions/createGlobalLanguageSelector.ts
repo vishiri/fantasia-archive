@@ -122,6 +122,8 @@ export function createGlobalLanguageSelector (deps: {
       })
     }
 
+    const resolveVitePublicAssetPath = deps.resolveVitePublicAssetPath
+
     return {
       activeI18nLocale,
       currentCode,
@@ -133,7 +135,7 @@ export function createGlobalLanguageSelector (deps: {
       onLanguageTriggerClickCapture,
       pickLanguage,
       refreshWebContentsAndHide,
-      resolveVitePublicAssetPath: deps.resolveVitePublicAssetPath,
+      resolveVitePublicAssetPath,
       showSelector,
       showSpellcheckRefresh
     }

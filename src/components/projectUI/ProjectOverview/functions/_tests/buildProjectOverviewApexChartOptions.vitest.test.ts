@@ -7,16 +7,35 @@ import {
   FA_PROJECT_OVERVIEW_CHART_HEIGHT_PX,
   FA_PROJECT_OVERVIEW_CHART_HEIGHT_TIPS_HIDDEN_PX,
   FA_PROJECT_OVERVIEW_CHART_XAXIS_LABELS_MAX_HEIGHT_PX,
-  buildProjectOverviewApexChartOptions,
   resolveProjectOverviewChartHeightPx,
   resolveProjectOverviewChartSvgHeightPx
 } from '../buildProjectOverviewApexChartOptions'
+import { buildProjectOverviewApexChartOptions } from '../../scripts/buildProjectOverviewApexChartOptionsWiring'
 import { buildProjectOverviewApexChartTooltipHtml } from '../buildProjectOverviewApexChartTooltipHtml'
 import { createProjectOverviewApexTooltipCustom } from '../createProjectOverviewApexTooltipCustom'
 import {
   FA_PROJECT_OVERVIEW_CHART_COLUMN_MAX_WIDTH_PX,
   resolveProjectOverviewApexColumnWidth
 } from '../resolveProjectOverviewApexColumnWidth'
+
+test('Test that project overview chart totals treat a missing series point as zero', () => {
+  const options = buildProjectOverviewApexChartOptions({
+    chartModel: {
+      categories: ['Artifacts', 'Beasts'],
+      series: [
+        {
+          color: '#112233',
+          data: [2],
+          name: 'Alpha'
+        }
+      ],
+      totalDocumentCount: 2
+    },
+    columnWidth: '40%',
+    tooltipCustom: () => ''
+  })
+  expect(options).toBeTypeOf('object')
+})
 
 const chartModel: I_faProjectOverviewStackedChartModel = {
   categories: ['Artifacts', 'Beasts'],

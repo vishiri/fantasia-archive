@@ -1,5 +1,6 @@
 export default {
   title: 'परियोजना सेटिंग्स',
+  loadError: 'परियोजना सेटिंग्स लोड नहीं हो सकीं.',
   closeButton: 'बिना सहेजे बंद करें',
   saveButton: 'सेटिंग्स सहेजें',
   saveWithoutClosingButton: 'बिना बंद किए सहेजें',

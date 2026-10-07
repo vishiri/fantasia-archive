@@ -62,11 +62,7 @@
             :disable="(!menuItem.conditions)"
             @mouseenter="onMenuRowMouseEnter(menuItem, index)"
             @mouseleave="onMenuRowMouseLeave(menuItem)"
-            @click="(menuItem.trigger)
-              ? menuItem.triggerArguments
-                ? menuItem.trigger(...menuItem.triggerArguments)
-                : menuItem.trigger()
-              : false"
+            @click="runAppControlMenuItemTrigger(menuItem)"
           >
             <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
               <span class="appControlSingleMenu__primaryLabel">{{ menuItem.text }}</span><div
@@ -142,7 +138,7 @@
                     :class="['appControlSingleMenu__item', ...resolveAppControlMenuItemColorClasses(submenuItem.specialColor), 'non-selectable']"
                     :disable="(!submenuItem.conditions)"
                     data-test-locator="AppControlSingleMenu-menuItem-subMenu-item"
-                    @click="(submenuItem.trigger) ? submenuItem.trigger() : false"
+                    @click="runAppControlMenuItemTrigger(submenuItem)"
                   >
                     <q-item-section
                       data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-text"
@@ -212,6 +208,7 @@ const {
   onSubmenuContentLeave,
   onSubmenuModelUpdate,
   openSubmenuRowIndex,
+  runAppControlMenuItemTrigger,
   trimmedSecondaryHintText
 } = useAppControlSingleMenu(props)
 

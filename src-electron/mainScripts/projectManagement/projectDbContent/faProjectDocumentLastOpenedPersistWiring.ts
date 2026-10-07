@@ -8,7 +8,7 @@ import {
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 
 /**
- * Upserts document_last_opened and trims oldest rows beyond the MRU max.
+ * Replaces document_last_opened so a repeat open gets a new rowid, then trims past the MRU max.
  */
 export function recordFaProjectDocumentLastOpened (
   db: Database,
@@ -21,17 +21,25 @@ export function recordFaProjectDocumentLastOpened (
     throw new FaProjectContentNotFoundError('Document', documentId)
   }
   const openedAtMs = Date.now()
-  db.prepare(
+  const deleteExistingStmt = db.prepare(
+    `DELETE FROM ${FA_PROJECT_TABLE_DOCUMENT_LAST_OPENED} WHERE document_id = ?`
+  )
+  const insertStmt = db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_LAST_OPENED} (document_id, opened_at_ms) ` +
-      'VALUES (?, ?) ' +
-      'ON CONFLICT(document_id) DO UPDATE SET opened_at_ms = excluded.opened_at_ms'
-  ).run(documentId, openedAtMs)
-  db.prepare(
+      'VALUES (?, ?)'
+  )
+  const trimStmt = db.prepare(
     `DELETE FROM ${FA_PROJECT_TABLE_DOCUMENT_LAST_OPENED} ` +
       'WHERE rowid NOT IN (' +
       `SELECT rowid FROM ${FA_PROJECT_TABLE_DOCUMENT_LAST_OPENED} ` +
       'ORDER BY opened_at_ms DESC, rowid DESC ' +
       `LIMIT ${FA_PROJECT_DOCUMENT_LAST_OPENED_MAX}` +
       ')'
-  ).run()
+  )
+  const runRecord = db.transaction(() => {
+    deleteExistingStmt.run(documentId)
+    insertStmt.run(documentId, openedAtMs)
+    trimStmt.run()
+  })
+  runRecord()
 }

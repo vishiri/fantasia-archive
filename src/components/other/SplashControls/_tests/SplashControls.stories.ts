@@ -38,7 +38,7 @@ const meta = {
       },
       description: {
         component:
-          'Welcome-screen primary actions: optional resume split control (MRU from main-process recent list), **Create new project**, and **Load existing project**. The main segment reads **Resume Latest Project** or **Resume Current Project** when a session is already loaded; the caret opens a menu of recent display names with file paths.'
+          'Welcome-screen primary actions: optional resume split control (MRU from main-process recent list), **Create New Project**, and **Load Existing Project**. The main segment reads **Resume Latest Project** or **Resume Current Project** when a session is already loaded; the caret opens a menu of recent display names with file paths.'
       }
     }
   }

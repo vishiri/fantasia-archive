@@ -163,9 +163,10 @@ export function searchFaProjectHierarchy (
 ): I_faProjectHierarchyTreeSearchResult {
   const trimmed = query.trim()
   if (trimmed.length === 0) {
+    const hits: I_faProjectHierarchyTreeSearchHit[] = []
     return {
       query: trimmed,
-      hits: []
+      hits
     }
   }
   const escaped = trimmed.replace(/[%_\\]/g, '\\$&')

@@ -9,6 +9,7 @@ type T_projectHierarchyTreeLazyPlaceholderApi = {
 
 /**
  * Maps lazy-loaded document child rows into he-tree document nodes.
+ * Equal sort and accent-equal names keep the query order (created_at_ms, then id).
  */
 export function createMapHierarchyDocumentChildrenToTreeNodes (deps: {
   lazyPlaceholderApi: T_projectHierarchyTreeLazyPlaceholderApi
@@ -26,14 +27,13 @@ export function createMapHierarchyDocumentChildrenToTreeNodes (deps: {
       if (sortOrderDelta !== 0) {
         return sortOrderDelta
       }
-      const nameDelta = left.displayName.localeCompare(
+      return left.displayName.localeCompare(
         right.displayName,
         undefined,
         {
           sensitivity: 'accent'
         }
       )
-      return nameDelta !== 0 ? nameDelta : left.id.localeCompare(right.id)
     })
     return orderedItems.map((item) => {
       const node: I_faProjectHierarchyTreeHeTreeNode = {

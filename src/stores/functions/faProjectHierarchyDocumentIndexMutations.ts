@@ -116,6 +116,50 @@ export function applyFaProjectHierarchyDocumentIndexMove (
   })
 }
 
+function mergeFaProjectHierarchyCrossParentSiblingOrder (
+  existingDestinationIds: readonly string[],
+  orderedDocumentIds: readonly string[]
+): string[] {
+  const orderedSet = new Set(orderedDocumentIds)
+  const existingIndex = new Map<string, number>()
+  existingDestinationIds.forEach((id, index) => {
+    existingIndex.set(id, index)
+  })
+  const merged: string[] = []
+  const seen = new Set<string>()
+  let missingCursor = 0
+  for (const orderedId of orderedDocumentIds) {
+    const anchorIndex = existingIndex.get(orderedId)
+    if (anchorIndex !== undefined) {
+      while (missingCursor < anchorIndex) {
+        const missingId = existingDestinationIds[missingCursor]
+        missingCursor += 1
+        if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+          continue
+        }
+        merged.push(missingId)
+        seen.add(missingId)
+      }
+      missingCursor = anchorIndex + 1
+    }
+    if (seen.has(orderedId)) {
+      continue
+    }
+    merged.push(orderedId)
+    seen.add(orderedId)
+  }
+  while (missingCursor < existingDestinationIds.length) {
+    const missingId = existingDestinationIds[missingCursor]
+    missingCursor += 1
+    if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+      continue
+    }
+    merged.push(missingId)
+    seen.add(missingId)
+  }
+  return merged
+}
+
 function uniqueOrderedDocumentIds (orderedDocumentIds: readonly string[]): string[] {
   return orderedDocumentIds.filter((documentId, index, ids) => {
     return ids.indexOf(documentId) === index
@@ -131,9 +175,20 @@ export function applyFaProjectHierarchyDocumentIndexReindex (
   deps: T_faProjectHierarchyDocumentIndexMutationDeps
 ): void {
   const moved = index.byId.get(input.movedDocumentId)
-  const previousParentDocumentId = moved?.parentDocumentId ?? input.parentDocumentId
+  const previousParentDocumentId = moved === undefined
+    ? input.parentDocumentId
+    : moved.parentDocumentId
   const orderedUniqueIds = uniqueOrderedDocumentIds(input.orderedDocumentIds)
-  orderedUniqueIds.forEach((documentId, sortOrder) => {
+  const destinationIds = previousParentDocumentId === input.parentDocumentId
+    ? []
+    : deps.listPlacementChildren(index, {
+      parentDocumentId: input.parentDocumentId,
+      placementId: input.placementId
+    }).map((child) => child.id)
+  const orderedIdsForSort = previousParentDocumentId === input.parentDocumentId
+    ? orderedUniqueIds
+    : mergeFaProjectHierarchyCrossParentSiblingOrder(destinationIds, orderedUniqueIds)
+  orderedIdsForSort.forEach((documentId, sortOrder) => {
     const document = index.byId.get(documentId)
     if (document === undefined) {
       return

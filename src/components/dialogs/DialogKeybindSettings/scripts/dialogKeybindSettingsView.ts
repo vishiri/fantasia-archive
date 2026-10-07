@@ -39,28 +39,50 @@ export function useDialogKeybindSettingsViewFromDeps (
       }
     )
   }
+  const {
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    filter,
+    isDirty,
+    onCaptureClear,
+    onCaptureSet,
+    onCloseMain,
+    onOpenCapture,
+    pendingChord,
+    tableColumns,
+    tableRows
+  } = state
+  const {
+    bodySectionRef,
+    dialogKeybindSettingsTableHeightStyle
+  } = tableChrome
+  const { saveMain } = routing
   return {
-    bodySectionRef: tableChrome.bodySectionRef,
-    captureActionName: state.captureActionName,
-    captureError: state.captureError,
-    captureErrorMessage: state.captureErrorMessage,
-    captureInfoMessage: state.captureInfoMessage,
-    captureLabel: state.captureLabel,
-    captureOpen: state.captureOpen,
-    dialogKeybindSettingsTableHeightStyle: tableChrome.dialogKeybindSettingsTableHeightStyle,
+    bodySectionRef,
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    dialogKeybindSettingsTableHeightStyle,
     dialogModel,
     documentName,
-    filter: state.filter,
-    isDirty: state.isDirty,
+    filter,
+    isDirty,
     noDataShowsFilterMiss,
-    onCaptureClear: state.onCaptureClear,
-    onCaptureSet: state.onCaptureSet,
-    onCloseMain: state.onCloseMain,
-    onOpenCapture: state.onOpenCapture,
-    pendingChord: state.pendingChord,
-    saveMain: routing.saveMain,
-    tableColumns: state.tableColumns,
-    tableRows: state.tableRows,
+    onCaptureClear,
+    onCaptureSet,
+    onCloseMain,
+    onOpenCapture,
+    pendingChord,
+    saveMain,
+    tableColumns,
+    tableRows,
     userKeybindButtonLabel
   }
 }

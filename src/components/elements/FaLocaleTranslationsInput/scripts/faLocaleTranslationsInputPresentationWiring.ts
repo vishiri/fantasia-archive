@@ -10,15 +10,18 @@ export function createFaLocaleTranslationsInputPresentationWiring (deps: {
   readPreferredLanguageInputFocus: () => (() => void) | null
   readPresentation: () => T_faLocaleTranslationsInputPresentation
 }): {
-    focusPreferredLanguageInput: () => void
+    focusPreferredLanguageInput: (shouldFocus?: () => boolean) => void
     isMenuPanelPresentation: ComputedRef<boolean>
   } {
   const isMenuPanelPresentation = deps.computed(() => deps.readPresentation() === 'menuPanel')
 
-  function focusPreferredLanguageInput (): void {
+  function focusPreferredLanguageInput (shouldFocus?: () => boolean): void {
     scheduleFaLocaleTranslationsMenuInputFocus({
       ResultAsync,
       focusMenuInput: () => {
+        if (shouldFocus !== undefined && !shouldFocus()) {
+          return
+        }
         const focusFn = deps.readPreferredLanguageInputFocus()
         if (focusFn !== null) {
           focusFn()

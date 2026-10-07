@@ -9,6 +9,8 @@ const saveDocumentDisplayNameMock = vi.fn(async () => undefined)
 const focusTabMock = vi.fn(async () => undefined)
 const moveActiveDocumentTabMock = vi.fn()
 const notifyCreateMock = vi.fn()
+let projectEpoch = 1
+let projectReplacementInFlight = false
 const getCurrentRoutePathMock = vi.fn(() => '/home/document/doc-1')
 const resolveCanEditActiveDocumentViaKeybindMock = vi.fn(() => true)
 const resolveAdjacentOpenedDocumentTabIdMock = vi.fn((
@@ -115,7 +117,9 @@ function createHandlers () {
         t: (key: string) => key
       }
     },
+    isProjectReplacementInFlight: () => projectReplacementInFlight,
     notifyCreate: notifyCreateMock,
+    readProjectContentEpoch: () => projectEpoch,
     resolveAdjacentOpenedDocumentTabId: resolveAdjacentOpenedDocumentTabIdMock,
     resolveCanEditActiveDocumentViaKeybind: resolveCanEditActiveDocumentViaKeybindMock,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-1',
@@ -124,6 +128,8 @@ function createHandlers () {
 }
 
 beforeEach(() => {
+  projectEpoch = 1
+  projectReplacementInFlight = false
   enterDocumentEditModeMock.mockClear()
   saveDocumentDisplayNameMock.mockClear()
   focusTabMock.mockClear()
@@ -192,6 +198,20 @@ test('Test that handleSaveOpenedDocumentDisplayName saves and shows success toas
     type: 'positive',
     message: 'globalFunctionality.faOpenedDocuments.saveSuccess'
   })
+})
+
+test('Test that handleSaveOpenedDocumentDisplayName skips the success toast when the project changes', async () => {
+  saveDocumentDisplayNameMock.mockImplementationOnce(async () => {
+    projectEpoch = 2
+  })
+  const { handleSaveOpenedDocumentDisplayName } = createHandlers()
+
+  await handleSaveOpenedDocumentDisplayName({
+    documentId: 'doc-1',
+    keepEditMode: true
+  })
+
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 test('Test that handleSaveOpenedDocumentDisplayName propagates store failures', async () => {

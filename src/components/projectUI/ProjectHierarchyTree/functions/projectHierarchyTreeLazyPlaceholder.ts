@@ -7,20 +7,27 @@ export function createProjectHierarchyTreeLazyPlaceholderApi () {
       'icon' | 'id' | 'placementId' | 'tagId' | 'worldColor' | 'worldId'
     >
   ): I_faProjectHierarchyTreeHeTreeNode {
+    const children: I_faProjectHierarchyTreeHeTreeNode[] = []
+    const icon = parent.icon
+    const id = `${parent.id}__lazy`
+    const placementId = parent.placementId
+    const tagId = parent.tagId ?? null
+    const worldColor = parent.worldColor
+    const worldId = parent.worldId
     return {
-      children: [],
+      children,
       childrenLoaded: false,
       documentId: null,
       groupId: null,
       hasChildren: false,
-      icon: parent.icon,
-      id: `${parent.id}__lazy`,
+      icon,
+      id,
       label: '',
       nodeKind: 'document',
-      placementId: parent.placementId,
-      tagId: parent.tagId ?? null,
-      worldColor: parent.worldColor,
-      worldId: parent.worldId
+      placementId,
+      tagId,
+      worldColor,
+      worldId
     }
   }
 

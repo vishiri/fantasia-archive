@@ -26,13 +26,17 @@ import L_appStylingFloating from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import L_projectStylingFloating from 'app/i18n/en-US/floatingWindows/L_projectStyling'
 import L_appNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 import L_projectNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_projectNoteboard'
+import L_faActionManager from 'app/i18n/en-US/globalFunctionality/L_faActionManager'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from 'app/i18n/en-US/globalFunctionality/L_faAppNoteboard'
 import L_faProjectNoteboard from 'app/i18n/en-US/globalFunctionality/L_faProjectNoteboard'
+import L_faAppStyling from 'app/i18n/en-US/globalFunctionality/L_faAppStyling'
 import L_faProjectStyling from 'app/i18n/en-US/globalFunctionality/L_faProjectStyling'
 import L_faProjectSettings from 'app/i18n/en-US/globalFunctionality/L_faProjectSettings'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
+import L_faOpenedDocuments from 'app/i18n/en-US/globalFunctionality/L_faOpenedDocuments'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
+import L_spellChecker from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_appUpdateCheck from 'app/i18n/en-US/globalFunctionality/L_appUpdateCheck'
 import L_mainLayout from 'app/i18n/en-US/layouts/L_mainLayout'
@@ -42,6 +46,7 @@ import L_projectOverview from 'app/i18n/en-US/components/projectUI/ProjectOvervi
 import L_projectHierarchyTree from 'app/i18n/en-US/components/projectUI/ProjectHierarchyTree/L_projectHierarchyTree'
 import L_projectHierarchyTreeSearch from 'app/i18n/en-US/components/projectUI/ProjectHierarchyTreeSearch/L_projectHierarchyTreeSearch'
 import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
+import L_documentWorkspacePage from 'app/i18n/en-US/pages/L_documentWorkspacePage'
 import { specialCharacterFixer } from 'app/i18n/specialCharactersFixer'
 import { ref } from 'vue'
 
@@ -77,6 +82,7 @@ const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
   mainLayout: L_mainLayout,
   splashPage: L_splashPage,
+  documentWorkspacePage: L_documentWorkspacePage,
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
@@ -118,13 +124,17 @@ const defaultMessages: Record<string, unknown> = {
     projectOverview: L_projectOverview
   },
   globalFunctionality: {
+    faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
     faAppNoteboard: L_faAppNoteboard,
     faProjectNoteboard: L_faProjectNoteboard,
+    faAppStyling: L_faAppStyling,
     faProjectStyling: L_faProjectStyling,
     faProjectSettings: L_faProjectSettings,
     faProjectSession: L_faProjectSession,
+    faOpenedDocuments: L_faOpenedDocuments,
     faUserSettings: L_faUserSettings,
+    spellChecker: L_spellChecker,
     unsortedAppTexts: L_unsortedAppTexts,
     appUpdateCheck: L_appUpdateCheck
   },

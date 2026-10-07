@@ -14,6 +14,50 @@ export function buildFaComponentTestingPlacementDocumentChildrenKey (
   return `${placementId}::${parentDocumentId ?? '__root__'}`
 }
 
+function mergeFaComponentTestingCrossParentSiblingOrder (
+  existingDestinationIds: readonly string[],
+  orderedDocumentIds: readonly string[]
+): string[] {
+  const orderedSet = new Set(orderedDocumentIds)
+  const existingIndex = new Map<string, number>()
+  existingDestinationIds.forEach((id, index) => {
+    existingIndex.set(id, index)
+  })
+  const merged: string[] = []
+  const seen = new Set<string>()
+  let missingCursor = 0
+  for (const orderedId of orderedDocumentIds) {
+    const anchorIndex = existingIndex.get(orderedId)
+    if (anchorIndex !== undefined) {
+      while (missingCursor < anchorIndex) {
+        const missingId = existingDestinationIds[missingCursor]
+        missingCursor += 1
+        if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+          continue
+        }
+        merged.push(missingId)
+        seen.add(missingId)
+      }
+      missingCursor = anchorIndex + 1
+    }
+    if (seen.has(orderedId)) {
+      continue
+    }
+    merged.push(orderedId)
+    seen.add(orderedId)
+  }
+  while (missingCursor < existingDestinationIds.length) {
+    const missingId = existingDestinationIds[missingCursor]
+    missingCursor += 1
+    if (missingId === undefined || orderedSet.has(missingId) || seen.has(missingId)) {
+      continue
+    }
+    merged.push(missingId)
+    seen.add(missingId)
+  }
+  return merged
+}
+
 function uniqueFaComponentTestingOrderedDocumentIds (
   orderedDocumentIds: readonly string[]
 ): string[] {
@@ -102,13 +146,22 @@ export function applyFaComponentTestingPlacementDocumentChildrenReindex (
   )
   const byId = collectFaComponentTestingPlacementDocumentChildrenById(childrenByKey)
   const orderedUniqueIds = uniqueFaComponentTestingOrderedDocumentIds(input.orderedDocumentIds)
+  const destinationItems = childrenByKey[targetKey] ?? []
+  const movedAlreadyInTarget = destinationItems.some((item) => item.id === input.movedDocumentId)
+  const destinationIds = destinationItems
+    .map((item) => item.id)
+    .filter((id) => id !== input.movedDocumentId)
+  const orderedIdsForSort = movedAlreadyInTarget
+    ? orderedUniqueIds
+    : mergeFaComponentTestingCrossParentSiblingOrder(destinationIds, orderedUniqueIds)
   const nextTarget = reindexFaComponentTestingPlacementDocumentChildren(
     [...byId.values()],
-    orderedUniqueIds
+    orderedIdsForSort
   ).map((item) => {
+    const parentDocumentId = input.parentDocumentId
     return {
       ...item,
-      parentDocumentId: input.parentDocumentId
+      parentDocumentId
     }
   })
   childrenByKey[targetKey] = nextTarget

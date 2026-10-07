@@ -10,13 +10,13 @@ import {
   applyFaOpenedDocumentIsDeadDraft,
   applyFaOpenedDocumentIsFinishedDraft,
   applyFaOpenedDocumentIsMinorDraft,
-  applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
   applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
   hydrateFaOpenedDocumentsTabsFromSnapshot
 } from '../faOpenedDocumentsStoreActions'
+import { applyFaOpenedDocumentTabAfterDisplayNameSave } from '../faOpenedDocumentsDisplayNameSaveStoreActions'
 import {
   applyFaOpenedDocumentParentIdDraft,
   applyFaOpenedDocumentParentIdSyncFromHierarchy
@@ -268,6 +268,34 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave can keep edit mode'
   expect(saved.editState).toBe(true)
 })
 
+test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave keeps a draft typed during the save', () => {
+  const draftAtSaveStart = {
+    ...baseTab,
+    displayNameDraft: 'First'
+  }
+  const liveTab = {
+    ...draftAtSaveStart,
+    displayNameDraft: 'Second'
+  }
+  const saved = applyFaOpenedDocumentTabAfterDisplayNameSave(liveTab, {
+    draftAtSaveStart,
+    keepEditMode: true,
+    savedDisplayName: 'First',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: '',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    savedExtraClasses: ''
+  })
+  expect(saved.displayNameDraft).toBe('Second')
+  expect(saved.savedDisplayName).toBe('First')
+  expect(saved.hasUnsavedChanges).toBe(true)
+})
+
 /**
  * buildFaOpenedDocumentsSnapshot
  * Snapshot builder copies active id and tab rows.
@@ -436,4 +464,35 @@ test('Test that removeFaOpenedDocumentTabAtIndex focuses the previous tab when c
   expect(result.shouldNavigateHome).toBe(false)
   expect(result.nextActiveDocumentId).toBe('doc-1')
   expect(activeDocumentId.value).toBe('doc-1')
+})
+
+test('Test that removeFaOpenedDocumentTabAtIndex keeps the active tab when a background tab closes', () => {
+  const secondTab: I_faOpenedDocumentTab = {
+    ...baseTab,
+    documentId: 'doc-2',
+    displayNameDraft: 'Villain',
+    savedDisplayName: 'Villain',
+    tabLabel: 'Villain'
+  }
+  const thirdTab: I_faOpenedDocumentTab = {
+    ...baseTab,
+    documentId: 'doc-3',
+    displayNameDraft: 'Place',
+    savedDisplayName: 'Place',
+    tabLabel: 'Place'
+  }
+  const tabs = ref([baseTab, secondTab, thirdTab])
+  const activeDocumentId = ref<string | null>('doc-1')
+  const lastRemovedIndex = ref(-1)
+  const result = removeFaOpenedDocumentTabAtIndex({
+    activeDocumentId,
+    lastRemovedIndex,
+    removedIndex: 2,
+    tabs
+  })
+  expect(result.shouldNavigateHome).toBe(false)
+  expect(result.nextActiveDocumentId).toBe('doc-1')
+  expect(activeDocumentId.value).toBe('doc-1')
+  expect(tabs.value.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2'])
+  expect(lastRemovedIndex.value).toBe(2)
 })

@@ -1,5 +1,5 @@
 import throttle from 'lodash-es/throttle.js'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onUnmounted, ref, watch } from 'vue'
 
 import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faColorPickerInput'
 import { FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH } from 'app/types/I_faProjectWorldDomain'
@@ -24,6 +24,7 @@ import {
 export const useFaColorPickerInput = createUseFaColorPickerInput({
   computed,
   useFaColorPickerInputPickerEmit: createFaColorPickerPopoverEmit({
+    onBeforeUnmount,
     onUnmounted,
     ref,
     throttle,

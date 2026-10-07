@@ -1,5 +1,7 @@
 import type { Ref } from 'vue'
 
+import { ResultAsync } from 'neverthrow'
+
 import {
   clearFaVerticalDraggableTabsDocumentDragCursor
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
@@ -27,14 +29,20 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeDragCancelWiri
   }
 
   function onWindowPointerUpDuringDrag (): void {
-    void deps.nextTick().then(() => {
-      if (deps.dragDropCommitted.value || !deps.dragCommitPending.value) {
-        return
+    void ResultAsync.fromPromise(
+      deps.nextTick().then(() => {
+        if (deps.dragDropCommitted.value || !deps.dragCommitPending.value) {
+          return
+        }
+        finishDragSessionWithoutCommit()
+      }),
+      (error): unknown => error
+    ).match(
+      () => undefined,
+      (err) => {
+        console.error('[dialogProjectSettingsWorldTemplateLayoutTree] drag cancel nextTick chain failed', err)
       }
-      finishDragSessionWithoutCommit()
-    }).catch((err: unknown) => {
-      console.error('[dialogProjectSettingsWorldTemplateLayoutTree] drag cancel nextTick chain failed', err)
-    })
+    )
   }
 
   function onWindowKeydownDuringDrag (event: KeyboardEvent): void {

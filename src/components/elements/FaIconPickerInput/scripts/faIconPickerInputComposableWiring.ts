@@ -58,6 +58,9 @@ function buildFaIconPickerInputComposableApi (
   const isCatalogLoading = deps.ref(false)
   const catalogLoadError = deps.ref<string | null>(null)
   const catalogCache = deps.ref<string[] | null>(null)
+  const catalogRequestSerial = {
+    current: 0
+  }
 
   const searchDebounce = deps.createFaIconPickerSearchDebounce({
     debouncedSearchQuery,
@@ -90,6 +93,7 @@ function buildFaIconPickerInputComposableApi (
   const menuHandlers = createFaIconPickerInputMenuHandlers({
     catalogCache,
     catalogLoadError,
+    catalogRequestSerial,
     debouncedSearchQuery,
     deps,
     emitModelValue: options.emitModelValue,
@@ -100,16 +104,22 @@ function buildFaIconPickerInputComposableApi (
     searchQuery
   })
 
+  const {
+    onIconSelect,
+    onMenuHide,
+    onMenuShow,
+    onSearchQueryUpdate
+  } = menuHandlers
   return {
     catalogLoadError,
     catalogRows,
     hasCatalogRows,
     isCatalogLoading,
     menuOpen,
-    onIconSelect: menuHandlers.onIconSelect,
-    onMenuHide: menuHandlers.onMenuHide,
-    onMenuShow: menuHandlers.onMenuShow,
-    onSearchQueryUpdate: menuHandlers.onSearchQueryUpdate,
+    onIconSelect,
+    onMenuHide,
+    onMenuShow,
+    onSearchQueryUpdate,
     previewIconName,
     searchQuery
   }
@@ -118,6 +128,7 @@ function buildFaIconPickerInputComposableApi (
 function createFaIconPickerInputMenuHandlers (args: {
   catalogCache: I_ref<string[] | null>
   catalogLoadError: I_ref<string | null>
+  catalogRequestSerial: { current: number }
   debouncedSearchQuery: I_ref<string>
   deps: I_faIconPickerInputComposableDeps
   emitModelValue: (value: string) => void
@@ -141,7 +152,8 @@ function createFaIconPickerInputMenuHandlers (args: {
       catalogLoadError: args.catalogLoadError,
       isCatalogLoading: args.isCatalogLoading,
       loadFaIconPickerMergedCatalogAsync: args.deps.loadFaIconPickerMergedCatalogAsync,
-      loadedCatalog: args.loadedCatalog
+      loadedCatalog: args.loadedCatalog,
+      requestSerialBox: args.catalogRequestSerial
     })
   }
 

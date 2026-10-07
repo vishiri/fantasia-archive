@@ -27,18 +27,23 @@ export function createFaAppStartupSkipWelcomeScreen (deps: {
   }
 
   async function runSkipWelcomeScreenRedirect (): Promise<boolean> {
-    if (!(await readSkipWelcomeScreenEnabled())) {
+    try {
+      if (!(await readSkipWelcomeScreenEnabled())) {
+        return false
+      }
+
+      const projectManagementBridge = deps.getProjectManagementBridge()
+      if (projectManagementBridge === undefined) {
+        return false
+      }
+
+      return await deps.openWelcomeScreenAutoLoadProject({
+        invocation: 'automatic'
+      })
+    } catch (error: unknown) {
+      console.error('[faAppStartup] skip welcome redirect failed', error)
       return false
     }
-
-    const projectManagementBridge = deps.getProjectManagementBridge()
-    if (projectManagementBridge === undefined) {
-      return false
-    }
-
-    return await deps.openWelcomeScreenAutoLoadProject({
-      invocation: 'automatic'
-    })
   }
 
   async function tryRunSkipWelcomeScreenOnLaunch (): Promise<boolean> {

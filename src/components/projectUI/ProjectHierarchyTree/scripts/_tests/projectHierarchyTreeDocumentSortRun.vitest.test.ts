@@ -5,11 +5,12 @@ import type {
   I_faProjectHierarchyTreeListPlacementChildrenInput
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { captureFaHierarchyTreeSortStep } from 'app/src/scripts/actionManager/faHierarchyTreeSortStepCaptureWiring'
 import {
   collectProjectHierarchyTreeDocumentSortBuckets,
   resolveProjectHierarchyTreeDocumentSortBucketTreeNodeId,
   runProjectHierarchyTreeDocumentSort
-} from '../projectHierarchyTreeDocumentSortRun'
+} from '../../functions/projectHierarchyTreeDocumentSortRun'
 
 function child (input: {
   displayName: string
@@ -116,6 +117,7 @@ test('runProjectHierarchyTreeDocumentSort reindexes each bucket in name order', 
   const reindexDocumentSiblingsInHierarchy = vi.fn(async () => undefined)
 
   await runProjectHierarchyTreeDocumentSort({
+    captureError: captureFaHierarchyTreeSortStep,
     direction: 'asc',
     key: 'name',
     listPlacementDocumentChildren,
@@ -151,6 +153,7 @@ test('runProjectHierarchyTreeDocumentSort returns buckets for tree refresh', asy
     return { items: [] }
   })
   const buckets = await runProjectHierarchyTreeDocumentSort({
+    captureError: captureFaHierarchyTreeSortStep,
     direction: 'asc',
     key: 'name',
     listPlacementDocumentChildren,
@@ -174,6 +177,7 @@ test('runProjectHierarchyTreeDocumentSort no-ops when sibling bucket is empty', 
   const reindexDocumentSiblingsInHierarchy = vi.fn(async () => undefined)
 
   await runProjectHierarchyTreeDocumentSort({
+    captureError: captureFaHierarchyTreeSortStep,
     direction: 'asc',
     key: 'name',
     listPlacementDocumentChildren,
@@ -220,6 +224,7 @@ test('runProjectHierarchyTreeDocumentSort attaches completedBuckets when a later
   })
 
   await expect(runProjectHierarchyTreeDocumentSort({
+    captureError: captureFaHierarchyTreeSortStep,
     direction: 'asc',
     key: 'name',
     listPlacementDocumentChildren,

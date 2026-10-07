@@ -34,6 +34,7 @@
     <!-- Image bitmap; hidden until load -->
     <img
       v-if="showImage"
+      :key="probeSrc"
       class="dialogProjectMediaMassEditPreviewThumb__image"
       :class="{
         'dialogProjectMediaMassEditPreviewThumb__image--pending': pending
@@ -47,8 +48,9 @@
     <!-- Video: hidden probe, or single-edit player -->
     <video
       v-if="showVideoEl"
+      :key="probeSrc"
       :class="videoClassName"
-      :controls="isSingleEdit"
+      :controls="showSingleEditVideoPlayer"
       :data-test-locator="`${locatorPrefix}Video-${rowId}`"
       preload="metadata"
       :src="probeSrc"
@@ -58,9 +60,10 @@
     <!-- Audio: hidden probe, or single-edit player -->
     <audio
       v-if="showAudioEl"
+      :key="probeSrc"
       ref="audioPlayerEl"
       :class="audioClassName"
-      :controls="isSingleEdit"
+      :controls="showSingleEditAudio"
       :data-test-locator="`${locatorPrefix}Audio-${rowId}`"
       :preload="audioPreload"
       :src="probeSrc"
@@ -89,7 +92,7 @@
 
 <script setup lang="ts">
 import type { T_faProjectMediaPreviewThumbSize } from 'app/types/I_faProjectMediaDomain'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import {
   FA_PROJECT_MEDIA_AUDIO_CONTROLS_RELAYOUT_MS,
@@ -138,6 +141,9 @@ const isSingleEditEmbed = computed(() => {
 const showGlyphTypeIcon = computed(() => {
   return props.showTypeIcon && !isSingleEdit.value
 })
+const showSingleEditVideoPlayer = computed(() => {
+  return isSingleEdit.value && props.showVideo && !props.showWarning
+})
 const showSingleEditAudio = computed(() => {
   return isSingleEdit.value && props.showAudio && !props.showWarning
 })
@@ -150,20 +156,16 @@ const audioPreload = computed(() => {
 const showPreviewGlyph = computed(() => {
   return props.showWarning || showGlyphTypeIcon.value
 })
-const showVideoEl = computed(() => {
-  return props.showVideo && !(isSingleEdit.value && props.showWarning)
-})
-const showAudioEl = computed(() => {
-  return props.showAudio && !(isSingleEdit.value && props.showWarning)
-})
+const showVideoEl = computed(() => props.showVideo)
+const showAudioEl = computed(() => props.showAudio)
 const videoClassName = computed(() => {
-  if (isSingleEdit.value) {
+  if (showSingleEditVideoPlayer.value) {
     return 'dialogProjectMediaMassEditPreviewThumb__videoPlayer'
   }
   return 'dialogProjectMediaMassEditPreviewThumb__mediaProbe'
 })
 const audioClassName = computed(() => {
-  if (isSingleEdit.value) {
+  if (showSingleEditAudio.value) {
     return 'dialogProjectMediaMassEditPreviewThumb__audioPlayer'
   }
   return 'dialogProjectMediaMassEditPreviewThumb__mediaProbe'
@@ -189,8 +191,10 @@ function onAudioLoadedMetadata (): void {
   relayoutSingleEditAudioControls()
 }
 
-onMounted(() => {
-  if (!showSingleEditAudio.value) {
+watch(showSingleEditAudio, (shown) => {
+  clearTimeout(audioRelayoutTimer)
+  audioRelayoutTimer = undefined
+  if (!shown) {
     return
   }
   void nextTick(() => {
@@ -199,6 +203,8 @@ onMounted(() => {
   audioRelayoutTimer = setTimeout(() => {
     relayoutSingleEditAudioControls()
   }, FA_PROJECT_MEDIA_AUDIO_CONTROLS_RELAYOUT_MS)
+}, {
+  immediate: true
 })
 
 onBeforeUnmount(() => {

@@ -10,6 +10,7 @@ export function createDocumentWorkspacePageCoreModels (deps: {
   i18n: T_createUseDocumentWorkspacePageDeps['i18n']
   navigateToWorkspaceHomeRoute: T_createUseDocumentWorkspacePageDeps['navigateToWorkspaceHomeRoute']
   onMounted: T_createUseDocumentWorkspacePageDeps['onMounted']
+  readActiveDocumentId: () => string | null
   resolveOpenedDocumentDisplayNameFromTab: T_createUseDocumentWorkspacePageDeps['resolveOpenedDocumentDisplayNameFromTab']
   resolveOpenedDocumentTabIsInEditMode: T_createUseDocumentWorkspacePageDeps['resolveOpenedDocumentTabIsInEditMode']
   resolveOpenedDocumentTabIsInPreviewMode: T_createUseDocumentWorkspacePageDeps['resolveOpenedDocumentTabIsInPreviewMode']
@@ -33,6 +34,7 @@ export function createDocumentWorkspacePageCoreModels (deps: {
     hydrationComplete: deps.hydrationComplete,
     navigateToWorkspaceHomeRoute: deps.navigateToWorkspaceHomeRoute,
     onMounted: deps.onMounted,
+    readActiveDocumentId: deps.readActiveDocumentId,
     routeParams: deps.routeParams,
     watch: deps.watch
   })

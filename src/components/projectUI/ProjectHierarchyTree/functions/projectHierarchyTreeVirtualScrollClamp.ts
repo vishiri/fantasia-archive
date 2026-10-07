@@ -56,12 +56,15 @@ export function readProjectHierarchyTreeVtlistInnerMetrics (
   const marginTopPx = Number.parseFloat(style.marginTop) || 0
   const marginBottomPx = Number.parseFloat(style.marginBottom) || 0
   const treeNodes = inner.querySelectorAll('.tree-node:not(.drag-placeholder-wrapper)')
+  const gapBelowLastRowPx = readProjectHierarchyTreeLastDomRowViewportGapPx(scrollContainer)
+  const innerOffsetHeight = inner.offsetHeight
+  const mountedNodeCount = treeNodes.length
   return {
-    gapBelowLastRowPx: readProjectHierarchyTreeLastDomRowViewportGapPx(scrollContainer),
-    innerOffsetHeight: inner.offsetHeight,
+    gapBelowLastRowPx,
+    innerOffsetHeight,
     marginBottomPx,
     marginTopPx,
-    mountedNodeCount: treeNodes.length
+    mountedNodeCount
   }
 }
 

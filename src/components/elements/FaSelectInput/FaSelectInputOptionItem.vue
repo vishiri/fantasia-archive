@@ -51,7 +51,10 @@ import { computed } from 'vue'
 import type { I_faColorGlyphCssCustomProperties } from 'app/types/I_faColorContrast'
 import type { T_faSelectInputOption } from 'app/types/I_faSelectInput'
 
-import { bindFaSelectInputOptionItemActivateProps } from './scripts/faSelectInput_manager'
+import {
+  bindFaSelectInputOptionItemActivateProps,
+  shouldActivateFaSelectInputOnEnter
+} from './scripts/faSelectInput_manager'
 
 defineOptions({
   name: 'FaSelectInputOptionItem'
@@ -92,6 +95,9 @@ const boundItemProps = computed(() => {
  * Portaled option rows: Enter must activate even when Quasar never focuses the filter input.
  */
 function onOptionEnterKeydown (event: KeyboardEvent): void {
+  if (!shouldActivateFaSelectInputOnEnter(event)) {
+    return
+  }
   boundItemProps.value.onKeydown(event)
 }
 </script>

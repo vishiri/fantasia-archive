@@ -7,6 +7,10 @@ import { resolveDocumentTabLabelFromOpenedTab } from 'app/src/components/project
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 
+import {
+  readDeleteDialogDocumentDisplayName,
+  reportDeleteDialogDocumentNameReadError
+} from './dialogDeleteOpenedDocumentNameWiring'
 import { createUseDialogDeleteOpenedDocument } from './functions/createUseDialogDeleteOpenedDocument'
 
 export const useDialogDeleteOpenedDocument = createUseDialogDeleteOpenedDocument({
@@ -15,7 +19,9 @@ export const useDialogDeleteOpenedDocument = createUseDialogDeleteOpenedDocument
   findProjectHierarchyTreeDocumentNodeByDocumentId,
   computed,
   i18n,
+  readDocumentDisplayName: readDeleteDialogDocumentDisplayName,
   ref,
+  reportDocumentNameReadError: reportDeleteDialogDocumentNameReadError,
   resolveOpenedDocumentTabListLabel: resolveDocumentTabLabelFromOpenedTab,
   storeToRefs,
   watch

@@ -1,22 +1,26 @@
 import type { I_faProjectContentAPI } from 'app/types/I_faProjectContentAPI'
 
 function stubNamedEntity () {
+  const displayNameTranslations = { 'en-US': 'Stub' }
   return {
     id: '550e8400-e29b-41d4-a716-446655440000',
     displayName: 'Stub',
-    displayNameTranslations: { 'en-US': 'Stub' },
+    displayNameTranslations,
     createdAtMs: 0,
     updatedAtMs: 0
   }
 }
 
 function stubMedia () {
+  const type = 'external' as const
+  const internalType = '' as const
+  const externalType = '' as const
   return {
     id: '550e8400-e29b-41d4-a716-446655440000',
     displayName: 'Stub',
-    type: 'external' as const,
-    internalType: '' as const,
-    externalType: '' as const,
+    type,
+    internalType,
+    externalType,
     externalLink: '',
     externalEmbed: '',
     internalLink: '',
@@ -27,8 +31,9 @@ function stubMedia () {
 }
 
 function stubWorld () {
+  const namedEntity = stubNamedEntity()
   return {
-    ...stubNamedEntity(),
+    ...namedEntity,
     color: '#808080',
     colorPalette: '',
     sortOrder: 0
@@ -36,25 +41,31 @@ function stubWorld () {
 }
 
 function stubWorldForSettings () {
+  const world = stubWorld()
+  const templateLayout = {
+    groups: [],
+    placements: []
+  }
   return {
-    ...stubWorld(),
+    ...world,
     documentCount: 0,
-    templateLayout: {
-      groups: [],
-      placements: []
-    }
+    templateLayout
   }
 }
 
 function stubDocumentTemplate () {
+  const namedEntity = stubNamedEntity()
+  const titlePluralTranslations = { 'en-US': 'Stub' }
+  const titleSingularTranslations = {}
+  const worldAppendixTranslations = {}
   return {
-    ...stubNamedEntity(),
+    ...namedEntity,
     icon: '',
     sortOrder: 0,
-    titlePluralTranslations: { 'en-US': 'Stub' },
-    titleSingularTranslations: {},
+    titlePluralTranslations,
+    titleSingularTranslations,
     worldAppendix: '',
-    worldAppendixTranslations: {}
+    worldAppendixTranslations
   }
 }
 
@@ -63,8 +74,9 @@ import {
 } from './openedDocumentTabTestStatusFlagDefaults'
 
 function stubDocument () {
+  const namedEntity = stubNamedEntity()
   return {
-    ...stubNamedEntity(),
+    ...namedEntity,
     templateId: null,
     worldId: '550e8400-e29b-41d4-a716-446655440000',
     placementId: null,
@@ -79,92 +91,141 @@ function stubDocument () {
 /**
  * No-op projectContent bridge for Storybook canvas and Vitest renderer harnesses.
  */
-export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAPI {
-  const emptyList = async () => ({ items: [] })
-  const noop = async () => undefined
+async function emptyProjectContentList () {
+  const items: never[] = []
+  return { items }
+}
+
+async function noopProjectContentCall () {
+  return undefined
+}
+
+async function returnStubDocument () {
+  return stubDocument()
+}
+
+async function returnStubDocumentTemplate () {
+  return stubDocumentTemplate()
+}
+
+async function returnStubMedia () {
+  return stubMedia()
+}
+
+async function returnStubWorld () {
+  return stubWorld()
+}
+
+async function listDocumentDistribution () {
+  const counts: never[] = []
+  const templates: never[] = []
+  const worlds: never[] = []
   return {
-    createDocument: async () => stubDocument(),
-    createDocumentTemplate: async () => stubDocumentTemplate(),
-    createMedia: async () => stubMedia(),
-    createWorld: async () => stubWorld(),
-    deleteDocument: noop,
-    deleteDocumentTemplate: noop,
-    deleteMedia: noop,
-    deleteWorld: noop,
-    getDocumentById: async () => stubDocument(),
-    getDocumentTemplateById: async () => stubDocumentTemplate(),
-    getMediaById: async () => stubMedia(),
-    getWorldById: async () => stubWorld(),
-    linkDocumentMedia: noop,
-    listDocumentDistribution: async () => ({
-      counts: [],
-      documentTemplateTotalCount: 0,
-      templates: [],
-      totalDocumentCount: 0,
-      worlds: []
-    }),
-    listDocumentLastOpened: emptyList,
-    listDocumentMedia: emptyList,
-    listDocumentTags: emptyList,
-    listDocumentsUnderTag: emptyList,
-    listTagsForWorld: emptyList,
-    listTagsWithDocumentCountsForWorld: emptyList,
-    listDocumentTemplates: emptyList,
-    listDocumentTemplatesForProjectSettings: async () => ({ items: [] }),
-    listDocuments: emptyList,
-    listMedia: emptyList,
-    listWorlds: emptyList,
-    listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
-    listWorkspaceHierarchyLayout: async () => ({ worlds: [] }),
-    listPlacementDocumentChildren: emptyList,
-    reindexDocumentSiblingsInHierarchy: async () => ({
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      displayName: 'Stub',
-      placementId: 'placement-stub',
-      parentDocumentId: null,
-      sortOrder: 0,
-      isCategory: false,
-      hasChildren: false
-    }),
-    moveDocumentInHierarchy: async () => ({
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      displayName: 'Stub',
-      placementId: 'placement-stub',
-      parentDocumentId: null,
-      sortOrder: 0,
-      isCategory: false,
-      hasChildren: false
-    }),
-    renameTag: async () => ({
-      tag: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        worldId: '550e8400-e29b-41d4-a716-446655440000',
-        name: 'Stub',
-        createdAtMs: 0,
-        updatedAtMs: 0
-      },
-      merged: false,
-      mergedFromTagId: null
-    }),
-    recordDocumentLastOpened: noop,
-    reorderDocumentsUnderTag: noop,
-    searchProjectHierarchy: async (query) => {
-      return {
-        hits: [],
-        query
-      }
-    },
-    saveDocumentTemplatesSnapshot: noop,
-    saveWorldsSnapshot: noop,
-    setDocumentTags: emptyList,
-    setDocumentTemplate: async () => stubDocument(),
-    setDocumentWorld: async () => stubDocument(),
-    deleteTag: noop,
-    unlinkDocumentMedia: noop,
-    updateDocument: async () => stubDocument(),
-    updateDocumentTemplate: async () => stubDocumentTemplate(),
-    updateMedia: async () => stubMedia(),
-    updateWorld: async () => stubWorld(),
-    upsertMedia: async () => ({ items: [stubMedia()] })
+    counts,
+    documentTemplateTotalCount: 0,
+    templates,
+    totalDocumentCount: 0,
+    worlds
+  }
+}
+
+async function listWorldsForProjectSettings () {
+  const items = [stubWorldForSettings()]
+  return { items }
+}
+
+async function listWorkspaceHierarchyLayout () {
+  const worlds: never[] = []
+  return { worlds }
+}
+
+async function stubHierarchyDocumentMove () {
+  return {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    displayName: 'Stub',
+    placementId: 'placement-stub',
+    parentDocumentId: null,
+    sortOrder: 0,
+    isCategory: false,
+    hasChildren: false
+  }
+}
+
+async function renameTag () {
+  const tag = {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    worldId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Stub',
+    createdAtMs: 0,
+    updatedAtMs: 0
+  }
+  return {
+    tag,
+    merged: false,
+    mergedFromTagId: null
+  }
+}
+
+async function searchProjectHierarchy (query: string) {
+  const hits: never[] = []
+  return {
+    hits,
+    query
+  }
+}
+
+async function upsertMedia () {
+  const items = [stubMedia()]
+  return { items }
+}
+
+export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAPI {
+  return {
+    createDocument: returnStubDocument,
+    createDocumentTemplate: returnStubDocumentTemplate,
+    createMedia: returnStubMedia,
+    createWorld: returnStubWorld,
+    deleteDocument: noopProjectContentCall,
+    deleteDocumentTemplate: noopProjectContentCall,
+    deleteMedia: noopProjectContentCall,
+    deleteWorld: noopProjectContentCall,
+    getDocumentById: returnStubDocument,
+    getDocumentTemplateById: returnStubDocumentTemplate,
+    getMediaById: returnStubMedia,
+    getWorldById: returnStubWorld,
+    linkDocumentMedia: noopProjectContentCall,
+    listDocumentDistribution,
+    listDocumentLastOpened: emptyProjectContentList,
+    listDocumentMedia: emptyProjectContentList,
+    listDocumentTags: emptyProjectContentList,
+    listDocumentsUnderTag: emptyProjectContentList,
+    listTagsForWorld: emptyProjectContentList,
+    listTagsWithDocumentCountsForWorld: emptyProjectContentList,
+    listDocumentTemplates: emptyProjectContentList,
+    listDocumentTemplatesForProjectSettings: emptyProjectContentList,
+    listDocuments: emptyProjectContentList,
+    listMedia: emptyProjectContentList,
+    listWorlds: emptyProjectContentList,
+    listWorldsForProjectSettings,
+    listWorkspaceHierarchyLayout,
+    listPlacementDocumentChildren: emptyProjectContentList,
+    reindexDocumentSiblingsInHierarchy: stubHierarchyDocumentMove,
+    moveDocumentInHierarchy: stubHierarchyDocumentMove,
+    renameTag,
+    recordDocumentLastOpened: noopProjectContentCall,
+    reorderDocumentsUnderTag: noopProjectContentCall,
+    searchProjectHierarchy,
+    saveDocumentTemplatesSnapshot: noopProjectContentCall,
+    saveWorldsSnapshot: noopProjectContentCall,
+    setDocumentTags: emptyProjectContentList,
+    setDocumentTemplate: returnStubDocument,
+    setDocumentWorld: returnStubDocument,
+    deleteTag: noopProjectContentCall,
+    unlinkDocumentMedia: noopProjectContentCall,
+    updateDocument: returnStubDocument,
+    updateDocumentTemplate: returnStubDocumentTemplate,
+    updateMedia: returnStubMedia,
+    updateWorld: returnStubWorld,
+    upsertMedia
   }
 }

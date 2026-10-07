@@ -1,8 +1,9 @@
 import { z } from 'zod'
 
 import {
-  faProjectContentDisplayNameSchema,
   faProjectContentIdSchema,
+  parseFaProjectContentDroppedRecord,
+  parseFaProjectContentIdPayload,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
@@ -17,6 +18,12 @@ const nullableTemplateIdSchema = z.union([
   z.null()
 ])
 
+const faProjectDocumentDisplayNameSchema = z
+  .string()
+  .min(1, 'display name is required')
+  .transform((value) => value.trim())
+  .refine((value) => value.length > 0, 'display name is empty after trim')
+
 export const faProjectDocumentNullableHexColorSchema = z.union([
   z.literal(''),
   z.null(),
@@ -24,7 +31,7 @@ export const faProjectDocumentNullableHexColorSchema = z.union([
 ]).transform((value) => (value === '' ? null : value))
 
 export const faProjectDocumentCreateInputSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema,
+  displayName: faProjectDocumentDisplayNameSchema,
   id: faProjectContentIdSchema.optional(),
   templateId: nullableTemplateIdSchema.optional(),
   worldId: faProjectContentIdSchema,
@@ -42,7 +49,7 @@ export const faProjectDocumentCreateInputSchema = z.object({
 }).strict()
 
 export const faProjectDocumentPatchSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema.optional(),
+  displayName: faProjectDocumentDisplayNameSchema.optional(),
   templateId: nullableTemplateIdSchema.optional(),
   worldId: faProjectContentIdSchema.optional(),
   placementId: nullableTemplateIdSchema.optional(),
@@ -79,17 +86,15 @@ export const faProjectSetDocumentTemplatePayloadSchema = z.object({
 export function parseFaProjectDocumentCreateInput (
   payload: unknown
 ): I_faProjectDocumentCreateInput {
-  const parsed = faProjectDocumentCreateInputSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentCreateInput
+  return parseFaProjectContentDroppedRecord(faProjectDocumentCreateInputSchema, payload)
 }
 
 export function parseFaProjectDocumentPatch (payload: unknown): I_faProjectDocumentPatch {
-  const parsed = faProjectDocumentPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentPatch
+  return parseFaProjectContentDroppedRecord(faProjectDocumentPatchSchema, payload)
 }
 
 export function parseFaProjectDocumentIdPayload (payload: unknown): string {
-  return faProjectDocumentIdPayloadSchema.parse(parseFaProjectContentPlainRecord(payload)).id
+  return parseFaProjectContentIdPayload(faProjectDocumentIdPayloadSchema, payload)
 }
 
 export function parseFaProjectDocumentListFilter (
@@ -98,8 +103,7 @@ export function parseFaProjectDocumentListFilter (
   if (payload === undefined) {
     return undefined
   }
-  const parsed = faProjectDocumentListFilterSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentListFilter
+  return parseFaProjectContentDroppedRecord(faProjectDocumentListFilterSchema, payload)
 }
 
 export function parseFaProjectSetDocumentWorldPayload (
@@ -123,8 +127,10 @@ export function parseFaProjectDocumentUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectDocumentPatch } {
   const parsed = faProjectDocumentUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const id = parsed.id
+  const patch = dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentPatch
   return {
-    id: parsed.id,
-    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentPatch
+    id,
+    patch
   }
 }

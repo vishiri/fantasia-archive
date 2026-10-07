@@ -214,7 +214,7 @@
 
       svg {
         height: $projectOverview-graph-apex-svg-height-css;
-        margin-bottom: -40px;
+        margin-bottom: $projectOverview-graph-apex-svg-marginBottom;
         overflow: visible;
       }
     }

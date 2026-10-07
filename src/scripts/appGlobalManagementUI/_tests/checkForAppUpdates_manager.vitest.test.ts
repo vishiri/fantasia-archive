@@ -11,9 +11,12 @@ const {
   return {
     determineCurrentImageMock: vi.fn(() => 'images/fantasiaMascot/fantasia_reading.png'),
     notifyCreateMock: vi.fn(() => vi.fn()),
-    tMock: vi.fn((key: string, params?: { version: string }) => {
+    tMock: vi.fn((key: string, params?: { status?: string, version?: string }) => {
       if (params?.version !== undefined) {
         return `${key}|${params.version}`
+      }
+      if (params?.status !== undefined) {
+        return `${key}|${params.status}`
       }
       return key
     })
@@ -105,7 +108,7 @@ test('Test that checkForAppUpdates manager throws for menu when version bridge m
   } as unknown as Window['faContentBridgeAPIs']
 
   await expect(checkForAppUpdates('menu')).rejects.toThrow(
-    'Could not read the installed app version.'
+    'appUpdateCheck.installedVersionUnreadable'
   )
 })
 
@@ -259,4 +262,16 @@ test('Test that checkForAppUpdates manager attach download no-ops without toast 
   await Promise.resolve()
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
+})
+
+test('Test that checkForAppUpdates manager reports bad GitHub release bodies', async () => {
+  const bodies: unknown[] = [null, { tag_name: '' }, { tag_name: 'v' }]
+  for (const body of bodies) {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => body
+    } as Response)
+    await checkForAppUpdates('startup')
+  }
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })

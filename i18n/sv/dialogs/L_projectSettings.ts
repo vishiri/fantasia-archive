@@ -1,5 +1,6 @@
 export default {
   title: 'Projektinställningar',
+  loadError: 'Det gick inte att läsa in projektinställningarna.',
   closeButton: 'Stäng utan att spara',
   saveButton: 'Spara inställningar',
   saveWithoutClosingButton: 'Spara utan att stänga',

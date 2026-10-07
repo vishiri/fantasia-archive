@@ -10,9 +10,10 @@ export function applyFaOpenedDocumentParentIdDraft (
     ...tab,
     parentDocumentIdDraft: nextDraft
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }
 
@@ -25,8 +26,9 @@ export function applyFaOpenedDocumentParentIdSyncFromHierarchy (
     parentDocumentIdDraft: parentDocumentId,
     savedParentDocumentId: parentDocumentId
   }
+  const hasUnsavedChanges = recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   return {
     ...nextTab,
-    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+    hasUnsavedChanges
   }
 }

@@ -37,9 +37,10 @@ export function mergeDialogProjectSettingsVitestGlobal (
   global: Record<string, unknown> = {}
 ): Record<string, unknown> {
   const existingPlugins = Array.isArray(global.plugins) ? global.plugins : []
+  const plugins = [dialogProjectSettingsVitestI18nPlugin, ...existingPlugins]
   return {
     ...global,
-    plugins: [dialogProjectSettingsVitestI18nPlugin, ...existingPlugins]
+    plugins
   }
 }
 

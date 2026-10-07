@@ -1,5 +1,26 @@
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 
+export function resolveDialogProjectSettingsWorldTemplateLayoutNextRootSortOrder (
+  layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
+): number {
+  let maxRootSortOrder = -1
+  for (const group of layout.groups) {
+    if (group.rootSortOrder > maxRootSortOrder) {
+      maxRootSortOrder = group.rootSortOrder
+    }
+  }
+  for (const placement of layout.placements) {
+    if (placement.groupId !== null) {
+      continue
+    }
+    const rootSortOrder = placement.rootSortOrder ?? 0
+    if (rootSortOrder > maxRootSortOrder) {
+      maxRootSortOrder = rootSortOrder
+    }
+  }
+  return maxRootSortOrder + 1
+}
+
 export function compareDialogProjectSettingsWorldTemplateLayoutGroupSortOrder (
   left: { groupSortOrder: number | null },
   right: { groupSortOrder: number | null }
@@ -72,25 +93,32 @@ export function normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder (
     groupSortByGroupId.set(group.id, orderMap)
   }
 
-  return {
-    groups: layout.groups.map((group) => ({
+  const groups = layout.groups.map((group) => {
+    const rootSortOrder = groupOrderById.get(group.id)!
+    return {
       ...group,
-      rootSortOrder: groupOrderById.get(group.id)!
-    })),
-    placements: layout.placements.map((placement) => {
-      if (placement.groupId === null) {
-        return {
-          ...placement,
-          groupSortOrder: null,
-          rootSortOrder: rootPlacementOrderById.get(placement.id)!
-        }
-      }
-      const orderMap = groupSortByGroupId.get(placement.groupId)
+      rootSortOrder
+    }
+  })
+  const placements = layout.placements.map((placement) => {
+    if (placement.groupId === null) {
+      const rootSortOrder = rootPlacementOrderById.get(placement.id)!
       return {
         ...placement,
-        groupSortOrder: orderMap?.get(placement.id) ?? placement.groupSortOrder,
-        rootSortOrder: null
+        groupSortOrder: null,
+        rootSortOrder
       }
-    })
+    }
+    const orderMap = groupSortByGroupId.get(placement.groupId)
+    const groupSortOrder = orderMap?.get(placement.id) ?? placement.groupSortOrder
+    return {
+      ...placement,
+      groupSortOrder,
+      rootSortOrder: null
+    }
+  })
+  return {
+    groups,
+    placements
   }
 }

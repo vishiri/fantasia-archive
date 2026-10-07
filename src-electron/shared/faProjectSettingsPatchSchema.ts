@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 import type { I_faProjectSettingsPatch } from 'app/types/I_faProjectSettingsDomain'
 import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
@@ -15,15 +16,6 @@ const projectNamePatchSchema = z
 export const faProjectSettingsPatchSchema = z.object({
   projectName: projectNamePatchSchema.optional()
 }).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses an IPC payload patching the active project settings. Throws when the payload fails Zod.

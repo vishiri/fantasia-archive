@@ -20,6 +20,7 @@ function loadFaIconPickerMergedCatalogForMenu (options: {
   isCatalogLoading: I_ref<boolean>
   loadFaIconPickerMergedCatalogAsync: () => Promise<string[]>
   loadedCatalog: I_ref<string[]>
+  requestSerialBox: { current: number }
 }): Promise<void> {
   return loadFaIconPickerMergedCatalogForMenuImpl({
     ...options,

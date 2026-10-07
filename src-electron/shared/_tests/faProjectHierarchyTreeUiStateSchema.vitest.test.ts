@@ -35,6 +35,16 @@ test('Test that serializeFaProjectHierarchyTreeUiStateJson round trips state', (
  * parseFaProjectHierarchyTreeUiStatePatch
  * Accepts partial patch objects from renderer IPC.
  */
+test('Test that parseFaProjectHierarchyTreeUiStatePatch keeps a document-under-tag node id', () => {
+  const tagId = 'a'.repeat(36)
+  const documentId = 'b'.repeat(36)
+  const nodeId = `${tagId}__doc__${documentId}`
+  const patch = parseFaProjectHierarchyTreeUiStatePatch({
+    expandedNodeIds: [nodeId]
+  })
+  expect(patch.expandedNodeIds).toEqual([nodeId])
+})
+
 test('Test that parseFaProjectHierarchyTreeUiStatePatch accepts scrollTopPx patch', () => {
   const patch = parseFaProjectHierarchyTreeUiStatePatch({ scrollTopPx: 10 })
   expect(patch.scrollTopPx).toBe(10)

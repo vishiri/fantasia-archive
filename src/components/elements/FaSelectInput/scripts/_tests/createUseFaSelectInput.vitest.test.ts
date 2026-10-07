@@ -7,6 +7,8 @@ import {
   FA_SELECT_INPUT_NEW_CHIP_COLOR
 } from 'app/types/I_faSelectInput'
 
+import { shouldAcceptFaEnterOutsideIme } from 'app/src/scripts/dom/dom_manager'
+
 import {
   appendFaSelectInputCreatedValue,
   clearFaSelectInputIsNewFlags,
@@ -41,6 +43,7 @@ function createTestUseFaSelectInput () {
     ref,
     resolveFaSelectInputEnterActivateOption,
     resolveFaSelectInputOptionIcon,
+    shouldActivateFaSelectInputOnEnter: shouldAcceptFaEnterOutsideIme,
     splitFaSelectInputLabelForFilterHighlight
   }, createFaSelectInputApi)
 }
@@ -338,6 +341,17 @@ test('Test that createUseFaSelectInput Enter emits option-activate for focused o
   }
   api.onSelectKeydown({ key: 'Enter' })
   expect(emitOptionActivate).toHaveBeenCalledWith('Venus')
+
+  emitOptionActivate.mockClear()
+  api.onSelectKeydown({
+    isComposing: true,
+    key: 'Enter'
+  })
+  api.onSelectKeydown({
+    key: 'Enter',
+    keyCode: 229
+  })
+  expect(emitOptionActivate).not.toHaveBeenCalled()
 
   emitOptionActivate.mockClear()
   api.onSelectKeydown({ key: 'ArrowDown' })

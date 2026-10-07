@@ -18,7 +18,13 @@ export function isDialogProjectMediaSingleEditSlideNavFieldActive (
     return false
   }
   const tag = target.tagName
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+  if (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    tag === 'VIDEO' ||
+    tag === 'AUDIO'
+  ) {
     return true
   }
   if (target.isContentEditable) {

@@ -1,4 +1,7 @@
-import type { I_faColorPickerPaletteAppendConfig } from 'app/types/I_faColorPickerInput'
+import type {
+  I_faColorPickerPaletteAppendConfig,
+  T_faColorPickerAppendToWorldPaletteEmit
+} from 'app/types/I_faColorPickerInput'
 
 function isFaColorPickerPaletteAppendHexValid (
   hex: string,
@@ -76,7 +79,7 @@ export async function runFaColorPickerPaletteAppendClick (
   persistWorldColorPalette: (worldId: string, colorPalette: string) => Promise<boolean>,
   readFaColorPickerPaletteAppendWorldId: (worldId: string | undefined) => string,
   refreshProjectWorldColorPalette: () => Promise<void>,
-  emitAppendToWorldPalette: (colorPalette: string) => void,
+  emitAppendToWorldPalette: T_faColorPickerAppendToWorldPaletteEmit,
   refreshProjectColorPalette?: () => Promise<void>
 ): Promise<void> {
   const nextPalette = appendFaProjectWorldColorPaletteHex(
@@ -88,7 +91,7 @@ export async function runFaColorPickerPaletteAppendClick (
     return
   }
   if (config.mode === 'draft') {
-    emitAppendToWorldPalette(nextPalette)
+    emitAppendToWorldPalette(nextPalette, '')
     return
   }
   const worldId = readFaColorPickerPaletteAppendWorldId(config.worldId)
@@ -98,5 +101,5 @@ export async function runFaColorPickerPaletteAppendClick (
   }
   const refresh = refreshProjectColorPalette ?? refreshProjectWorldColorPalette
   await refresh()
-  emitAppendToWorldPalette(nextPalette)
+  emitAppendToWorldPalette(nextPalette, worldId)
 }

@@ -95,7 +95,12 @@ const renameTranslationsInputRef = ref<InstanceType<typeof FaLocaleTranslationsI
 function onMenuShow (): void {
   props.onShow()
   void nextTick(() => {
-    renameTranslationsInputRef.value?.focusPreferredLanguageInput()
+    if (!renameMenuOpenModel.value) {
+      return
+    }
+    renameTranslationsInputRef.value?.focusPreferredLanguageInput(() => {
+      return renameMenuOpenModel.value
+    })
   })
 }
 </script>

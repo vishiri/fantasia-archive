@@ -1,11 +1,12 @@
 import throttle from 'lodash-es/throttle.js'
 import { afterEach, expect, test, vi } from 'vitest'
-import { onUnmounted, reactive, ref, watch } from 'vue'
+import { onBeforeUnmount, onUnmounted, reactive, ref, watch } from 'vue'
 
 import { FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS } from 'app/types/I_faColorPickerInput'
 import { createFaColorPickerPopoverEmit } from '../functions/createFaColorPickerPopoverEmit'
 
 const pickerEmitDeps = {
+  onBeforeUnmount,
   onUnmounted,
   ref,
   throttle,
@@ -52,6 +53,34 @@ test('createFaColorPickerPopoverEmit throttles picker updates and flushes on cha
   vi.advanceTimersByTime(FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS)
   pickerEmit.onPickerChange(null)
   expect(emitted.slice(-2)).toEqual(['', ''])
+})
+
+/**
+ * createFaColorPickerPopoverEmit
+ * A typed hex replaces a pending spectrum draft so menu hide cannot overwrite it.
+ */
+test('createFaColorPickerPopoverEmit text input drops a pending picker draft', () => {
+  vi.useFakeTimers()
+
+  const emitted: string[] = []
+  const props = reactive({
+    modelValue: ''
+  })
+
+  const usePickerEmit = createFaColorPickerPopoverEmit(pickerEmitDeps)
+  const pickerEmit = usePickerEmit(props, (value) => {
+    emitted.push(value)
+    props.modelValue = value
+  })
+
+  pickerEmit.onPickerUpdate('#111111')
+  pickerEmit.onPickerUpdate('#222222')
+  pickerEmit.applyTextModelValue('#abcdef')
+  pickerEmit.onPickerMenuHide()
+
+  vi.advanceTimersByTime(FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS)
+  expect(emitted).toEqual(['#111111', '#abcdef'])
+  expect(pickerEmit.resolveLiveColorString()).toBe('#abcdef')
 })
 
 /**
@@ -140,6 +169,43 @@ test('createFaColorPickerPopoverEmit cancels throttled emit on teardown', () => 
 
   vi.advanceTimersByTime(FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS)
   expect(emitted).toEqual(['#111111'])
+})
+
+/**
+ * createFaColorPickerPopoverEmit
+ * A menu hide during teardown must not flush the pending color onto the next owner.
+ */
+test('createFaColorPickerPopoverEmit drops a pending picker sync when the menu hides during teardown', () => {
+  vi.useFakeTimers()
+
+  const emitted: string[] = []
+  const props = {
+    modelValue: ''
+  }
+  const beforeUnmountCallbacks: Array<() => void> = []
+  const deps = {
+    ...pickerEmitDeps,
+    onBeforeUnmount: (fn: () => void) => {
+      beforeUnmountCallbacks.push(fn)
+    }
+  }
+
+  const usePickerEmit = createFaColorPickerPopoverEmit(deps)
+  const pickerEmit = usePickerEmit(props, (value: string) => {
+    emitted.push(value)
+  })
+
+  pickerEmit.onPickerUpdate('#111111')
+  pickerEmit.onPickerUpdate('#222222')
+
+  beforeUnmountCallbacks.forEach((fn) => {
+    fn()
+  })
+  pickerEmit.onPickerMenuHide()
+
+  vi.advanceTimersByTime(FA_COLOR_PICKER_INPUT_PICKER_EMIT_THROTTLE_MS)
+  expect(emitted).toEqual(['#111111'])
+  expect(pickerEmit.resolveLiveColorString()).toBe('')
 })
 
 afterEach(() => {

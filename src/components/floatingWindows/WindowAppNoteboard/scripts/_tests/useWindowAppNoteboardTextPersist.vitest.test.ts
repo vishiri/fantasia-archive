@@ -21,6 +21,7 @@ vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', async (impor
   }
 })
 
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { useWindowAppNoteboardTextPersist } from '../windowAppNoteboard_manager'
 
@@ -227,4 +228,35 @@ test('useWindowAppNoteboardTextPersist coerces null rejections to a string messa
   expect(runFaActionMock).toHaveBeenCalledWith('reportAppNoteboardSaveFailure', {
     message: 'null'
   })
+})
+
+test('useWindowAppNoteboardTextPersist still writes after the project changes', async () => {
+  const store = S_FaAppNoteboard()
+  const persistSpy = vi.spyOn(store, 'persistCurrentTextSilent').mockResolvedValue(undefined)
+
+  const text = ref('a')
+  const windowModel = ref(true)
+
+  const Harness = defineComponent({
+    setup () {
+      useWindowAppNoteboardTextPersist({
+        text,
+        windowModel
+      })
+      return () => null
+    }
+  })
+
+  mount(Harness, { global: { plugins: [pinia] } })
+
+  text.value = 'ab'
+  await nextTick()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\p\\a.faproject',
+    id: 'proj-1',
+    name: 'My world'
+  })
+  vi.advanceTimersByTime(380)
+  await flushPromises()
+  expect(persistSpy).toHaveBeenCalledTimes(1)
 })

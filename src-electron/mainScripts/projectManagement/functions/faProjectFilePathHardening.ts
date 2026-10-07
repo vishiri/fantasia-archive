@@ -1,4 +1,11 @@
+type T_faProjectFilePathHardeningResult = {
+  fromThrowable: <T, E>(fn: () => T, onError: (error: unknown) => E) => () => {
+    unwrapOr: <D>(defaultValue: D) => T | D
+  }
+}
+
 type T_createResolveHardenedFaProjectFilePathDeps = {
+  Result: T_faProjectFilePathHardeningResult
   pathLooksLikeFaProjectFile: (path: string) => boolean
   realpathSync: (path: string) => string
   statSync: (path: string) => { isFile: () => boolean }
@@ -19,7 +26,7 @@ export function createResolveHardenedFaProjectFilePath (
       return null
     }
 
-    try {
+    return deps.Result.fromThrowable(() => {
       const realPath = deps.realpathSync(trimmed)
       const stat = deps.statSync(realPath)
 
@@ -32,9 +39,7 @@ export function createResolveHardenedFaProjectFilePath (
       }
 
       return realPath
-    } catch {
-      return null
-    }
+    }, () => null)().unwrapOr(null)
   }
 
   return {

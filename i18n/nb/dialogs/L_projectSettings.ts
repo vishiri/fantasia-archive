@@ -1,5 +1,6 @@
 export default {
   title: 'Prosjektinnstillinger',
+  loadError: 'Kunne ikke laste inn prosjektinnstillingene.',
   closeButton: 'Lukk uten å lagre',
   saveButton: 'Lagre innstillinger',
   saveWithoutClosingButton: 'Lagre uten å lukke',

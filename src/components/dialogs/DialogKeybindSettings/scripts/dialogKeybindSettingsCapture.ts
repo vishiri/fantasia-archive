@@ -26,17 +26,26 @@ export function buildDialogKeybindSettingsCaptureApi (
   const onCaptureClear = deps.bindOnCaptureClear(actionDeps)
   const onCaptureSet = deps.bindOnCaptureSet(actionDeps)
   const onOpenCapture = deps.bindOnOpenCapture(actionDeps)
+  const {
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    pendingChord
+  } = refs
   return {
-    captureActionName: refs.captureActionName,
-    captureError: refs.captureError,
-    captureErrorMessage: refs.captureErrorMessage,
-    captureInfoMessage: refs.captureInfoMessage,
-    captureLabel: refs.captureLabel,
-    captureOpen: refs.captureOpen,
+    captureActionName,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
     onCaptureClear,
     onCaptureSet,
     onOpenCapture,
-    pendingChord: refs.pendingChord,
+    pendingChord,
     removeCaptureListener
   }
 }

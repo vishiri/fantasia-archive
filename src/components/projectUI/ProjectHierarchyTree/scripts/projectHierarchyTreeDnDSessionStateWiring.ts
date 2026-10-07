@@ -1,9 +1,6 @@
 import type { Ref } from 'vue'
-import type { I_faProjectHierarchyTreeDragSiblingOrderSnapshot, I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions } from 'app/types/I_faProjectHierarchyTreeDomain'
-import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import { shouldClearDragSessionWithoutCommit } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
-import { PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS } from '../functions/projectHierarchyTreeConstants'
-import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
+import type { I_faProjectHierarchyTreeDragSiblingOrderSnapshot } from 'app/types/I_faProjectHierarchyTreeDomain'
+import { finishHierarchyDragSessionWithoutCommit } from './projectHierarchyTreeDnDCancelFinishWiring'
 
 export function createProjectHierarchyTreeDragCancelWiring (deps: {
   clearDragSessionFlags: () => void
@@ -26,47 +23,25 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
     window.removeEventListener('keydown', onWindowKeydownDuringDrag)
   }
 
+  const session = {
+    cancelFinishSerial: null as number | null
+  }
+
   function attachDragCancelListeners (): void {
     window.addEventListener('pointerup', onWindowPointerUpDuringDrag)
     window.addEventListener('keydown', onWindowKeydownDuringDrag)
   }
   function finishDragSessionWithoutCommit (): void {
-    if (!shouldClearDragSessionWithoutCommit({
-      dragDropCommitted: deps.dragDropCommitted.value
-    })) {
-      return
-    }
-    removeDragCancelListeners()
-    clearFaVerticalDraggableTabsDocumentDragCursor()
-    deps.resyncTreeDataFromLayout()
-    const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
-    void runWithPreservedProjectHierarchyTreeScrollTop({
-      getTreeScrollHost: deps.getTreeScrollHost,
-      nextTick: deps.nextTick,
-      requestAnimationFrame: deps.requestAnimationFrame,
-      run: async () => {
-        await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-          expandedNodeIds: expandedSnapshot,
-          nextTick: deps.nextTick,
-          restoreExpandedSnapshot: deps.restoreExpandedSnapshot
-        })
-      }
-    }).finally(() => {
-      deps.dragExpandPostCommitGuard.value = false
-      deps.dragExpandUiFrozen.value = false
-      deps.clearDragSessionFlags()
-    })
+    finishHierarchyDragSessionWithoutCommit(deps, session, removeDragCancelListeners)
   }
 
   function onWindowPointerUpDuringDrag (): void {
-    void deps.nextTick().then(() => {
+    window.setTimeout(() => {
       if (deps.dragDropCommitted.value) {
         return
       }
       finishDragSessionWithoutCommit()
-    }).catch((err: unknown) => {
-      console.error('[ProjectHierarchyTree] drag cancel nextTick chain failed', err)
-    })
+    }, 50)
   }
 
   function onWindowKeydownDuringDrag (event: KeyboardEvent): void {
@@ -211,30 +186,4 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     readDragModelValueSettledForCommit,
     resetDragModelValueRevisionForDragStart
   }
-}
-
-/**
- * Restores expand snapshot after drag settle so drag-open cannot race restore.
- */
-function waitForProjectHierarchyTreeDragOpenRestoreSettle (): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS)
-  })
-}
-
-export async function remountProjectHierarchyTreeAndRestoreExpandedSnapshot (deps: {
-  expandedNodeIds: string[]
-  nextTick: () => Promise<void>
-  restoreExpandedSnapshot: (
-    expandedNodeIds: string[],
-    restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
-  ) => Promise<void>
-  restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
-  waitBeforeRemount?: () => Promise<void>
-}): Promise<void> {
-  const waitBeforeRemount = deps.waitBeforeRemount ?? waitForProjectHierarchyTreeDragOpenRestoreSettle
-  await waitBeforeRemount()
-  await deps.restoreExpandedSnapshot(deps.expandedNodeIds, deps.restoreOptions)
-  await deps.nextTick()
-  await deps.nextTick()
 }

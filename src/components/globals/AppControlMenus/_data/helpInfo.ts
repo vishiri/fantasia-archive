@@ -44,8 +44,10 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
 }
 
 export function buildHelpInfoMenu (): I_appMenuList {
+  const data = buildHelpInfoMenuData()
+  const title = i18n.global.t('appControlMenus.helpInfo.title')
   return {
-    data: buildHelpInfoMenuData(),
-    title: i18n.global.t('appControlMenus.helpInfo.title')
+    data,
+    title
   }
 }

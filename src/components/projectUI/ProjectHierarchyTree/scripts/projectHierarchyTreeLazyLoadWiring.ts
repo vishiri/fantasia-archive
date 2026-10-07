@@ -57,8 +57,72 @@ function createPublishTreeRevision (deps: {
   }
 }
 
+type T_deferredLazyLoadBatchState = {
+  active: number
+  hadSuccess: boolean
+  nextTick: (() => Promise<void>) | undefined
+  reapplyWanted: boolean
+}
+
+const deferredLazyLoadBatchStateByDefer = new WeakMap<
+  Ref<boolean>,
+  T_deferredLazyLoadBatchState
+>()
+
+function readDeferredLazyLoadBatchState (
+  deferLazyLoadTreeRevisionPublish: Ref<boolean>
+): T_deferredLazyLoadBatchState {
+  const existing = deferredLazyLoadBatchStateByDefer.get(deferLazyLoadTreeRevisionPublish)
+  if (existing !== undefined) {
+    return existing
+  }
+  const created: T_deferredLazyLoadBatchState = {
+    active: 0,
+    hadSuccess: false,
+    nextTick: undefined,
+    reapplyWanted: false
+  }
+  deferredLazyLoadBatchStateByDefer.set(deferLazyLoadTreeRevisionPublish, created)
+  return created
+}
+
+async function finishDeferredLazyLoadBatch (
+  deps: {
+    deferLazyLoadTreeRevisionPublish: Ref<boolean>
+    flushDeferredTreeRevisionPublish: () => Promise<void>
+    reapplyHeTreeOpenState: () => void
+  },
+  state: T_deferredLazyLoadBatchState
+): Promise<void> {
+  try {
+    await deps.flushDeferredTreeRevisionPublish()
+    if (state.active > 0) {
+      return
+    }
+    const nextTick = state.nextTick
+    state.nextTick = undefined
+    if (nextTick !== undefined) {
+      await nextTick()
+      await nextTick()
+    }
+    if (state.active > 0) {
+      return
+    }
+    const reapplyWanted = state.reapplyWanted
+    state.reapplyWanted = false
+    if (reapplyWanted) {
+      deps.reapplyHeTreeOpenState()
+    }
+  } finally {
+    if (state.active === 0) {
+      deps.deferLazyLoadTreeRevisionPublish.value = false
+    }
+  }
+}
+
 /**
- * Loads lazy tree rows without publishing or opening he-tree until the batch finishes.
+ * Loads lazy tree rows without publishing or opening he-tree until every overlapping batch finishes.
+ * A second load that starts while the first is still running must not publish early or skip the later rows.
  */
 export async function runProjectHierarchyTreeDeferredLazyLoadBatch (deps: {
   deferLazyLoadTreeRevisionPublish: Ref<boolean>
@@ -68,23 +132,40 @@ export async function runProjectHierarchyTreeDeferredLazyLoadBatch (deps: {
   runBatch: () => Promise<void>
   skipReapplyHeTreeOpenState?: boolean
 }): Promise<void> {
-  if (deps.deferLazyLoadTreeRevisionPublish.value) {
-    await deps.runBatch()
-    return
-  }
+  const state = readDeferredLazyLoadBatchState(deps.deferLazyLoadTreeRevisionPublish)
+  state.active += 1
   deps.deferLazyLoadTreeRevisionPublish.value = true
+  if (deps.nextTick !== undefined) {
+    state.nextTick = deps.nextTick
+  }
+  if (deps.skipReapplyHeTreeOpenState !== true) {
+    state.reapplyWanted = true
+  }
+  let batchError: unknown
+  let batchFailed = false
   try {
     await deps.runBatch()
-    await deps.flushDeferredTreeRevisionPublish()
-    if (deps.nextTick !== undefined) {
-      await deps.nextTick()
-      await deps.nextTick()
+  } catch (error: unknown) {
+    batchFailed = true
+    batchError = error
+  }
+  state.active -= 1
+  if (!batchFailed) {
+    state.hadSuccess = true
+  }
+  if (state.active === 0) {
+    const hadSuccess = state.hadSuccess
+    state.hadSuccess = false
+    if (!hadSuccess) {
+      state.nextTick = undefined
+      state.reapplyWanted = false
+      deps.deferLazyLoadTreeRevisionPublish.value = false
+    } else {
+      await finishDeferredLazyLoadBatch(deps, state)
     }
-    if (deps.skipReapplyHeTreeOpenState !== true) {
-      deps.reapplyHeTreeOpenState()
-    }
-  } finally {
-    deps.deferLazyLoadTreeRevisionPublish.value = false
+  }
+  if (batchFailed) {
+    throw batchError
   }
 }
 

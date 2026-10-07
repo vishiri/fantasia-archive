@@ -46,18 +46,36 @@ export function wireDocumentWorkspacePageStatusFlagToggles (input: {
     updateDraft: input.openedDocumentsStore.updateIsDeadDraft.bind(input.openedDocumentsStore)
   })
 
+  const {
+    description: isDeadDescription,
+    model: isDeadModel,
+    readOnly: isDeadToggleReadOnly,
+    title: isDeadTitle
+  } = isDeadToggle
+  const {
+    description: isFinishedDescription,
+    model: isFinishedModel,
+    readOnly: isFinishedToggleReadOnly,
+    title: isFinishedTitle
+  } = isFinishedToggle
+  const {
+    description: isMinorDescription,
+    model: isMinorModel,
+    readOnly: isMinorToggleReadOnly,
+    title: isMinorTitle
+  } = isMinorToggle
   return {
-    isDeadDescription: isDeadToggle.description,
-    isDeadModel: isDeadToggle.model,
-    isDeadTitle: isDeadToggle.title,
-    isDeadToggleReadOnly: isDeadToggle.readOnly,
-    isFinishedDescription: isFinishedToggle.description,
-    isFinishedModel: isFinishedToggle.model,
-    isFinishedTitle: isFinishedToggle.title,
-    isFinishedToggleReadOnly: isFinishedToggle.readOnly,
-    isMinorDescription: isMinorToggle.description,
-    isMinorModel: isMinorToggle.model,
-    isMinorTitle: isMinorToggle.title,
-    isMinorToggleReadOnly: isMinorToggle.readOnly
+    isDeadDescription,
+    isDeadModel,
+    isDeadTitle,
+    isDeadToggleReadOnly,
+    isFinishedDescription,
+    isFinishedModel,
+    isFinishedTitle,
+    isFinishedToggleReadOnly,
+    isMinorDescription,
+    isMinorModel,
+    isMinorTitle,
+    isMinorToggleReadOnly
   }
 }

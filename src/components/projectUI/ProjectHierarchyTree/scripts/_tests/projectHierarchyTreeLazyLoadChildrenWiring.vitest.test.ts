@@ -1,7 +1,10 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeDocumentChild,
+  I_faProjectHierarchyTreeHeTreeNode
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
   loadProjectHierarchyTreeNodeChildren,
@@ -125,6 +128,62 @@ test('Test that loadProjectHierarchyTreeNodeChildren rethrows unexpected nested 
     publishTreeRevision: vi.fn(async () => undefined),
     treeData: ref([node])
   })).rejects.toThrow('network down nested')
+})
+
+function placementListChild (id: string, displayName: string): I_faProjectHierarchyTreeDocumentChild {
+  return {
+    displayName,
+    hasChildren: false,
+    id,
+    parentDocumentId: null,
+    placementId: 'placement-1',
+    sortOrder: 0
+  }
+}
+
+test('Test that a later child load drops an older placement list', async () => {
+  const node = buildPlacementNode()
+  const treeData = ref([node])
+  let resolveFirst: ((value: {
+    items: I_faProjectHierarchyTreeDocumentChild[]
+  }) => void) | undefined
+  let listCalls = 0
+  const listPlacementDocumentChildren = vi.fn((): Promise<{
+    items: I_faProjectHierarchyTreeDocumentChild[]
+  }> => {
+    listCalls += 1
+    if (listCalls === 1) {
+      return new Promise((resolve) => {
+        resolveFirst = resolve
+      })
+    }
+    return Promise.resolve({
+      items: [placementListChild('doc-b', 'Doc B')]
+    })
+  })
+  const firstLoad = loadProjectHierarchyTreeNodeChildren({
+    listPlacementDocumentChildren,
+    node,
+    preferredLanguageCode: 'en-US',
+    publishTreeRevision: vi.fn(async () => undefined),
+    treeData
+  })
+  const secondLoad = loadProjectHierarchyTreeNodeChildren({
+    listPlacementDocumentChildren,
+    node,
+    preferredLanguageCode: 'en-US',
+    publishTreeRevision: vi.fn(async () => undefined),
+    treeData
+  })
+  await Promise.resolve()
+  resolveFirst?.({
+    items: [placementListChild('doc-a', 'Doc A')]
+  })
+  await Promise.all([firstLoad, secondLoad])
+  expect(node.children.map((child) => child.id)).toEqual([
+    'doc-b',
+    'placement-1__add-new'
+  ])
 })
 
 test('Test that refreshProjectHierarchyTreeNodeChildrenFromDatabase no-ops for missing node id', async () => {

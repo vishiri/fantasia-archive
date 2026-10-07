@@ -6,6 +6,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
+import { Result } from 'neverthrow'
 
 const ROOT = process.cwd()
 const EXTRAS_ROOT = join(ROOT, 'node_modules', '@quasar', 'extras')
@@ -121,15 +122,18 @@ async function fetchAndSaveMaterialLigatureSource () {
 }
 
 async function resolveMaterialLigatures () {
-  try {
-    return readMaterialLigatureSource()
-  } catch (error) {
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
-      return fetchAndSaveMaterialLigatureSource()
-    }
-
-    throw error
+  const read = Result.fromThrowable(
+    () => readMaterialLigatureSource(),
+    (error) => error
+  )()
+  if (read.isOk()) {
+    return read.value
   }
+  const error = read.error
+  if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+    return fetchAndSaveMaterialLigatureSource()
+  }
+  throw error
 }
 
 async function main () {

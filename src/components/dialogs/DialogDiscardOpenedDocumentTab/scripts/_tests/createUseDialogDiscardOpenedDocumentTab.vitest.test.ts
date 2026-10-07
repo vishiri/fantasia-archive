@@ -7,7 +7,9 @@ import { createUseDialogDiscardOpenedDocumentTab } from '../functions/createUseD
 
 function mountDiscardDialog (input: {
   pendingCloseDocumentId?: string | null
+  savedDisplayName?: string
   tabDisplayName?: string | null
+  tabLabel?: string
 } = {}) {
   const pendingCloseDocumentId = ref<string | null>(input.pendingCloseDocumentId ?? null)
   const confirmDiscardAndClose = vi.fn(async () => undefined)
@@ -17,7 +19,9 @@ function mountDiscardDialog (input: {
       return null
     }
     return {
-      displayNameDraft: input.tabDisplayName ?? documentId
+      displayNameDraft: input.tabDisplayName ?? documentId,
+      savedDisplayName: input.savedDisplayName ?? '',
+      tabLabel: input.tabLabel ?? ''
     }
   })
 
@@ -45,6 +49,31 @@ function mountDiscardDialog (input: {
   }
 }
 
+test('Test that discard dialog opens when a close is already pending before the watch runs', () => {
+  const pendingCloseDocumentId = ref<string | null>('doc-a')
+  const useDialog = createUseDialogDiscardOpenedDocumentTab({
+    S_FaOpenedDocuments: () => ({
+      confirmDiscardAndClose: vi.fn(async () => undefined),
+      dismissPendingClose: vi.fn(),
+      findTabByDocumentId: () => ({
+        displayNameDraft: 'Hero draft',
+        savedDisplayName: 'Hero',
+        tabLabel: 'Character'
+      })
+    }) as never,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    ref: ref as <T>(value: T) => I_ref<T>,
+    storeToRefs: () => ({
+      pendingCloseDocumentId
+    }) as never,
+    watch: () => undefined
+  })
+
+  const api = useDialog()
+  expect(api.dialogOpen.value).toBe(true)
+  expect(api.documentName.value).toBe('Hero draft')
+})
+
 test('Test that discard dialog document name is empty when no tab is pending close', () => {
   const { api } = mountDiscardDialog({ pendingCloseDocumentId: null })
   expect(api.documentName.value).toBe('')
@@ -58,6 +87,36 @@ test('Test that discard dialog document name uses tab draft name when available'
   })
   expect(api.documentName.value).toBe('Hero draft')
   expect(api.dialogOpen.value).toBe(true)
+})
+
+test('Test that discard dialog document name uses the saved name when the draft is blank', () => {
+  const { api } = mountDiscardDialog({
+    pendingCloseDocumentId: 'doc-a',
+    savedDisplayName: 'Hero',
+    tabDisplayName: '   ',
+    tabLabel: 'Character'
+  })
+  expect(api.documentName.value).toBe('Hero')
+})
+
+test('Test that discard dialog document name uses the tab label when drafts are blank', () => {
+  const { api } = mountDiscardDialog({
+    pendingCloseDocumentId: 'doc-a',
+    savedDisplayName: '   ',
+    tabDisplayName: ' ',
+    tabLabel: 'Character'
+  })
+  expect(api.documentName.value).toBe('Character')
+})
+
+test('Test that discard dialog document name uses the document id when every label is blank', () => {
+  const { api } = mountDiscardDialog({
+    pendingCloseDocumentId: 'doc-a',
+    savedDisplayName: '',
+    tabDisplayName: '',
+    tabLabel: '   '
+  })
+  expect(api.documentName.value).toBe('doc-a')
 })
 
 test('Test that discard dialog document name falls back to document id when tab is missing', () => {

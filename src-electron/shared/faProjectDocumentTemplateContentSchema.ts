@@ -7,6 +7,8 @@ import {
 import {
   faProjectContentDisplayNameSchema,
   faProjectContentIdSchema,
+  parseFaProjectContentDroppedRecord,
+  parseFaProjectContentIdPayload,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 
@@ -48,23 +50,17 @@ export const faProjectDocumentTemplateIdPayloadSchema = z.object({
 export function parseFaProjectDocumentTemplateCreateInput (
   payload: unknown
 ): I_faProjectDocumentTemplateCreateInput {
-  const parsed = faProjectDocumentTemplateCreateInputSchema.parse(
-    parseFaProjectContentPlainRecord(payload)
-  )
-  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplateCreateInput
+  return parseFaProjectContentDroppedRecord(faProjectDocumentTemplateCreateInputSchema, payload)
 }
 
 export function parseFaProjectDocumentTemplatePatch (
   payload: unknown
 ): I_faProjectDocumentTemplatePatch {
-  const parsed = faProjectDocumentTemplatePatchSchema.parse(parseFaProjectContentPlainRecord(payload))
-  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplatePatch
+  return parseFaProjectContentDroppedRecord(faProjectDocumentTemplatePatchSchema, payload)
 }
 
 export function parseFaProjectDocumentTemplateIdPayload (payload: unknown): string {
-  return faProjectDocumentTemplateIdPayloadSchema.parse(
-    parseFaProjectContentPlainRecord(payload)
-  ).id
+  return parseFaProjectContentIdPayload(faProjectDocumentTemplateIdPayloadSchema, payload)
 }
 
 export const faProjectDocumentTemplateUpdatePayloadSchema = z.object({
@@ -78,9 +74,11 @@ export function parseFaProjectDocumentTemplateUpdatePayload (
   const parsed = faProjectDocumentTemplateUpdatePayloadSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   )
+  const id = parsed.id
+  const patch = dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentTemplatePatch
   return {
-    id: parsed.id,
-    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentTemplatePatch
+    id,
+    patch
   }
 }
 

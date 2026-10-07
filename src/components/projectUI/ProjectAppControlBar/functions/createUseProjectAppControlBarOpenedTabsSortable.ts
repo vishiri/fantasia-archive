@@ -13,17 +13,30 @@ export function createUseProjectAppControlBarOpenedTabsSortable (deps: {
     onTabReorder: (fromIndex: number, toIndex: number) => void
   }) => {
     onTabsDragEnd: (event: { newIndex?: number | undefined, oldIndex?: number | undefined }) => void
+    onTabsDragStart: () => void
     sortableTabs: I_ref<I_faOpenedDocumentTab[]>
   } {
   return function useProjectAppControlBarOpenedTabsSortable (input) {
     const sortableTabs = deps.ref<I_faOpenedDocumentTab[]>([])
+    let tabsDragActive = false
+    let skippedTabsSyncDuringDrag = false
+
+    function copyOpenedTabs (
+      tabs: readonly I_faOpenedDocumentTab[]
+    ): I_faOpenedDocumentTab[] {
+      return tabs.map((tab) => {
+        return { ...tab }
+      })
+    }
 
     deps.watch(
       () => input.getOpenedDocumentTabs(),
       (tabs) => {
-        sortableTabs.value = tabs.map((tab) => {
-          return { ...tab }
-        })
+        if (tabsDragActive) {
+          skippedTabsSyncDuringDrag = true
+          return
+        }
+        sortableTabs.value = copyOpenedTabs(tabs)
       },
       {
         deep: true,
@@ -31,19 +44,25 @@ export function createUseProjectAppControlBarOpenedTabsSortable (deps: {
       }
     )
 
+    function onTabsDragStart (): void {
+      tabsDragActive = true
+    }
+
     function onTabsDragEnd (event: { newIndex?: number | undefined, oldIndex?: number | undefined }): void {
+      tabsDragActive = false
       const { oldIndex, newIndex } = event
-      if (oldIndex === undefined || newIndex === undefined) {
-        return
+      const reorder = oldIndex !== undefined && newIndex !== undefined && oldIndex !== newIndex
+      if (reorder) {
+        input.onTabReorder(oldIndex, newIndex)
+      } else if (skippedTabsSyncDuringDrag) {
+        sortableTabs.value = copyOpenedTabs(input.getOpenedDocumentTabs())
       }
-      if (oldIndex === newIndex) {
-        return
-      }
-      input.onTabReorder(oldIndex, newIndex)
+      skippedTabsSyncDuringDrag = false
     }
 
     return {
       onTabsDragEnd,
+      onTabsDragStart,
       sortableTabs
     }
   }

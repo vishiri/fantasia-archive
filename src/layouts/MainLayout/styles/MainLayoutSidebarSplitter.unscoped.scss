@@ -1,8 +1,8 @@
 @use './variables' as *;
 
 .appShellLayout--workspace > .mainLayoutSidebarSplitter {
-  height: 100vh;
-  max-height: 100vh;
+  height: $mainLayout-sidebarSplitter-viewportHeight;
+  max-height: $mainLayout-sidebarSplitter-viewportHeight;
 }
 
 .mainLayoutSidebarSplitter {

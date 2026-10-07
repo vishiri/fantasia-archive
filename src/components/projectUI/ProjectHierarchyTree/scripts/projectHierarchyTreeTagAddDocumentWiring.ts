@@ -3,6 +3,7 @@ import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLangu
 
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from '../functions/projectHierarchyTreeAddNewDocumentLabel'
+import { startProjectHierarchyTreeAddNewDocumentCreate } from './projectHierarchyTreeAddNewDocumentCreateOnce'
 import { isProjectHierarchyTreeAddNewDocumentCreateSourceNode } from './projectHierarchyTreeAddNewDocumentNode'
 
 export function createProjectHierarchyTreeTagAddDocumentClickHandler (deps: {
@@ -11,6 +12,7 @@ export function createProjectHierarchyTreeTagAddDocumentClickHandler (deps: {
     initialTagsDraft: Array<{ id: string, name: string }>
     openMode: 'leftNavigate'
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>
@@ -38,7 +40,7 @@ export function createProjectHierarchyTreeTagAddDocumentClickHandler (deps: {
     ) {
       return
     }
-    void deps.createTemporaryDocument({
+    startProjectHierarchyTreeAddNewDocumentCreate(deps.createTemporaryDocument, {
       displayName: resolveProjectHierarchyTreeNewDocumentDisplayName({
         preferredLanguageCode: deps.resolvePreferredLanguageCode(),
         titlePluralTranslations: placement.titlePluralTranslations ?? {},
@@ -50,8 +52,10 @@ export function createProjectHierarchyTreeTagAddDocumentClickHandler (deps: {
       }],
       openMode: 'leftNavigate',
       parentDocumentId: null,
+      placementId: placement.placementId,
       templateId: placement.documentTemplateId,
       worldId: placement.worldId
-    })
+    },
+    tagId)
   }
 }

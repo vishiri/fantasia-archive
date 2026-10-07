@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive सेटिंग्स',
+  loadError: 'सेटिंग्स लोड नहीं हो सकीं.',
   saveButton: 'सेटिंग्स सेव करें',
   closeButton: 'बिना सहेजे बंद करें',
   settingsSearchPlaceholder: 'सेटिंग्स खोजें...',

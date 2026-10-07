@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
 
 const {
@@ -223,6 +224,30 @@ test('Test that S_FaOpenedDocuments hydrates tabs from project database snapshot
   expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
 })
 
+test('Test that S_FaOpenedDocuments hydrate reloads tags missing from the snapshot', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    listDocumentTags: listDocumentTagsMock
+  })
+  listDocumentTagsMock.mockResolvedValue({
+    items: [{
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  })
+  await store.hydrateFromProjectDatabase()
+  expect(store.tabs[0]?.savedTags).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+  expect(store.tabs[0]?.tagsDraft).toEqual([{
+    id: 'tag-1',
+    name: 'Heroes'
+  }])
+  expect(store.tabs[0]?.hasUnsavedChanges).toBe(false)
+})
+
 test('Test that S_FaOpenedDocuments hydrate navigates to active document when autoOpenLastDocument is on', async () => {
   const { S_FaUserSettings } = await import('../S_FaUserSettings')
   const { FA_USER_SETTINGS_DEFAULTS } = await import(
@@ -240,6 +265,250 @@ test('Test that S_FaOpenedDocuments hydrate navigates to active document when au
   expect(store.activeDocumentId).toBe('doc-1')
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-1')
   expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments hydrate waits to finish until the auto-open route resolves', async () => {
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToOpenedDocumentRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const { S_FaUserSettings } = await import('../S_FaUserSettings')
+  const { FA_USER_SETTINGS_DEFAULTS } = await import(
+    'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+  )
+  const userSettings = S_FaUserSettings()
+  userSettings.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    autoOpenLastDocument: true
+  }
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  await vi.waitUntil(() => navigateToOpenedDocumentRouteMock.mock.calls.length === 1)
+  expect(store.hydrationComplete).toBe(false)
+  const finishNavigate = resolveNavigate
+  if (finishNavigate === undefined) {
+    throw new Error('missing navigate resolver')
+  }
+  finishNavigate(undefined)
+  await pending
+  expect(store.hydrationComplete).toBe(true)
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-1')
+})
+
+test('Test that S_FaOpenedDocuments hydrate keeps a name typed during the document read', async () => {
+  let resolveDocument: ((value: { displayName: string, id: string, parentDocumentId: null }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveDocument = resolve
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  await vi.waitUntil(() => getDocumentByIdMock.mock.calls.length === 1)
+  store.updateDisplayNameDraft('doc-1', 'Hero revised')
+  const finishDocument = resolveDocument
+  if (finishDocument === undefined) {
+    throw new Error('missing document resolver')
+  }
+  finishDocument({
+    displayName: 'Hero from database',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await pending
+  expect(store.tabs[0]?.displayNameDraft).toBe('Hero revised')
+  expect(store.tabs[0]?.savedDisplayName).toBe('Hero from database')
+  expect(store.tabs[0]?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments hydrate does not restore a tab closed during the document read', async () => {
+  let resolveDocument: ((value: { displayName: string, id: string, parentDocumentId: null }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveDocument = resolve
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  await vi.waitUntil(() => getDocumentByIdMock.mock.calls.length === 1)
+  store.requestCloseTab('doc-1')
+  await vi.waitUntil(() => store.tabs.length === 0)
+  const finishDocument = resolveDocument
+  if (finishDocument === undefined) {
+    throw new Error('missing document resolver')
+  }
+  finishDocument({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await pending
+  expect(store.tabs).toHaveLength(0)
+  expect(store.activeDocumentId).toBeNull()
+})
+
+test('Test that openFromTree does not add a tab after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const tabCount = store.tabs.length
+  navigateToOpenedDocumentRouteMock.mockClear()
+  recordDocumentLastOpenedMock.mockClear()
+  let resolveDocument: ((value: { displayName: string, id: string }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveDocument = resolve
+    })
+  })
+  const pending = store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveDocument?.({
+    displayName: 'Villain',
+    id: 'doc-2'
+  })
+  await pending
+  expect(store.tabs).toHaveLength(tabCount)
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-2')
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalled()
+})
+
+test('Test that openFromTree does not bump last opened after the project changes during the MRU write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  const bumpDocumentLastOpenedRefreshGeneration = vi.fn()
+  hierarchyStore.bumpDocumentLastOpenedRefreshGeneration = bumpDocumentLastOpenedRefreshGeneration
+  await store.hydrateFromProjectDatabase()
+  let resolveRecord: ((value: undefined) => void) | undefined
+  recordDocumentLastOpenedMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveRecord = resolve
+    })
+  })
+  const pending = store.openFromTree('doc-1', 'leftNavigate', treeMeta)
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (recordDocumentLastOpenedMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishRecord = resolveRecord
+  if (finishRecord === undefined) {
+    throw new Error('missing last-opened resolver')
+  }
+  finishRecord(undefined)
+  await pending
+  expect(bumpDocumentLastOpenedRefreshGeneration).not.toHaveBeenCalled()
+})
+
+test('Test that a temporary document is not opened after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const tabCount = store.tabs.length
+  let resolveWorld: ((value: { id: string }) => void) | undefined
+  getWorldByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveWorld = resolve
+    })
+  })
+  const pending = store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveWorld?.({ id: 'world-1' })
+  await pending
+  expect(store.tabs).toHaveLength(tabCount)
+})
+
+test('Test that a temporary document does not steal focus when another tab is focused during create', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  navigateToOpenedDocumentRouteMock.mockClear()
+  let resolveWorld: ((value: { id: string }) => void) | undefined
+  getWorldByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveWorld = resolve
+    })
+  })
+  const pending = store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  await Promise.resolve()
+  await store.focusTab('doc-1')
+  resolveWorld?.({ id: 'world-1' })
+  const documentId = await pending
+  expect(store.activeDocumentId).toBe('doc-1')
+  expect(store.findTabByDocumentId(documentId)?.displayNameDraft).toBe('Aria')
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith(documentId)
+})
+
+test('Test that S_FaOpenedDocuments openFromTree fills a blank tree label and icon from the document', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Villain',
+    id: 'doc-2',
+    templateId: 'tpl-2'
+  })
+  getDocumentTemplateByIdMock.mockResolvedValueOnce({
+    icon: ' mdi-skull ',
+    id: 'tpl-2'
+  })
+  await store.openFromTree('doc-2', 'leftNavigate', {
+    tabLabel: '   ',
+    templateIcon: ''
+  })
+  const opened = store.tabs.find((tab) => tab.documentId === 'doc-2')
+  expect(opened?.tabLabel).toBe('Villain')
+  expect(opened?.templateIcon).toBe('mdi-skull')
+  expect(opened?.displayNameDraft).toBe('Villain')
+})
+
+test('Test that S_FaOpenedDocuments openFromTree still opens when the template icon read fails', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Villain',
+    id: 'doc-2',
+    templateId: 'tpl-2'
+  })
+  getDocumentTemplateByIdMock.mockRejectedValueOnce(new Error('template missing'))
+  await store.openFromTree('doc-2', 'leftNavigate', {
+    tabLabel: '',
+    templateIcon: ''
+  })
+  const opened = store.tabs.find((tab) => tab.documentId === 'doc-2')
+  expect(opened?.tabLabel).toBe('Villain')
+  expect(opened?.templateIcon).toBe('')
 })
 
 test('Test that S_FaOpenedDocuments openFromTree appends a new tab on left navigate', async () => {
@@ -294,6 +563,425 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists and queues 
   await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
   expect(store.findTabByDocumentId('doc-1')?.savedDisplayName).toBe('Saved Hero')
   expect(hierarchyStore.pendingDocumentRefreshIds).toEqual(['doc-1'])
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName keeps a name typed during the write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'First')
+  let resolveUpdate: ((value: {
+    displayName: string
+    id: string
+    parentDocumentId: null
+  }) => void) | undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUpdate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await Promise.resolve()
+  store.updateDisplayNameDraft('doc-1', 'Second')
+  resolveUpdate?.({
+    displayName: 'First',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await pending
+  expect(store.findTabByDocumentId('doc-1')?.displayNameDraft).toBe('Second')
+  expect(store.findTabByDocumentId('doc-1')?.savedDisplayName).toBe('First')
+  expect(store.findTabByDocumentId('doc-1')?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName keeps a temporary name typed during create', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'First',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  store.updateDisplayNameDraft(documentId, 'First')
+  const pending = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  store.updateDisplayNameDraft(documentId, 'Second')
+  await pending
+  expect(store.findTabByDocumentId(documentId)?.persistenceState).toBe('persisted')
+  expect(store.findTabByDocumentId(documentId)?.displayNameDraft).toBe('Second')
+  expect(store.findTabByDocumentId(documentId)?.savedDisplayName).toBe('First')
+  expect(store.findTabByDocumentId(documentId)?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that a second temporary save waits and does not create twice', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let releaseCreate: (() => void) | undefined
+  const createGate = new Promise<void>((resolve) => {
+    releaseCreate = resolve
+  })
+  createDocumentMock.mockImplementation(async (input: { id?: string, displayName: string }) => {
+    await createGate
+    return {
+      displayName: input.displayName,
+      id: input.id ?? documentId
+    }
+  })
+  updateDocumentMock.mockResolvedValue({
+    displayName: 'Aria',
+    id: documentId,
+    parentDocumentId: null
+  })
+  const firstSave = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  const secondSave = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (createDocumentMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  expect(createDocumentMock).toHaveBeenCalledTimes(1)
+  const finishCreate = releaseCreate
+  if (finishCreate === undefined) {
+    throw new Error('missing create resolver')
+  }
+  finishCreate()
+  await firstSave
+  await secondSave
+  expect(createDocumentMock).toHaveBeenCalledTimes(1)
+  expect(updateDocumentMock).toHaveBeenCalled()
+  expect(store.findTabByDocumentId(documentId)?.persistenceState).toBe('persisted')
+})
+
+test('Test that deleteOpenedDocument waits for an in-flight temporary save before removing the row', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let releaseCreate: (() => void) | undefined
+  const createGate = new Promise<void>((resolve) => {
+    releaseCreate = resolve
+  })
+  createDocumentMock.mockImplementation(async (input: { id?: string, displayName: string }) => {
+    await createGate
+    return {
+      displayName: input.displayName,
+      id: input.id ?? documentId
+    }
+  })
+  deleteDocumentMock.mockResolvedValue(undefined)
+  const pendingSave = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (createDocumentMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  expect(createDocumentMock).toHaveBeenCalledTimes(1)
+  const pendingDelete = store.deleteOpenedDocument(documentId)
+  await Promise.resolve()
+  expect(deleteDocumentMock).not.toHaveBeenCalled()
+  const finishCreate = releaseCreate
+  if (finishCreate === undefined) {
+    throw new Error('missing create resolver')
+  }
+  finishCreate()
+  await pendingSave
+  await pendingDelete
+  expect(deleteDocumentMock).toHaveBeenCalledWith(documentId)
+  expect(store.findTabByDocumentId(documentId)).toBeNull()
+})
+
+test('Test that a temporary document save does not record last opened after the project changes during layout refresh', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'First',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  const bumpDocumentCensusRefreshGeneration = vi.fn()
+  hierarchyStore.bumpDocumentCensusRefreshGeneration = bumpDocumentCensusRefreshGeneration
+  let resolveRefresh: ((value: undefined) => void) | undefined
+  const refreshLayout = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveRefresh = resolve
+    })
+  })
+  hierarchyStore.refreshLayout = refreshLayout
+  recordDocumentLastOpenedMock.mockClear()
+  const pending = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (refreshLayout.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  recordDocumentLastOpenedMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishRefresh = resolveRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing layout refresh resolver')
+  }
+  finishRefresh(undefined)
+  await pending
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalled()
+  expect(bumpDocumentCensusRefreshGeneration).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName keeps a name typed during the tag write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'First')
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-1',
+    isNew: false,
+    name: 'Heroes'
+  }])
+  let resolveTags: ((value: { items: Array<{ id: string, name: string }> }) => void) | undefined
+  setDocumentTagsMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveTags = resolve
+    })
+  })
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.waitUntil(() => setDocumentTagsMock.mock.calls.length === 1)
+  store.updateDisplayNameDraft('doc-1', 'Second')
+  resolveTags?.({
+    items: [{
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  })
+  await pending
+  expect(store.findTabByDocumentId('doc-1')?.displayNameDraft).toBe('Second')
+  expect(store.findTabByDocumentId('doc-1')?.savedDisplayName).toBe('Saved Hero')
+  expect(store.findTabByDocumentId('doc-1')?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName keeps a preview toggle during the tag write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.enterDocumentEditMode('doc-1')
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-1',
+    isNew: false,
+    name: 'Heroes'
+  }])
+  let resolveTags: ((value: { items: Array<{ id: string, name: string }> }) => void) | undefined
+  setDocumentTagsMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveTags = resolve
+    })
+  })
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.waitUntil(() => setDocumentTagsMock.mock.calls.length === 1)
+  store.setDocumentEditState('doc-1', false)
+  resolveTags?.({
+    items: [{
+      id: 'tag-1',
+      name: 'Heroes'
+    }]
+  })
+  await pending
+  expect(store.findTabByDocumentId('doc-1')?.editState).toBe(false)
+})
+
+test('Test that a persisted document save does not refresh the tree after the project changes during layout refresh', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  await store.hydrateFromProjectDatabase()
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-1',
+    isNew: false,
+    name: 'Heroes'
+  }])
+  const refreshDocumentsInTree = vi.fn()
+  hierarchyStore.refreshDocumentsInTree = refreshDocumentsInTree
+  let resolveRefresh: ((value: undefined) => void) | undefined
+  const refreshLayout = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveRefresh = resolve
+    })
+  })
+  hierarchyStore.refreshLayout = refreshLayout
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (refreshLayout.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishRefresh = resolveRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing layout refresh resolver')
+  }
+  finishRefresh(undefined)
+  await pending
+  expect(refreshDocumentsInTree).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName follows a tab reorder during the write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const otherTab: I_faOpenedDocumentTab = {
+    ...baseTab,
+    documentId: 'doc-2',
+    displayNameDraft: 'Other',
+    savedDisplayName: 'Other',
+    tabLabel: 'Other'
+  }
+  store.replaceOpenedDocumentTabs([store.tabs[0]!, otherTab])
+  store.updateDisplayNameDraft('doc-1', 'Saved Hero')
+  let resolveUpdate: ((value: {
+    displayName: string
+    id: string
+    parentDocumentId: null
+  }) => void) | undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUpdate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await Promise.resolve()
+  store.reorderDocumentTabs(0, 1)
+  resolveUpdate?.({
+    displayName: 'Saved Hero',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await pending
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2', 'doc-1'])
+  expect(store.findTabByDocumentId('doc-1')?.savedDisplayName).toBe('Saved Hero')
+  expect(store.findTabByDocumentId('doc-2')?.savedDisplayName).toBe('Other')
+})
+
+test('Test that a document save does not rewrite tabs after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'Saved Hero')
+  let resolveUpdate: ((value: {
+    displayName: string
+    id: string
+    parentDocumentId: null
+  }) => void) | undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUpdate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  store.replaceOpenedDocumentTabs([])
+  resolveUpdate?.({
+    displayName: 'Saved Hero',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await pending
+  expect(store.tabs).toEqual([])
+})
+
+test('Test that a temporary document save does not create after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let resolveTemplate: ((value: {
+    id: string
+    titleSingularTranslations: { 'en-US': string }
+  }) => void) | undefined
+  getDocumentTemplateByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveTemplate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName(documentId, { keepEditMode: false })
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveTemplate?.({
+    id: 'tpl-1',
+    titleSingularTranslations: { 'en-US': 'Character' }
+  })
+  await pending
+  expect(createDocumentMock).not.toHaveBeenCalled()
+})
+
+test('Test that a temporary document save does not create while a project open is in flight', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let resolveTemplate: ((value: {
+    id: string
+    titleSingularTranslations: { 'en-US': string }
+  }) => void) | undefined
+  getDocumentTemplateByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveTemplate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName(documentId, { keepEditMode: false })
+  await Promise.resolve()
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  resolveTemplate?.({
+    id: 'tpl-1',
+    titleSingularTranslations: { 'en-US': 'Character' }
+  })
+  await pending
+  expect(createDocumentMock).not.toHaveBeenCalled()
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName moves parent before updateDocument', async () => {
@@ -371,6 +1059,115 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName moves parent before 
   expect(store.findTabByDocumentId('doc-1')?.savedParentDocumentId).toBe('parent-2')
   expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['parent-2'])
   expect(hierarchyStore.treeData[0]?.children[0]?.children[0]?.hasChildren).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects an inexact order number before creating a temporary document', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      persistenceState: 'temporary',
+      worldId: 'world-1',
+      templateId: 'tpl-1',
+      treeOrderNumberDraft: '1e20'
+    }]
+  })
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects.toThrow('Could not save the document.')
+  expect(createDocumentMock).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects an inexact order number before moving the parent', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      parentDocumentIdDraft: 'parent-2',
+      savedParentDocumentId: '',
+      treeOrderNumberDraft: '1e20'
+    }]
+  })
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects.toThrow('Could not save the document.')
+  expect(moveDocumentInHierarchyMock).not.toHaveBeenCalled()
+  expect(updateDocumentMock).not.toHaveBeenCalled()
+  expect(store.findTabByDocumentId('doc-1')?.savedParentDocumentId).toBe('')
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects extra classes over 512 before creating a temporary document', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      persistenceState: 'temporary',
+      worldId: 'world-1',
+      templateId: 'tpl-1',
+      extraClassesDraft: 'a'.repeat(513)
+    }]
+  })
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects.toThrow('Could not save the document.')
+  expect(createDocumentMock).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects extra classes over 512 before moving the parent', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      parentDocumentIdDraft: 'parent-2',
+      savedParentDocumentId: '',
+      extraClassesDraft: 'a'.repeat(513),
+      savedExtraClasses: ''
+    }]
+  })
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects.toThrow('Could not save the document.')
+  expect(moveDocumentInHierarchyMock).not.toHaveBeenCalled()
+  expect(updateDocumentMock).not.toHaveBeenCalled()
+  expect(store.findTabByDocumentId('doc-1')?.savedParentDocumentId).toBe('')
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName skips a parent move already stored', async () => {
+  const documentRow = {
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null as string | null,
+    placementId: 'placement-1',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  }
+  getDocumentByIdMock
+    .mockResolvedValueOnce(documentRow)
+    .mockResolvedValueOnce(documentRow)
+    .mockResolvedValue({
+      ...documentRow,
+      parentDocumentId: 'parent-2'
+    })
+  updateDocumentMock.mockRejectedValueOnce(new Error('write failed'))
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateParentDocumentIdDraft('doc-1', 'parent-2')
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects.toThrow('write failed')
+  expect(moveDocumentInHierarchyMock).toHaveBeenCalledTimes(1)
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  expect(moveDocumentInHierarchyMock).toHaveBeenCalledTimes(1)
+  expect(store.findTabByDocumentId('doc-1')?.savedParentDocumentId).toBe('parent-2')
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName parent move to root queues placement refresh', async () => {
@@ -644,6 +1441,36 @@ test('Test that S_FaOpenedDocuments confirmDiscardAndClose navigates home when l
   expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
 })
 
+test('Test that confirmDiscardAndClose does not snapshot after the project changes during navigate', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToWorkspaceHomeRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.confirmDiscardAndClose('doc-1')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (navigateToWorkspaceHomeRouteMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveNavigate?.(undefined)
+  await pending
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  navigateToWorkspaceHomeRouteMock.mockReset()
+  navigateToWorkspaceHomeRouteMock.mockImplementation(async () => undefined)
+})
+
 test('Test that S_FaOpenedDocuments confirmDeleteOpenedDocument deletes tab and refreshes hierarchy tree', async () => {
   const refreshDocumentsInTreeMock = vi.fn()
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
@@ -677,6 +1504,31 @@ test('Test that S_FaOpenedDocuments confirmDeleteOpenedDocument deletes tab and 
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
   expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
   expect(store.pendingDeleteDocumentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments confirmDeleteOpenedDocument keeps the pending delete when delete fails', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [baseTab]
+  })
+  store.requestDeleteDocument('doc-1')
+  deleteDocumentMock.mockRejectedValueOnce(new Error('delete failed'))
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+  await store.confirmDeleteOpenedDocument('doc-1')
+
+  expect(store.pendingDeleteDocumentId).toBe('doc-1')
+  expect(store.findTabByDocumentId('doc-1')).not.toBeNull()
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    faSkipNotifyConsoleLog: true,
+    group: false,
+    message: 'Could not delete the document.',
+    type: 'negative'
+  })
+  expect(consoleErrorSpy).toHaveBeenCalled()
+  consoleErrorSpy.mockRestore()
 })
 
 test('Test that S_FaOpenedDocuments syncActiveDocumentIdFromWorkspaceRoute ignores routes before hydration completes', async () => {
@@ -816,6 +1668,134 @@ test('Test that S_FaOpenedDocuments forceCloseAllTabs clears every tab and navig
   expect(store.tabs).toEqual([])
   expect(store.activeDocumentId).toBeNull()
   expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
+})
+
+test('Test that forceCloseAllTabs does not snapshot after the project changes during navigate', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToWorkspaceHomeRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.forceCloseAllTabs()
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (navigateToWorkspaceHomeRouteMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveNavigate?.(undefined)
+  await pending
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  navigateToWorkspaceHomeRouteMock.mockReset()
+  navigateToWorkspaceHomeRouteMock.mockImplementation(async () => undefined)
+})
+
+test('Test that a document delete does not close tabs after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  let resolveDelete: ((value: undefined) => void) | undefined
+  deleteDocumentMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveDelete = resolve
+    })
+  })
+  const pending = store.deleteOpenedDocument('doc-1')
+  await Promise.resolve()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveDelete?.(undefined)
+  await pending
+  expect(store.findTabByDocumentId('doc-1')).not.toBeNull()
+})
+
+test('Test that a document delete does not toast or snapshot after the project changes during navigate', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = vi.fn(async () => undefined)
+  await store.hydrateFromProjectDatabase()
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToWorkspaceHomeRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.deleteOpenedDocument('doc-1')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (navigateToWorkspaceHomeRouteMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  notifyCreateMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveNavigate?.(undefined)
+  await pending
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+  navigateToWorkspaceHomeRouteMock.mockReset()
+  navigateToWorkspaceHomeRouteMock.mockImplementation(async () => undefined)
+})
+
+test('Test that a document delete does not bump census after the project changes during layout refresh', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  const bumpDocumentCensusRefreshGeneration = vi.fn()
+  hierarchyStore.bumpDocumentCensusRefreshGeneration = bumpDocumentCensusRefreshGeneration
+  let resolveRefresh: ((value: undefined) => void) | undefined
+  const refreshLayout = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveRefresh = resolve
+    })
+  })
+  hierarchyStore.refreshLayout = refreshLayout
+  await store.hydrateFromProjectDatabase()
+  const pending = store.deleteOpenedDocument('doc-1')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (refreshLayout.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  expect(store.findTabByDocumentId('doc-1')).toBeNull()
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  notifyCreateMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  const finishRefresh = resolveRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing layout refresh resolver')
+  }
+  finishRefresh(undefined)
+  await pending
+  expect(bumpDocumentCensusRefreshGeneration).not.toHaveBeenCalled()
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 test('Test that S_FaOpenedDocuments deleteOpenedDocument removes tab and skips hierarchy refresh when tree has no loaded container', async () => {
@@ -979,6 +1959,105 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds 
   expect(store.activeDocumentId).toBe(documentId)
 })
 
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource keeps a name saved during the read', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  let doc1Reads = 0
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-1') {
+      doc1Reads += 1
+      return {
+        displayName: doc1Reads === 1 ? 'Hero' : 'Hero revised',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    return {
+      displayName: 'Parent',
+      id,
+      parentDocumentId: null
+    }
+  })
+  let resolveTemplate: ((value: {
+    icon: string
+    titlePluralTranslations: Record<string, string>
+    titleSingularTranslations: Record<string, string>
+  }) => void) | undefined
+  getDocumentTemplateByIdMock.mockClear()
+  getDocumentTemplateByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveTemplate = resolve
+    })
+  })
+
+  const pending = store.createTemporaryDocumentCopyFromSource('doc-1')
+  await vi.waitUntil(() => resolveTemplate !== undefined)
+  const finishTemplate = resolveTemplate
+  if (finishTemplate === undefined) {
+    throw new Error('missing template resolver')
+  }
+  finishTemplate({
+    icon: 'fa-solid fa-file',
+    titlePluralTranslations: { 'en-US': 'Notes' },
+    titleSingularTranslations: { 'en-US': 'Note' }
+  })
+  const documentId = await pending
+
+  expect(documentId).not.toBeNull()
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.displayNameDraft).toContain('Hero revised')
+})
+
+test('Test that createTemporaryDocumentCopyFromSource returns null when the project changes during navigate', async () => {
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    return {
+      displayName: 'Hero',
+      id,
+      parentDocumentId: null
+    }
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  navigateToOpenedDocumentRouteMock.mockClear()
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToOpenedDocumentRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.createTemporaryDocumentCopyFromSource('doc-1')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (navigateToOpenedDocumentRouteMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveNavigate?.(undefined)
+  const documentId = await pending
+  expect(documentId).toBeNull()
+  navigateToOpenedDocumentRouteMock.mockReset()
+  navigateToOpenedDocumentRouteMock.mockImplementation(async () => undefined)
+})
+
 test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource returns null without template', async () => {
   getDocumentByIdMock.mockImplementation(async (id: string) => {
     if (id === 'doc-1') {
@@ -1061,6 +2140,97 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab see
   expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
   expect(tempTab?.hasUnsavedChanges).toBe(false)
   expect(store.activeDocumentId).toBe(documentId)
+})
+
+test('Test that createTemporaryDocumentCopyFromOpenedTab keeps an unsaved belongs-under edit', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: 'doc-parent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-parent' || documentId === 'typed-parent') {
+      return {
+        displayName: 'Parent',
+        id: documentId,
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      parentDocumentIdDraft: 'typed-parent',
+      savedParentDocumentId: 'doc-parent',
+      worldId: 'world-1'
+    }]
+  })
+
+  const documentId = await store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.parentDocumentId).toBe('typed-parent')
+  expect(tempTab?.parentDocumentIdDraft).toBe('typed-parent')
+  expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['typed-parent'])
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab keeps a name typed during the read', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      displayNameDraft: 'Hero',
+      worldId: 'world-1'
+    }]
+  })
+  let resolveWorld: ((value: { id: string }) => void) | undefined
+  getWorldByIdMock.mockClear()
+  getWorldByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveWorld = resolve
+    })
+  })
+
+  const pending = store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+  await vi.waitUntil(() => getWorldByIdMock.mock.calls.length === 1)
+  store.updateDisplayNameDraft('doc-1', 'Hero revised')
+  const finishWorld = resolveWorld
+  if (finishWorld === undefined) {
+    throw new Error('missing world resolver')
+  }
+  finishWorld({ id: 'world-1' })
+  const documentId = await pending
+
+  expect(documentId).not.toBeNull()
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.displayNameDraft).toContain('Hero revised')
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName on tab copy persists sibling parent from resolve chain', async () => {
@@ -1315,6 +2485,18 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
     id: documentId
   })
   store.updateExtraClassesDraft(documentId, 'foo bar')
+  store.replaceOpenedDocumentTabs(store.tabs.map((tab) => {
+    if (tab.documentId !== documentId) {
+      return tab
+    }
+    return {
+      ...tab,
+      savedTags: [{
+        id: 'tag-1',
+        name: 'Quest'
+      }]
+    }
+  }))
 
   await store.saveDocumentDisplayName(documentId, { keepEditMode: false })
   await vi.runAllTimersAsync()
@@ -1342,6 +2524,76 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
   expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
   expect(recordDocumentLastOpenedMock).toHaveBeenCalledWith({ documentId })
   expect(hierarchyStore.documentCensusRefreshGeneration).toBe(1)
+})
+
+/**
+ * saveDocumentDisplayName
+ * Add-new on a placement must create in that placement, not an arbitrary template match.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName keeps the temporary placement', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    placementId: 'placement-2',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Aria',
+    id: documentId,
+    placementId: 'placement-2'
+  })
+
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+
+  expect(createDocumentMock).toHaveBeenCalledWith(expect.objectContaining({
+    parentDocumentId: null,
+    placementId: 'placement-2'
+  }))
+})
+
+/**
+ * saveDocumentDisplayName
+ * A child follows the parent's placement when that placement differs from the draft hint.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName uses the parent placement', async () => {
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        placementId: 'placement-b',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error(`Document not found: ${id}`)
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Child',
+    parentDocumentId: 'doc-parent',
+    placementId: 'placement-a',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Child',
+    id: documentId,
+    placementId: 'placement-b'
+  })
+
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+
+  expect(createDocumentMock).toHaveBeenCalledWith(expect.objectContaining({
+    parentDocumentId: 'doc-parent',
+    placementId: 'placement-b'
+  }))
 })
 
 /**
@@ -1393,6 +2645,180 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName temporary promotes w
   }])
 })
 
+/**
+ * saveDocumentDisplayName
+ * First save of a new document reloads tag branches for the tags that were saved.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshes tag branches for a new document', async () => {
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.treeData = [{
+    children: [],
+    childrenLoaded: true,
+    id: 'tag-node-saved',
+    nodeKind: 'tag',
+    tagId: 'tag-saved'
+  } as unknown as I_faProjectHierarchyTreeHeTreeNode]
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Tagged Temp',
+    initialTagsDraft: [{
+      id: 'tag-temp',
+      isNew: true,
+      name: 'TempTag'
+    }],
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Tagged Temp',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: '',
+    id: documentId,
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-saved',
+      name: 'TempTag'
+    }]
+  })
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  await vi.runAllTimersAsync()
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['tag-node-saved'])
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName reloads tag branches when the new document tab closes during create', async () => {
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.treeData = [{
+    children: [],
+    childrenLoaded: true,
+    id: 'tag-node-saved',
+    nodeKind: 'tag',
+    tagId: 'tag-saved'
+  } as unknown as I_faProjectHierarchyTreeHeTreeNode]
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Tagged Temp',
+    initialTagsDraft: [{
+      id: 'tag-temp',
+      isNew: true,
+      name: 'TempTag'
+    }],
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let releaseCreate: (value: {
+    displayName: string
+    documentBackgroundColor: null
+    documentTextColor: null
+    extraClasses: string
+    id: string
+    isCategory: false
+    isDead: false
+    isFinished: false
+    isMinor: false
+    parentDocumentId: null
+    treeOrderNumber: number
+  }) => void = () => {}
+  const createGate = new Promise<{
+    displayName: string
+    documentBackgroundColor: null
+    documentTextColor: null
+    extraClasses: string
+    id: string
+    isCategory: false
+    isDead: false
+    isFinished: false
+    isMinor: false
+    parentDocumentId: null
+    treeOrderNumber: number
+  }>((resolve) => {
+    releaseCreate = resolve
+  })
+  createDocumentMock.mockImplementationOnce(() => createGate)
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-saved',
+      name: 'TempTag'
+    }]
+  })
+  const savePromise = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  await vi.waitUntil(() => createDocumentMock.mock.calls.length === 1)
+  await store.confirmDiscardAndClose(documentId)
+  expect(store.tabs.some((tab) => tab.documentId === documentId)).toBe(false)
+  releaseCreate({
+    displayName: 'Tagged Temp',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: '',
+    id: documentId,
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  await savePromise
+  await vi.runAllTimersAsync()
+  expect(setDocumentTagsMock).toHaveBeenCalled()
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['tag-node-saved'])
+  expect(store.tabs.some((tab) => tab.documentId === documentId)).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName finishes when the tab closes during an update', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  let releaseUpdate: (value: {
+    displayName: string
+    id: string
+    parentDocumentId: null
+  }) => void = () => {}
+  const updateGate = new Promise<{
+    displayName: string
+    id: string
+    parentDocumentId: null
+  }>((resolve) => {
+    releaseUpdate = resolve
+  })
+  updateDocumentMock.mockImplementationOnce(() => updateGate)
+  const savePromise = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.waitUntil(() => updateDocumentMock.mock.calls.length === 1)
+  await store.confirmDiscardAndClose('doc-1')
+  expect(store.tabs.some((tab) => tab.documentId === 'doc-1')).toBe(false)
+  releaseUpdate({
+    displayName: 'Saved Hero',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await savePromise
+  await vi.runAllTimersAsync()
+  expect(store.tabs.some((tab) => tab.documentId === 'doc-1')).toBe(false)
+})
+
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName remaps tab id when create substitutes', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
@@ -1415,6 +2841,50 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName remaps tab id when c
   expect(store.tabs.some((tab) => tab.documentId === 'server-id')).toBe(true)
   expect(store.activeDocumentId).toBe('server-id')
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('server-id')
+})
+
+test('Test that a temporary document save does not snapshot after the project changes during id remap', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    documentId: 'client-id',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Aria',
+    id: 'server-id'
+  })
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToOpenedDocumentRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+  const navigateCalls: unknown[][] = navigateToOpenedDocumentRouteMock.mock.calls
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (navigateCalls.some((call) => call[0] === 'server-id')) {
+      break
+    }
+    await Promise.resolve()
+  }
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  setDocumentTagsMock.mockClear()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveNavigate?.(undefined)
+  await pending
+  await vi.runAllTimersAsync()
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  expect(setDocumentTagsMock).not.toHaveBeenCalled()
+  navigateToOpenedDocumentRouteMock.mockReset()
+  navigateToOpenedDocumentRouteMock.mockImplementation(async () => undefined)
 })
 
 test('Test that S_FaOpenedDocuments hydrates temporary tabs from snapshot', async () => {
@@ -1476,6 +2946,32 @@ test('Test that S_FaOpenedDocuments updateTemporaryDocumentParent updates parent
 
   const tab = store.tabs.find((entry) => entry.documentId === documentId)
   expect(tab?.parentDocumentId).toBe('parent-1')
+})
+
+test('Test that S_FaOpenedDocuments updateTemporaryDocumentParent follows a tab reorder during the lookup', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let resolveParent: ((value: { id: string }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveParent = resolve
+    })
+  })
+  const pending = store.updateTemporaryDocumentParent(documentId, 'parent-1')
+  await Promise.resolve()
+  store.reorderDocumentTabs(1, 0)
+  resolveParent?.({ id: 'parent-1' })
+  await pending
+
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual([documentId, 'doc-1'])
+  expect(store.findTabByDocumentId(documentId)?.parentDocumentId).toBe('parent-1')
+  expect(store.findTabByDocumentId('doc-1')?.parentDocumentId).toBeUndefined()
 })
 
 test('Test that S_FaOpenedDocuments requestDeleteDocument opens pending delete for temporary tabs', async () => {
@@ -1544,6 +3040,63 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentDocument s
   expect(tab?.editState).toBe(true)
   expect(tab?.hasUnsavedChanges).toBe(false)
   expect(tab?.displayNameDraft).toBe('New character')
+})
+
+test('Test that createTemporaryDocumentUnderParentDocument returns null when the project changes before the tab opens', async () => {
+  let templateCalls = 0
+  let resolveSecondTemplate: ((value: {
+    icon: string
+    id: string
+    titlePluralTranslations: { 'en-US': string }
+    titleSingularTranslations: { 'en-US': string }
+  }) => void) | undefined
+  const template = {
+    icon: 'mdi-account',
+    id: 'tpl-1',
+    titlePluralTranslations: { 'en-US': 'Characters' },
+    titleSingularTranslations: { 'en-US': 'Character' }
+  }
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+  getDocumentTemplateByIdMock.mockImplementation(() => {
+    templateCalls += 1
+    if (templateCalls >= 2) {
+      return new Promise((resolve) => {
+        resolveSecondTemplate = resolve
+      })
+    }
+    return Promise.resolve(template)
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const tabCountBefore = store.tabs.length
+  const pending = store.createTemporaryDocumentUnderParentDocument('doc-parent')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (templateCalls >= 2) {
+      break
+    }
+    await Promise.resolve()
+  }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  resolveSecondTemplate?.(template)
+  const documentId = await pending
+  expect(documentId).toBeNull()
+  expect(store.tabs).toHaveLength(tabCountBefore)
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName under parent queues parent tree refresh', async () => {
@@ -1660,7 +3213,7 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName resolves deleted par
 
   getDocumentByIdMock.mockImplementation(async (id: string) => {
     if (id === 'doc-parent') {
-      throw new Error('not found')
+      throw new Error('Document not found: doc-parent')
     }
     if (id === 'doc-grandparent') {
       return {
@@ -1757,6 +3310,39 @@ test('Test that S_FaOpenedDocuments syncActiveDocumentIdFromWorkspaceRoute updat
   expect(store.activeDocumentId).toBe('doc-1')
 })
 
+test('Test that syncActiveDocumentIdFromWorkspaceRoute bumps Last opened after a tab route change', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  const bumpDocumentLastOpenedRefreshGeneration = vi.fn()
+  hierarchyStore.bumpDocumentLastOpenedRefreshGeneration = bumpDocumentLastOpenedRefreshGeneration
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+  recordDocumentLastOpenedMock.mockClear()
+
+  store.syncActiveDocumentIdFromWorkspaceRoute('/home/document/doc-2')
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (bumpDocumentLastOpenedRefreshGeneration.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+
+  expect(store.activeDocumentId).toBe('doc-2')
+  expect(recordDocumentLastOpenedMock).toHaveBeenCalledWith({ documentId: 'doc-2' })
+  expect(bumpDocumentLastOpenedRefreshGeneration).toHaveBeenCalledTimes(1)
+})
+
 test('Test that S_FaOpenedDocuments updateTemporaryDocumentParent ignores persisted tabs', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
@@ -1803,13 +3389,124 @@ test('Test that S_FaOpenedDocuments hydrate drops temporary tabs when world look
       worldId: 'world-1'
     }]
   })
-  getWorldByIdMock.mockRejectedValueOnce(new Error('missing'))
+  getWorldByIdMock.mockRejectedValueOnce(new Error('World not found: world-1'))
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
 
   expect(store.tabs).toEqual([])
   expect(store.activeDocumentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments hydrateFromProjectDatabase ignores a snapshot from an older project', async () => {
+  let resolveDocument: ((value: unknown) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveDocument = resolve
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pendingOld = store.hydrateFromProjectDatabase()
+  await vi.waitUntil(() => getDocumentByIdMock.mock.calls.length === 1)
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  getOpenedDocumentsSnapshotMock.mockResolvedValueOnce({
+    ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT
+  })
+  await store.hydrateFromProjectDatabase()
+  expect(store.tabs).toEqual([])
+  expect(store.hydrationComplete).toBe(true)
+  const finishDocument = resolveDocument
+  if (finishDocument === undefined) {
+    throw new Error('missing document resolver')
+  }
+  finishDocument({
+    displayName: 'Stale Hero',
+    id: 'doc-1'
+  })
+  await pendingOld
+  expect(store.tabs).toEqual([])
+  expect(store.hydrationComplete).toBe(true)
+})
+
+test('Test that hydrate keeps a document opened while the snapshot read is in flight', async () => {
+  let releaseSnapshot: ((value: unknown) => void) | undefined
+  getOpenedDocumentsSnapshotMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseSnapshot = resolve
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  await Promise.resolve()
+  await Promise.resolve()
+  await store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  const finishSnapshot = releaseSnapshot
+  if (finishSnapshot === undefined) {
+    throw new Error('missing snapshot resolver')
+  }
+  finishSnapshot({
+    ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
+    activeDocumentId: 'doc-1',
+    tabs: [baseTab]
+  })
+  await pending
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2'])
+  expect(store.activeDocumentId).toBe('doc-2')
+  expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
+})
+
+test('Test that hydrate does not go home when a document opens during the tab check', async () => {
+  let releaseTabCheck: ((value: {
+    displayName: string
+    id: string
+    parentDocumentId: null
+    placementId: string
+  }) => void) | undefined
+  getDocumentByIdMock.mockImplementation((documentId: string) => {
+    if (documentId === 'doc-1') {
+      return new Promise((resolve) => {
+        releaseTabCheck = resolve
+      })
+    }
+    return Promise.resolve({
+      displayName: 'Opened during check',
+      id: documentId,
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await Promise.resolve()
+    if (releaseTabCheck !== undefined) {
+      break
+    }
+  }
+  const finishTabCheck = releaseTabCheck
+  if (finishTabCheck === undefined) {
+    throw new Error('missing tab-check resolver')
+  }
+  await store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  finishTabCheck({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  await pending
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2'])
+  expect(store.activeDocumentId).toBe('doc-2')
+  expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
 })
 
 test('Test that S_FaOpenedDocuments hydrateFromProjectDatabase no-ops without an active project', async () => {
@@ -1876,6 +3573,230 @@ test('Test that S_FaOpenedDocuments focusTab updates active tab and navigates', 
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
 })
 
+test('Test that focusTab bumps Last opened after the MRU write', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  const bumpDocumentLastOpenedRefreshGeneration = vi.fn()
+  hierarchyStore.bumpDocumentLastOpenedRefreshGeneration = bumpDocumentLastOpenedRefreshGeneration
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+  recordDocumentLastOpenedMock.mockClear()
+
+  await store.focusTab('doc-2')
+
+  expect(recordDocumentLastOpenedMock).toHaveBeenCalledWith({ documentId: 'doc-2' })
+  expect(bumpDocumentLastOpenedRefreshGeneration).toHaveBeenCalledTimes(1)
+})
+
+test('Test that focusTab does not record last opened while a project open is in flight', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+  navigateToOpenedDocumentRouteMock.mockClear()
+  recordDocumentLastOpenedMock.mockClear()
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  await store.focusTab('doc-2')
+  expect(store.activeDocumentId).toBe('doc-1')
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalled()
+})
+
+test('Test that focusTab does not record last opened after the project changes during navigate', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+  recordDocumentLastOpenedMock.mockClear()
+  let resolveNavigate: ((value: undefined) => void) | undefined
+  navigateToOpenedDocumentRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveNavigate = resolve
+    })
+  })
+  const pending = store.focusTab('doc-2')
+  await Promise.resolve()
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  resolveNavigate?.(undefined)
+  await pending
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalled()
+})
+
+test('Test that focusTab does not record last opened after another tab is focused during navigate', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      }
+    ]
+  })
+  recordDocumentLastOpenedMock.mockClear()
+  let resolveDoc2: ((value: undefined) => void) | undefined
+  navigateToOpenedDocumentRouteMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      resolveDoc2 = resolve
+    })
+  })
+  const pending = store.focusTab('doc-2')
+  await Promise.resolve()
+  await store.focusTab('doc-1')
+  resolveDoc2?.(undefined)
+  await pending
+  expect(store.activeDocumentId).toBe('doc-1')
+  expect(recordDocumentLastOpenedMock).toHaveBeenCalledTimes(1)
+  expect(recordDocumentLastOpenedMock).toHaveBeenCalledWith({ documentId: 'doc-1' })
+})
+
+test('Test that openFromTree does not steal focus when another tab is focused during load', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  recordDocumentLastOpenedMock.mockClear()
+  navigateToOpenedDocumentRouteMock.mockClear()
+  let releaseDocument: ((value: { displayName: string, id: string }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseDocument = resolve
+    })
+  })
+  const pending = store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  await Promise.resolve()
+  await store.focusTab('doc-1')
+  releaseDocument?.({
+    displayName: 'Villain',
+    id: 'doc-2'
+  })
+  await pending
+  expect(store.activeDocumentId).toBe('doc-1')
+  expect(store.tabs.map((tab) => tab.documentId)).toContain('doc-2')
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-2')
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalledWith({ documentId: 'doc-2' })
+})
+
+test('Test that a later openFromTree keeps focus when an earlier open finishes first', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  navigateToOpenedDocumentRouteMock.mockClear()
+  recordDocumentLastOpenedMock.mockClear()
+  let releaseEarlier: ((value: { displayName: string, id: string }) => void) | undefined
+  let releaseLater: ((value: { displayName: string, id: string }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseEarlier = resolve
+    })
+  })
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseLater = resolve
+    })
+  })
+  const earlierOpen = store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  await Promise.resolve()
+  await Promise.resolve()
+  const laterOpen = store.openFromTree('doc-3', 'leftNavigate', {
+    tabLabel: 'Later',
+    templateIcon: 'mdi-account'
+  })
+  await Promise.resolve()
+  await Promise.resolve()
+  const finishEarlier = releaseEarlier
+  const finishLater = releaseLater
+  if (finishEarlier === undefined || finishLater === undefined) {
+    throw new Error('missing document resolver')
+  }
+  finishEarlier({
+    displayName: 'Earlier',
+    id: 'doc-2'
+  })
+  await Promise.resolve()
+  finishLater({
+    displayName: 'Later',
+    id: 'doc-3'
+  })
+  await earlierOpen
+  await laterOpen
+  expect(store.activeDocumentId).toBe('doc-3')
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-3')
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-2')
+  expect(recordDocumentLastOpenedMock).not.toHaveBeenCalledWith({ documentId: 'doc-2' })
+  expect(recordDocumentLastOpenedMock).toHaveBeenCalledWith({ documentId: 'doc-3' })
+})
+
+test('Test that a tab close keeps focus when an earlier openFromTree finishes later', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  navigateToOpenedDocumentRouteMock.mockClear()
+  navigateToWorkspaceHomeRouteMock.mockClear()
+  let releaseOpen: ((value: { displayName: string, id: string }) => void) | undefined
+  getDocumentByIdMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseOpen = resolve
+    })
+  })
+  const earlierOpen = store.openFromTree('doc-2', 'leftNavigate', treeMeta)
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await Promise.resolve()
+    if (releaseOpen !== undefined) {
+      break
+    }
+  }
+  const finishOpen = releaseOpen
+  if (finishOpen === undefined) {
+    throw new Error('missing document resolver')
+  }
+  await store.confirmDiscardAndClose('doc-1')
+  finishOpen({
+    displayName: 'Earlier',
+    id: 'doc-2'
+  })
+  await earlierOpen
+  expect(store.activeDocumentId).toBeNull()
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2'])
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-2')
+  expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
+})
+
 test('Test that S_FaOpenedDocuments setDocumentEditState ignores unknown tabs and duplicate state', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
@@ -1906,12 +3827,25 @@ test('Test that S_FaOpenedDocuments openFromTree ignores missing documents', asy
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
-  getDocumentByIdMock.mockRejectedValueOnce(new Error('missing'))
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('Document not found: doc-missing'))
 
   await store.openFromTree('doc-missing', 'leftNavigate', treeMeta)
 
   expect(store.tabs).toHaveLength(1)
   expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-missing')
+})
+
+test('Test that S_FaOpenedDocuments openFromTree rejects when the document read fails', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('database locked'))
+
+  await expect(store.openFromTree('doc-locked', 'leftNavigate', treeMeta)).rejects.toThrow(
+    'database locked'
+  )
+  expect(store.tabs).toHaveLength(1)
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalledWith('doc-locked')
 })
 
 test('Test that S_FaOpenedDocuments hydrate drops persisted tabs when document rows are missing', async () => {
@@ -1924,13 +3858,33 @@ test('Test that S_FaOpenedDocuments hydrate drops persisted tabs when document r
       persistenceState: 'persisted'
     }]
   })
-  getDocumentByIdMock.mockRejectedValueOnce(new Error('missing'))
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('Document not found: doc-missing'))
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
 
   expect(store.tabs).toEqual([])
   expect(store.activeDocumentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments hydrate keeps persisted tabs when document read fails for another reason', async () => {
+  getOpenedDocumentsSnapshotMock.mockResolvedValueOnce({
+    activeDocumentId: 'doc-kept',
+    schemaVersion: 2,
+    tabs: [{
+      ...baseTab,
+      documentId: 'doc-kept',
+      persistenceState: 'persisted'
+    }]
+  })
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('no active project database'))
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  expect(store.tabs).toHaveLength(1)
+  expect(store.tabs[0]?.documentId).toBe('doc-kept')
+  expect(store.activeDocumentId).toBe('doc-kept')
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects empty persisted drafts', async () => {
@@ -1964,6 +3918,100 @@ test('Test that S_FaOpenedDocuments moveActiveDocumentTab no-ops without an acti
   store.moveActiveDocumentTab('left')
 
   expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1'])
+})
+
+test('Test that S_FaOpenedDocuments flushPersistSnapshotBeforeProjectReplacement waits for an in-flight snapshot write', async () => {
+  let resolvePersist: ((value: boolean) => void) | undefined
+  saveOpenedDocumentsSnapshotMock.mockImplementationOnce(() => new Promise<boolean>((resolve) => {
+    resolvePersist = resolve
+  }))
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'Dirty Hero')
+  await vi.advanceTimersByTimeAsync(500)
+  expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalledTimes(1)
+
+  let replacementDone = false
+  const replacement = store.flushPersistSnapshotBeforeProjectReplacement().then(() => {
+    replacementDone = true
+  })
+  await Promise.resolve()
+  expect(replacementDone).toBe(false)
+  expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalledTimes(1)
+
+  resolvePersist?.(true)
+  await replacement
+
+  expect(replacementDone).toBe(true)
+  expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalledTimes(2)
+})
+
+test('Test that an opened-document snapshot does not write after the project changes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  store.updateDisplayNameDraft('doc-1', 'Dirty Hero')
+  const { nextTick } = await import('vue')
+  await nextTick()
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\b.faproject',
+    id: 'project-b',
+    name: 'B'
+  })
+  await vi.advanceTimersByTimeAsync(500)
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+})
+
+test('Test that an opened-document snapshot does not write during a project switch', async () => {
+  await import('../S_FaProjectHierarchyTree')
+  await import('../S_FaProjectSidebar')
+  await import('app/src/scripts/floatingWindows/faProjectReplacementPersistHooksWiring')
+  let releaseOpen: ((value: { outcome: 'canceled' }) => void) | undefined
+  const projectManagement = window.faContentBridgeAPIs?.projectManagement
+  if (projectManagement === undefined) {
+    throw new Error('missing project management bridge')
+  }
+  Object.assign(projectManagement, {
+    openProject: () => {
+      return new Promise((resolve) => {
+        releaseOpen = resolve
+      })
+    }
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  let openFailure: unknown = null
+  const opening = S_FaActiveProject().openProjectFromKnownPath('C:\\b.faproject').then(
+    () => undefined,
+    (error: unknown) => {
+      openFailure = error
+    }
+  )
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    if (releaseOpen !== undefined || openFailure !== null) {
+      break
+    }
+    await Promise.resolve()
+    await vi.advanceTimersByTimeAsync(0)
+  }
+  if (openFailure !== null) {
+    throw openFailure
+  }
+  const finishOpen = releaseOpen
+  if (finishOpen === undefined) {
+    throw new Error('missing open resolver')
+  }
+  saveOpenedDocumentsSnapshotMock.mockClear()
+  store.updateDisplayNameDraft('doc-1', 'Dirty Hero')
+  await vi.advanceTimersByTimeAsync(500)
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+  finishOpen({
+    outcome: 'canceled'
+  })
+  await opening
 })
 
 test('Test that S_FaOpenedDocuments clearSession awaits an in-flight persist before reset', async () => {
@@ -2005,6 +4053,38 @@ test('Test that S_FaOpenedDocuments confirmDiscardAndClose navigates to the next
   expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2'])
   expect(store.activeDocumentId).toBe('doc-2')
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
+})
+
+test('Test that S_FaOpenedDocuments confirmDiscardAndClose keeps the active tab when a background tab closes', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-2',
+        persistenceState: 'persisted',
+        tabLabel: 'Villain'
+      },
+      {
+        ...baseTab,
+        documentId: 'doc-3',
+        persistenceState: 'persisted',
+        tabLabel: 'Place'
+      }
+    ]
+  })
+  navigateToOpenedDocumentRouteMock.mockClear()
+  navigateToWorkspaceHomeRouteMock.mockClear()
+
+  await store.confirmDiscardAndClose('doc-3')
+
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2'])
+  expect(store.activeDocumentId).toBe('doc-1')
+  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
+  expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
 })
 
 test('Test that S_FaOpenedDocuments confirmDiscardAndClose clears pending close when tab is missing', async () => {
@@ -2060,6 +4140,119 @@ test('Test that S_FaOpenedDocuments deleteOpenedDocument discards temporary tabs
   expect(store.activeDocumentId).toBeNull()
   expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
   expect(hierarchyStore.documentCensusRefreshGeneration).toBe(0)
+})
+
+test('Test that S_FaOpenedDocuments deleteOpenedDocument updates open child tabs to the promoted parent', async () => {
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-child' || id === 'doc-clean-child') {
+      return {
+        displayName: 'Child',
+        id,
+        parentDocumentId: 'doc-root'
+      }
+    }
+    return {
+      displayName: 'Hero',
+      id,
+      parentDocumentId: null
+    }
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-child',
+        hasUnsavedChanges: true,
+        parentDocumentIdDraft: 'other-parent',
+        savedParentDocumentId: 'doc-1',
+        tabLabel: 'Edited child'
+      },
+      {
+        ...baseTab,
+        documentId: 'doc-clean-child',
+        parentDocumentIdDraft: 'doc-1',
+        savedParentDocumentId: 'doc-1',
+        tabLabel: 'Clean child'
+      }
+    ]
+  })
+
+  await store.deleteOpenedDocument('doc-1')
+
+  const edited = store.tabs.find((tab) => tab.documentId === 'doc-child')
+  const clean = store.tabs.find((tab) => tab.documentId === 'doc-clean-child')
+  expect(edited?.parentDocumentIdDraft).toBe('other-parent')
+  expect(edited?.savedParentDocumentId).toBe('doc-root')
+  expect(edited?.hasUnsavedChanges).toBe(true)
+  expect(clean?.parentDocumentIdDraft).toBe('doc-root')
+  expect(clean?.savedParentDocumentId).toBe('doc-root')
+  expect(clean?.hasUnsavedChanges).toBe(false)
+  expect(getDocumentByIdMock).toHaveBeenCalledWith('doc-child')
+  expect(getDocumentByIdMock).toHaveBeenCalledWith('doc-clean-child')
+})
+
+test('Test that S_FaOpenedDocuments deleteOpenedDocument keeps drafts typed while child parents refresh', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [
+      baseTab,
+      {
+        ...baseTab,
+        documentId: 'doc-child',
+        displayNameDraft: 'Child',
+        hasUnsavedChanges: true,
+        parentDocumentIdDraft: 'other-parent',
+        savedDisplayName: 'Child',
+        savedParentDocumentId: 'doc-1',
+        tabLabel: 'Edited child'
+      },
+      {
+        ...baseTab,
+        documentId: 'doc-clean-child',
+        parentDocumentIdDraft: 'doc-1',
+        savedParentDocumentId: 'doc-1',
+        tabLabel: 'Clean child'
+      }
+    ]
+  })
+  let releaseChildRead: (() => void) | undefined
+  getDocumentByIdMock.mockImplementation((id: string) => {
+    if (id === 'doc-child') {
+      store.updateDisplayNameDraft('doc-child', 'Typed during delete')
+      store.requestCloseTab('doc-clean-child')
+      return new Promise((resolve) => {
+        releaseChildRead = () => {
+          resolve({
+            displayName: 'Child',
+            id,
+            parentDocumentId: 'doc-root'
+          })
+        }
+      })
+    }
+    return Promise.resolve({
+      displayName: 'Child',
+      id,
+      parentDocumentId: 'doc-root'
+    })
+  })
+
+  const pending = store.deleteOpenedDocument('doc-1')
+  await vi.waitUntil(() => releaseChildRead !== undefined)
+  releaseChildRead?.()
+  await pending
+
+  const edited = store.tabs.find((tab) => tab.documentId === 'doc-child')
+  expect(edited?.displayNameDraft).toBe('Typed during delete')
+  expect(edited?.parentDocumentIdDraft).toBe('other-parent')
+  expect(edited?.savedParentDocumentId).toBe('doc-root')
+  expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-child'])
 })
 
 test('Test that S_FaOpenedDocuments deleteOpenedDocument no-ops tab removal when document is not open', async () => {
@@ -2782,12 +4975,16 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshLayout when c
   expect(store.findTabByDocumentId('doc-1')?.savedIsCategory).toBe(true)
 })
 
-test('Test that S_FaOpenedDocuments saveDocumentDisplayName throws when temporary tab is missing after create', async () => {
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName finishes when the temporary tab is missing after create', async () => {
   const tabDomain = await import('app/src/scripts/openedDocuments/functions/openedDocumentTabDomain')
   const originalFind = tabDomain.findOpenedDocumentTabIndexByDocumentId
   const findIndexSpy = vi.spyOn(tabDomain, 'findOpenedDocumentTabIndexByDocumentId')
+  const refreshLayoutMock = vi.fn(async () => undefined)
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = refreshLayoutMock
   await store.hydrateFromProjectDatabase()
   const documentId = await store.createTemporaryDocument({
     displayName: 'Aria',
@@ -2805,8 +5002,10 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName throws when temporar
     return originalFind(tabs, docId)
   })
 
-  await expect(store.saveDocumentDisplayName(documentId, { keepEditMode: false })).rejects.toThrow()
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: false })
 
+  expect(createDocumentMock).toHaveBeenCalled()
+  expect(refreshLayoutMock).toHaveBeenCalled()
   findIndexSpy.mockRestore()
 })
 
@@ -2928,11 +5127,22 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentDocument r
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
-  getDocumentByIdMock.mockRejectedValueOnce(new Error('source missing'))
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('Document not found: missing-source'))
 
   const documentId = await store.createTemporaryDocumentUnderParentDocument('missing-source')
 
   expect(documentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentDocument rejects a document read failure', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('database locked'))
+
+  await expect(store.createTemporaryDocumentUnderParentDocument('missing-source')).rejects.toThrow(
+    'database locked'
+  )
 })
 
 /**
@@ -2943,11 +5153,22 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource return
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
-  getDocumentByIdMock.mockRejectedValueOnce(new Error('source missing'))
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('Document not found: missing-source'))
 
   const documentId = await store.createTemporaryDocumentCopyFromSource('missing-source')
 
   expect(documentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource rejects a document read failure', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  getDocumentByIdMock.mockRejectedValueOnce(new Error('database locked'))
+
+  await expect(store.createTemporaryDocumentCopyFromSource('missing-source')).rejects.toThrow(
+    'database locked'
+  )
 })
 
 /**
@@ -3012,7 +5233,7 @@ test('Test that S_FaOpenedDocuments openFromTree seeds tags from listDocumentTag
 
 /**
  * openFromTree
- * Continues with empty tags when listDocumentTags rejects.
+ * Leaves tags unset when listDocumentTags rejects so a later save does not wipe them.
  */
 test('Test that S_FaOpenedDocuments openFromTree tolerates listDocumentTags failures', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
@@ -3033,8 +5254,8 @@ test('Test that S_FaOpenedDocuments openFromTree tolerates listDocumentTags fail
     templateIcon: 'mdi-tag'
   })
   const tab = store.findTabByDocumentId('doc-tagged-fail')
-  expect(tab?.savedTags).toEqual([])
-  expect(tab?.tagsDraft).toEqual([])
+  expect(tab?.savedTags).toBeUndefined()
+  expect(tab?.tagsDraft).toBeUndefined()
 })
 
 /**
@@ -3090,6 +5311,81 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshLayout when t
   expect(store.findTabByDocumentId('doc-1')?.savedTags).toEqual([{
     id: 'tag-saved',
     name: 'Places'
+  }])
+})
+
+/**
+ * saveDocumentDisplayName
+ * A tag assigned while the document row is still saving still refreshes tag branches.
+ */
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshes tags assigned during the document write', async () => {
+  let resolveUpdate: ((value: {
+    displayName: string
+    documentBackgroundColor: null
+    documentTextColor: null
+    extraClasses: string
+    id: string
+    isCategory: boolean
+    isDead: boolean
+    isFinished: boolean
+    isMinor: boolean
+    parentDocumentId: null
+    treeOrderNumber: number
+  }) => void) | undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUpdate = resolve
+    })
+  })
+  const refreshLayoutMock = vi.fn(async () => undefined)
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = refreshLayoutMock
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  await store.hydrateFromProjectDatabase()
+  Object.assign(window.faContentBridgeAPIs.projectContent, {
+    setDocumentTags: setDocumentTagsMock
+  })
+  setDocumentTagsMock.mockResolvedValueOnce({
+    items: [{
+      id: 'tag-late',
+      name: 'Late'
+    }]
+  })
+  const pending = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.waitUntil(() => updateDocumentMock.mock.calls.length === 1)
+  store.updateTagsDraft('doc-1', [{
+    id: 'tag-late',
+    isNew: true,
+    name: 'Late'
+  }])
+  const finishUpdate = resolveUpdate
+  if (finishUpdate === undefined) {
+    throw new Error('missing document update resolver')
+  }
+  finishUpdate({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    extraClasses: '',
+    id: 'doc-1',
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    parentDocumentId: null,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  await pending
+  await vi.runAllTimersAsync()
+  expect(refreshLayoutMock).toHaveBeenCalled()
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalled()
+  expect(store.findTabByDocumentId('doc-1')?.savedTags).toEqual([{
+    id: 'tag-late',
+    name: 'Late'
   }])
 })
 
@@ -3165,4 +5461,251 @@ test('Test that S_FaOpenedDocuments replaceOpenedDocumentTabs replaces tabs arra
   }])
   expect(store.tabs).toHaveLength(1)
   expect(store.tabs[0]?.documentId).toBe('doc-replaced')
+})
+
+test('Test that S_FaOpenedDocuments draft updates ignore a missing tab', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDocumentTextColorDraft('missing', '#112233')
+  store.updateDocumentBackgroundColorDraft('missing', '#AABBCC')
+  store.updateParentDocumentIdDraft('missing', 'parent-1')
+  store.updateTreeOrderNumberDraft('missing', '4')
+  store.syncOpenedDocumentParentFromHierarchy('missing', 'parent-1')
+  expect(store.tabs[0]?.documentTextColorDraft).toBe('')
+})
+
+test('Test that S_FaOpenedDocuments draft updates ignore a stale tab index', async () => {
+  const openedDocuments = await import('app/src/scripts/openedDocuments/openedDocuments_manager')
+  const indexSpy = vi.spyOn(openedDocuments, 'findOpenedDocumentTabIndexByDocumentId')
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  indexSpy.mockReturnValue(0)
+  store.replaceOpenedDocumentTabs([])
+  store.updateDisplayNameDraft('doc-1', 'Renamed')
+  store.updateDocumentTextColorDraft('doc-1', '#112233')
+  store.updateDocumentBackgroundColorDraft('doc-1', '#AABBCC')
+  store.updateIsCategoryDraft('doc-1', true)
+  store.updateIsFinishedDraft('doc-1', true)
+  store.updateIsMinorDraft('doc-1', true)
+  store.updateIsDeadDraft('doc-1', true)
+  store.updateParentDocumentIdDraft('doc-1', 'parent-1')
+  store.updateTreeOrderNumberDraft('doc-1', '4')
+  store.updateExtraClassesDraft('doc-1', 'fa-extra')
+  store.updateTagsDraft('doc-1', [])
+  store.syncOpenedDocumentParentFromHierarchy('doc-1', null)
+  store.setDocumentEditState('doc-1', true)
+  expect(store.tabs).toEqual([])
+  indexSpy.mockRestore()
+})
+
+test('Test that createTemporaryDocumentCopyFromSource rejects a second document read failure', async () => {
+  let reads = 0
+  getDocumentByIdMock.mockImplementation(async () => {
+    reads += 1
+    if (reads === 1) {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('database locked')
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  reads = 0
+  await expect(store.createTemporaryDocumentCopyFromSource('doc-1')).rejects.toThrow(
+    'database locked'
+  )
+})
+
+test('Test that createTemporaryDocumentCopyFromSource returns null when the live template is gone', async () => {
+  let reads = 0
+  getDocumentByIdMock.mockImplementation(async () => {
+    reads += 1
+    return {
+      displayName: 'Hero',
+      id: 'doc-1',
+      parentDocumentId: null,
+      templateId: reads === 1 ? 'tpl-1' : null,
+      worldId: 'world-1'
+    }
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  reads = 0
+  await expect(store.createTemporaryDocumentCopyFromSource('doc-1')).resolves.toBeNull()
+})
+
+test('Test that createTemporaryDocumentCopyFromSource reloads a moved source template and parent', async () => {
+  let reads = 0
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    reads += 1
+    if (reads === 1) {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    return {
+      displayName: 'Hero',
+      id,
+      parentDocumentId: 'doc-parent',
+      templateId: 'tpl-2',
+      worldId: 'world-2'
+    }
+  })
+  getDocumentTemplateByIdMock.mockImplementation(async (id: string) => ({
+    icon: 'mdi-account',
+    id,
+    titlePluralTranslations: { 'en-US': 'Places' },
+    titleSingularTranslations: { 'en-US': 'Place' }
+  }))
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  reads = 0
+  const documentId = await store.createTemporaryDocumentCopyFromSource('doc-1')
+  expect(documentId).not.toBeNull()
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.parentDocumentId).toBe('doc-parent')
+  expect(tempTab?.tabLabel).toBe('Places')
+})
+
+test('Test that saveDocumentDisplayName runs a queued save after the previous save rejects', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'Dirty Hero')
+  let rejectUpdate: (error: Error) => void = () => undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((_resolve, reject) => {
+      rejectUpdate = reject
+    })
+  })
+  const firstSave = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (updateDocumentMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  const secondSave = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  rejectUpdate(new Error('save-fail'))
+  await expect(firstSave).rejects.toThrow('save-fail')
+  await secondSave
+  expect(updateDocumentMock).toHaveBeenCalledTimes(2)
+})
+
+test('Test that saveDocumentDisplayName rejects a temporary parent read that is not a missing row', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'temp-1',
+    tabs: [{
+      ...baseTab,
+      displayNameDraft: 'Aria',
+      documentId: 'temp-1',
+      parentDocumentIdDraft: 'parent-1',
+      persistenceState: 'temporary',
+      placementId: 'placement-1',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }]
+  })
+  let reads = 0
+  getDocumentByIdMock.mockImplementation(async () => {
+    reads += 1
+    if (reads === 1) {
+      return {
+        id: 'parent-1',
+        placementId: 'placement-1'
+      }
+    }
+    throw new Error('database locked')
+  })
+  await expect(store.saveDocumentDisplayName('temp-1', { keepEditMode: true })).rejects.toThrow(
+    'database locked'
+  )
+})
+
+test('Test that S_FaOpenedDocuments hydrate ignores a snapshot after the project epoch moves', async () => {
+  let resolveSnapshot: (value: unknown) => void = () => undefined
+  getOpenedDocumentsSnapshotMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveSnapshot = resolve
+    })
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  const pending = store.hydrateFromProjectDatabase()
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (getOpenedDocumentsSnapshotMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  S_FaActiveProject().clearActiveProject()
+  resolveSnapshot({
+    ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
+    activeDocumentId: 'doc-1',
+    tabs: [baseTab]
+  })
+  await pending
+  expect(store.hydrationComplete).toBe(false)
+})
+
+test('Test that openFromTree skips a blank template icon when the document has no template', async () => {
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    id: 'doc-blank',
+    parentDocumentId: null,
+    templateId: ''
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  await store.openFromTree('doc-blank', 'leftNavigate', {
+    tabLabel: 'Hero',
+    templateIcon: '   '
+  })
+  expect(store.findTabByDocumentId('doc-blank')?.templateIcon).toBe('')
+})
+
+test('Test that saveDocumentDisplayName runs a queued save after the previous save settles', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDisplayNameDraft('doc-1', 'Dirty Hero')
+  let resolveUpdate: (value: unknown) => void = () => undefined
+  updateDocumentMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      resolveUpdate = resolve
+    })
+  })
+  const firstSave = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (updateDocumentMock.mock.calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  const secondSave = store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  resolveUpdate({
+    displayName: 'Dirty Hero',
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  await firstSave
+  await secondSave
+  expect(updateDocumentMock.mock.calls.length).toBeGreaterThanOrEqual(2)
 })

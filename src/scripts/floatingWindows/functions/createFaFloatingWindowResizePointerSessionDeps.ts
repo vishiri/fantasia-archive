@@ -8,12 +8,20 @@ export function createFaFloatingWindowResizePointerSessionDeps (deps: {
   requestAnimationFrame: T_faFloatingWindowResizePointerSessionDeps['requestAnimationFrame']
   sampleDeps: T_faFloatingWindowResizePointerSessionDeps['sampleDeps']
 }): T_faFloatingWindowResizePointerSessionDeps {
+  const {
+    addWindowEventListener,
+    applySample,
+    cancelAnimationFrame,
+    removeWindowEventListener,
+    requestAnimationFrame,
+    sampleDeps
+  } = deps
   return {
-    addWindowEventListener: deps.addWindowEventListener,
-    applySample: deps.applySample,
-    cancelAnimationFrame: deps.cancelAnimationFrame,
-    removeWindowEventListener: deps.removeWindowEventListener,
-    requestAnimationFrame: deps.requestAnimationFrame,
-    sampleDeps: deps.sampleDeps
+    addWindowEventListener,
+    applySample,
+    cancelAnimationFrame,
+    removeWindowEventListener,
+    requestAnimationFrame,
+    sampleDeps
   }
 }

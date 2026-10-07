@@ -57,10 +57,13 @@ export function resolveProjectHierarchyTreeDocumentButtonVisibilityForNode (
     showsOpen: boolean
   } {
   const underTag = typeof node.tagId === 'string' && node.tagId.length > 0
+  const showsAddUnder = underTag ? false : visibility.showsAddUnder
+  const showsEdit = visibility.showsEdit
+  const showsOpen = visibility.showsOpen
   return {
-    showsAddUnder: underTag ? false : visibility.showsAddUnder,
-    showsEdit: visibility.showsEdit,
-    showsOpen: visibility.showsOpen
+    showsAddUnder,
+    showsEdit,
+    showsOpen
   }
 }
 

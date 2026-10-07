@@ -26,9 +26,10 @@ export function buildFaProjectIdempotentOpenResult (
   snapshot: I_faProjectManagementActiveSnapshot | null
 ): I_faProjectOpenResult {
   if (snapshot === null) {
+    const errorMessage = rejected.message
     return {
       attemptedFilePath: filePath,
-      errorMessage: rejected.message,
+      errorMessage,
       errorName: FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE,
       outcome: 'error'
     }

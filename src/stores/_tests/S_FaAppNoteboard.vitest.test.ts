@@ -72,6 +72,30 @@ test('Test that refreshNoteboard returns false when getNoteboard is not a functi
   expect(ok).toBe(false)
 })
 
+test('Test that refreshNoteboard keeps text typed while the read is in flight', async () => {
+  let releaseGet: ((root: I_faAppNoteboardRoot) => void) | undefined
+  getNoteboardMock.mockImplementationOnce(() => {
+    return new Promise<I_faAppNoteboardRoot>((resolve) => {
+      releaseGet = resolve
+    })
+  })
+  const refreshPromise = store.refreshNoteboard()
+  await vi.waitUntil(() => getNoteboardMock.mock.calls.length === 1)
+  store.text = 'typed'
+  const finishGet = releaseGet
+  if (finishGet === undefined) {
+    throw new Error('missing noteboard read resolver')
+  }
+  finishGet({
+    ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+    text: 'from-disk'
+  })
+  const ok = await refreshPromise
+  expect(ok).toBe(true)
+  expect(store.text).toBe('typed')
+  expect(store.root?.text).toBe('typed')
+})
+
 test('Test that refreshNoteboard mirrors text from the bridge', async () => {
   getNoteboardMock.mockResolvedValueOnce({
     ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
@@ -80,6 +104,62 @@ test('Test that refreshNoteboard mirrors text from the bridge', async () => {
   const ok = await store.refreshNoteboard()
   expect(ok).toBe(true)
   expect(store.text).toBe('hello')
+})
+
+test('Test that a refresh started first does not replace a later noteboard save', async () => {
+  let releaseFirstGet: ((root: I_faAppNoteboardRoot) => void) | undefined
+  const firstGet = new Promise<I_faAppNoteboardRoot>((resolve) => {
+    releaseFirstGet = resolve
+  })
+  getNoteboardMock.mockImplementationOnce(() => firstGet)
+  getNoteboardMock.mockResolvedValueOnce({
+    ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+    text: 'saved'
+  })
+
+  const refreshPromise = store.refreshNoteboard()
+  await vi.waitUntil(() => getNoteboardMock.mock.calls.length === 1)
+  const persistPromise = store.persistNoteboardPartialSilent({ text: 'saved' })
+  const finishFirstGet = releaseFirstGet
+  if (finishFirstGet === undefined) {
+    throw new Error('missing noteboard read resolver')
+  }
+  finishFirstGet({
+    ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+    text: 'stale'
+  })
+  const refreshed = await refreshPromise
+  await persistPromise
+
+  expect(refreshed).toBe(true)
+  expect(store.text).toBe('saved')
+  expect(setNoteboardMock).toHaveBeenCalledWith({ text: 'saved' })
+})
+
+test('Test that frame-only persist keeps text typed during the round trip', async () => {
+  store.applyRoot({
+    ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+    text: 'draft-note'
+  })
+  const framePatch = {
+    frame: {
+      height: 400,
+      width: 400,
+      x: 12,
+      y: 48
+    }
+  } as const satisfies I_faAppNoteboardPatch
+  getNoteboardMock.mockImplementationOnce(async () => {
+    store.text = 'typed-during-save'
+    return {
+      ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+      frame: framePatch.frame,
+      text: ''
+    }
+  })
+  await store.persistNoteboardPartialSilent(framePatch)
+  expect(store.text).toBe('typed-during-save')
+  expect(store.root?.text).toBe('typed-during-save')
 })
 
 test('Test that persistNoteboardPartialSilent updates root after a successful round trip', async () => {
@@ -139,6 +219,20 @@ test('Test that persistCurrentTextSilent writes current text', async () => {
   })
   await store.persistCurrentTextSilent()
   expect(setNoteboardMock).toHaveBeenCalledWith({ text: 'draft' })
+})
+
+test('Test that persistCurrentTextSilent keeps text typed during the round trip', async () => {
+  store.text = 'draft'
+  getNoteboardMock.mockImplementationOnce(async () => {
+    store.text = 'typed-during-save'
+    return {
+      ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
+      text: 'draft'
+    }
+  })
+  await store.persistCurrentTextSilent()
+  expect(store.text).toBe('typed-during-save')
+  expect(store.root?.text).toBe('typed-during-save')
 })
 
 test('Test that persistNoteboardPartialSilent throws when setNoteboard fails with an Error', async () => {

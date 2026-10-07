@@ -7,6 +7,84 @@ import { registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher } from './
 
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
+type T_dialogProjectSettingsDialogActions = ReturnType<
+  T_dialogProjectSettingsUseHookDeps['createDialogProjectSettingsDialogActions']
+>
+type T_dialogProjectSettingsValidation = ReturnType<typeof createDialogProjectSettingsValidationComputeds>
+
+function assembleUseDialogProjectSettingsApi<
+  TCurrentLanguageCode,
+  TDialogModel,
+  TDocumentName,
+  TIsDirty,
+  TLocalDocumentTemplates,
+  TLocalSettings,
+  TLocalWorlds,
+  TSelectedCategoryTab
+> (
+  actions: T_dialogProjectSettingsDialogActions,
+  validation: T_dialogProjectSettingsValidation,
+  currentLanguageCode: TCurrentLanguageCode,
+  dialogModel: TDialogModel,
+  documentName: TDocumentName,
+  isDirty: TIsDirty,
+  localDocumentTemplates: TLocalDocumentTemplates,
+  localSettings: TLocalSettings,
+  localWorlds: TLocalWorlds,
+  selectedCategoryTab: TSelectedCategoryTab
+) {
+  const {
+    addDocumentTemplate,
+    addWorld,
+    removeDocumentTemplate,
+    removeWorld,
+    saveAndCloseDialog,
+    saveWithoutClosingDialog,
+    updateDocumentTemplateIcon,
+    updateDocumentTemplateTitleTranslations,
+    updateDocumentTemplateWorldAppendixTranslations,
+    updateWorldColor,
+    updateWorldColorPalette,
+    updateWorldDisplayNameTranslations,
+    updateWorldTemplateLayout
+  } = actions
+  const {
+    hasDocumentTemplatesSettingsValidationError,
+    hasGeneralSettingsValidationError,
+    hasWorldsSettingsValidationError,
+    isSaveDisabled,
+    saveValidationErrorsTooltip
+  } = validation
+  return {
+    addDocumentTemplate,
+    addWorld,
+    currentLanguageCode,
+    dialogModel,
+    documentName,
+    hasDocumentTemplatesSettingsValidationError,
+    hasGeneralSettingsValidationError,
+    hasWorldsSettingsValidationError,
+    isDirty,
+    isSaveDisabled,
+    localDocumentTemplates,
+    localSettings,
+    localWorlds,
+    removeDocumentTemplate,
+    removeWorld,
+    saveAndCloseDialog,
+    saveWithoutClosingDialog,
+    saveValidationErrorsTooltip,
+    selectedCategoryTab,
+    updateDocumentTemplateIcon,
+    updateDocumentTemplateTitleTranslations,
+    updateDocumentTemplateWorldAppendixTranslations,
+    updateWorldColor,
+    updateWorldColorPalette,
+    updateWorldDisplayNameTranslations,
+    updateWorldTemplateLayout
+  }
+}
+
 export function useDialogProjectSettingsImpl (
   deps: T_dialogProjectSettingsUseHookDeps,
   props: I_dialogProjectSettingsProps
@@ -83,32 +161,16 @@ export function useDialogProjectSettingsImpl (
     localWorlds
   })
 
-  return {
-    addDocumentTemplate: actions.addDocumentTemplate,
-    addWorld: actions.addWorld,
+  return assembleUseDialogProjectSettingsApi(
+    actions,
+    validation,
     currentLanguageCode,
     dialogModel,
     documentName,
-    hasDocumentTemplatesSettingsValidationError: validation.hasDocumentTemplatesSettingsValidationError,
-    hasGeneralSettingsValidationError: validation.hasGeneralSettingsValidationError,
-    hasWorldsSettingsValidationError: validation.hasWorldsSettingsValidationError,
     isDirty,
-    isSaveDisabled: validation.isSaveDisabled,
     localDocumentTemplates,
     localSettings,
     localWorlds,
-    removeDocumentTemplate: actions.removeDocumentTemplate,
-    removeWorld: actions.removeWorld,
-    saveAndCloseDialog: actions.saveAndCloseDialog,
-    saveWithoutClosingDialog: actions.saveWithoutClosingDialog,
-    saveValidationErrorsTooltip: validation.saveValidationErrorsTooltip,
-    selectedCategoryTab,
-    updateDocumentTemplateIcon: actions.updateDocumentTemplateIcon,
-    updateDocumentTemplateTitleTranslations: actions.updateDocumentTemplateTitleTranslations,
-    updateDocumentTemplateWorldAppendixTranslations: actions.updateDocumentTemplateWorldAppendixTranslations,
-    updateWorldColor: actions.updateWorldColor,
-    updateWorldColorPalette: actions.updateWorldColorPalette,
-    updateWorldDisplayNameTranslations: actions.updateWorldDisplayNameTranslations,
-    updateWorldTemplateLayout: actions.updateWorldTemplateLayout
-  }
+    selectedCategoryTab
+  )
 }

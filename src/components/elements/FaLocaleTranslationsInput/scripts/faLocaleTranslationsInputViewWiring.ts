@@ -47,10 +47,11 @@ export function createFaLocaleTranslationsInputViewWiring (deps: {
     return deps.readRows() ?? FA_LOCALE_TRANSLATIONS_INPUT_DEFAULT_TEXTAREA_ROWS
   })
 
+  const readTriggerElement = deps.readTriggerElement
   return {
     emitUpdate,
     readPreferredLanguageInputFocus,
-    readTriggerElement: deps.readTriggerElement,
+    readTriggerElement,
     resolvedTextareaRows,
     setPreferredLanguageInputRef
   }

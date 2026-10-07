@@ -128,6 +128,29 @@ function primaryHit (hits) {
 }
 
 /**
+ * @param {TriageStatus} status
+ * @param {string} domain
+ * @param {string} reason
+ * @param {import('./auditYagniShared.mjs').Hit} top
+ * @param {import('./auditYagniShared.mjs').Hit[]} fileHits
+ */
+function classifyHeuristicHitRow (status, domain, reason, top, fileHits) {
+  const id = top.id
+  const severity = top.severity
+  const sample = top.sample
+  const hitCount = fileHits.length
+  return {
+    status,
+    domain,
+    reason,
+    id,
+    severity,
+    sample,
+    hitCount
+  }
+}
+
+/**
  * @param {string} rel
  * @param {Map<string, import('./auditYagniShared.mjs').Hit[]>} hitsByFile
  * @returns {{ status: TriageStatus, domain: string, reason: string, id?: string, severity?: string, sample?: string, hitCount?: number }}
@@ -154,10 +177,12 @@ function classifyFile (rel, hitsByFile) {
   }
 
   if (DEFER_EXACT.has(norm) || DEFER_PATTERNS.some((d) => d.pattern.test(norm))) {
+    const matchedDefer = DEFER_PATTERNS.find((d) => d.pattern.test(norm))
+    const reason = matchedDefer?.reason ?? 'prior_audit_deferred_follow_up'
     return {
       status: 'defer',
       domain,
-      reason: DEFER_PATTERNS.find((d) => d.pattern.test(norm))?.reason ?? 'prior_audit_deferred_follow_up',
+      reason,
       id: 'manual-defer'
     }
   }
@@ -166,36 +191,30 @@ function classifyFile (rel, hitsByFile) {
   if (fileHits.length > 0) {
     const top = primaryHit(fileHits)
     if (top.id === 'Y6-wrapper') {
-      return {
-        status: 'fp',
+      return classifyHeuristicHitRow(
+        'fp',
         domain,
-        reason: 'thin_subcomponent_line_cap_decomposition',
-        id: top.id,
-        severity: top.severity,
-        sample: top.sample,
-        hitCount: fileHits.length
-      }
+        'thin_subcomponent_line_cap_decomposition',
+        top,
+        fileHits
+      )
     }
     if (top.id === 'Y5-shim') {
-      return {
-        status: 'hit',
+      return classifyHeuristicHitRow(
+        'hit',
         domain,
-        reason: 're_export_shim_review',
-        id: top.id,
-        severity: top.severity,
-        sample: top.sample,
-        hitCount: fileHits.length
-      }
+        're_export_shim_review',
+        top,
+        fileHits
+      )
     }
-    return {
-      status: 'hit',
+    return classifyHeuristicHitRow(
+      'hit',
       domain,
-      reason: 'heuristic_flag_needs_review',
-      id: top.id,
-      severity: top.severity,
-      sample: top.sample,
-      hitCount: fileHits.length
-    }
+      'heuristic_flag_needs_review',
+      top,
+      fileHits
+    )
   }
 
   const mandatory = mandatoryStructureReason(norm, domain)

@@ -4,8 +4,13 @@ import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerD
 
 import { findProjectHierarchyTreeDocumentNodeByDocumentId } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentNodeLookup'
 import {
+  createHandleAddHierarchyTreeChildDocument,
+  createHandleCopyHierarchyTreeDocument
+} from './faActionDefinitionHandlersHierarchyTreeDocumentCreateWiring'
+import {
   findOpenedDocumentTabIndexByDocumentId,
-  resolveHierarchyTreeDocumentOpenEditSteps
+  resolveHierarchyTreeDocumentOpenEditSteps,
+  resolveHierarchyTreeDocumentOpenMetaFromNode
 } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 type T_hierarchyTreeDocumentActionsHandlerDeps = {
@@ -18,6 +23,7 @@ type T_hierarchyTreeDocumentActionsHandlerDeps = {
       documentId: string,
       openMode?: T_faOpenedDocumentOpenMode | undefined
     ) => Promise<string | null>
+    activeDocumentId: string | null
     enterDocumentEditMode: (documentId: string) => void
     focusTab: (documentId: string) => Promise<void>
     openFromTree: (
@@ -36,19 +42,12 @@ type T_hierarchyTreeDocumentActionsHandlerDeps = {
       t: (key: string) => string
     }
   }
+  isProjectReplacementInFlight?: () => boolean
   notifyCreate: (options: {
     message: string
     type: string
   }) => void
-}
-
-function resolveHierarchyTreeDocumentTreeOpenMeta (
-  node: I_faProjectHierarchyTreeHeTreeNode
-): I_faOpenedDocumentTreeOpenMeta {
-  return {
-    tabLabel: node.label,
-    templateIcon: node.icon
-  }
+  readProjectContentEpoch?: () => number
 }
 
 function readOpenedDocumentTabState (
@@ -72,9 +71,11 @@ function readOpenedDocumentTabState (
       tabIsOpen: false
     }
   }
+  const tabEditState = tab.editState
+  const tabIsOpen = true
   return {
-    tabEditState: tab.editState,
-    tabIsOpen: true
+    tabEditState,
+    tabIsOpen
   }
 }
 
@@ -90,9 +91,7 @@ async function runHierarchyTreeDocumentOpenEditAction (
     deps.S_FaProjectHierarchyTree().treeData,
     input.documentId
   )
-  if (node === null || node.documentId === null) {
-    return
-  }
+  const treeMeta = resolveHierarchyTreeDocumentOpenMetaFromNode(node)
 
   const openedDocumentsStore = deps.S_FaOpenedDocuments()
   const tabState = readOpenedDocumentTabState(openedDocumentsStore.tabs, input.documentId)
@@ -101,20 +100,24 @@ async function runHierarchyTreeDocumentOpenEditAction (
     tabEditState: tabState.tabEditState,
     tabIsOpen: tabState.tabIsOpen
   })
-  const treeMeta = resolveHierarchyTreeDocumentTreeOpenMeta(node)
   const treeOpenMode = input.openMode ?? 'leftNavigate'
+  let openKeptFocus = true
 
   if (steps.shouldOpenFromTree) {
     await openedDocumentsStore.openFromTree(input.documentId, treeOpenMode, treeMeta)
+    if (treeOpenMode !== 'middleBackground') {
+      openKeptFocus = openedDocumentsStore.activeDocumentId === input.documentId
+    }
   }
-  if (steps.shouldFocusTab && treeOpenMode !== 'middleBackground') {
+  if (openKeptFocus && steps.shouldFocusTab && treeOpenMode !== 'middleBackground') {
     await openedDocumentsStore.focusTab(input.documentId)
   }
-  if (steps.shouldEnterEditMode) {
+  if (openKeptFocus && steps.shouldEnterEditMode) {
     openedDocumentsStore.enterDocumentEditMode(input.documentId)
   }
 
-  return { payloadPreview: input.documentId }
+  const payloadPreview = input.documentId
+  return { payloadPreview }
 }
 
 function createHandleOpenHierarchyTreeDocument (
@@ -151,58 +154,6 @@ function createHandleEditHierarchyTreeDocument (
   }
 }
 
-function createHandleCopyHierarchyTreeDocument (
-  deps: T_hierarchyTreeDocumentActionsHandlerDeps
-): (payload: {
-    documentId: string
-    openMode?: T_faOpenedDocumentOpenMode | undefined
-  }) => Promise<T_faActionHandlerContinuation | void> {
-  return async function handleCopyHierarchyTreeDocument (payload: {
-    documentId: string
-    openMode?: T_faOpenedDocumentOpenMode | undefined
-  }): Promise<T_faActionHandlerContinuation | void> {
-    const newDocumentId = await deps.S_FaOpenedDocuments().createTemporaryDocumentCopyFromSource(
-      payload.documentId,
-      payload.openMode
-    )
-    if (newDocumentId === null) {
-      deps.notifyCreate({
-        message: deps.i18n.global.t('globalFunctionality.faOpenedDocuments.copyDocumentMissingTemplateError'),
-        type: 'negative'
-      })
-      return
-    }
-
-    return { payloadPreview: newDocumentId }
-  }
-}
-
-function createHandleAddHierarchyTreeChildDocument (
-  deps: T_hierarchyTreeDocumentActionsHandlerDeps
-): (payload: {
-    documentId: string
-    openMode?: T_faOpenedDocumentOpenMode | undefined
-  }) => Promise<T_faActionHandlerContinuation | void> {
-  return async function handleAddHierarchyTreeChildDocument (payload: {
-    documentId: string
-    openMode?: T_faOpenedDocumentOpenMode | undefined
-  }): Promise<T_faActionHandlerContinuation | void> {
-    const newDocumentId = await deps.S_FaOpenedDocuments().createTemporaryDocumentUnderParentDocument(
-      payload.documentId,
-      payload.openMode
-    )
-    if (newDocumentId === null) {
-      deps.notifyCreate({
-        message: deps.i18n.global.t('globalFunctionality.faOpenedDocuments.copyDocumentMissingTemplateError'),
-        type: 'negative'
-      })
-      return
-    }
-
-    return { payloadPreview: newDocumentId }
-  }
-}
-
 function createHandleDeleteHierarchyTreeDocument (
   deps: T_hierarchyTreeDocumentActionsHandlerDeps
 ): (payload: { documentId: string }) => Promise<T_faActionHandlerContinuation | void> {
@@ -210,7 +161,8 @@ function createHandleDeleteHierarchyTreeDocument (
     documentId: string
   }): Promise<T_faActionHandlerContinuation | void> {
     deps.S_FaOpenedDocuments().requestDeleteDocument(payload.documentId)
-    return { payloadPreview: payload.documentId }
+    const payloadPreview = payload.documentId
+    return { payloadPreview }
   }
 }
 

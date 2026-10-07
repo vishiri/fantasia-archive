@@ -9,8 +9,9 @@ export const buildFaLocaleTranslationsInputLocaleRows = (
 ): I_faLocaleTranslationsInputLocaleRow[] => {
   const rows = GLOBAL_LANGUAGE_SELECTOR_LOCALES.map((localeRow) => {
     const displayName = FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES[localeRow.languageNamesKey]
+    const code = localeRow.code
     return {
-      code: localeRow.code,
+      code,
       displayName
     }
   })

@@ -21,6 +21,7 @@ type T_projectHierarchyTreeSessionBulkContextMenuWiringDeps = {
     initialTagsDraft?: Array<{ id: string, name: string }> | undefined
     openMode: 'leftNavigate' | 'middleBackground'
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>

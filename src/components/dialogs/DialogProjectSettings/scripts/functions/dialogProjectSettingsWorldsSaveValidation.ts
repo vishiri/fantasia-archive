@@ -176,8 +176,9 @@ export function buildDialogProjectSettingsSaveValidationTooltip (
   resolveErrorMessage: (error: I_dialogProjectSettingsSaveValidationError) => string
 ): I_dialogProjectSettingsSaveValidationTooltipContent {
   if (errors.length === 0) {
+    const bullets: I_dialogProjectSettingsSaveValidationTooltipContent['bullets'] = []
     return {
-      bullets: [],
+      bullets,
       flatText: '',
       intro: ''
     }

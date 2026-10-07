@@ -20,7 +20,14 @@ import {
   navigateToOpenedDocumentRoute,
   navigateToWorkspaceHomeRoute
 } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
+import { refreshOpenedDocumentTabsAfterDeletedParent } from 'app/src/stores/scripts/faOpenedDocumentsParentAfterDeleteWiring'
 import { recordFaOpenedDocumentLastOpenedBestEffort } from 'app/src/stores/scripts/faOpenedDocumentsRecordLastOpenedWiring'
+import {
+  isFaProjectContentMissingRowError,
+  throwUnlessFaProjectContentMissingRow,
+  reconcileTemporaryOpenedDocumentTabFromSnapshot,
+  resolveTemporaryOpenedDocumentParentIdForSave
+} from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 import {
   createFaProjectDocumentForRenderer,
   deleteFaProjectDocumentForRenderer,
@@ -40,13 +47,22 @@ import {
   applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
   applyFaOpenedDocumentIsCategoryDraft,
-  applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
   applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
   hydrateFaOpenedDocumentsTabsFromSnapshot
 } from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
+import {
+  keepOpenedDocumentDraftsTypedDuringSave,
+  mergeOpenedDocumentSaveOntoLiveTab,
+  resolveOpenedDocumentEditStateAfterSave
+} from 'app/src/stores/scripts/faOpenedDocumentsDraftTypedDuringSave'
+import {
+  mergeOpenedDocumentHydrateReconcileOntoLiveTabs,
+  mergeOpenedDocumentHydrateSnapshotOntoLiveTabs
+} from 'app/src/stores/scripts/faOpenedDocumentsHydrateReconcileLiveTab'
+import { applyFaOpenedDocumentTabAfterDisplayNameSave } from 'app/src/stores/scripts/faOpenedDocumentsDisplayNameSaveStoreActions'
 import {
   applyFaOpenedDocumentParentIdDraft,
   applyFaOpenedDocumentParentIdSyncFromHierarchy
@@ -55,7 +71,9 @@ import { applyFaOpenedDocumentTreeOrderNumberDraft } from 'app/src/stores/script
 import { applyFaOpenedDocumentExtraClassesDraft } from 'app/src/stores/scripts/faOpenedDocumentsExtraClassesStoreActions'
 import {
   applyFaOpenedDocumentTagsDraft,
-  persistFaOpenedDocumentTagsAfterSave
+  persistFaOpenedDocumentTagsAfterSave,
+  reconcileOpenedDocumentTabTagsOnHydrate,
+  resolveOpenedDocumentTagRefreshNodeIdsAfterSave
 } from 'app/src/stores/scripts/faOpenedDocumentsTagsStoreActions'
 import {
   applyFaOpenedDocumentIsDeadDraft,
@@ -79,6 +97,8 @@ import {
   reorderOpenedDocumentTabsByIndex,
   resolveCopyOfDocumentDisplayName,
   resolveOpenedDocumentAppearanceColorDraftForPersist,
+  resolveOpenedDocumentHydrateUnsavedDraft,
+  openedDocumentExtraClassesDraftExceedsStorage,
   resolveOpenedDocumentExtraClassesDraftForPersist,
   resolveOpenedDocumentParentIdDraftForPersist,
   resolveOpenedDocumentParentMoveAppendSortOrder,
@@ -86,9 +106,11 @@ import {
   resolveOpenedDocumentTabIsTemporary,
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose,
+  openedDocumentSavedTagIdSetsDiffer,
   resolveOpenedDocumentTagsFingerprint,
+  resolveOpenedDocumentTreeOpenMetaForSeed,
+  openedDocumentTreeOrderNumberDraftExceedsStorage,
   resolveOpenedDocumentTreeOrderNumberDraftForPersist,
-  resolveTemporaryDocumentParentDocumentIdForSave,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
@@ -97,10 +119,9 @@ import {
   resolveFaOpenedDocumentOpenFromTree,
   resolveFaOpenedDocumentsActiveDocumentSyncTarget
 } from 'app/src/stores/scripts/faOpenedDocumentsTabSessionWiring'
-import { reconcileTemporaryOpenedDocumentTabFromSnapshot } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
-import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
-import { collectProjectHierarchyTreeLoadedTagNodeIdsForRefresh } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeLoadedTagNodeIds'
+import { collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentRefreshNodeIds'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeAddNewDocumentLabel'
 import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
@@ -126,6 +147,53 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   const hydrationComplete: Ref<boolean> = ref(false)
 
   let persistInFlight: Promise<boolean> | null = null
+  let openedDocumentNavigationSerial = 0
+
+  function claimOpenedDocumentNavigationSerial (): number {
+    openedDocumentNavigationSerial += 1
+    return openedDocumentNavigationSerial
+  }
+
+  function readOpenedDocumentNavigationSerialForMode (
+    mode: T_faOpenedDocumentOpenMode | undefined
+  ): number {
+    if (mode === 'middleBackground') {
+      return openedDocumentNavigationSerial
+    }
+    return claimOpenedDocumentNavigationSerial()
+  }
+
+  async function openPreparedDocumentTab (input: {
+    documentId: string
+    mode: T_faOpenedDocumentOpenMode
+    navigationSerialAtStart: number
+    newTab: I_faOpenedDocumentTab
+  }): Promise<{
+    navigated: boolean
+    superseded: boolean
+  }> {
+    const superseded = input.navigationSerialAtStart !== openedDocumentNavigationSerial
+    const applyMode = superseded && input.mode !== 'middleBackground'
+      ? 'middleBackground'
+      : input.mode
+    const openResult = resolveFaOpenedDocumentOpenFromTree({
+      activeDocumentId,
+      documentId: input.documentId,
+      mode: applyMode,
+      newTab: input.newTab,
+      tabs
+    })
+    queueOpenedDocumentsSnapshotPersist()
+    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
+      openedDocumentNavigationSerial += 1
+      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    }
+    const navigated = openResult.shouldNavigate
+    return {
+      navigated,
+      superseded
+    }
+  }
 
   function buildCurrentSnapshot () {
     return buildFaOpenedDocumentsSnapshot({
@@ -134,12 +202,39 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     })
   }
 
+  let openedDocumentsSnapshotEpochAtSchedule = 0
+
   const schedulePersistSnapshot = debounce(() => {
-    void flushPersistSnapshot()
+    void flushPersistSnapshot({
+      epochAtSchedule: openedDocumentsSnapshotEpochAtSchedule
+    })
   }, OPENED_DOCUMENTS_PERSIST_DEBOUNCE_MS)
 
-  async function flushPersistSnapshot (): Promise<boolean> {
+  function queueOpenedDocumentsSnapshotPersist (): void {
+    openedDocumentsSnapshotEpochAtSchedule = S_FaActiveProject().readProjectContentEpoch()
+    schedulePersistSnapshot()
+  }
+
+  async function flushPersistSnapshot (options?: {
+    epochAtSchedule?: number
+    ignoreReplacementFlight?: boolean
+  }): Promise<boolean> {
+    const pendingPersist = persistInFlight
+    if (pendingPersist !== null) {
+      await pendingPersist
+    }
     if (!S_FaActiveProject().hasActiveProject) {
+      return false
+    }
+    const epochAtSchedule = options?.epochAtSchedule
+    if (
+      epochAtSchedule !== undefined &&
+      S_FaActiveProject().readProjectContentEpoch() !== epochAtSchedule
+    ) {
+      return false
+    }
+    const ignoreReplacementFlight = options?.ignoreReplacementFlight === true
+    if (!ignoreReplacementFlight && S_FaActiveProject().isProjectReplacementInFlight()) {
       return false
     }
     const snapshot = buildCurrentSnapshot()
@@ -152,6 +247,16 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     return ok
   }
 
+  async function flushPersistSnapshotBeforeProjectReplacement (): Promise<void> {
+    schedulePersistSnapshot.cancel()
+    if (!S_FaActiveProject().hasActiveProject) {
+      return
+    }
+    await flushPersistSnapshot({
+      ignoreReplacementFlight: true
+    })
+  }
+
   function resetSessionState (): void {
     tabs.value = []
     activeDocumentId.value = null
@@ -162,17 +267,21 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot.cancel()
   }
 
-  async function validateAndFilterTabsFromSnapshot (): Promise<void> {
+  async function validateAndFilterTabsFromSnapshot (epochAtStart: number): Promise<void> {
     const api = window.faContentBridgeAPIs?.projectContent
     if (typeof api?.getDocumentById !== 'function') {
       return
     }
-    const nextTabs: I_faOpenedDocumentTab[] = []
-    for (const tab of tabs.value) {
+    const startTabs = tabs.value.slice()
+    const reconciledByDocumentId = new Map<string, I_faOpenedDocumentTab>()
+    const droppedDocumentIds = new Set<string>()
+    for (const tab of startTabs) {
       if (resolveOpenedDocumentTabIsTemporary(tab.persistenceState)) {
         const reconciledTab = await reconcileTemporaryOpenedDocumentTabFromSnapshot(tab, api)
-        if (reconciledTab !== null) {
-          nextTabs.push(reconciledTab)
+        if (reconciledTab === null) {
+          droppedDocumentIds.add(tab.documentId)
+        } else {
+          reconciledByDocumentId.set(tab.documentId, reconciledTab)
         }
         continue
       }
@@ -182,7 +291,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         (error): unknown => error
       )
       if (documentResult.isErr()) {
-        // Drop tabs whose document row no longer exists.
+        if (isFaProjectContentMissingRowError(documentResult.error)) {
+          droppedDocumentIds.add(tab.documentId)
+          continue
+        }
+        reconciledByDocumentId.set(tab.documentId, tab)
         continue
       }
       const doc = documentResult.value
@@ -201,25 +314,81 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       const savedTreeOrderNumber = doc.treeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
       const savedExtraClasses = normalizeOpenedDocumentExtraClassesFromDb(doc.extraClasses)
       const displayNameDraft = tab.hasUnsavedChanges ? tab.displayNameDraft : savedDisplayName
-      const documentTextColorDraft = tab.hasUnsavedChanges
-        ? tab.documentTextColorDraft
-        : savedDocumentTextColor
-      const documentBackgroundColorDraft = tab.hasUnsavedChanges
-        ? tab.documentBackgroundColorDraft
-        : savedDocumentBackgroundColor
-      const isCategoryDraft = tab.hasUnsavedChanges ? tab.isCategoryDraft : savedIsCategory
-      const isFinishedDraft = tab.hasUnsavedChanges ? tab.isFinishedDraft : savedIsFinished
-      const isMinorDraft = tab.hasUnsavedChanges ? tab.isMinorDraft : savedIsMinor
-      const isDeadDraft = tab.hasUnsavedChanges ? tab.isDeadDraft : savedIsDead
-      const parentDocumentIdDraft = tab.hasUnsavedChanges
-        ? tab.parentDocumentIdDraft
-        : savedParentDocumentId
-      const treeOrderNumberDraft = tab.hasUnsavedChanges
-        ? tab.treeOrderNumberDraft
-        : normalizeOpenedDocumentTreeOrderNumberFromDb(savedTreeOrderNumber)
-      const extraClassesDraft = tab.hasUnsavedChanges
-        ? tab.extraClassesDraft
-        : savedExtraClasses
+      const documentTextColorDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedDocumentTextColor,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: '',
+        missingSaved: '',
+        snapshotDraft: tab.documentTextColorDraft,
+        snapshotSaved: tab.savedDocumentTextColor
+      })
+      const documentBackgroundColorDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedDocumentBackgroundColor,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: '',
+        missingSaved: '',
+        snapshotDraft: tab.documentBackgroundColorDraft,
+        snapshotSaved: tab.savedDocumentBackgroundColor
+      })
+      const isCategoryDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedIsCategory,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: false,
+        missingSaved: false,
+        snapshotDraft: tab.isCategoryDraft,
+        snapshotSaved: tab.savedIsCategory
+      })
+      const isFinishedDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedIsFinished,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: false,
+        missingSaved: false,
+        snapshotDraft: tab.isFinishedDraft,
+        snapshotSaved: tab.savedIsFinished
+      })
+      const isMinorDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedIsMinor,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: false,
+        missingSaved: false,
+        snapshotDraft: tab.isMinorDraft,
+        snapshotSaved: tab.savedIsMinor
+      })
+      const isDeadDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedIsDead,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: false,
+        missingSaved: false,
+        snapshotDraft: tab.isDeadDraft,
+        snapshotSaved: tab.savedIsDead
+      })
+      const parentDocumentIdDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedParentDocumentId,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: '',
+        missingSaved: '',
+        snapshotDraft: tab.parentDocumentIdDraft,
+        snapshotSaved: tab.savedParentDocumentId
+      })
+      const treeOrderNumberDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: normalizeOpenedDocumentTreeOrderNumberFromDb(savedTreeOrderNumber),
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: '',
+        missingSaved: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+        snapshotDraft: tab.treeOrderNumberDraft,
+        snapshotSaved: tab.savedTreeOrderNumber
+      })
+      const extraClassesDraft = resolveOpenedDocumentHydrateUnsavedDraft({
+        databaseDraft: savedExtraClasses,
+        hasUnsavedChanges: tab.hasUnsavedChanges,
+        missingDraft: '',
+        missingSaved: '',
+        snapshotDraft: tab.extraClassesDraft,
+        snapshotSaved: tab.savedExtraClasses
+      })
+      const tagFields = await reconcileOpenedDocumentTabTagsOnHydrate(tab)
+      const savedTags = tagFields.savedTags
+      const tagsDraft = tagFields.tagsDraft
       const reconciledTab: I_faOpenedDocumentTab = {
         ...tab,
         displayNameDraft,
@@ -242,13 +411,24 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         savedParentDocumentId,
         savedTreeOrderNumber,
         savedExtraClasses,
+        savedTags,
+        tagsDraft,
         worldId: tab.worldId ?? doc.worldId
       }
-      nextTabs.push({
+      reconciledByDocumentId.set(tab.documentId, {
         ...reconciledTab,
         hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(reconciledTab)
       })
     }
+    if (S_FaActiveProject().readProjectContentEpoch() !== epochAtStart) {
+      return
+    }
+    const nextTabs = mergeOpenedDocumentHydrateReconcileOntoLiveTabs({
+      droppedDocumentIds,
+      liveTabs: tabs.value,
+      reconciledByDocumentId,
+      startTabs
+    })
     tabs.value = nextTabs
     if (
       activeDocumentId.value !== null &&
@@ -265,20 +445,47 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       hydrationComplete.value = true
       return
     }
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const snapshot = await faOpenedDocumentsRefreshSnapshotFromBridge()
+    if (S_FaActiveProject().readProjectContentEpoch() !== epochAtStart) {
+      return
+    }
     const resolved = snapshot ?? FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT
     const hydrated = hydrateFaOpenedDocumentsTabsFromSnapshot(resolved)
-    tabs.value = hydrated.tabs
-    activeDocumentId.value = hydrated.activeDocumentId
-    await validateAndFilterTabsFromSnapshot()
-    hydrationComplete.value = true
-    if (activeDocumentId.value !== null) {
+    const liveTabsDuringSnapshotRead = tabs.value.slice()
+    const liveActiveDuringSnapshotRead = activeDocumentId.value
+    const mergedHydrate = mergeOpenedDocumentHydrateSnapshotOntoLiveTabs({
+      liveActiveDocumentId: liveActiveDuringSnapshotRead,
+      liveTabs: liveTabsDuringSnapshotRead,
+      snapshotActiveDocumentId: hydrated.activeDocumentId,
+      snapshotTabs: hydrated.tabs
+    })
+    tabs.value = mergedHydrate.tabs
+    activeDocumentId.value = mergedHydrate.activeDocumentId
+    const activeBeforeTabCheck = activeDocumentId.value
+    await validateAndFilterTabsFromSnapshot(epochAtStart)
+    if (S_FaActiveProject().readProjectContentEpoch() !== epochAtStart) {
+      return
+    }
+    const activeAfterTabCheck = activeDocumentId.value
+    const previousFocusStillOpen = activeBeforeTabCheck !== null &&
+      findOpenedDocumentTabIndexByDocumentId(tabs.value, activeBeforeTabCheck) !== -1
+    const userFocusedDuringTabCheck = activeAfterTabCheck !== null &&
+      activeAfterTabCheck !== activeBeforeTabCheck &&
+      (activeBeforeTabCheck === null || previousFocusStillOpen)
+    const userKeptFocusDuringSnapshotRead = liveActiveDuringSnapshotRead !== null &&
+      activeAfterTabCheck === liveActiveDuringSnapshotRead
+    if (activeAfterTabCheck !== null && !userKeptFocusDuringSnapshotRead) {
       if (S_FaUserSettings().settings?.autoOpenLastDocument === true) {
-        await navigateToOpenedDocumentRoute(activeDocumentId.value)
-      } else {
+        await navigateToOpenedDocumentRoute(activeAfterTabCheck)
+      } else if (!userFocusedDuringTabCheck) {
         await navigateToWorkspaceHomeRoute()
       }
     }
+    if (S_FaActiveProject().readProjectContentEpoch() !== epochAtStart) {
+      return
+    }
+    hydrationComplete.value = true
   }
 
   async function clearSession (): Promise<void> {
@@ -287,6 +494,26 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       await persistInFlight
     }
     resetSessionState()
+  }
+
+  async function resolveFallbackTemplateIconForBlankTreeMeta (
+    templateId: string | null | undefined,
+    treeTemplateIcon: string
+  ): Promise<string> {
+    if (treeTemplateIcon.trim().length > 0) {
+      return ''
+    }
+    if (templateId === null || templateId === undefined || templateId.length === 0) {
+      return ''
+    }
+    const templateResult = await ResultAsync.fromPromise(
+      getFaProjectDocumentTemplateByIdForRenderer(templateId),
+      (error): unknown => error
+    )
+    if (templateResult.isErr()) {
+      return ''
+    }
+    return templateResult.value.icon.trim()
   }
 
   async function seedDocumentBaselineIfNeeded (
@@ -301,9 +528,21 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       (error): unknown => error
     )
     if (documentResult.isErr()) {
-      return null
+      if (isFaProjectContentMissingRowError(documentResult.error)) {
+        return null
+      }
+      throw documentResult.error
     }
     const doc = documentResult.value
+    const fallbackTemplateIcon = await resolveFallbackTemplateIconForBlankTreeMeta(
+      doc.templateId,
+      treeMeta.templateIcon
+    )
+    const resolvedTreeMeta = resolveOpenedDocumentTreeOpenMetaForSeed(
+      treeMeta,
+      doc.displayName,
+      fallbackTemplateIcon
+    )
     let tagsDraft: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] = []
     let savedTags: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagRef[] = []
     const tagsResult = await ResultAsync.fromPromise(
@@ -313,28 +552,40 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (tagsResult.isOk()) {
       savedTags = tagsResult.value.items
       tagsDraft = savedTags.map((tag) => {
+        const id = tag.id
+        const name = tag.name
         return {
-          id: tag.id,
-          name: tag.name
+          id,
+          name
         }
       })
     }
+    const tagsWereLoaded = tagsResult.isOk()
+    const seededTab = createFaOpenedDocumentTabFromOpenMeta({
+      documentId,
+      displayName: doc.displayName,
+      documentBackgroundColor: doc.documentBackgroundColor,
+      documentTextColor: doc.documentTextColor,
+      isCategory: doc.isCategory,
+      isFinished: doc.isFinished,
+      isMinor: doc.isMinor,
+      isDead: doc.isDead,
+      parentDocumentId: doc.parentDocumentId,
+      treeOrderNumber: doc.treeOrderNumber,
+      extraClasses: doc.extraClasses,
+      treeMeta: resolvedTreeMeta,
+      worldId: doc.worldId
+    })
+    if (!tagsWereLoaded) {
+      const unloadedTags = undefined
+      return {
+        ...seededTab,
+        savedTags: unloadedTags,
+        tagsDraft: unloadedTags
+      }
+    }
     return {
-      ...createFaOpenedDocumentTabFromOpenMeta({
-        documentId,
-        displayName: doc.displayName,
-        documentBackgroundColor: doc.documentBackgroundColor,
-        documentTextColor: doc.documentTextColor,
-        isCategory: doc.isCategory,
-        isFinished: doc.isFinished,
-        isMinor: doc.isMinor,
-        isDead: doc.isDead,
-        parentDocumentId: doc.parentDocumentId,
-        treeOrderNumber: doc.treeOrderNumber,
-        extraClasses: doc.extraClasses,
-        treeMeta,
-        worldId: doc.worldId
-      }),
+      ...seededTab,
       tagsDraft,
       savedTags
     }
@@ -345,6 +596,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     mode: T_faOpenedDocumentOpenMode,
     treeMeta: I_faOpenedDocumentTreeOpenMeta
   ): Promise<void> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+    const navigationSerialAtStart = readOpenedDocumentNavigationSerialForMode(mode)
     const existingIndex = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     let newTab: I_faOpenedDocumentTab | null = null
     if (existingIndex === -1) {
@@ -358,21 +611,31 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         return
       }
     }
-    const openResult = resolveFaOpenedDocumentOpenFromTree({
-      activeDocumentId,
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    const opened = await openPreparedDocumentTab({
       documentId,
       mode,
-      newTab,
-      tabs
+      navigationSerialAtStart,
+      newTab
     })
-    schedulePersistSnapshot()
-    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
-      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    if (opened.superseded && mode !== 'middleBackground') {
+      return
+    }
+    if (opened.navigated && activeDocumentId.value !== documentId) {
+      return
     }
     if (!resolveOpenedDocumentTabIsTemporary(newTab.persistenceState)) {
       // Await MRU write before Last opened bump so overview list reload includes this doc.
       // Chart rebuilds only when Last opened empty↔non-empty (see refreshLastOpenedAfterMru).
       await recordFaOpenedDocumentLastOpenedBestEffort(documentId)
+      if (openedDocumentSaveEpochMoved(epochAtStart)) {
+        return
+      }
       S_FaProjectHierarchyTree().bumpDocumentLastOpenedRefreshGeneration()
     }
   }
@@ -382,11 +645,16 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   }
 
   async function createTemporaryDocument (
-    input: I_faTemporaryOpenedDocumentCreateInput
+    input: I_faTemporaryOpenedDocumentCreateInput,
+    navigationSerialAtStart?: number
   ): Promise<string> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
+    const navigationSerial = navigationSerialAtStart !== undefined
+      ? navigationSerialAtStart
+      : readOpenedDocumentNavigationSerialForMode(input.openMode)
 
     const documentId = input.documentId ?? crypto.randomUUID()
     const parentDocumentId = resolveTemporaryOpenedDocumentParentDocumentId(input)
@@ -418,20 +686,21 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       worldId: input.worldId,
       ...(input.initialTagsDraft === undefined
         ? {}
-        : { initialTagsDraft: input.initialTagsDraft })
+        : { initialTagsDraft: input.initialTagsDraft }),
+      ...(input.placementId === undefined
+        ? {}
+        : { placementId: input.placementId })
     })
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return documentId
+    }
     const openMode = input.openMode ?? 'leftNavigate'
-    const openResult = resolveFaOpenedDocumentOpenFromTree({
-      activeDocumentId,
+    await openPreparedDocumentTab({
       documentId,
       mode: openMode,
-      newTab,
-      tabs
+      navigationSerialAtStart: navigationSerial,
+      newTab
     })
-    schedulePersistSnapshot()
-    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
-      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
-    }
     return documentId
   }
 
@@ -439,16 +708,18 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     sourceDocumentId: string,
     openMode?: T_faOpenedDocumentOpenMode | undefined
   ): Promise<string | null> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
+    const navigationSerialAtStart = readOpenedDocumentNavigationSerialForMode(openMode)
 
     const sourceDocumentResult = await ResultAsync.fromPromise(
       getFaProjectDocumentByIdForRenderer(sourceDocumentId),
       (error): unknown => error
     )
     if (sourceDocumentResult.isErr()) {
-      return null
+      return throwUnlessFaProjectContentMissingRow(sourceDocumentResult.error)
     }
     const sourceDocument = sourceDocumentResult.value
 
@@ -469,15 +740,22 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       titlePluralTranslations: template.titlePluralTranslations,
       titleSingularTranslations: template.titleSingularTranslations
     })
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
 
     const documentId = await createTemporaryDocument({
       displayName,
       openMode,
       parentDocumentId: sourceDocumentId,
+      placementId: sourceDocument.placementId,
       templateId,
       temporaryParentResolveDocumentIds,
       worldId: sourceDocument.worldId
-    })
+    }, navigationSerialAtStart)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
     return documentId
   }
 
@@ -485,16 +763,18 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     sourceDocumentId: string,
     openMode?: T_faOpenedDocumentOpenMode | undefined
   ): Promise<string | null> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
+    const navigationSerialAtStart = readOpenedDocumentNavigationSerialForMode(openMode)
 
     const sourceDocumentResult = await ResultAsync.fromPromise(
       getFaProjectDocumentByIdForRenderer(sourceDocumentId),
       (error): unknown => error
     )
     if (sourceDocumentResult.isErr()) {
-      return null
+      return throwUnlessFaProjectContentMissingRow(sourceDocumentResult.error)
     }
     const sourceDocument = sourceDocumentResult.value
 
@@ -511,15 +791,6 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       template.titleSingularTranslations,
       preferredLanguageCode
     )
-    const displayName = resolveCopyOfDocumentDisplayName({
-      formatCopyOfPrefix: (params) => {
-        return i18n.global.t(
-          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
-          params
-        )
-      },
-      originalDisplayName: sourceDocument.displayName
-    })
     const documentId = crypto.randomUUID()
     const parentDocumentId = sourceDocument.parentDocumentId
     const temporaryParentResolveDocumentIds = parentDocumentId === null
@@ -528,34 +799,81 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         getDocumentById: getFaProjectDocumentByIdForRenderer,
         startDocumentId: parentDocumentId
       })
+    const liveSourceResult = await ResultAsync.fromPromise(
+      getFaProjectDocumentByIdForRenderer(sourceDocumentId),
+      (error): unknown => error
+    )
+    if (liveSourceResult.isErr()) {
+      return throwUnlessFaProjectContentMissingRow(liveSourceResult.error)
+    }
+    const liveSource = liveSourceResult.value
+    const liveTemplateId = liveSource.templateId
+    if (liveTemplateId === null || liveTemplateId === undefined) {
+      return null
+    }
+    const liveTemplate = liveTemplateId === templateId
+      ? template
+      : await getFaProjectDocumentTemplateByIdForRenderer(liveTemplateId)
+    const liveTabLabel = liveTemplateId === templateId
+      ? tabLabel
+      : resolveFaProjectDocumentTemplateDisplayTitleFromFields(
+        liveTemplate.titlePluralTranslations,
+        liveTemplate.titleSingularTranslations,
+        preferredLanguageCode
+      )
+    if (liveSource.worldId !== sourceDocument.worldId) {
+      await getFaProjectWorldByIdForRenderer(liveSource.worldId)
+    }
+    const liveParentDocumentId = liveSource.parentDocumentId
+    const liveTemporaryParentResolveDocumentIds = liveParentDocumentId === parentDocumentId
+      ? temporaryParentResolveDocumentIds
+      : liveParentDocumentId === null
+        ? undefined
+        : await buildTemporaryDocumentParentResolveDocumentIds({
+          getDocumentById: getFaProjectDocumentByIdForRenderer,
+          startDocumentId: liveParentDocumentId
+        })
+    const displayName = resolveCopyOfDocumentDisplayName({
+      formatCopyOfPrefix: (params) => {
+        return i18n.global.t(
+          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
+          params
+        )
+      },
+      originalDisplayName: liveSource.displayName
+    })
     const newTab = createTemporaryOpenedDocumentTabCopySeed({
       displayName,
-      documentBackgroundColor: sourceDocument.documentBackgroundColor,
+      documentBackgroundColor: liveSource.documentBackgroundColor,
       documentId,
-      documentTextColor: sourceDocument.documentTextColor,
-      isCategory: sourceDocument.isCategory,
-      isDead: sourceDocument.isDead,
-      isFinished: sourceDocument.isFinished,
-      isMinor: sourceDocument.isMinor,
-      parentDocumentId,
-      tabLabel,
-      templateIcon: template.icon,
-      templateId,
-      temporaryParentResolveDocumentIds,
-      treeOrderNumber: sourceDocument.treeOrderNumber,
-      extraClasses: sourceDocument.extraClasses,
-      worldId: sourceDocument.worldId
+      documentTextColor: liveSource.documentTextColor,
+      isCategory: liveSource.isCategory,
+      isDead: liveSource.isDead,
+      isFinished: liveSource.isFinished,
+      isMinor: liveSource.isMinor,
+      parentDocumentId: liveParentDocumentId,
+      tabLabel: liveTabLabel,
+      templateIcon: liveTemplate.icon,
+      templateId: liveTemplateId,
+      temporaryParentResolveDocumentIds: liveTemporaryParentResolveDocumentIds,
+      treeOrderNumber: liveSource.treeOrderNumber,
+      extraClasses: liveSource.extraClasses,
+      worldId: liveSource.worldId,
+      ...(liveSource.placementId === undefined
+        ? {}
+        : { placementId: liveSource.placementId })
     })
-    const openResult = resolveFaOpenedDocumentOpenFromTree({
-      activeDocumentId,
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
+    await openPreparedDocumentTab({
       documentId,
       mode: openMode ?? 'leftNavigate',
-      newTab,
-      tabs
+      navigationSerialAtStart,
+      newTab
     })
-    schedulePersistSnapshot()
-    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
-      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
     }
     return documentId
   }
@@ -563,6 +881,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function createTemporaryDocumentCopyFromOpenedTab (
     sourceDocumentId: string
   ): Promise<string | null> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const sourceTab = findTabByDocumentId(sourceDocumentId)
     if (sourceTab === null) {
       return null
@@ -571,10 +890,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
+    const navigationSerialAtStart = readOpenedDocumentNavigationSerialForMode('leftNavigate')
 
     const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
       ResultAsync,
       getDocumentById: getFaProjectDocumentByIdForRenderer,
+      isMissingProjectContentRow: isFaProjectContentMissingRowError,
       sourceTab
     })
     if (actionContext === null) {
@@ -585,15 +906,6 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     await getFaProjectWorldByIdForRenderer(worldId)
     await getFaProjectDocumentTemplateByIdForRenderer(templateId)
 
-    const displayName = resolveCopyOfDocumentDisplayName({
-      formatCopyOfPrefix: (params) => {
-        return i18n.global.t(
-          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
-          params
-        )
-      },
-      originalDisplayName: sourceTab.displayNameDraft
-    })
     const documentId = crypto.randomUUID()
     const temporaryParentResolveDocumentIds = parentDocumentId === null
       ? undefined
@@ -601,38 +913,64 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         getDocumentById: getFaProjectDocumentByIdForRenderer,
         startDocumentId: parentDocumentId
       })
+    const liveSourceTab = findTabByDocumentId(sourceDocumentId) ?? sourceTab
+    const parentEdited = liveSourceTab.parentDocumentIdDraft !== liveSourceTab.savedParentDocumentId
+    const liveParentDocumentId = parentEdited
+      ? resolveOpenedDocumentParentIdDraftForPersist(liveSourceTab.parentDocumentIdDraft)
+      : parentDocumentId
+    const liveTemporaryParentResolveDocumentIds = liveParentDocumentId === parentDocumentId
+      ? temporaryParentResolveDocumentIds
+      : liveParentDocumentId === null
+        ? undefined
+        : await buildTemporaryDocumentParentResolveDocumentIds({
+          getDocumentById: getFaProjectDocumentByIdForRenderer,
+          startDocumentId: liveParentDocumentId
+        })
+    const displayName = resolveCopyOfDocumentDisplayName({
+      formatCopyOfPrefix: (params) => {
+        return i18n.global.t(
+          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
+          params
+        )
+      },
+      originalDisplayName: liveSourceTab.displayNameDraft
+    })
     const newTab = createTemporaryOpenedDocumentTabCopySeed({
       displayName,
-      documentBackgroundColor: sourceTab.documentBackgroundColorDraft,
+      documentBackgroundColor: liveSourceTab.documentBackgroundColorDraft,
       documentId,
-      documentTextColor: sourceTab.documentTextColorDraft,
-      isCategory: sourceTab.isCategoryDraft,
-      isDead: sourceTab.isDeadDraft,
-      isFinished: sourceTab.isFinishedDraft,
-      isMinor: sourceTab.isMinorDraft,
-      parentDocumentId,
-      tabLabel: sourceTab.tabLabel,
-      templateIcon: sourceTab.templateIcon,
+      documentTextColor: liveSourceTab.documentTextColorDraft,
+      isCategory: liveSourceTab.isCategoryDraft,
+      isDead: liveSourceTab.isDeadDraft,
+      isFinished: liveSourceTab.isFinishedDraft,
+      isMinor: liveSourceTab.isMinorDraft,
+      parentDocumentId: liveParentDocumentId,
+      tabLabel: liveSourceTab.tabLabel,
+      templateIcon: liveSourceTab.templateIcon,
       templateId,
-      temporaryParentResolveDocumentIds,
+      temporaryParentResolveDocumentIds: liveTemporaryParentResolveDocumentIds,
       treeOrderNumber: resolveOpenedDocumentTreeOrderNumberDraftForPersist(
-        sourceTab.treeOrderNumberDraft
+        liveSourceTab.treeOrderNumberDraft
       ),
       extraClasses: resolveOpenedDocumentExtraClassesDraftForPersist(
-        sourceTab.extraClassesDraft
+        liveSourceTab.extraClassesDraft
       ),
-      worldId
+      worldId,
+      ...(actionContext.placementId === undefined
+        ? {}
+        : { placementId: actionContext.placementId })
     })
-    const openResult = resolveFaOpenedDocumentOpenFromTree({
-      activeDocumentId,
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
+    await openPreparedDocumentTab({
       documentId,
       mode: 'leftNavigate',
-      newTab,
-      tabs
+      navigationSerialAtStart,
+      newTab
     })
-    schedulePersistSnapshot()
-    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
-      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
     }
     return documentId
   }
@@ -640,6 +978,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function createTemporaryDocumentUnderParentFromOpenedTab (
     sourceDocumentId: string
   ): Promise<string | null> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const sourceTab = findTabByDocumentId(sourceDocumentId)
     if (sourceTab === null) {
       return null
@@ -648,10 +987,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (!hasFaProjectContentEntityReaders()) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
     }
+    const navigationSerialAtStart = readOpenedDocumentNavigationSerialForMode('leftNavigate')
 
     const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
       ResultAsync,
       getDocumentById: getFaProjectDocumentByIdForRenderer,
+      isMissingProjectContentRow: isFaProjectContentMissingRowError,
       sourceTab
     })
     if (actionContext === null) {
@@ -672,14 +1013,23 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         getDocumentById: getFaProjectDocumentByIdForRenderer,
         sourceTab
       })
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
 
     const documentId = await createTemporaryDocument({
       displayName,
       parentDocumentId: sourceTab.documentId,
       templateId,
       temporaryParentResolveDocumentIds,
-      worldId
-    })
+      worldId,
+      ...(actionContext.placementId === undefined
+        ? {}
+        : { placementId: actionContext.placementId })
+    }, navigationSerialAtStart)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return null
+    }
     return documentId
   }
 
@@ -687,6 +1037,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     documentId: string,
     parentDocumentId: string | null
   ): Promise<void> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
       return
@@ -702,13 +1053,25 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (parentDocumentId !== null) {
       await api.getDocumentById(parentDocumentId)
     }
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    const liveIndex = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (liveIndex === -1) {
+      return
+    }
+    const liveTab = tabs.value[liveIndex]
+    if (liveTab === undefined || !resolveOpenedDocumentTabIsTemporary(liveTab.persistenceState)) {
+      return
+    }
     const nextTabs = [...tabs.value]
-    nextTabs[index] = applyTemporaryOpenedDocumentParent(current, parentDocumentId)
+    nextTabs[liveIndex] = applyTemporaryOpenedDocumentParent(liveTab, parentDocumentId)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   async function remapOpenedDocumentTabId (fromId: string, toId: string): Promise<void> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, fromId)
     if (index === -1) {
       return
@@ -722,9 +1085,13 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     tabs.value = nextTabs
     if (activeDocumentId.value === fromId) {
       activeDocumentId.value = toId
+      claimOpenedDocumentNavigationSerial()
       await navigateToOpenedDocumentRoute(toId)
     }
-    schedulePersistSnapshot()
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   async function focusTab (documentId: string): Promise<void> {
@@ -732,15 +1099,33 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (index === -1) {
       return
     }
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
     const tab = tabs.value[index]
     activeDocumentId.value = documentId
-    schedulePersistSnapshot()
+    openedDocumentNavigationSerial += 1
+    queueOpenedDocumentsSnapshotPersist()
     await navigateToOpenedDocumentRoute(documentId)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    if (activeDocumentId.value !== documentId) {
+      return
+    }
     if (
       tab !== undefined &&
       !resolveOpenedDocumentTabIsTemporary(tab.persistenceState)
     ) {
-      void recordFaOpenedDocumentLastOpenedBestEffort(documentId)
+      await recordFaOpenedDocumentLastOpenedBestEffort(documentId)
+      if (openedDocumentSaveEpochMoved(epochAtStart)) {
+        return
+      }
+      if (activeDocumentId.value !== documentId) {
+        return
+      }
+      S_FaProjectHierarchyTree().bumpDocumentLastOpenedRefreshGeneration()
     }
   }
 
@@ -756,7 +1141,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentDisplayNameDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateDocumentTextColorDraft (documentId: string, value: string): void {
@@ -771,7 +1156,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentTextColorDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateDocumentBackgroundColorDraft (documentId: string, value: string): void {
@@ -786,7 +1171,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentBackgroundColorDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateIsCategoryDraft (documentId: string, value: boolean): void {
@@ -801,7 +1186,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentIsCategoryDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateIsFinishedDraft (documentId: string, value: boolean): void {
@@ -816,7 +1201,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentIsFinishedDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateIsMinorDraft (documentId: string, value: boolean): void {
@@ -831,7 +1216,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentIsMinorDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateIsDeadDraft (documentId: string, value: boolean): void {
@@ -846,7 +1231,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentIsDeadDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateParentDocumentIdDraft (documentId: string, value: string): void {
@@ -861,7 +1246,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentParentIdDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateTreeOrderNumberDraft (documentId: string, value: string): void {
@@ -876,7 +1261,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentTreeOrderNumberDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateExtraClassesDraft (documentId: string, value: string): void {
@@ -891,7 +1276,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentExtraClassesDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function updateTagsDraft (
@@ -909,7 +1294,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentTagsDraft(current, value)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function syncOpenedDocumentParentFromHierarchy (
@@ -931,7 +1316,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       normalizedParentDocumentId
     )
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function setDocumentEditState (documentId: string, editState: boolean): void {
@@ -949,14 +1334,83 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const nextTabs = [...tabs.value]
     nextTabs[index] = applyFaOpenedDocumentTabEditState(current, editState)
     tabs.value = nextTabs
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
   }
 
   function enterDocumentEditMode (documentId: string): void {
     setDocumentEditState(documentId, true)
   }
 
+  function commitOpenedDocumentSaveToLiveTab (
+    saveAppliedTab: I_faOpenedDocumentTab,
+    documentId: string,
+    draftAtSaveStart: I_faOpenedDocumentTab,
+    keepEditMode: boolean
+  ): void {
+    const liveIndex = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (liveIndex === -1) {
+      return
+    }
+    const liveNow = tabs.value[liveIndex]
+    if (liveNow === undefined) {
+      return
+    }
+    const merged = mergeOpenedDocumentSaveOntoLiveTab(
+      saveAppliedTab,
+      liveNow,
+      draftAtSaveStart
+    )
+    const editState = resolveOpenedDocumentEditStateAfterSave(
+      keepEditMode,
+      liveNow.editState
+    )
+    const mergedWithEditState = {
+      ...merged,
+      editState
+    }
+    const liveTabs = [...tabs.value]
+    liveTabs[liveIndex] = mergedWithEditState
+    tabs.value = liveTabs
+  }
+
+  function openedDocumentSaveEpochMoved (epochAtStart: number): boolean {
+    if (S_FaActiveProject().isProjectReplacementInFlight()) {
+      return true
+    }
+    return S_FaActiveProject().readProjectContentEpoch() !== epochAtStart
+  }
+
+  const openedDocumentSaveTailById = new Map<string, Promise<void>>()
+
+  function clearOpenedDocumentSaveTail (
+    documentId: string,
+    settled: Promise<void>
+  ): void {
+    if (openedDocumentSaveTailById.get(documentId) === settled) {
+      openedDocumentSaveTailById.delete(documentId)
+    }
+  }
+
   async function saveDocumentDisplayName (
+    documentId: string,
+    input: { keepEditMode: boolean }
+  ): Promise<void> {
+    const previous = openedDocumentSaveTailById.get(documentId)
+    const run = previous === undefined
+      ? runSaveDocumentDisplayName(documentId, input)
+      : previous.then(() => {
+        return runSaveDocumentDisplayName(documentId, input)
+      })
+    const settled = run.then(() => {
+      clearOpenedDocumentSaveTail(documentId, settled)
+    }, () => {
+      clearOpenedDocumentSaveTail(documentId, settled)
+    })
+    openedDocumentSaveTailById.set(documentId, settled)
+    return await run
+  }
+
+  async function runSaveDocumentDisplayName (
     documentId: string,
     input: { keepEditMode: boolean }
   ): Promise<void> {
@@ -974,6 +1428,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         activeElement.blur()
       }
     }
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
 
     if (resolveOpenedDocumentTabIsTemporary(current.persistenceState)) {
       if (
@@ -985,6 +1440,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       const worldId = current.worldId
       const templateId = current.templateId
       if (worldId === undefined || templateId === undefined) {
+        throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+      }
+      if (openedDocumentExtraClassesDraftExceedsStorage(current.extraClassesDraft)) {
+        throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+      }
+      if (openedDocumentTreeOrderNumberDraftExceedsStorage(current.treeOrderNumberDraft)) {
         throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
       }
       const template = await getFaProjectDocumentTemplateByIdForRenderer(templateId)
@@ -1003,34 +1464,36 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         templateSingularTitle
       })
       const parentResolveChain = current.temporaryParentResolveDocumentIds ?? []
-      const availableDocumentIds = new Set<string>()
-      for (const chainDocumentId of parentResolveChain) {
-        const chainDocumentResult = await ResultAsync.fromPromise(
-          getFaProjectDocumentByIdForRenderer(chainDocumentId),
-          (error): unknown => error
-        )
-        if (chainDocumentResult.isOk()) {
-          availableDocumentIds.add(chainDocumentId)
-        }
-      }
       const draftParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
         current.parentDocumentIdDraft
       )
-      let resolvedParentDocumentId = draftParentDocumentId
-      if (draftParentDocumentId !== null) {
-        const parentDocumentResult = await ResultAsync.fromPromise(
-          getFaProjectDocumentByIdForRenderer(draftParentDocumentId),
+      const resolvedParentDocumentId = await resolveTemporaryOpenedDocumentParentIdForSave({
+        draftParentDocumentId,
+        getDocumentById: getFaProjectDocumentByIdForRenderer,
+        parentResolveChain
+      })
+      let createPlacementId = current.placementId
+      if (resolvedParentDocumentId !== null) {
+        const parentPlacementResult = await ResultAsync.fromPromise(
+          getFaProjectDocumentByIdForRenderer(resolvedParentDocumentId),
           (error): unknown => error
         )
-        if (parentDocumentResult.isErr()) {
-          resolvedParentDocumentId = resolveTemporaryDocumentParentDocumentIdForSave({
-            chain: parentResolveChain,
-            isDocumentIdAvailable: (chainDocumentId) => availableDocumentIds.has(chainDocumentId)
-          })
+        if (parentPlacementResult.isErr()) {
+          if (!isFaProjectContentMissingRowError(parentPlacementResult.error)) {
+            const parentError = parentPlacementResult.error
+            throw parentError instanceof Error
+              ? parentError
+              : new Error(String(parentError))
+          }
+        } else if (parentPlacementResult.value.placementId !== undefined) {
+          createPlacementId = parentPlacementResult.value.placementId
         }
       }
       const temporarySaveResult = await ResultAsync.fromPromise(
         (async () => {
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
           const savedDocument = await createFaProjectDocumentForRenderer({
             displayName,
             documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
@@ -1052,42 +1515,73 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
               current.extraClassesDraft
             ),
             templateId,
-            worldId
+            worldId,
+            ...(createPlacementId === undefined
+              ? {}
+              : { placementId: createPlacementId })
           })
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
           if (savedDocument.id !== documentId) {
             await remapOpenedDocumentTabId(documentId, savedDocument.id)
+          }
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
           }
           const savedIndex = findOpenedDocumentTabIndexByDocumentId(
             tabs.value,
             savedDocument.id
           )
-          if (savedIndex === -1) {
-            throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
+          const savedTab = savedIndex === -1 ? undefined : tabs.value[savedIndex]
+          let temporaryTagSavedTab = current
+          if (savedTab !== undefined) {
+            const nextTabs = [...tabs.value]
+            const promotedTab = promoteTemporaryOpenedDocumentTabAfterCreate(savedTab, {
+              documentId: savedDocument.id,
+              keepEditMode: input.keepEditMode,
+              savedDisplayName: savedDocument.displayName,
+              savedDocumentBackgroundColor: savedDocument.documentBackgroundColor,
+              savedDocumentTextColor: savedDocument.documentTextColor,
+              savedIsCategory: savedDocument.isCategory,
+              savedIsFinished: savedDocument.isFinished,
+              savedIsMinor: savedDocument.isMinor,
+              savedIsDead: savedDocument.isDead,
+              savedParentDocumentId: savedDocument.parentDocumentId,
+              savedTreeOrderNumber: savedDocument.treeOrderNumber,
+              savedExtraClasses: savedDocument.extraClasses
+            })
+            nextTabs[savedIndex] = keepOpenedDocumentDraftsTypedDuringSave(
+              promotedTab,
+              savedTab,
+              current
+            )
+            if (openedDocumentSaveEpochMoved(epochAtStart)) {
+              return
+            }
+            const temporaryTagBaseTab = nextTabs[savedIndex]!
+            temporaryTagSavedTab = await persistFaOpenedDocumentTagsAfterSave(
+              temporaryTagBaseTab,
+              savedDocument.id
+            )
+            if (openedDocumentSaveEpochMoved(epochAtStart)) {
+              return
+            }
+            commitOpenedDocumentSaveToLiveTab(
+              temporaryTagSavedTab,
+              savedDocument.id,
+              current,
+              input.keepEditMode
+            )
+          } else {
+            temporaryTagSavedTab = await persistFaOpenedDocumentTagsAfterSave(
+              current,
+              savedDocument.id
+            )
+            if (openedDocumentSaveEpochMoved(epochAtStart)) {
+              return
+            }
           }
-          const savedTab = tabs.value[savedIndex]
-          if (savedTab === undefined) {
-            throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
-          }
-          const nextTabs = [...tabs.value]
-          nextTabs[savedIndex] = promoteTemporaryOpenedDocumentTabAfterCreate(savedTab, {
-            documentId: savedDocument.id,
-            keepEditMode: input.keepEditMode,
-            savedDisplayName: savedDocument.displayName,
-            savedDocumentBackgroundColor: savedDocument.documentBackgroundColor,
-            savedDocumentTextColor: savedDocument.documentTextColor,
-            savedIsCategory: savedDocument.isCategory,
-            savedIsFinished: savedDocument.isFinished,
-            savedIsMinor: savedDocument.isMinor,
-            savedIsDead: savedDocument.isDead,
-            savedParentDocumentId: savedDocument.parentDocumentId,
-            savedTreeOrderNumber: savedDocument.treeOrderNumber,
-            savedExtraClasses: savedDocument.extraClasses
-          })
-          nextTabs[savedIndex] = await persistFaOpenedDocumentTagsAfterSave(
-            nextTabs[savedIndex]!,
-            savedDocument.id
-          )
-          tabs.value = nextTabs
           schedulePersistSnapshot.flush()
           await flushPersistSnapshot()
           const hierarchyStore = S_FaProjectHierarchyTree()
@@ -1109,8 +1603,33 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
             hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
           }
           await hierarchyStore.refreshLayout()
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
+          const temporaryTagRefreshIndex = findOpenedDocumentTabIndexByDocumentId(
+            tabs.value,
+            savedDocument.id
+          )
+          const temporaryTagRefreshTab = temporaryTagRefreshIndex === -1
+            ? undefined
+            : tabs.value[temporaryTagRefreshIndex]
+          const temporarySavedTagsForRefresh = temporaryTagRefreshTab?.savedTags ??
+            temporaryTagSavedTab.savedTags
+          const temporaryNextSavedTagIds = (temporarySavedTagsForRefresh ?? []).map((tag) => tag.id)
+          const temporaryPreviousSavedTagIds = (current.savedTags ?? []).map((tag) => tag.id)
+          const temporaryTagRefreshNodeIds = resolveOpenedDocumentTagRefreshNodeIdsAfterSave(
+            hierarchyStore.treeData,
+            temporaryPreviousSavedTagIds,
+            temporaryNextSavedTagIds
+          )
+          if (temporaryTagRefreshNodeIds !== null) {
+            hierarchyStore.refreshHierarchyTreeNodes(temporaryTagRefreshNodeIds)
+          }
           // Await MRU write before census bump so Project overview reload includes this doc.
           await recordFaOpenedDocumentLastOpenedBestEffort(savedDocument.id)
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
           hierarchyStore.bumpDocumentCensusRefreshGeneration()
         })(),
         (error): unknown => error
@@ -1137,9 +1656,18 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
     const persistedSaveResult = await ResultAsync.fromPromise(
       (async () => {
+        if (openedDocumentSaveEpochMoved(epochAtStart)) {
+          return
+        }
+        if (openedDocumentExtraClassesDraftExceedsStorage(current.extraClassesDraft)) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+        }
+        if (openedDocumentTreeOrderNumberDraftExceedsStorage(current.treeOrderNumberDraft)) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+        }
         const savedIsCategoryBeforeSave = current.savedIsCategory
-        const tagsChanged =
-          resolveOpenedDocumentTagsFingerprint(current.tagsDraft ?? []) !==
+        const tagsChanged = current.tagsDraft !== undefined &&
+          resolveOpenedDocumentTagsFingerprint(current.tagsDraft) !==
           resolveOpenedDocumentTagsFingerprint(current.savedTags ?? [])
         const previousSavedTagIds = (current.savedTags ?? []).map((tag) => tag.id)
         const parentChanged = current.parentDocumentIdDraft !== current.savedParentDocumentId
@@ -1161,25 +1689,37 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
           const targetParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
             current.parentDocumentIdDraft
           )
-          const siblingsResult = await listFaProjectPlacementDocumentChildrenForRenderer({
-            placementId,
-            parentDocumentId: targetParentDocumentId
-          })
-          const targetSortOrder = resolveOpenedDocumentParentMoveAppendSortOrder(
-            siblingsResult.items,
-            documentId
-          )
-          await moveFaProjectDocumentInHierarchyForRenderer({
-            documentId,
-            targetParentDocumentId,
-            targetSortOrder
-          })
+          const existingParentDocumentId = existingDocument.parentDocumentId ?? null
+          if (existingParentDocumentId !== targetParentDocumentId) {
+            if (openedDocumentSaveEpochMoved(epochAtStart)) {
+              return
+            }
+            const siblingsResult = await listFaProjectPlacementDocumentChildrenForRenderer({
+              placementId,
+              parentDocumentId: targetParentDocumentId
+            })
+            const targetSortOrder = resolveOpenedDocumentParentMoveAppendSortOrder(
+              siblingsResult.items,
+              documentId
+            )
+            if (openedDocumentSaveEpochMoved(epochAtStart)) {
+              return
+            }
+            await moveFaProjectDocumentInHierarchyForRenderer({
+              documentId,
+              targetParentDocumentId,
+              targetSortOrder
+            })
+          }
           savedParentDocumentId = normalizeOpenedDocumentParentIdFromDb(targetParentDocumentId)
           parentMoveTreeRefreshInput = {
             parentDocumentId: targetParentDocumentId,
             templateId: existingDocument.templateId ?? '',
             worldId: existingDocument.worldId
           }
+        }
+        if (openedDocumentSaveEpochMoved(epochAtStart)) {
+          return
         }
         const savedDocument = await updateFaProjectDocumentForRenderer(documentId, {
           displayName: trimmedDraft,
@@ -1213,44 +1753,83 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         const savedTreeOrderNumber = savedDocument.treeOrderNumber
         const savedExtraClasses = normalizeOpenedDocumentExtraClassesFromDb(savedDocument.extraClasses)
         const nextTabs = [...tabs.value]
-        nextTabs[index] = applyFaOpenedDocumentTabAfterDisplayNameSave(current, {
-          keepEditMode: input.keepEditMode,
-          savedDisplayName: savedDocument.displayName,
-          savedDocumentBackgroundColor,
-          savedDocumentTextColor,
-          savedIsCategory,
-          savedIsFinished,
-          savedIsMinor,
-          savedIsDead,
-          savedParentDocumentId,
-          savedTreeOrderNumber,
-          savedExtraClasses
-        })
-        nextTabs[index] = await persistFaOpenedDocumentTagsAfterSave(
-          nextTabs[index]!,
-          documentId
-        )
-        tabs.value = nextTabs
+        if (openedDocumentSaveEpochMoved(epochAtStart)) {
+          return
+        }
+        const savedIndex = findOpenedDocumentTabIndexByDocumentId(nextTabs, documentId)
+        const liveTab = savedIndex === -1 ? undefined : nextTabs[savedIndex]
+        let persistedTagSavedTab = current
+        if (liveTab !== undefined) {
+          nextTabs[savedIndex] = applyFaOpenedDocumentTabAfterDisplayNameSave(liveTab, {
+            draftAtSaveStart: current,
+            keepEditMode: input.keepEditMode,
+            savedDisplayName: savedDocument.displayName,
+            savedDocumentBackgroundColor,
+            savedDocumentTextColor,
+            savedIsCategory,
+            savedIsFinished,
+            savedIsMinor,
+            savedIsDead,
+            savedParentDocumentId,
+            savedTreeOrderNumber,
+            savedExtraClasses
+          })
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
+          const persistedTagBaseTab = nextTabs[savedIndex]!
+          persistedTagSavedTab = await persistFaOpenedDocumentTagsAfterSave(
+            persistedTagBaseTab,
+            documentId
+          )
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
+          commitOpenedDocumentSaveToLiveTab(
+            persistedTagSavedTab,
+            documentId,
+            current,
+            input.keepEditMode
+          )
+        } else {
+          persistedTagSavedTab = await persistFaOpenedDocumentTagsAfterSave(
+            current,
+            documentId
+          )
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
+        }
         schedulePersistSnapshot.flush()
         await flushPersistSnapshot()
         const hierarchyStore = S_FaProjectHierarchyTree()
         const categoryChanged = savedIsCategoryBeforeSave !== savedIsCategory
-        const willRefreshLayout = parentChanged || categoryChanged || tagsChanged
+        const tagRefreshIndex = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+        const tagRefreshTab = tagRefreshIndex === -1 ? undefined : tabs.value[tagRefreshIndex]
+        const savedTagsForRefresh = tagRefreshTab?.savedTags ?? persistedTagSavedTab.savedTags
+        const nextSavedTagIds = (savedTagsForRefresh ?? []).map((tag) => tag.id)
+        const tagsPersistedChanged = openedDocumentSavedTagIdSetsDiffer(
+          previousSavedTagIds,
+          nextSavedTagIds
+        )
+        const willRefreshLayout = parentChanged || categoryChanged || tagsChanged || tagsPersistedChanged
         if (willRefreshLayout) {
           await hierarchyStore.refreshLayout()
+          if (openedDocumentSaveEpochMoved(epochAtStart)) {
+            return
+          }
           await nextTick()
         }
-        if (tagsChanged) {
-          const nextSavedTagIds = (tabs.value[index]?.savedTags ?? []).map((tag) => tag.id)
-          const affectedTagIds = [...new Set([...previousSavedTagIds, ...nextSavedTagIds])]
-          const newlyAssignedTagIds = nextSavedTagIds.filter((tagId) => {
-            return !previousSavedTagIds.includes(tagId)
-          })
-          const loadedTagNodeIds = collectProjectHierarchyTreeLoadedTagNodeIdsForRefresh(
+        if (openedDocumentSaveEpochMoved(epochAtStart)) {
+          return
+        }
+        if (tagsChanged || tagsPersistedChanged) {
+          const loadedTagNodeIds = resolveOpenedDocumentTagRefreshNodeIdsAfterSave(
             hierarchyStore.treeData,
-            affectedTagIds,
-            newlyAssignedTagIds
-          )
+            previousSavedTagIds,
+            nextSavedTagIds,
+            true
+          ) ?? []
           hierarchyStore.refreshHierarchyTreeNodes(loadedTagNodeIds)
         }
         hierarchyStore.refreshDocumentsInTree([documentId])
@@ -1310,11 +1889,23 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   }
 
   async function confirmDeleteOpenedDocument (documentId: string): Promise<void> {
+    try {
+      await deleteOpenedDocument(documentId)
+    } catch (error: unknown) {
+      console.error('[FaOpenedDocuments] delete document failed', error)
+      Notify.create({
+        faSkipNotifyConsoleLog: true,
+        group: false,
+        message: i18n.global.t('globalFunctionality.faOpenedDocuments.deleteError'),
+        type: 'negative'
+      })
+      return
+    }
     pendingDeleteDocumentId.value = null
-    await deleteOpenedDocument(documentId)
   }
 
   async function confirmDiscardAndClose (documentId: string): Promise<void> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
       pendingCloseDocumentId.value = null
@@ -1331,10 +1922,15 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot.flush()
     if (wasActive) {
       if (closeResult.shouldNavigateHome) {
+        claimOpenedDocumentNavigationSerial()
         await navigateToWorkspaceHomeRoute()
       } else if (closeResult.nextActiveDocumentId !== null) {
+        claimOpenedDocumentNavigationSerial()
         await navigateToOpenedDocumentRoute(closeResult.nextActiveDocumentId)
       }
+    }
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
     }
     await flushPersistSnapshot()
   }
@@ -1348,6 +1944,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     previousActiveDocumentId: string | null
     previousTabs: readonly I_faOpenedDocumentTab[]
   }): Promise<void> {
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     if (input.closeResult.nextTabs.length === input.previousTabs.length) {
       return
     }
@@ -1367,10 +1964,15 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot.flush()
     if (input.previousActiveDocumentId !== input.closeResult.nextActiveDocumentId) {
       if (input.closeResult.shouldNavigateHome) {
+        claimOpenedDocumentNavigationSerial()
         await navigateToWorkspaceHomeRoute()
       } else if (input.closeResult.nextActiveDocumentId !== null) {
+        claimOpenedDocumentNavigationSerial()
         await navigateToOpenedDocumentRoute(input.closeResult.nextActiveDocumentId)
       }
+    }
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
     }
     await flushPersistSnapshot()
   }
@@ -1424,6 +2026,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   }
 
   async function deleteOpenedDocument (documentId: string): Promise<void> {
+    const pendingSave = openedDocumentSaveTailById.get(documentId)
+    if (pendingSave !== undefined) {
+      await pendingSave
+    }
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
     const hierarchyStore = S_FaProjectHierarchyTree()
     const treeRefreshNodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
       hierarchyStore.treeData,
@@ -1436,6 +2043,9 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (shouldDeletePersistedDocumentRow) {
       await deleteFaProjectDocumentForRenderer(documentId)
     }
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
     removeProjectHierarchyTreeDocumentNodesByDocumentIds(
       hierarchyStore.treeData,
       [documentId]
@@ -1443,13 +2053,9 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (treeRefreshNodeIds.length > 0) {
       hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
     }
-    if (shouldDeletePersistedDocumentRow) {
-      // Same as temp save promote: layout carries placement documentCount / categoryCount.
-      await hierarchyStore.refreshLayout()
-      hierarchyStore.bumpDocumentCensusRefreshGeneration()
-    }
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
-    if (index !== -1) {
+    const removedOpenTab = index !== -1
+    if (removedOpenTab) {
       const wasActive = activeDocumentId.value === documentId
       const closeResult = removeFaOpenedDocumentTabAtIndex({
         activeDocumentId,
@@ -1462,12 +2068,43 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       schedulePersistSnapshot.flush()
       if (wasActive) {
         if (closeResult.shouldNavigateHome) {
+          claimOpenedDocumentNavigationSerial()
           await navigateToWorkspaceHomeRoute()
         } else if (closeResult.nextActiveDocumentId !== null) {
+          claimOpenedDocumentNavigationSerial()
           await navigateToOpenedDocumentRoute(closeResult.nextActiveDocumentId)
         }
       }
+      if (openedDocumentSaveEpochMoved(epochAtStart)) {
+        return
+      }
+    }
+    const parentRefreshTabs = await refreshOpenedDocumentTabsAfterDeletedParent({
+      deletedDocumentId: documentId,
+      getDocumentById: getFaProjectDocumentByIdForRenderer,
+      hasDocumentReader: hasFaProjectDocumentByIdReader(),
+      readLiveTabs: () => tabs.value
+    })
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    if (parentRefreshTabs !== null) {
+      tabs.value = parentRefreshTabs
+      schedulePersistSnapshot.flush()
+    }
+    if (shouldDeletePersistedDocumentRow) {
+      // Same as temp save promote: layout carries placement documentCount / categoryCount.
+      await hierarchyStore.refreshLayout()
+      if (openedDocumentSaveEpochMoved(epochAtStart)) {
+        return
+      }
+      hierarchyStore.bumpDocumentCensusRefreshGeneration()
+    }
+    if (removedOpenTab || parentRefreshTabs !== null) {
       await flushPersistSnapshot()
+    }
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
     }
     Notify.create({
       group: false,
@@ -1498,7 +2135,33 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return
     }
     activeDocumentId.value = nextActiveDocumentId
-    schedulePersistSnapshot()
+    queueOpenedDocumentsSnapshotPersist()
+    if (nextActiveDocumentId === null) {
+      return
+    }
+    const syncedTab = findTabByDocumentId(nextActiveDocumentId)
+    if (
+      syncedTab === null ||
+      resolveOpenedDocumentTabIsTemporary(syncedTab.persistenceState)
+    ) {
+      return
+    }
+    const epochAtStart = S_FaActiveProject().readProjectContentEpoch()
+    void recordLastOpenedAfterWorkspaceRouteSync(nextActiveDocumentId, epochAtStart)
+  }
+
+  async function recordLastOpenedAfterWorkspaceRouteSync (
+    documentId: string,
+    epochAtStart: number
+  ): Promise<void> {
+    await recordFaOpenedDocumentLastOpenedBestEffort(documentId)
+    if (openedDocumentSaveEpochMoved(epochAtStart)) {
+      return
+    }
+    if (activeDocumentId.value !== documentId) {
+      return
+    }
+    S_FaProjectHierarchyTree().bumpDocumentLastOpenedRefreshGeneration()
   }
 
   function moveDocumentTab (documentId: string, direction: 'left' | 'right'): void {
@@ -1548,13 +2211,21 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       if (!hydrationComplete.value) {
         return
       }
-      schedulePersistSnapshot()
+      queueOpenedDocumentsSnapshotPersist()
     },
-    { deep: true }
+    {
+      deep: true,
+      flush: 'sync'
+    }
   )
 
+  const publishedActiveDocumentId = readonly(activeDocumentId)
+  const publishedHydrationComplete = readonly(hydrationComplete)
+  const publishedPendingCloseDocumentId = readonly(pendingCloseDocumentId)
+  const publishedPendingDeleteDocumentId = readonly(pendingDeleteDocumentId)
+  const publishedTabs = readonly(tabs)
   return {
-    activeDocumentId: readonly(activeDocumentId),
+    activeDocumentId: publishedActiveDocumentId,
     closeAllTabsWithoutChanges,
     closeTabsWithoutChangesExcept,
     confirmDiscardAndClose,
@@ -1564,11 +2235,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     dismissPendingDelete,
     findTabByDocumentId,
     flushPersistSnapshot,
+    flushPersistSnapshotBeforeProjectReplacement,
     focusTab,
     forceCloseAllTabs,
     forceCloseAllTabsExcept,
     hydrateFromProjectDatabase,
-    hydrationComplete: readonly(hydrationComplete),
+    hydrationComplete: publishedHydrationComplete,
     clearSession,
     createTemporaryDocument,
     createTemporaryDocumentCopyFromOpenedTab,
@@ -1581,8 +2253,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     reorderDocumentTabs,
     replaceOpenedDocumentTabs,
     openFromTree,
-    pendingCloseDocumentId: readonly(pendingCloseDocumentId),
-    pendingDeleteDocumentId: readonly(pendingDeleteDocumentId),
+    pendingCloseDocumentId: publishedPendingCloseDocumentId,
+    pendingDeleteDocumentId: publishedPendingDeleteDocumentId,
     replaceSessionForComponentTesting,
     remapOpenedDocumentTabId,
     requestCloseTab,
@@ -1591,7 +2263,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     setDocumentEditState,
     syncActiveDocumentIdFromWorkspaceRoute,
     syncOpenedDocumentParentFromHierarchy,
-    tabs: readonly(tabs),
+    tabs: publishedTabs,
     updateDisplayNameDraft,
     updateDocumentBackgroundColorDraft,
     updateDocumentTextColorDraft,

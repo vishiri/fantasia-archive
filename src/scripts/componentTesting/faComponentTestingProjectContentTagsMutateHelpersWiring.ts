@@ -62,9 +62,11 @@ export function resolveFaComponentTestingTagAssignmentToRef (
     return tag.name.localeCompare(normalizedName, undefined, { sensitivity: 'accent' }) === 0
   })
   if (existingByName !== undefined) {
+    const id = existingByName.id
+    const name = existingByName.name
     return {
-      id: existingByName.id,
-      name: existingByName.name
+      id,
+      name
     }
   }
   if (assignment.isNew === true || worldTags.every((tag) => tag.id !== assignment.id)) {
@@ -82,13 +84,16 @@ export function resolveFaComponentTestingTagAssignmentToRef (
       id: created.id,
       name: created.name
     })
+    const id = created.id
+    const name = created.name
     return {
-      id: created.id,
-      name: created.name
+      id,
+      name
     }
   }
+  const id = assignment.id
   return {
-    id: assignment.id,
+    id,
     name: normalizedName
   }
 }

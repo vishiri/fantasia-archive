@@ -12,10 +12,11 @@ export function resolveHierarchyTreeDocumentOpenEditSteps (input: {
   tabIsOpen: boolean
 }): I_hierarchyTreeDocumentOpenEditSteps {
   if (input.mode === 'open') {
+    const shouldOpenFromTree = !input.tabIsOpen
     return {
       shouldEnterEditMode: false,
       shouldFocusTab: true,
-      shouldOpenFromTree: !input.tabIsOpen
+      shouldOpenFromTree
     }
   }
 

@@ -85,7 +85,8 @@ test('mapProjectHierarchyTreeDocumentsUnderTagToNodes maps flat mirror docs', ()
         isFinished: false,
         isMinor: false,
         sortOrder: 0,
-        templateId: null,
+        templateIcon: 'mdi-account',
+        templateId: 'tpl-1',
         treeOrderNumber: 0
       }
     ],
@@ -97,6 +98,8 @@ test('mapProjectHierarchyTreeDocumentsUnderTagToNodes maps flat mirror docs', ()
   expect(nodes.map((node) => node.documentId)).toEqual(['doc-1', 'doc-2'])
   expect(nodes[0]?.id).toBe('tag-1__doc__doc-1')
   expect(nodes[0]?.tagId).toBe('tag-1')
+  expect(nodes[0]?.icon).toBe('mdi-account')
+  expect(nodes[1]?.icon).toBe('mdi-file-outline')
   expect(nodes[0]?.hasChildren).toBe(false)
 })
 

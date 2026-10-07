@@ -16,6 +16,7 @@ import {
   shiftFaProjectHierarchySiblingSortOrders
 } from '../faProjectHierarchyTreeSqlWiring'
 import { createFaProjectDocument } from '../faProjectDocumentsPersistWiring'
+import { listFaProjectDocuments } from '../faProjectDocumentsQueryWiring'
 import { createFaProjectDocumentTemplate } from '../faProjectDocumentTemplatesPersistWiring'
 import { createFaProjectWorld } from '../faProjectWorldsPersistWiring'
 import { replaceFaProjectWorldTemplateLayoutSnapshot } from '../faProjectWorldTemplateLayoutSnapshotWiring'
@@ -88,6 +89,39 @@ test('Test that collectFaProjectHierarchyAncestorDocumentIds stops on broken par
   applyFaProjectContentSchemaV1(db)
   const ancestors = collectFaProjectHierarchyAncestorDocumentIds(db, 'missing-parent-id')
   expect(ancestors).toEqual(['missing-parent-id'])
+})
+
+/**
+ * collectFaProjectHierarchyAncestorDocumentIds
+ * A parent loop must stop instead of walking forever.
+ */
+test('Test that collectFaProjectHierarchyAncestorDocumentIds stops when the parent chain loops', () => {
+  const connection = new Database(':memory:')
+  db = connection
+  applyFaProjectContentSchemaV1(connection)
+  const placementId = seedPlacement(connection)
+  const world = connection.prepare('SELECT world_id FROM documents LIMIT 1').get() as { world_id: string }
+  const template = connection.prepare('SELECT template_id FROM documents LIMIT 1').get() as { template_id: string }
+  const first = createFaProjectDocument(connection, {
+    worldId: world.world_id,
+    templateId: template.template_id,
+    placementId,
+    displayName: 'First',
+    sortOrder: 1
+  })
+  const second = createFaProjectDocument(connection, {
+    worldId: world.world_id,
+    templateId: template.template_id,
+    placementId,
+    parentDocumentId: first.id,
+    displayName: 'Second',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ? WHERE id = ?`
+  ).run(second.id, first.id)
+  const ancestors = collectFaProjectHierarchyAncestorDocumentIds(connection, second.id)
+  expect(ancestors).toEqual([first.id, second.id])
 })
 
 /**
@@ -168,4 +202,75 @@ test('Test that mapFaProjectHierarchyDocumentChildRow maps null placement id to 
   expect(mapped.isMinor).toBe(false)
   expect(mapped.isDead).toBe(false)
   expect(readFaProjectDocumentHasChildren(db, 'missing-doc')).toBe(false)
+})
+
+/**
+ * readFaProjectDocumentHasChildren
+ * Ignores children whose placement does not match the parent.
+ */
+test('Test that readFaProjectDocumentHasChildren ignores a cross-placement child', () => {
+  const connection = new Database(':memory:')
+  db = connection
+  applyFaProjectContentSchemaV1(connection)
+  const placementId = seedPlacement(connection)
+  const world = connection.prepare('SELECT world_id FROM documents LIMIT 1').get() as { world_id: string }
+  const template = connection.prepare('SELECT template_id FROM documents LIMIT 1').get() as { template_id: string }
+  const parent = createFaProjectDocument(connection, {
+    worldId: world.world_id,
+    templateId: template.template_id,
+    placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  createFaProjectDocument(connection, {
+    worldId: world.world_id,
+    templateId: template.template_id,
+    placementId: null,
+    parentDocumentId: parent.id,
+    displayName: 'Unplaced child',
+    sortOrder: 0
+  })
+  expect(readFaProjectDocumentHasChildren(connection, parent.id)).toBe(false)
+  createFaProjectDocument(connection, {
+    worldId: world.world_id,
+    templateId: template.template_id,
+    placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Same placement child',
+    sortOrder: 1
+  })
+  expect(readFaProjectDocumentHasChildren(connection, parent.id)).toBe(true)
+})
+
+/**
+ * listFaProjectDocuments
+ * Equal sort, name, and created time stay in id order (later insert with a smaller id first).
+ */
+test('Test that listFaProjectDocuments orders equal sort and name by id', () => {
+  const connection = new Database(':memory:')
+  db = connection
+  applyFaProjectContentSchemaV1(connection)
+  const world = createFaProjectWorld(connection, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(connection, { displayName: 'Character' })
+  createFaProjectDocument(connection, {
+    id: 'doc-zzz',
+    worldId: world.id,
+    templateId: template.id,
+    displayName: 'Same',
+    sortOrder: 0
+  })
+  createFaProjectDocument(connection, {
+    id: 'doc-aaa',
+    worldId: world.id,
+    templateId: template.id,
+    displayName: 'Same',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET created_at_ms = 1700000000000`
+  ).run()
+  expect(listFaProjectDocuments(connection).items.map((item) => item.id)).toEqual([
+    'doc-aaa',
+    'doc-zzz'
+  ])
 })

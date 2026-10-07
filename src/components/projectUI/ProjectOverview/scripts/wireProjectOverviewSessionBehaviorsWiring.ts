@@ -13,6 +13,15 @@ import {
   createProjectOverviewLastOpenedChromeResolver
 } from './createProjectOverviewDisplayStateWiring'
 
+function readProjectOverviewContentEpoch (
+  deps: I_wireProjectOverviewSessionBehaviorsInput['deps']
+): number | undefined {
+  const activeProject = deps.S_FaActiveProject() as {
+    readProjectContentEpoch?: () => number
+  }
+  return activeProject.readProjectContentEpoch?.()
+}
+
 /**
  * Wires display computeds, CTA/last-opened handlers, and chart data loader.
  */
@@ -65,6 +74,7 @@ export function wireProjectOverviewSessionBehaviors (
       listDocumentDistribution: input.deps.listDocumentDistribution,
       listDocumentLastOpened: input.deps.listDocumentLastOpened,
       preferredLanguageCode: () => input.settings.value?.languageCode ?? 'en-US',
+      readProjectContentEpoch: () => readProjectOverviewContentEpoch(input.deps),
       resolveChartHeightPx: () => display.chartHeightPx.value,
       resolveDocumentCountSeparator: () => String(
         input.deps.t('projectUI.projectOverview.documentDistributionWorldLegendSeparator')

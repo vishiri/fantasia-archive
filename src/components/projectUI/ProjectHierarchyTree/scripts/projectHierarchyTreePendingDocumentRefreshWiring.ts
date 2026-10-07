@@ -7,7 +7,7 @@ import {
   openProjectHierarchyTreeNodeInHeTree
 } from './projectHierarchyTreeExpandDomWiring'
 import type { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionWiring'
-import { collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh } from '../functions/projectHierarchyTreeDocumentParentBucket'
+import { collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh } from './projectHierarchyTreeDocumentRefreshNodeIds'
 import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
 
 export async function flushPendingProjectHierarchyTreeDocumentRefresh (deps: {

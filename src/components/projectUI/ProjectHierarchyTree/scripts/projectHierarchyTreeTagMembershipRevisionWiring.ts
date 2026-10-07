@@ -3,6 +3,10 @@ import type { Ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { publishProjectHierarchyTreeRootRevision } from '../functions/projectHierarchyTreeExpandState'
+import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from '../functions/projectHierarchyTreeSuppressEmitDepth'
 
 function collectProjectHierarchyTreeTagIds (
   nodes: I_faProjectHierarchyTreeHeTreeNode[]
@@ -42,10 +46,10 @@ export function publishProjectHierarchyTreeRootRevisionIfTagsRemoved (input: {
     JSON.stringify(input.treeTagIdsBefore) !== JSON.stringify(treeTagIdsAfter)
   const needsRevision = tagsRemoved || orderChanged
   if (needsRevision) {
-    input.suppressTreeEmit.value = true
+    beginProjectHierarchyTreeSuppressEmit(input.suppressTreeEmit)
     input.treeData.value = publishProjectHierarchyTreeRootRevision(input.treeData.value)
     void input.nextTick().then(() => {
-      input.suppressTreeEmit.value = false
+      endProjectHierarchyTreeSuppressEmit(input.suppressTreeEmit)
     })
   }
   return needsRevision

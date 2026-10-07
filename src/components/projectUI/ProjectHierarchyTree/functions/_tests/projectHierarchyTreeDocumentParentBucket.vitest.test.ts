@@ -4,13 +4,15 @@ import { expect, test } from 'vitest'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
-  collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds,
-  collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh,
   collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh,
   ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh,
   findProjectHierarchyTreeDocumentParentBucket,
   removeProjectHierarchyTreeDocumentNodesByDocumentIds
 } from '../projectHierarchyTreeDocumentParentBucket'
+import {
+  collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds,
+  collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh
+} from '../../scripts/projectHierarchyTreeDocumentRefreshNodeIds'
 
 function buildPlacementNode (input: {
   children: I_faProjectHierarchyTreeHeTreeNode[]
@@ -169,6 +171,80 @@ test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh dedup
     ['doc-a', 'doc-b']
   )
   expect(parentNodeIds).toEqual(['placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh includes tag and placement copies', () => {
+  const underTagDoc = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'tag-1__doc__doc-a',
+    tagId: 'tag-1'
+  })
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [underTagDoc],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-a',
+        id: 'doc-a'
+      })
+    ],
+    childrenLoaded: true
+  })
+  const parentNodeIds = collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh(
+    [tagNode, placement],
+    ['doc-a']
+  )
+  expect(parentNodeIds).toEqual(['tag-1', 'placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds includes tag and placement copies', () => {
+  const underTagDoc = buildDocumentNode({
+    documentId: 'doc-a',
+    id: 'tag-1__doc__doc-a',
+    tagId: 'tag-1'
+  })
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [underTagDoc],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-a',
+        id: 'doc-a'
+      })
+    ],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [tagNode, placement],
+    'doc-a'
+  )
+  expect(nodeIds).toEqual(['tag-1', 'placement-1'])
 })
 
 test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh includes loaded saved document nodes', () => {
@@ -496,6 +572,63 @@ test('Test that ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh mark
   )
   expect(marked).toBe(true)
   expect(parentDocument.hasChildren).toBe(true)
+})
+
+test('Test that nested document refresh targets the main-tree parent when a tag copy comes first', () => {
+  const tagCopy = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'tag-1__doc__doc-parent',
+      tagId: 'tag-1'
+    }),
+    children: [],
+    childrenLoaded: true,
+    hasChildren: false
+  }
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagCopy],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [],
+    childrenLoaded: false,
+    hasChildren: false
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const marked = ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh(
+    [tagNode, placement],
+    'doc-parent'
+  )
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [tagNode, placement],
+    {
+      parentDocumentId: 'doc-parent',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(marked).toBe(true)
+  expect(tagCopy.hasChildren).toBe(false)
+  expect(parentDocument.hasChildren).toBe(true)
+  expect(nodeIds).toEqual(['doc-parent'])
 })
 
 test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh finds nested placement rows', () => {

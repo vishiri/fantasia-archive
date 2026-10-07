@@ -6,7 +6,7 @@ export const PROJECT_HIERARCHY_TREE_ADD_NEW_MISSING_TRANSLATION_TOKEN = 'MISSING
 
 function readTrimmedTranslation (
   translations: Record<string, string | undefined>,
-  languageCode: T_faUserSettingsLanguageCode
+  languageCode: string
 ): string {
   const value = translations[languageCode]
   if (value === undefined) {
@@ -16,8 +16,32 @@ function readTrimmedTranslation (
 }
 
 /**
+ * After preferred and en-US, use language-code order.
+ * Matches locale translation fallback. JSON key order must not win.
+ */
+function readFirstOtherLocaleTranslation (
+  translations: I_faProjectDocumentTemplateTitleTranslations,
+  preferredLanguageCode: T_faUserSettingsLanguageCode
+): string {
+  const sortedCodes = Object.keys(translations).sort((left, right) => {
+    return left.localeCompare(right)
+  })
+  for (const languageCode of sortedCodes) {
+    if (languageCode === preferredLanguageCode || languageCode === 'en-US') {
+      continue
+    }
+    const trimmed = readTrimmedTranslation(translations, languageCode)
+    if (trimmed.length > 0) {
+      return trimmed
+    }
+  }
+  return ''
+}
+
+/**
  * Resolves the template title fragment for add-new row labels and new-document display names.
- * Fallback: singular preferred -> plural preferred -> singular en-US -> plural en-US -> missing token.
+ * Fallback: singular preferred, plural preferred, singular en-US, plural en-US,
+ * then other locales in language-code order (singular, then plural), then the missing token.
  */
 export function resolveProjectHierarchyTreeAddNewTemplateTitlePart (input: {
   preferredLanguageCode: T_faUserSettingsLanguageCode
@@ -45,6 +69,20 @@ export function resolveProjectHierarchyTreeAddNewTemplateTitlePart (input: {
   const pluralEnUs = readTrimmedTranslation(input.titlePluralTranslations, 'en-US')
   if (pluralEnUs.length > 0) {
     return pluralEnUs
+  }
+  const singularOther = readFirstOtherLocaleTranslation(
+    input.titleSingularTranslations,
+    input.preferredLanguageCode
+  )
+  if (singularOther.length > 0) {
+    return singularOther
+  }
+  const pluralOther = readFirstOtherLocaleTranslation(
+    input.titlePluralTranslations,
+    input.preferredLanguageCode
+  )
+  if (pluralOther.length > 0) {
+    return pluralOther
   }
   return PROJECT_HIERARCHY_TREE_ADD_NEW_MISSING_TRANSLATION_TOKEN
 }

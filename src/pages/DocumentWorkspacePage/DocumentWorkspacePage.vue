@@ -1,5 +1,6 @@
 <template>
   <main
+    :key="documentTab === null ? '' : documentTab.documentId"
     class="documentWorkspacePage q-page column no-wrap q-pa-xl"
     :class="workspacePageExtraHtmlClassList"
     data-test-locator="documentWorkspacePage"
@@ -261,10 +262,6 @@ const {
 
 .documentWorkspacePage__fieldHelpIcon {
   align-self: flex-start;
-}
-
-.documentWorkspacePage__fieldLabel {
-  display: block;
 }
 </style>
 

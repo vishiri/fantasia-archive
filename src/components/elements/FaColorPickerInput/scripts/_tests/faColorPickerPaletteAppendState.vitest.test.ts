@@ -96,7 +96,7 @@ test('Test that isFaColorPickerPaletteAppendDisabled blocks invalid append state
  * Emits draft palette updates without persisting.
  */
 test('Test that runFaColorPickerPaletteAppendClick emits draft palette updates', async () => {
-  const emitted: string[] = []
+  const emitted: Array<{ colorPalette: string, worldId: string }> = []
   await runFaColorPickerPaletteAppendClick(
     draftConfig,
     '#aabbcc',
@@ -105,11 +105,17 @@ test('Test that runFaColorPickerPaletteAppendClick emits draft palette updates',
     vi.fn(async () => true),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     }
   )
-  expect(emitted).toEqual(['#112233;#AABBCC'])
+  expect(emitted).toEqual([{
+    colorPalette: '#112233;#AABBCC',
+    worldId: ''
+  }])
 })
 
 /**
@@ -119,7 +125,7 @@ test('Test that runFaColorPickerPaletteAppendClick emits draft palette updates',
 test('Test that runFaColorPickerPaletteAppendClick persists palette updates', async () => {
   const persistWorldColorPalette = vi.fn(async () => true)
   const refreshProjectWorldColorPalette = vi.fn(async () => undefined)
-  const emitted: string[] = []
+  const emitted: Array<{ colorPalette: string, worldId: string }> = []
 
   await runFaColorPickerPaletteAppendClick(
     persistConfig,
@@ -129,14 +135,56 @@ test('Test that runFaColorPickerPaletteAppendClick persists palette updates', as
     persistWorldColorPalette,
     readFaColorPickerPaletteAppendWorldId,
     refreshProjectWorldColorPalette,
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     }
   )
 
   expect(persistWorldColorPalette).toHaveBeenCalledWith('world-1', '#112233;#AABBCC')
   expect(refreshProjectWorldColorPalette).toHaveBeenCalled()
-  expect(emitted).toEqual(['#112233;#AABBCC'])
+  expect(emitted).toEqual([{
+    colorPalette: '#112233;#AABBCC',
+    worldId: 'world-1'
+  }])
+})
+
+/**
+ * faColorPickerPaletteAppendState
+ * The emitted world id is the one read before the palette save, not a later edit of the config.
+ */
+test('Test that runFaColorPickerPaletteAppendClick keeps the world id from the click', async () => {
+  let releasePersist: () => void = () => {}
+  const persistGate = new Promise<void>((resolve) => {
+    releasePersist = resolve
+  })
+  const config = {
+    mode: 'persist' as const,
+    worldColorPalette: '#112233',
+    worldId: 'world-saved'
+  }
+  const emittedWorldIds: string[] = []
+  const pending = runFaColorPickerPaletteAppendClick(
+    config,
+    '#aabbcc',
+    appendFaProjectWorldColorPaletteHex,
+    FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
+    async () => {
+      config.worldId = 'world-live'
+      await persistGate
+      return true
+    },
+    readFaColorPickerPaletteAppendWorldId,
+    vi.fn(async () => undefined),
+    (_colorPalette, worldId) => {
+      emittedWorldIds.push(worldId)
+    }
+  )
+  releasePersist()
+  await pending
+  expect(emittedWorldIds).toEqual(['world-saved'])
 })
 
 /**
@@ -144,7 +192,7 @@ test('Test that runFaColorPickerPaletteAppendClick persists palette updates', as
  * No-ops when persist fails or append returns null.
  */
 test('Test that runFaColorPickerPaletteAppendClick no-ops on persist failure', async () => {
-  const emitted: string[] = []
+  const emitted: Array<{ colorPalette: string, worldId: string }> = []
   await runFaColorPickerPaletteAppendClick(
     persistConfig,
     '#aabbcc',
@@ -153,8 +201,11 @@ test('Test that runFaColorPickerPaletteAppendClick no-ops on persist failure', a
     vi.fn(async () => false),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     }
   )
   expect(emitted).toHaveLength(0)
@@ -167,8 +218,11 @@ test('Test that runFaColorPickerPaletteAppendClick no-ops on persist failure', a
     vi.fn(async () => true),
     readFaColorPickerPaletteAppendWorldId,
     vi.fn(async () => undefined),
-    (colorPalette) => {
-      emitted.push(colorPalette)
+    (colorPalette, worldId) => {
+      emitted.push({
+        colorPalette,
+        worldId
+      })
     }
   )
   expect(emitted).toHaveLength(0)

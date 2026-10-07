@@ -8,6 +8,7 @@ export async function loadFaIconPickerMergedCatalogForMenu (deps: {
   isCatalogLoading: I_ref<boolean>
   loadFaIconPickerMergedCatalogAsync: () => Promise<string[]>
   loadedCatalog: I_ref<string[]>
+  requestSerialBox: { current: number }
 }): Promise<void> {
   const cached = deps.catalogCache.value
 
@@ -17,6 +18,8 @@ export async function loadFaIconPickerMergedCatalogForMenu (deps: {
     return
   }
 
+  const requestSerial = deps.requestSerialBox.current + 1
+  deps.requestSerialBox.current = requestSerial
   deps.isCatalogLoading.value = true
   deps.catalogLoadError.value = null
 
@@ -24,6 +27,9 @@ export async function loadFaIconPickerMergedCatalogForMenu (deps: {
     deps.loadFaIconPickerMergedCatalogAsync(),
     (error): unknown => error
   )
+  if (requestSerial !== deps.requestSerialBox.current) {
+    return
+  }
   if (loadResult.isOk()) {
     deps.catalogCache.value = loadResult.value
     deps.loadedCatalog.value = loadResult.value

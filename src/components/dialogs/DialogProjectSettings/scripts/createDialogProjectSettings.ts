@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import type { I_dialogComponentStoreLike } from 'app/types/I_dialogComponentStoreLike'
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import type { T_dialogProjectSettingsUseHookDeps } from 'app/types/I_dialogProjectSettings'
@@ -11,11 +13,10 @@ export function createDialogProjectSettings (deps: {
   ) => (props: I_dialogProjectSettingsProps) => ReturnType<typeof useDialogProjectSettingsImpl>
 } & T_dialogProjectSettingsUseHookDeps) {
   function resolveDialogComponentStore (): I_dialogComponentStoreLike | null {
-    try {
-      return deps.S_DialogComponent()
-    } catch {
-      return null
-    }
+    return Result.fromThrowable(
+      () => deps.S_DialogComponent(),
+      () => null
+    )().unwrapOr(null)
   }
 
   const {
@@ -25,11 +26,15 @@ export function createDialogProjectSettings (deps: {
   } = deps
 
   const useDialogProjectSettings = createDialogProjectSettingsUseHook(hookDeps)
+  const {
+    createDialogProjectSettingsDialogActions,
+    registerDialogProjectSettingsWatchers
+  } = hookDeps
 
   return {
     resolveDialogComponentStore,
-    createDialogProjectSettingsDialogActions: hookDeps.createDialogProjectSettingsDialogActions,
-    registerDialogProjectSettingsWatchers: hookDeps.registerDialogProjectSettingsWatchers,
+    createDialogProjectSettingsDialogActions,
+    registerDialogProjectSettingsWatchers,
     useDialogProjectSettings
   }
 }

@@ -1,10 +1,10 @@
 export default {
-  ariaLabel: 'Import or export app configuration',
+  ariaLabel: 'Import / Export App Configuration',
   title: 'Import / Export App Configuration',
   stepper: {
-    importPanel: 'Select parts to import',
-    rootPanel: 'Import or export',
-    exportPanel: 'Select parts to export'
+    importPanel: 'Select Parts to Import',
+    rootPanel: 'Import or Export',
+    exportPanel: 'Select Parts to Export'
   },
   importButton: 'Import',
   exportButton: 'Export',
@@ -24,8 +24,8 @@ export default {
     appNoteboard: 'App Noteboard',
     appStyling: 'Custom App CSS'
   },
-  createExportFile: 'Create export file',
-  importSelected: 'Import selected',
+  createExportFile: 'Create Export File',
+  importSelected: 'Import Selected',
   toasts: {
     exportSuccess: 'Configuration successfully exported',
     importSuccess: 'Configuration successfully imported'

@@ -13,6 +13,7 @@ export function createUseFaColorPickerInput (deps: {
     props: { modelValue: string },
     emitModelValue: (value: string) => void
   ) => {
+    applyTextModelValue: (value: string) => void
     onPickerChange: (value: string | null) => void
     onPickerMenuHide: () => void
     onPickerUpdate: (value: string | null) => void
@@ -28,6 +29,7 @@ export function createUseFaColorPickerInput (deps: {
     hasPaletteFooter: I_computedRef<boolean>
     isSwatchEmpty: I_computedRef<boolean>
     menuOffset: I_computedRef<[number, number]>
+    applyTextModelValue: (value: string) => void
     onPickerChange: (value: string | null) => void
     onPickerMenuHide: () => void
     onPickerUpdate: (value: string | null) => void
@@ -69,24 +71,34 @@ export function createUseFaColorPickerInput (deps: {
     })
 
     const colorSwatchStyle = deps.computed(() => {
+      const backgroundColor = pickerEmit.resolveLiveColorString().trim()
       return {
-        backgroundColor: pickerEmit.resolveLiveColorString().trim()
+        backgroundColor
       }
     })
 
     const menuOffset = deps.computed(() => [0, 4] as [number, number])
 
+    const {
+      applyTextModelValue,
+      onPickerChange,
+      onPickerMenuHide,
+      onPickerUpdate,
+      resolveLiveColorString
+    } = pickerEmit
+    const refreshProjectColorPalette = bridgePalette.refreshPaletteFromBridge
     return {
+      applyTextModelValue,
       colorSwatchStyle,
       displayHex,
       hasPaletteFooter,
       isSwatchEmpty,
       menuOffset,
-      onPickerChange: pickerEmit.onPickerChange,
-      onPickerMenuHide: pickerEmit.onPickerMenuHide,
-      onPickerUpdate: pickerEmit.onPickerUpdate,
-      refreshProjectColorPalette: bridgePalette.refreshPaletteFromBridge,
-      resolveLiveColorString: pickerEmit.resolveLiveColorString,
+      onPickerChange,
+      onPickerMenuHide,
+      onPickerUpdate,
+      refreshProjectColorPalette,
+      resolveLiveColorString,
       resolvedPalette
     }
   }

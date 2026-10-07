@@ -1,5 +1,6 @@
 export default {
   title: 'إعدادات المشروع',
+  loadError: 'تعذر تحميل إعدادات المشروع.',
   closeButton: 'إغلاق بدون حفظ',
   saveButton: 'حفظ الإعدادات',
   saveWithoutClosingButton: 'حفظ دون إغلاق',

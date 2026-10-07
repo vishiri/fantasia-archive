@@ -617,41 +617,42 @@ async function stubHierarchyTreeBridge (page: Page): Promise<void> {
     if (content === undefined || management === undefined) {
       return
     }
-    try {
-      ;(content as { listWorkspaceHierarchyLayout?: unknown }).listWorkspaceHierarchyLayout =
-        async () => {
-          return {
-            worlds: payload.worlds
-          }
-        }
-      ;(content as { listPlacementDocumentChildren?: unknown }).listPlacementDocumentChildren =
-        async (input: { parentDocumentId?: string | null }) => {
-          const parentKey = input?.parentDocumentId ?? '__root__'
-          const items = payload.placementDocumentsByParentId[parentKey] ?? []
-          return {
-            items
-          }
-        }
-      ;(management as { getHierarchyTreeUiState?: unknown }).getHierarchyTreeUiState = async () => {
-        return payload.uiState
+    const assignBridgeMethod = (target: object, key: string, value: unknown): void => {
+      const desc = Object.getOwnPropertyDescriptor(target, key)
+      const canAssign = desc === undefined || desc.writable === true || typeof desc.set === 'function'
+      if (!canAssign) {
+        return
       }
-      ;(management as { setHierarchyTreeUiState?: unknown }).setHierarchyTreeUiState = async () => {
-        return true
-      }
-      ;(management as { getOpenedDocumentsSnapshot?: unknown }).getOpenedDocumentsSnapshot = async () => {
-        return {
-          activeDocumentId: null,
-          schemaVersion: 1,
-          tabs: []
-        }
-      }
-      ;(management as { saveOpenedDocumentsSnapshot?: unknown }).saveOpenedDocumentsSnapshot =
-        async () => {
-          return true
-        }
-    } catch {
-      // Frozen bridge: ignore.
+      ;(target as Record<string, unknown>)[key] = value
     }
+    assignBridgeMethod(content, 'listWorkspaceHierarchyLayout', async () => {
+      return {
+        worlds: payload.worlds
+      }
+    })
+    assignBridgeMethod(content, 'listPlacementDocumentChildren', async (input: { parentDocumentId?: string | null }) => {
+      const parentKey = input?.parentDocumentId ?? '__root__'
+      const items = payload.placementDocumentsByParentId[parentKey] ?? []
+      return {
+        items
+      }
+    })
+    assignBridgeMethod(management, 'getHierarchyTreeUiState', async () => {
+      return payload.uiState
+    })
+    assignBridgeMethod(management, 'setHierarchyTreeUiState', async () => {
+      return true
+    })
+    assignBridgeMethod(management, 'getOpenedDocumentsSnapshot', async () => {
+      return {
+        activeDocumentId: null,
+        schemaVersion: 1,
+        tabs: []
+      }
+    })
+    assignBridgeMethod(management, 'saveOpenedDocumentsSnapshot', async () => {
+      return true
+    })
   }, {
     placementDocumentsByParentId: {
       [PARENT_DOCUMENT_ID]: sampleParentChildDocuments,
@@ -986,11 +987,8 @@ async function readLastHierarchySortAction (page: Page): Promise<{
 
 async function readClipboardTextBestEffort (page: Page): Promise<string | null> {
   return await page.evaluate(async () => {
-    try {
-      return await navigator.clipboard.readText()
-    } catch {
-      return null
-    }
+    // Browser realm inside page.evaluate cannot import neverthrow.
+    return navigator.clipboard.readText().catch(() => null)
   })
 }
 

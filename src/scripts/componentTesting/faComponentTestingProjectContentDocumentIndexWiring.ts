@@ -38,30 +38,49 @@ export async function listFaProjectPlacementDocumentChildrenForRenderer (
     )
     const items = overridesMap[key]
     if (items !== undefined) {
+      const copiedItems = [...items]
       return {
-        items: [...items]
+        items: copiedItems
       }
     }
+    const emptyItems: I_faProjectHierarchyTreeDocumentChild[] = []
     return {
-      items: []
+      items: emptyItems
     }
   }
   const store = tryGetFaProjectHierarchyTreeStoreForRenderer()
   if (store === null) {
+    const emptyItems: I_faProjectHierarchyTreeDocumentChild[] = []
     return {
-      items: []
+      items: emptyItems
     }
   }
   await store.ensureDocumentIndexLoaded()
+  const indexedItems = store.listIndexedPlacementChildren(input)
   return {
-    items: store.listIndexedPlacementChildren(input)
+    items: indexedItems
   }
+}
+
+let documentHierarchyWriteTail: Promise<unknown> = Promise.resolve()
+
+/**
+ * Runs hierarchy order writes one at a time so an earlier drop cannot finish after a later move.
+ */
+export function enqueueFaProjectDocumentHierarchyWrite<T> (
+  run: () => Promise<T>
+): Promise<T> {
+  const previous = documentHierarchyWriteTail
+  const result = previous.then(run, run)
+  const settled = result.then(() => undefined, () => undefined)
+  documentHierarchyWriteTail = settled
+  return result
 }
 
 /**
  * Reindexes sibling document order in overrides when present, else bridge.
  */
-export async function reindexFaProjectDocumentSiblingsForRenderer (
+async function reindexFaProjectDocumentSiblingsNow (
   input: I_faProjectHierarchyTreeReindexDocumentSiblingsInput
 ): Promise<unknown> {
   const overrides = getFaComponentTestingProjectContentOverrides()
@@ -70,7 +89,18 @@ export async function reindexFaProjectDocumentSiblingsForRenderer (
     applyFaComponentTestingPlacementDocumentChildrenReindex(overridesMap, input)
     const documentsById = overrides?.documentsById
     if (documentsById !== undefined) {
-      applyFaComponentTestingDocumentsByIdParentFromReindex(documentsById, input)
+      const targetKey = buildFaComponentTestingPlacementDocumentChildrenKey(
+        input.placementId,
+        input.parentDocumentId
+      )
+      const targetItems = overridesMap[targetKey] ?? []
+      const orderedDocumentIds = targetItems.map((item) => item.id)
+      applyFaComponentTestingDocumentsByIdParentFromReindex(documentsById, {
+        movedDocumentId: input.movedDocumentId,
+        orderedDocumentIds,
+        parentDocumentId: input.parentDocumentId,
+        placementId: input.placementId
+      })
     }
     tryGetFaProjectHierarchyTreeStoreForRenderer()?.applyIndexedReindexBucket(input)
     return true
@@ -82,4 +112,15 @@ export async function reindexFaProjectDocumentSiblingsForRenderer (
   const result = await api.reindexDocumentSiblingsInHierarchy(input)
   tryGetFaProjectHierarchyTreeStoreForRenderer()?.applyIndexedReindexBucket(input)
   return result
+}
+
+/**
+ * Sibling reindex writes share the hierarchy order chain.
+ */
+export async function reindexFaProjectDocumentSiblingsForRenderer (
+  input: I_faProjectHierarchyTreeReindexDocumentSiblingsInput
+): Promise<unknown> {
+  return await enqueueFaProjectDocumentHierarchyWrite(() => {
+    return reindexFaProjectDocumentSiblingsNow(input)
+  })
 }

@@ -33,11 +33,13 @@ export function tryResolveFaKeybindDocumentWorkspaceSaveActionDispatch (
     return null
   }
 
+  const keepEditMode = commandId === 'saveDocumentKeepEditMode'
+  const payload = {
+    documentId: activeDocumentId,
+    keepEditMode
+  }
   return {
     actionId: 'saveOpenedDocumentDisplayName',
-    payload: {
-      documentId: activeDocumentId,
-      keepEditMode: commandId === 'saveDocumentKeepEditMode'
-    }
+    payload
   }
 }

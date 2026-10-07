@@ -106,3 +106,60 @@ test('createWindowNoteboard useWindowNoteboard exposes documentNameClass from va
   const state = api.useWindowNoteboard({})
   expect(state.documentNameClass).toBe('WindowAppNoteboard')
 })
+
+test('createWindowNoteboard forwards project epoch guards into text and frame persist', () => {
+  const isProjectReplacementInFlight = () => false
+  const readProjectContentEpoch = () => 1
+  const useFaFloatingWindowTextPersist = vi.fn()
+  const useFaFloatingWindowFramePersist = vi.fn()
+  const api = createWindowNoteboard(buildFactoryDeps({
+    isProjectReplacementInFlight,
+    onMounted: vi.fn(),
+    readProjectContentEpoch,
+    useFaFloatingWindowFramePersist,
+    useFaFloatingWindowTextPersist,
+    watch: vi.fn()
+  }))
+
+  api.useWindowNoteboardTextPersist({
+    text: ref(''),
+    windowModel: ref(true)
+  })
+  expect(useFaFloatingWindowTextPersist).toHaveBeenCalledWith(expect.objectContaining({
+    isProjectReplacementInFlight,
+    readProjectContentEpoch
+  }))
+
+  api.useWindowNoteboardFramePersist({
+    h: ref(1),
+    w: ref(1),
+    windowModel: ref(true),
+    x: ref(0),
+    y: ref(0)
+  })
+  expect(useFaFloatingWindowFramePersist).toHaveBeenCalledWith(expect.objectContaining({
+    isProjectReplacementInFlight,
+    readProjectContentEpoch
+  }))
+})
+
+test('createWindowNoteboard omits project epoch guards when the caller does not pass them', () => {
+  const useFaFloatingWindowTextPersist = vi.fn()
+  const api = createWindowNoteboard(buildFactoryDeps({
+    onMounted: vi.fn(),
+    useFaFloatingWindowTextPersist,
+    watch: vi.fn()
+  }))
+
+  api.useWindowNoteboardTextPersist({
+    text: ref('note'),
+    windowModel: ref(true)
+  })
+
+  const call = useFaFloatingWindowTextPersist.mock.calls[0]?.[0] as {
+    isProjectReplacementInFlight?: () => boolean
+    readProjectContentEpoch?: () => number
+  } | undefined
+  expect(call?.isProjectReplacementInFlight).toBeUndefined()
+  expect(call?.readProjectContentEpoch).toBeUndefined()
+})

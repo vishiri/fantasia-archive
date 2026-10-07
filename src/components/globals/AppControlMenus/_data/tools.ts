@@ -42,8 +42,10 @@ function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
 }
 
 export function buildToolsMenu (session: I_appMenuBuildSession): I_appMenuList {
+  const data = buildToolsMenuData(session)
+  const title = i18n.global.t('appControlMenus.tools.title')
   return {
-    data: buildToolsMenuData(session),
-    title: i18n.global.t('appControlMenus.tools.title')
+    data,
+    title
   }
 }

@@ -1,5 +1,6 @@
 /** @vitest-environment jsdom */
 import { expect, test, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
@@ -229,6 +230,7 @@ test('Test that createProjectHierarchyTreeTagAddDocumentClickHandler creates tag
       id: 'tag-1',
       name: 'Heroes'
     }],
+    placementId: 'placement-1',
     templateId: 'tpl-1',
     worldId: 'world-1'
   }))
@@ -289,6 +291,145 @@ test('Test that persistProjectHierarchyTreeTagRename persists rename and refresh
   expect(onDismiss).toHaveBeenCalled()
   expect(refreshLayout).toHaveBeenCalled()
   expect(resyncTreeDataFromLayout).toHaveBeenCalled()
+})
+
+/**
+ * persistProjectHierarchyTreeTagRename
+ * A project switch during the rename must not rewrite the next project's tabs.
+ */
+test('Test that persistProjectHierarchyTreeTagRename skips tab updates after the project changes', async () => {
+  setActivePinia(createPinia())
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const refreshLayout = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseRename: ((value: {
+    merged: false
+    mergedFromTagId: null
+    tag: {
+      createdAtMs: number
+      id: string
+      name: string
+      updatedAtMs: number
+      worldId: string
+    }
+  }) => void) | undefined
+  const renameTag = vi.fn(() => {
+    return new Promise((resolve) => {
+      releaseRename = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          renameTag
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagRename({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    getTreeData: () => [],
+    newName: 'Villains',
+    onDismiss,
+    refreshHierarchyTreeNodes: vi.fn(),
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => renameTag.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishRename = releaseRename
+  if (finishRename === undefined) {
+    throw new Error('missing tag rename resolver')
+  }
+  finishRename({
+    merged: false,
+    mergedFromTagId: null,
+    tag: {
+      createdAtMs: 1,
+      id: 'tag-1',
+      name: 'Villains',
+      updatedAtMs: 2,
+      worldId: 'world-1'
+    }
+  })
+  await pending
+  expect(applyOpenedDocumentTabs).not.toHaveBeenCalled()
+  expect(refreshLayout).not.toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(onDismiss).toHaveBeenCalled()
+  setActivePinia(undefined)
+})
+
+/**
+ * persistProjectHierarchyTreeTagRename
+ * A project switch during layout refresh must not resync the next tree.
+ */
+test('Test that persistProjectHierarchyTreeTagRename skips resync after the project changes during refresh', async () => {
+  setActivePinia(createPinia())
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const refreshHierarchyTreeNodes = vi.fn()
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseRefresh: ((value: undefined) => void) | undefined
+  const refreshLayout = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          renameTag: vi.fn(async () => {
+            return {
+              merged: false,
+              mergedFromTagId: null,
+              tag: {
+                createdAtMs: 1,
+                id: 'tag-1',
+                name: 'Villains',
+                updatedAtMs: 2,
+                worldId: 'world-1'
+              }
+            }
+          })
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagRename({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    getTreeData: () => [],
+    newName: 'Villains',
+    onDismiss,
+    refreshHierarchyTreeNodes,
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => refreshLayout.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing layout refresh resolver')
+  }
+  finishRefresh(undefined)
+  await pending
+  expect(applyOpenedDocumentTabs).toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(refreshHierarchyTreeNodes).not.toHaveBeenCalled()
+  setActivePinia(undefined)
 })
 
 /**
@@ -374,6 +515,8 @@ test('Test that persistProjectHierarchyTreeTagRename handles missing API and err
     tagId: 'tag-1'
   })
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const onDismiss = vi.fn()
+  vi.mocked(Notify.create).mockClear()
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
     value: {
@@ -392,13 +535,20 @@ test('Test that persistProjectHierarchyTreeTagRename handles missing API and err
     getOpenedDocumentTabs: () => [],
     getTreeData: () => [],
     newName: 'X',
-    onDismiss: vi.fn(),
+    onDismiss,
     refreshHierarchyTreeNodes: vi.fn(),
     refreshLayout: vi.fn(async () => undefined),
     resyncTreeDataFromLayout: vi.fn(),
     tagId: 'tag-1'
   })
   expect(errorSpy).toHaveBeenCalled()
+  expect(onDismiss).not.toHaveBeenCalled()
+  expect(Notify.create).toHaveBeenCalledWith({
+    faSkipNotifyConsoleLog: true,
+    group: false,
+    message: 'projectUI.projectHierarchyTree.renameTagError',
+    type: 'negative'
+  })
   errorSpy.mockRestore()
 })
 
@@ -504,6 +654,236 @@ test('Test that persistProjectHierarchyTreeTagDelete uses component-testing tag 
 })
 
 /**
+ * persistProjectHierarchyTreeTagRename
+ * An open already in flight has not moved the epoch. Tab updates must still stop.
+ */
+test('Test that persistProjectHierarchyTreeTagRename skips tab updates while a project open is in flight', async () => {
+  setActivePinia(createPinia())
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const refreshLayout = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseRename: ((value: {
+    merged: false
+    mergedFromTagId: null
+    tag: {
+      createdAtMs: number
+      id: string
+      name: string
+      updatedAtMs: number
+      worldId: string
+    }
+  }) => void) | undefined
+  const renameTag = vi.fn(() => {
+    return new Promise((resolve) => {
+      releaseRename = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          renameTag
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagRename({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    getTreeData: () => [],
+    newName: 'Villains',
+    onDismiss,
+    refreshHierarchyTreeNodes: vi.fn(),
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => renameTag.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  const finishRename = releaseRename
+  if (finishRename === undefined) {
+    throw new Error('missing tag rename resolver')
+  }
+  finishRename({
+    merged: false,
+    mergedFromTagId: null,
+    tag: {
+      createdAtMs: 1,
+      id: 'tag-1',
+      name: 'Villains',
+      updatedAtMs: 2,
+      worldId: 'world-1'
+    }
+  })
+  await pending
+  expect(applyOpenedDocumentTabs).not.toHaveBeenCalled()
+  expect(refreshLayout).not.toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(onDismiss).toHaveBeenCalled()
+  setActivePinia(undefined)
+})
+
+/**
+ * persistProjectHierarchyTreeTagDelete
+ * A project switch during delete must not rewrite the next project's tabs.
+ */
+test('Test that persistProjectHierarchyTreeTagDelete skips tab updates after the project changes', async () => {
+  setActivePinia(createPinia())
+  vi.mocked(Notify.create).mockClear()
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const refreshLayout = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseDelete: ((value: undefined) => void) | undefined
+  const deleteTag = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseDelete = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          deleteTag
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagDelete({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    onDismiss,
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => deleteTag.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishDelete = releaseDelete
+  if (finishDelete === undefined) {
+    throw new Error('missing tag delete resolver')
+  }
+  finishDelete(undefined)
+  await pending
+  expect(applyOpenedDocumentTabs).not.toHaveBeenCalled()
+  expect(refreshLayout).not.toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(Notify.create).not.toHaveBeenCalled()
+  expect(onDismiss).toHaveBeenCalled()
+  setActivePinia(undefined)
+})
+
+/**
+ * persistProjectHierarchyTreeTagDelete
+ * A project switch during layout refresh must not resync the next tree or toast success.
+ */
+test('Test that persistProjectHierarchyTreeTagDelete skips resync after the project changes during refresh', async () => {
+  setActivePinia(createPinia())
+  vi.mocked(Notify.create).mockClear()
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseRefresh: ((value: undefined) => void) | undefined
+  const refreshLayout = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          deleteTag: vi.fn(async () => undefined)
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagDelete({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    onDismiss,
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => refreshLayout.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  S_FaActiveProject().clearActiveProject()
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing layout refresh resolver')
+  }
+  finishRefresh(undefined)
+  await pending
+  expect(applyOpenedDocumentTabs).toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(Notify.create).not.toHaveBeenCalled()
+  setActivePinia(undefined)
+})
+
+/**
+ * persistProjectHierarchyTreeTagDelete
+ * An open already in flight has not moved the epoch. Tab updates and the success toast must still stop.
+ */
+test('Test that persistProjectHierarchyTreeTagDelete skips tab updates while a project open is in flight', async () => {
+  setActivePinia(createPinia())
+  vi.mocked(Notify.create).mockClear()
+  const applyOpenedDocumentTabs = vi.fn()
+  const onDismiss = vi.fn()
+  const refreshLayout = vi.fn(async () => undefined)
+  const resyncTreeDataFromLayout = vi.fn()
+  let releaseDelete: ((value: undefined) => void) | undefined
+  const deleteTag = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseDelete = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          deleteTag
+        }
+      }
+    },
+    writable: true
+  })
+  const pending = persistProjectHierarchyTreeTagDelete({
+    applyOpenedDocumentTabs,
+    getOpenedDocumentTabs: () => [buildTab()],
+    onDismiss,
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    tagId: 'tag-1'
+  })
+  await vi.waitUntil(() => deleteTag.mock.calls.length === 1)
+  const { S_FaActiveProject } = await import('app/src/stores/S_FaActiveProject')
+  vi.spyOn(S_FaActiveProject(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  const finishDelete = releaseDelete
+  if (finishDelete === undefined) {
+    throw new Error('missing tag delete resolver')
+  }
+  finishDelete(undefined)
+  await pending
+  expect(applyOpenedDocumentTabs).not.toHaveBeenCalled()
+  expect(refreshLayout).not.toHaveBeenCalled()
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(Notify.create).not.toHaveBeenCalled()
+  expect(onDismiss).toHaveBeenCalled()
+  setActivePinia(undefined)
+})
+
+/**
  * createProjectHierarchyTreeTagRenameDialogWiring
  * Opens, validates, warns on merge conflict, and confirms rename.
  */
@@ -575,8 +955,7 @@ test('Test that createProjectHierarchyTreeTagRenameDialogWiring drives rename di
   expect(wiring.renameTagCanConfirm.value).toBe(true)
   expect(wiring.renameTagMergeWarning.value).toBe(true)
   wiring.onConfirmRenameTag()
-  await Promise.resolve()
-  await Promise.resolve()
+  await vi.waitUntil(() => applyOpenedDocumentTabs.mock.calls.length === 1)
   expect(applyOpenedDocumentTabs).toHaveBeenCalled()
   wiring.onDismissRenameTagDialog()
   expect(wiring.renameTagDialogOpen.value).toBe(false)
@@ -591,6 +970,82 @@ test('Test that createProjectHierarchyTreeTagRenameDialogWiring drives rename di
   })
   noAnchor.onRenameTagFromContextMenuClick()
   noAnchor.onConfirmRenameTag()
+})
+
+/**
+ * createProjectHierarchyTreeTagRenameDialogWiring
+ * A second confirm during rename must not start another rename.
+ * A name typed during that rename stays in the open dialog.
+ */
+test('Test that a second tag rename confirm is ignored while the first rename runs', async () => {
+  await Promise.resolve()
+  await Promise.resolve()
+  const renamedTag = {
+    merged: false,
+    mergedFromTagId: null,
+    tag: {
+      createdAtMs: 1,
+      id: 'tag-1',
+      name: 'Villains',
+      updatedAtMs: 2,
+      worldId: 'world-1'
+    }
+  }
+  let releaseRename: ((value: typeof renamedTag) => void) | undefined
+  const renameTag = vi.fn(() => {
+    return new Promise<typeof renamedTag>((resolve) => {
+      releaseRename = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          renameTag
+        }
+      }
+    },
+    writable: true
+  })
+  const resyncTreeDataFromLayout = vi.fn()
+  const wiring = createProjectHierarchyTreeTagRenameDialogWiring({
+    applyOpenedDocumentTabs: vi.fn(),
+    getOpenedDocumentTabs: () => [],
+    refreshHierarchyTreeNodes: vi.fn(),
+    refreshLayout: vi.fn(async () => undefined),
+    resolveTagContextMenuAnchor: () => buildTagNode(),
+    resyncTreeDataFromLayout,
+    treeData: ref([buildTagNode()])
+  })
+  wiring.onRenameTagFromContextMenuClick()
+  wiring.renameTagNameDraft.value = 'Villains'
+  wiring.onConfirmRenameTag()
+  wiring.renameTagNameDraft.value = 'Places'
+  wiring.onConfirmRenameTag()
+  await vi.waitUntil(() => renameTag.mock.calls.length === 1)
+  expect(renameTag).toHaveBeenCalledTimes(1)
+  expect(renameTag).toHaveBeenCalledWith({
+    newName: 'Villains',
+    tagId: 'tag-1'
+  })
+  const finishRename = releaseRename
+  if (finishRename === undefined) {
+    throw new Error('missing tag rename resolver')
+  }
+  finishRename(renamedTag)
+  await vi.waitUntil(() => resyncTreeDataFromLayout.mock.calls.length === 1)
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(wiring.renameTagDialogOpen.value).toBe(true)
+  expect(wiring.renameTagNameDraft.value).toBe('Places')
+  renameTag.mockImplementation(async () => renamedTag)
+  wiring.onConfirmRenameTag()
+  await vi.waitUntil(() => renameTag.mock.calls.length === 2)
+  expect(renameTag).toHaveBeenLastCalledWith({
+    newName: 'Places',
+    tagId: 'tag-1'
+  })
 })
 
 /**
@@ -623,11 +1078,9 @@ test('Test that createProjectHierarchyTreeTagDeleteDialogWiring deletes tags', a
   wiring.onDeleteTagFromContextMenuClick()
   expect(wiring.deleteTagConfirmOpen.value).toBe(true)
   expect(wiring.deleteTagName.value).toBe('Heroes')
+  const notifyCallsAtConfirm = vi.mocked(Notify.create).mock.calls.length
   wiring.onConfirmDeleteTag()
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
+  await vi.waitUntil(() => vi.mocked(Notify.create).mock.calls.length > notifyCallsAtConfirm)
   expect(deleteTag).toHaveBeenCalledWith({ tagId: 'tag-1' })
   expect(applyOpenedDocumentTabs).toHaveBeenCalled()
   expect(refreshLayout).toHaveBeenCalled()
@@ -640,6 +1093,47 @@ test('Test that createProjectHierarchyTreeTagDeleteDialogWiring deletes tags', a
   wiring.onDismissDeleteTagDialog()
   expect(wiring.deleteTagConfirmOpen.value).toBe(false)
 
+  await Promise.resolve()
+  await Promise.resolve()
+  let releaseDelete: ((value: undefined) => void) | undefined
+  const gatedDelete = vi.fn(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseDelete = resolve
+    })
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          deleteTag: gatedDelete
+        }
+      }
+    },
+    writable: true
+  })
+  const gatedResync = vi.fn()
+  const gatedWiring = createProjectHierarchyTreeTagDeleteDialogWiring({
+    applyOpenedDocumentTabs: vi.fn(),
+    getOpenedDocumentTabs: () => [],
+    refreshLayout: vi.fn(async () => undefined),
+    resolveTagContextMenuAnchor: () => buildTagNode(),
+    resyncTreeDataFromLayout: gatedResync
+  })
+  gatedWiring.onDeleteTagFromContextMenuClick()
+  gatedWiring.onConfirmDeleteTag()
+  gatedWiring.onConfirmDeleteTag()
+  await vi.waitUntil(() => gatedDelete.mock.calls.length === 1)
+  expect(gatedDelete).toHaveBeenCalledTimes(1)
+  const finishDelete = releaseDelete
+  if (finishDelete === undefined) {
+    throw new Error('missing tag delete resolver')
+  }
+  finishDelete(undefined)
+  await vi.waitUntil(() => gatedResync.mock.calls.length === 1)
+  await Promise.resolve()
+  await Promise.resolve()
+
   const missingApi = createProjectHierarchyTreeTagDeleteDialogWiring({
     applyOpenedDocumentTabs,
     getOpenedDocumentTabs: () => [],
@@ -651,6 +1145,7 @@ test('Test that createProjectHierarchyTreeTagDeleteDialogWiring deletes tags', a
   missingApi.onConfirmDeleteTag()
 
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  vi.mocked(Notify.create).mockClear()
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
     value: {
@@ -673,11 +1168,16 @@ test('Test that createProjectHierarchyTreeTagDeleteDialogWiring deletes tags', a
   })
   failing.onDeleteTagFromContextMenuClick()
   failing.onConfirmDeleteTag()
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
-  expect(errorSpy).toHaveBeenCalled()
+  await vi.waitFor(() => {
+    expect(errorSpy).toHaveBeenCalled()
+  })
+  expect(failing.deleteTagConfirmOpen.value).toBe(true)
+  expect(Notify.create).toHaveBeenCalledWith({
+    faSkipNotifyConsoleLog: true,
+    group: false,
+    message: 'projectUI.projectHierarchyTree.deleteTagError',
+    type: 'negative'
+  })
   errorSpy.mockRestore()
 
   Object.defineProperty(globalThis, 'window', {

@@ -10,15 +10,18 @@
  * 'preventFilledNoteBoardPopup' maps onto 'preventFilledAppNoteBoardPopup'.
  * Boolean 'appTheme' (old dark-mode toggle) maps to fantasy light/dark theme ids.
  */
+function isMigrateableSettingsRecord (raw: unknown): raw is Record<string, unknown> {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+    return false
+  }
+  const prototype: object | null = Object.getPrototypeOf(raw) as object | null
+  return prototype === Object.prototype || prototype === null
+}
+
 export function migrateLegacyFaUserSettingsKeys (
   raw: unknown
 ): Record<string, unknown> {
-  if (
-    typeof raw !== 'object' ||
-    raw === null ||
-    Array.isArray(raw) ||
-    Object.getPrototypeOf(raw) !== Object.prototype
-  ) {
+  if (!isMigrateableSettingsRecord(raw)) {
     return {}
   }
 

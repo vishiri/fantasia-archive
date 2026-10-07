@@ -14,7 +14,7 @@ test('Test that mdListArrayConverter extracts only markdown list items', () => {
   ].join('\n')
 
   expect(mdListArrayConverter(input)).toEqual([
-    '- first entry',
+    'first entry',
     'second "quoted" entry'
   ])
 })
@@ -24,7 +24,7 @@ test('Test that mdListArrayConverter extracts only markdown list items', () => {
  * Drops a trailing empty segment produced by a final newline before splitting.
  */
 test('Test that mdListArrayConverter pops a trailing empty entry after split', () => {
-  expect(mdListArrayConverter('- only line\n')).toEqual(['- only line'])
+  expect(mdListArrayConverter('- only line\n')).toEqual(['only line'])
 })
 
 /**
@@ -32,7 +32,7 @@ test('Test that mdListArrayConverter pops a trailing empty entry after split', (
  * Leaves the last segment in place when the final split token is not an empty string.
  */
 test('Test that mdListArrayConverter keeps the sole line when there is no trailing newline', () => {
-  expect(mdListArrayConverter('- solo')).toEqual(['- solo'])
+  expect(mdListArrayConverter('- solo')).toEqual(['solo'])
 })
 
 /**
@@ -48,5 +48,9 @@ test('Test that mdListArrayConverter returns an empty array when no list lines e
  * Asterisk-style markdown bullets are not treated as list items for this helper.
  */
 test('Test that mdListArrayConverter drops asterisk bullet lines like other non-dash list lines', () => {
-  expect(mdListArrayConverter('* not supported\n- kept')).toEqual(['- kept'])
+  expect(mdListArrayConverter('* not supported\n- kept')).toEqual(['kept'])
+})
+
+test('Test that mdListArrayConverter strips the dash marker on CRLF list lines', () => {
+  expect(mdListArrayConverter('- one\r\n- two')).toEqual(['one', 'two'])
 })

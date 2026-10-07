@@ -221,6 +221,47 @@ test('Test that disposeEditor swallows errors thrown by dispose calls', async ()
  * useMonacoMount
  * onBeforeUnmount auto-disposes any live editor.
  */
+test('Test that dispose during Monaco load does not keep the editor', async () => {
+  const onChangeSpy = vi.fn()
+  await mountHarness(onChangeSpy)
+  const handle = getHandle()
+  const host = document.createElement('div')
+  const pending = handle.mountInto(host, 'late css')
+  handle.disposeEditor()
+  await pending
+  expect(monacoEditorCreateMock).not.toHaveBeenCalled()
+  expect(handle.editor.value).toBeNull()
+  expect(handle.isLoading.value).toBe(false)
+})
+
+test('Test that mountInto on a new host replaces the detached editor', async () => {
+  const onChangeSpy = vi.fn()
+  await mountHarness(onChangeSpy)
+  const handle = getHandle()
+  const firstHost = document.createElement('div')
+  const secondHost = document.createElement('div')
+  await handle.mountInto(firstHost, 'first')
+  await handle.mountInto(secondHost, 'second')
+  expect(editorDisposeMock).toHaveBeenCalledTimes(1)
+  expect(monacoEditorCreateMock).toHaveBeenCalledTimes(2)
+  expect(monacoEditorCreateMock.mock.calls[1]?.[0]).toBe(secondHost)
+  expect(monacoEditorCreateMock.mock.calls[1]?.[1]).toMatchObject({ value: 'second' })
+})
+
+test('Test that overlapping Monaco mounts keep a single editor', async () => {
+  const onChangeSpy = vi.fn()
+  await mountHarness(onChangeSpy)
+  const handle = getHandle()
+  const host = document.createElement('div')
+  const first = handle.mountInto(host, 'first')
+  const second = handle.mountInto(host, 'second')
+  await first
+  await second
+  expect(monacoEditorCreateMock).toHaveBeenCalledTimes(1)
+  expect(monacoEditorCreateMock.mock.calls[0]?.[1]).toMatchObject({ value: 'second' })
+  expect(handle.editor.value).not.toBeNull()
+})
+
 test('Test that unmounting the harness disposes the live editor', async () => {
   const onChangeSpy = vi.fn()
   const wrapper = await mountHarness(onChangeSpy)

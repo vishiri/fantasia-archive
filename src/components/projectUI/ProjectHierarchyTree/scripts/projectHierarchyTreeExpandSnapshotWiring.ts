@@ -26,6 +26,9 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
   ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
+  if (deps.restoreOptions?.isStillCurrent?.() === false) {
+    return
+  }
   const withAncestors = deps.restoreOptions?.includeAncestorClosure === true
     ? expandProjectHierarchyTreeExpandedNodeIdsWithAncestors(
       deps.treeData.value,
@@ -46,19 +49,20 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     expandedNodeIds: pruned,
     treeNodes: deps.treeData.value
   })
-  deps.openNodeIds.value = new Set(immediateOpenNodeIds)
   const persistedExpandedNodeIds = collectProjectHierarchyTreePersistedExpandedNodeIds(
     deps.treeData.value,
     new Set(pruned)
   )
-  if (shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
+  const persistRestoredExpandedNodeIds = shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
     intendedExpandedNodeIds: ancestorPruned,
-    restoredExpandedNodeIds: persistedExpandedNodeIds,
-    treeNodeCount: deps.treeData.value.length
-  })) {
+    restoredExpandedNodeIds: persistedExpandedNodeIds
+  })
+  if (persistRestoredExpandedNodeIds) {
+    deps.openNodeIds.value = new Set(immediateOpenNodeIds)
     deps.onExpandedNodeIdsChange(persistedExpandedNodeIds)
   }
 
+  const isStillCurrent = deps.restoreOptions?.isStillCurrent
   await loadAndReapplyExpandedSnapshotAfterOpenSet({
     commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
@@ -68,7 +72,8 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
     runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
-    treeData: deps.treeData
+    treeData: deps.treeData,
+    ...(isStillCurrent === undefined ? {} : { isStillCurrent })
   })
 }
 

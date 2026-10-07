@@ -116,12 +116,13 @@ test('Test that expand open reloads evicted document children after close and re
   })
   async function runDeferredLazyLoadBatch (runBatch: () => Promise<void>): Promise<void> {
     deferLazyLoadTreeRevisionPublish.value = true
-    try {
+    const batch = (async () => {
       await runBatch()
       await lazyLoadWiring.flushDeferredTreeRevisionPublish()
-    } finally {
+    })()
+    await batch.finally(() => {
       deferLazyLoadTreeRevisionPublish.value = false
-    }
+    })
   }
   const firstNode = treeData.value[0]!
   await runProjectHierarchyTreeSessionExpandOpen({
@@ -204,12 +205,13 @@ test('Test that parent document reopen flushes before latent reloads nested desc
   })
   async function runDeferredLazyLoadBatch (runBatch: () => Promise<void>): Promise<void> {
     deferLazyLoadTreeRevisionPublish.value = true
-    try {
+    const batch = (async () => {
       await runBatch()
       await lazyLoadWiring.flushDeferredTreeRevisionPublish()
-    } finally {
+    })()
+    await batch.finally(() => {
       deferLazyLoadTreeRevisionPublish.value = false
-    }
+    })
   }
   const parentNode = treeData.value[0]!
   await runProjectHierarchyTreeSessionExpandOpen({

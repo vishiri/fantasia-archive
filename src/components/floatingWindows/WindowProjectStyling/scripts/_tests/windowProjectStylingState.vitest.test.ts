@@ -383,6 +383,32 @@ test('saveAndCloseWindow leaves the chrome open while persistence refuses to com
   wrapper.unmount()
 })
 
+test('saveAndCloseWindow stays open when CSS changes during save', async () => {
+  primeProjectCssStore('')
+  let finishSave: ((ok: boolean) => void) | undefined
+  const pendingSave = new Promise<boolean>((resolve) => {
+    finishSave = resolve
+  })
+  runFaActionAwaitMock.mockReturnValueOnce(pendingSave)
+  const { harness, wrapper } = mountUseWindowProject('WindowProjectStyling')
+  await nextTick()
+  harness.current!.state.workingCss.value = 'final css'
+  const savePromise = harness.current!.state.saveAndCloseWindow()
+  harness.current!.state.workingCss.value = 'newer css'
+  const finish = finishSave
+  if (finish === undefined) {
+    throw new Error('missing save resolver')
+  }
+  finish(true)
+  await savePromise
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('saveProjectStyling', {
+    css: 'final css'
+  })
+  expect(harness.current!.state.windowModel.value).toBe(true)
+  expect(harness.current!.state.workingCss.value).toBe('newer css')
+  wrapper.unmount()
+})
+
 test('closeWithoutSaving refreshes project KV overlays then collapses live preview bookkeeping', async () => {
   const projectKvStore = S_FaProjectStyling()
 

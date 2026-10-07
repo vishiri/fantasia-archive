@@ -26,9 +26,10 @@ export function readFaProjectDialogUiPref (
     }
   }
   const trimmed = raw.trim()
+  const value = trimmed.length > 0 ? trimmed : null
   return {
     key,
-    value: trimmed.length > 0 ? trimmed : null
+    value
   }
 }
 

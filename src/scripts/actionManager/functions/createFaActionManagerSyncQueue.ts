@@ -111,7 +111,16 @@ async function processNextFaActionSyncQueueEntry (
   }
   const definition = definitionLookup(next.id)
   if (definition === undefined) {
-    deps.reportFaActionFailure(next, new Error(`Unknown action id: ${String(next.id)}`))
+    const unknownActionError = new Error(`Unknown action id: ${String(next.id)}`)
+    const failure = deps.reportFaActionFailure(next, unknownActionError)
+    deps.recordHistoryCompleted(
+      next.uid,
+      {
+        errorMessage: failure.errorMessage,
+        kind: 'failed'
+      },
+      Date.now()
+    )
     void processNextFaActionSyncQueueEntry(deps, state, definitionLookup)
     return
   }
@@ -188,21 +197,34 @@ export function createFaActionManagerSyncQueue (
     drainCompletionWaiters: [],
     isDraining: false
   }
-
-  return {
-    FA_ACTION_SYNC_QUEUE_MAX: deps.FA_ACTION_SYNC_QUEUE_MAX,
-    FA_ACTION_SYNC_TIMEOUT_MS: deps.FA_ACTION_SYNC_TIMEOUT_MS,
-    awaitSyncQueueDrain: () => awaitFaActionSyncQueueDrain(deps, state),
-    enqueueSyncAction: (entry, definition, definitionLookup) => enqueueFaActionSyncQueueEntry(
+  const FA_ACTION_SYNC_QUEUE_MAX = deps.FA_ACTION_SYNC_QUEUE_MAX
+  const FA_ACTION_SYNC_TIMEOUT_MS = deps.FA_ACTION_SYNC_TIMEOUT_MS
+  const awaitSyncQueueDrain = (): Promise<void> => {
+    return awaitFaActionSyncQueueDrain(deps, state)
+  }
+  const enqueueSyncAction = (
+    entry: I_faActionQueueEntry,
+    definition: I_faActionDefinition<T_faActionId>,
+    definitionLookup: (id: T_faActionId) => I_faActionDefinition<T_faActionId> | undefined
+  ): boolean => {
+    return enqueueFaActionSyncQueueEntry(
       deps,
       state,
       entry,
       definition,
       definitionLookup
-    ),
-    _resetFaActionSyncQueueForTests: () => {
-      state.isDraining = false
-      state.drainCompletionWaiters.length = 0
-    }
+    )
+  }
+  const resetFaActionSyncQueueForTests = (): void => {
+    state.isDraining = false
+    state.drainCompletionWaiters.length = 0
+  }
+
+  return {
+    FA_ACTION_SYNC_QUEUE_MAX,
+    FA_ACTION_SYNC_TIMEOUT_MS,
+    awaitSyncQueueDrain,
+    enqueueSyncAction,
+    _resetFaActionSyncQueueForTests: resetFaActionSyncQueueForTests
   }
 }

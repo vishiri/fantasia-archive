@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 /**
  * Best-effort MRU write for a saved document open. Never throws to callers.
  */
@@ -8,9 +10,11 @@ export async function recordFaOpenedDocumentLastOpenedBestEffort (
   if (typeof api?.recordDocumentLastOpened !== 'function') {
     return
   }
-  try {
-    await api.recordDocumentLastOpened({ documentId })
-  } catch (error) {
-    console.warn('[S_FaOpenedDocuments] recordDocumentLastOpened failed', error)
+  const recorded = await ResultAsync.fromPromise(
+    api.recordDocumentLastOpened({ documentId }),
+    (error: unknown) => error
+  )
+  if (recorded.isErr()) {
+    console.warn('[S_FaOpenedDocuments] recordDocumentLastOpened failed', recorded.error)
   }
 }

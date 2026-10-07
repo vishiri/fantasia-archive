@@ -350,7 +350,7 @@ All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 | `reindex-document-siblings-in-hierarchy-async` | `reindexFaProjectDocumentSiblingsInHierarchy` (same parent bucket sibling **`sort_order`** rewrite after drag reorder) |
 | `search-project-hierarchy-async` | `searchFaProjectHierarchy` |
 
-**`FA_PROJECT_MANAGEMENT_IPC`** (hierarchy UI state): **`get-hierarchy-tree-ui-state-async`** → **`readFaProjectHierarchyTreeUiState`**; **`set-hierarchy-tree-ui-state-patch-async`** → **`upsertFaProjectHierarchyTreeUiStateKv`**.
+**`FA_PROJECT_MANAGEMENT_IPC`** (hierarchy UI state): **`get-hierarchy-tree-ui-state-async`** → **`readFaProjectHierarchyTreeUiState`**; **`set-hierarchy-tree-ui-state-patch-async`** → **`upsertFaProjectHierarchyTreeUiStateKv`**. Optional patch field **`expandedNodeIdsBaseJson`** is JSON of the expand list the writer last saved. When it does not match the stored list, stored **`expandedNodeIds`** stay. The base is not written into **`hierarchy_tree_ui_state`**.
 
 **`FA_PROJECT_MANAGEMENT_IPC`** (opened document tabs): **`get-opened-documents-snapshot-async`** → **`readFaProjectOpenedDocumentsSnapshot`**; **`save-opened-documents-snapshot-async`** → **`upsertFaProjectOpenedDocumentsSnapshot`**.
 

@@ -102,6 +102,7 @@ export interface I_createUseDialogQuickAddDocumentDeps {
   readLastSelectedWorldId: () => Promise<string | null>
   ref: <T>(value: T) => I_ref<T>
   registerComponentDialogStackGuard: (dialogModel: I_ref<boolean>) => void
+  reportTemporaryDocumentCreateFailure: (error: unknown) => void
   resolveDialogComponentStoreOrNull: () => I_dialogComponentStoreLike | null
   resolveNewDocumentDisplayName: (input: {
     preferredLanguageCode: T_faUserSettingsLanguageCode

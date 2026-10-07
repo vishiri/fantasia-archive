@@ -1,23 +1,38 @@
 import { expect, test } from 'vitest'
 
-import { parseProjectOverviewTranslationsJson } from '../parseProjectOverviewTranslationsJson'
+import { mapProjectOverviewTranslationStrings } from '../parseProjectOverviewTranslationsJson'
+import { parseProjectOverviewTranslationsJson } from '../../scripts/applyProjectOverviewChartModelWiring'
 
 /**
- * parseProjectOverviewTranslationsJson
+ * mapProjectOverviewTranslationStrings
  * Keeps string entries from valid objects and drops non-string values.
  */
-test('Test that parseProjectOverviewTranslationsJson keeps string map entries', () => {
-  expect(parseProjectOverviewTranslationsJson('{"en-US":"Heroes","nb":1,"fr":"Heros"}')).toEqual({
+test('Test that mapProjectOverviewTranslationStrings keeps string map entries', () => {
+  expect(mapProjectOverviewTranslationStrings({
+    'en-US': 'Heroes',
+    fr: 'Heros',
+    nb: 1
+  })).toEqual({
     'en-US': 'Heroes',
     fr: 'Heros'
   })
 })
 
 /**
- * parseProjectOverviewTranslationsJson
- * Returns empty maps for invalid JSON, arrays, and null.
+ * mapProjectOverviewTranslationStrings
+ * Returns empty maps for null, arrays, and non-objects.
  */
-test('Test that parseProjectOverviewTranslationsJson returns empty for invalid payloads', () => {
+test('Test that mapProjectOverviewTranslationStrings returns empty for non-objects', () => {
+  expect(mapProjectOverviewTranslationStrings(null)).toEqual({})
+  expect(mapProjectOverviewTranslationStrings([])).toEqual({})
+  expect(mapProjectOverviewTranslationStrings('x')).toEqual({})
+})
+
+/**
+ * parseProjectOverviewTranslationsJson
+ * Invalid JSON becomes an empty map.
+ */
+test('Test that parseProjectOverviewTranslationsJson returns empty for invalid JSON', () => {
   expect(parseProjectOverviewTranslationsJson('{')).toEqual({})
   expect(parseProjectOverviewTranslationsJson('null')).toEqual({})
   expect(parseProjectOverviewTranslationsJson('[]')).toEqual({})

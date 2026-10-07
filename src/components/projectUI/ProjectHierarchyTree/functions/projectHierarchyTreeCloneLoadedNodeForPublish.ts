@@ -4,17 +4,22 @@ function cloneProjectHierarchyTreeChildForPublish (
   child: I_faProjectHierarchyTreeHeTreeNode
 ): I_faProjectHierarchyTreeHeTreeNode {
   if (!child.childrenLoaded || child.children.length === 0) {
+    const children = [...child.children]
     return {
       ...child,
-      children: [...child.children]
+      children
     }
   }
+  const children = child.children.map((nestedChild) => {
+    const nestedChildren = [...nestedChild.children]
+    return {
+      ...nestedChild,
+      children: nestedChildren
+    }
+  })
   return {
     ...child,
-    children: child.children.map((nestedChild) => ({
-      ...nestedChild,
-      children: [...nestedChild.children]
-    }))
+    children
   }
 }
 
@@ -24,9 +29,10 @@ function cloneProjectHierarchyTreeChildForPublish (
 export function cloneProjectHierarchyTreeLoadedNodeForPublish (
   node: I_faProjectHierarchyTreeHeTreeNode
 ): I_faProjectHierarchyTreeHeTreeNode {
+  const children = node.children.map(cloneProjectHierarchyTreeChildForPublish)
   return {
     ...node,
-    children: node.children.map(cloneProjectHierarchyTreeChildForPublish)
+    children
   }
 }
 

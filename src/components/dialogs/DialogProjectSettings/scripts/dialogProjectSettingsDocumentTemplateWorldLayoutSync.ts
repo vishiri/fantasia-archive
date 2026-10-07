@@ -17,25 +17,29 @@ export function syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLa
   const templateById = new Map(documentTemplates.map((template) => {
     return [template.id, template] as const
   }))
+  const groups = layout.groups
+  const placements = layout.placements.map((placement) => {
+    const template = templateById.get(placement.documentTemplateId)
+    if (template === undefined) {
+      return placement
+    }
+    const templateDisplayName = resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
+      template,
+      languageCode
+    )
+    const worldAppendix = resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
+      template,
+      languageCode
+    )
+    return {
+      ...placement,
+      templateDisplayName,
+      worldAppendix
+    }
+  })
   return {
-    groups: layout.groups,
-    placements: layout.placements.map((placement) => {
-      const template = templateById.get(placement.documentTemplateId)
-      if (template === undefined) {
-        return placement
-      }
-      return {
-        ...placement,
-        templateDisplayName: resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
-          template,
-          languageCode
-        ),
-        worldAppendix: resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
-          template,
-          languageCode
-        )
-      }
-    })
+    groups,
+    placements
   }
 }
 
@@ -45,13 +49,14 @@ export function syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedL
   languageCode: T_faUserSettingsLanguageCode
 ): I_dialogProjectSettingsWorldDraft[] {
   return worlds.map((world) => {
+    const templateLayout = syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels(
+      world.templateLayout,
+      documentTemplates,
+      languageCode
+    )
     return {
       ...world,
-      templateLayout: syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels(
-        world.templateLayout,
-        documentTemplates,
-        languageCode
-      )
+      templateLayout
     }
   })
 }
@@ -62,13 +67,14 @@ export function syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDispla
   templateDisplayName: string
 ): I_dialogProjectSettingsWorldDraft[] {
   return worlds.map((world) => {
+    const templateLayout = syncDialogProjectSettingsWorldTemplatePlacementTemplateDisplayNames(
+      world.templateLayout,
+      documentTemplateId,
+      templateDisplayName
+    )
     return {
       ...world,
-      templateLayout: syncDialogProjectSettingsWorldTemplatePlacementTemplateDisplayNames(
-        world.templateLayout,
-        documentTemplateId,
-        templateDisplayName
-      )
+      templateLayout
     }
   })
 }

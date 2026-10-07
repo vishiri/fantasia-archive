@@ -74,6 +74,24 @@ test('Test that plural en-US is fourth fallback', () => {
 
 /**
  * resolveProjectHierarchyTreeAddNewTemplateTitlePart
+ * Another locale in language-code order wins before the missing token.
+ */
+test('Test that another locale in language-code order wins before the missing token', () => {
+  const part = resolveProjectHierarchyTreeAddNewTemplateTitlePart({
+    preferredLanguageCode: 'de',
+    titlePluralTranslations: {
+      zh: '角色们'
+    },
+    titleSingularTranslations: {
+      fr: 'Personnage',
+      zh: '角色'
+    }
+  })
+  expect(part).toBe('Personnage')
+})
+
+/**
+ * resolveProjectHierarchyTreeAddNewTemplateTitlePart
  * Missing translations return the missing token.
  */
 test('Test that missing translations return the missing token', () => {

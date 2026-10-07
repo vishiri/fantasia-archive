@@ -1,3 +1,5 @@
+import { Result, ResultAsync } from 'neverthrow'
+
 import type {
   I_faProjectHierarchyTreeHeTreeInstance,
   I_faProjectHierarchyTreeHeTreeNode
@@ -5,6 +7,10 @@ import type {
 import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 import { PROJECT_HIERARCHY_TREE_ROOT_CLASS } from '../functions/projectHierarchyTreeConstants'
+import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from '../functions/projectHierarchyTreeSuppressEmitDepth'
 import { projectHierarchyTreeNodeShowsOpenIcon } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 
 export function readProjectHierarchyTreeHeTreeLiveData (
@@ -91,21 +97,22 @@ export function tryOpenHeTreeNodeAndParents (deps: {
   statOpen?: { open: boolean }
   treeRef: I_faProjectHierarchyTreeHeTreeInstance
 }): boolean {
-  try {
+  const opened = Result.fromThrowable(() => {
     deps.treeRef.openNodeAndParents(deps.node)
     if (deps.statOpen !== undefined) {
       deps.statOpen.open = true
     }
+  }, (error: unknown) => error)()
+  if (opened.isOk()) {
     return true
-  } catch (error) {
-    if (!isHeTreeStatNotFoundError(error)) {
-      throw error
-    }
-    if (deps.statOpen !== undefined) {
-      deps.statOpen.open = false
-    }
-    return false
   }
+  if (!isHeTreeStatNotFoundError(opened.error)) {
+    throw opened.error
+  }
+  if (deps.statOpen !== undefined) {
+    deps.statOpen.open = false
+  }
+  return false
 }
 
 export async function handleProjectHierarchyTreeOpenIconClick (deps: {
@@ -147,7 +154,7 @@ export async function handleProjectHierarchyTreeOpenIconClick (deps: {
     return
   }
   deps.scheduleOpenIconExpandAnimation(deps.node.id)
-  try {
+  const opened = await ResultAsync.fromPromise((async () => {
     if (deps.awaitHeTreeResyncIdle !== undefined) {
       await deps.awaitHeTreeResyncIdle()
     }
@@ -158,9 +165,10 @@ export async function handleProjectHierarchyTreeOpenIconClick (deps: {
         statOpen: deps.stat
       }
     )
-  } catch (error) {
+  })(), (error: unknown) => error)
+  if (opened.isErr()) {
     deps.stat.open = false
-    throw error
+    throw opened.error
   }
 }
 
@@ -188,24 +196,25 @@ export function createProjectHierarchyTreeHeTreeResyncController (deps: {
       await heTreeResyncInFlight
     }
     const resyncWork = (async () => {
-      deps.suppressTreeEmit.value = true
+      beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
       programmaticHeTreeResyncActive = true
-      // Soft path only — remount via :key tears down vtlist under virtualization.
-      // Full reapplyHeTreeOpenState after a root slice caused whole-tree blink;
-      // callers open the expand target instead.
-      await deps.nextTick()
-      programmaticHeTreeResyncActive = false
-      deps.suppressTreeEmit.value = false
+      try {
+        // Soft path only — remount via :key tears down vtlist under virtualization.
+        // Full reapplyHeTreeOpenState after a root slice caused whole-tree blink;
+        // callers open the expand target instead.
+        await deps.nextTick()
+      } finally {
+        programmaticHeTreeResyncActive = false
+        endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
+      }
     })()
     heTreeResyncInFlight = resyncWork
-    try {
-      await resyncWork
-    } finally {
+    await resyncWork.finally(() => {
       programmaticHeTreeResyncActive = false
       if (heTreeResyncInFlight === resyncWork) {
         heTreeResyncInFlight = null
       }
-    }
+    })
   }
 
   async function awaitHeTreeResyncIdle (): Promise<void> {

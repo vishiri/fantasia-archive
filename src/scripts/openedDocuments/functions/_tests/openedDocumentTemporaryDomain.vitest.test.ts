@@ -121,6 +121,21 @@ test('Test that resolveCopyOfDocumentDisplayName applies translated prefix', () 
   expect(displayName).toBe('Copy of - Hero')
 })
 
+test('Test that createTemporaryOpenedDocumentTabSeed stores an explicit placement id', () => {
+  const tab = createTemporaryOpenedDocumentTabSeed({
+    displayName: 'Aria',
+    documentId: 'temp-1',
+    parentDocumentId: null,
+    placementId: 'placement-2',
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  expect(tab.placementId).toBe('placement-2')
+})
+
 test('Test that createTemporaryOpenedDocumentTabSeed starts in edit mode without unsaved changes', () => {
   const tab = createTemporaryOpenedDocumentTabSeed({
     displayName: 'Aria',
@@ -346,6 +361,20 @@ test('Test that buildTemporaryDocumentParentResolveDocumentIds walks parent chai
   expect(chain).toEqual(['doc-child', 'doc-parent'])
 })
 
+test('Test that buildTemporaryDocumentParentResolveDocumentIds stops when the parent chain loops', async () => {
+  const chain = await buildTemporaryDocumentParentResolveDocumentIds({
+    getDocumentById: async (documentId) => {
+      if (documentId === 'doc-a') {
+        return { parentDocumentId: 'doc-b' }
+      }
+      return { parentDocumentId: 'doc-a' }
+    },
+    startDocumentId: 'doc-a'
+  })
+
+  expect(chain).toEqual(['doc-a', 'doc-b'])
+})
+
 test('Test that resolveTemporaryDocumentParentDocumentIdForSave picks first available ancestor', () => {
   const resolved = resolveTemporaryDocumentParentDocumentIdForSave({
     chain: ['doc-child', 'doc-parent', 'doc-root'],
@@ -404,6 +433,29 @@ test('Test that promoteTemporaryOpenedDocumentTabAfterCreate can keep edit mode 
   })
 
   expect(promoted.editState).toBe(true)
+})
+
+test('Test that promoteTemporaryOpenedDocumentTabAfterCreate keeps preview when save stays in the current mode', () => {
+  const tab = createTemporaryOpenedDocumentTabSeed({
+    displayName: 'Aria',
+    documentId: 'temp-1',
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  const previewTab = {
+    ...tab,
+    editState: false
+  }
+  const promoted = promoteTemporaryOpenedDocumentTabAfterCreate(previewTab, {
+    documentId: 'saved-1',
+    keepEditMode: true,
+    savedDisplayName: 'Aria'
+  })
+
+  expect(promoted.editState).toBe(false)
 })
 
 test('Test that createTemporaryOpenedDocumentTabCopySeed stores parent resolve chain', () => {

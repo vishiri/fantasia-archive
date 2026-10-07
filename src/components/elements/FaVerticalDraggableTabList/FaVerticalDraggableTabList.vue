@@ -239,14 +239,24 @@ function onDragStart (event: SortableEvent): void {
   applyFaVerticalDraggableTabsDocumentDragCursor()
 }
 
+function blurFocusedTabAfterDrag (): void {
+  const activeElement = document.activeElement
+  const scroll = tabListScrollRef.value
+  if (!(activeElement instanceof HTMLElement) || scroll === null) {
+    return
+  }
+  if (!scroll.contains(activeElement)) {
+    return
+  }
+  activeElement.blur()
+}
+
 function onDragEnd (): void {
   draggingItemId.value = null
   clearFaVerticalDraggableTabsDocumentDragCursor()
   applySortableListToFull()
   emit('update:items', props.cloneList(draggableItems.value))
-  if (document.activeElement instanceof HTMLElement) {
-    document.activeElement.blur()
-  }
+  blurFocusedTabAfterDrag()
   schedulePointerHoverResyncAfterAnimation()
 }
 

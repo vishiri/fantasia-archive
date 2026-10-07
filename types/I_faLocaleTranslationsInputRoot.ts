@@ -51,7 +51,7 @@ export type T_useFaLocaleTranslationsInputRoot = (
   props: I_faLocaleTranslationsInputRootProps,
   emit: I_faLocaleTranslationsInputRootEmit
 ) => {
-  focusPreferredLanguageInput: () => void
+  focusPreferredLanguageInput: (shouldFocus?: () => boolean) => void
   isMenuPanelPresentation: import('vue').ComputedRef<boolean>
   isSingularPluralForms: import('vue').ComputedRef<boolean>
   menuPanelBindings: import('vue').ComputedRef<I_faLocaleTranslationsInputMenuPanelBindings>

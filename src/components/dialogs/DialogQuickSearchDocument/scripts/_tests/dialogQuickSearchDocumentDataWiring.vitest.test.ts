@@ -108,6 +108,7 @@ test('Test that loadDialogQuickSearchDocumentSources maps bridge list results', 
       })),
       listDocuments: vi.fn(async () => ({
         items: [{
+          createdAtMs: 1700,
           displayName: 'Aria',
           documentTextColor: '#ff0000',
           id: 'doc-1',
@@ -140,6 +141,7 @@ test('Test that loadDialogQuickSearchDocumentSources maps bridge list results', 
     }]
   })
   await expect(loadDialogQuickSearchDocumentDocumentsForWorld('world-1')).resolves.toEqual([{
+    createdAtMs: 1700,
     displayName: 'Aria',
     documentTextColor: '#ff0000',
     id: 'doc-1',

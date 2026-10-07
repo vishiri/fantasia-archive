@@ -118,3 +118,29 @@ test('Test that remove group draft shifts later groups when removed group had ch
   const secondGroup = nextLayout.groups.find((group) => group.id === secondGroupId)
   expect(secondGroup?.rootSortOrder).toBe(secondGroupRootBefore + 1)
 })
+
+/**
+ * appendDialogProjectSettingsWorldTemplateGroupDraft
+ * A gap in root sort order must not pull a new row into the middle.
+ */
+test('Test that append group draft stays after a gapped root order', () => {
+  const layout = {
+    groups: [
+      {
+        displayNameTranslations: { 'en-US': 'Early' },
+        id: 'group-early',
+        rootSortOrder: 0
+      },
+      {
+        displayNameTranslations: { 'en-US': 'Late' },
+        id: 'group-late',
+        rootSortOrder: 10
+      }
+    ],
+    placements: []
+  }
+  const nextLayout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'New')
+  const lateOrder = nextLayout.groups.find((group) => group.id === 'group-late')?.rootSortOrder ?? 0
+  const newOrder = nextLayout.groups.find((group) => group.id !== 'group-early' && group.id !== 'group-late')?.rootSortOrder ?? 0
+  expect(newOrder).toBeGreaterThan(lateOrder)
+})

@@ -1,8 +1,8 @@
 export default {
   title: 'Project',
   items: {
-    newProject: 'Create new project',
-    loadProject: 'Load existing project',
+    newProject: 'Create New Project',
+    loadProject: 'Load Existing Project',
     loadRecentProject: 'Load Recent Project',
     noRecentProjects: 'No Recent Projects',
     recentProjectRow: 'Recent Project',

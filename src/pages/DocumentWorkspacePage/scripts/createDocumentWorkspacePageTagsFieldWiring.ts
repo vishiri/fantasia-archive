@@ -27,9 +27,11 @@ export function wireDocumentWorkspacePageTagsField (input: {
     listTagsForWorld: async (worldId) => {
       const result = await listFaProjectTagsForWorldForRenderer({ worldId })
       return result.items.map((tag): I_faSelectInputObjectItem => {
+        const id = tag.id
+        const name = tag.name
         return {
-          id: tag.id,
-          name: tag.name
+          id,
+          name
         }
       })
     },

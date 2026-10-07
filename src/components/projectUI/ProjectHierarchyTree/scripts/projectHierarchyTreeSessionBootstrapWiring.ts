@@ -4,6 +4,7 @@ import { bindProjectHierarchyTreeHeTreeNodeTabIndexGuard } from './projectHierar
 import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import { resolveProjectHierarchyTreeWorldsLayoutExpandSnapshot } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
 import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import { projectHierarchyTreeRevealPathsMatch } from '../functions/projectHierarchyTreeRevealPath'
 
 export function createProjectHierarchyTreeSessionRefs (deps: {
   ref: <T>(initial: T) => Ref<T>
@@ -88,7 +89,7 @@ export function createProjectHierarchyTreeSessionHydrateWiring (deps: {
   async function hydrateTreeSession (): Promise<void> {
     const thisGeneration = ++hydrateGeneration
     treeSessionHydrateInFlight = true
-    try {
+    const hydrateWork = (async () => {
       const ensureDocumentIndexLoaded = deps.hierarchyStore.ensureDocumentIndexLoaded
       const documentIndexPromise = ensureDocumentIndexLoaded === undefined
         ? Promise.resolve()
@@ -111,11 +112,12 @@ export function createProjectHierarchyTreeSessionHydrateWiring (deps: {
       }
       detachScrollPersist?.()
       detachScrollPersist = deps.uiStateWiring.attachScrollPersist()
-    } finally {
+    })()
+    await hydrateWork.finally(() => {
       if (thisGeneration === hydrateGeneration) {
         treeSessionHydrateInFlight = false
       }
-    }
+    })
   }
 
   function teardown (): void {
@@ -179,6 +181,9 @@ async function runProjectHierarchyTreeWorldsLayoutRestore (
   if (deps.shouldDeferWorldsExpandRestore()) {
     return
   }
+  if (expandedSnapshot.length === 0) {
+    return
+  }
   await deps.restoreExpandedSnapshot(expandedSnapshot)
 }
 
@@ -214,13 +219,24 @@ export function wireProjectHierarchyTreeSessionLifecycle (
     }
   )
 
+  let pendingRevealSerial = 0
+
   deps.watch(
     () => [...deps.pendingRevealPath.value],
     () => {
       if (deps.pendingRevealPath.value.length === 0) {
         return
       }
+      pendingRevealSerial += 1
+      const serialAtSchedule = pendingRevealSerial
+      const pathAtSchedule = [...deps.pendingRevealPath.value]
       void deps.revealPendingPath().then(() => {
+        if (serialAtSchedule !== pendingRevealSerial) {
+          return
+        }
+        if (!projectHierarchyTreeRevealPathsMatch(deps.pendingRevealPath.value, pathAtSchedule)) {
+          return
+        }
         deps.clearPendingRevealPath()
       })
     }

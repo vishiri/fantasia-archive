@@ -18,7 +18,7 @@
   background-color: $projectAppControlBar-backgroundColor;
   left: $projectAppControlBar-widthOffsetPx;
   min-height: $projectAppControlBar-minHeightPx;
-  min-width: calc(100vw - #{$projectAppControlBar-widthOffsetPx});
+  min-width: calc(#{$projectAppControlBar-fixedStrip-viewportWidth} - #{$projectAppControlBar-widthOffsetPx});
   position: fixed;
   right: 0;
   top: calc(#{mainLayout.$mainLayout-appHeader-heightPx} + #{$projectAppControlBar-topOffsetPx});
@@ -26,7 +26,7 @@
 
   &--treeHidden {
     left: 0;
-    min-width: 100vw;
+    min-width: $projectAppControlBar-fixedStrip-viewportWidth;
   }
 }
 

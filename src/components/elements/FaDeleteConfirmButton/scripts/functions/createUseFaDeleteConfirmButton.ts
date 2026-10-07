@@ -1,5 +1,51 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
+function createFaDeleteConfirmCountdown (deps: {
+  clearInterval: (handle: ReturnType<typeof setInterval>) => void
+  confirmDelaySec: number
+  ref: <T>(value: T) => I_ref<T>
+  setInterval: (handler: () => void, timeout: number) => ReturnType<typeof setInterval>
+}): {
+    resetCountdown: () => void
+    secondsRemaining: I_ref<number>
+    startCountdown: () => void
+    stopCountdown: () => void
+  } {
+  const secondsRemaining = deps.ref(deps.confirmDelaySec)
+  let intervalId: ReturnType<typeof deps.setInterval> | null = null
+
+  function stopCountdown (): void {
+    if (intervalId !== null) {
+      deps.clearInterval(intervalId)
+      intervalId = null
+    }
+  }
+
+  function resetCountdown (): void {
+    stopCountdown()
+    secondsRemaining.value = deps.confirmDelaySec
+  }
+
+  function startCountdown (): void {
+    resetCountdown()
+    intervalId = deps.setInterval(() => {
+      if (secondsRemaining.value > 1) {
+        secondsRemaining.value -= 1
+      } else {
+        secondsRemaining.value = 0
+        stopCountdown()
+      }
+    }, 1000)
+  }
+
+  return {
+    resetCountdown,
+    secondsRemaining,
+    startCountdown,
+    stopCountdown
+  }
+}
+
 export function createUseFaDeleteConfirmButton (deps: {
   clearInterval: (handle: ReturnType<typeof setInterval>) => void
   computed: <T>(fn: () => T) => I_computedRef<T>
@@ -11,7 +57,9 @@ export function createUseFaDeleteConfirmButton (deps: {
     source: I_ref<boolean>,
     callback: (isOpen: boolean) => void
   ) => void
-}): () => {
+}): (input: {
+    isRemoveDisabled: () => boolean
+  }) => {
     closeMenu: () => void
     confirmDeleteDisabled: I_computedRef<boolean>
     menuOffset: I_computedRef<[number, number]>
@@ -21,41 +69,16 @@ export function createUseFaDeleteConfirmButton (deps: {
     onConfirmDelete: (onConfirm: () => void) => void
     secondsRemaining: I_ref<number>
   } {
-  return function useFaDeleteConfirmButton () {
+  return function useFaDeleteConfirmButton (input) {
     const menuOpen = deps.ref(false)
-    const secondsRemaining = deps.ref(deps.confirmDelaySec)
-    let intervalId: ReturnType<typeof deps.setInterval> | null = null
-
-    function clearCountdownInterval (): void {
-      if (intervalId !== null) {
-        deps.clearInterval(intervalId)
-        intervalId = null
-      }
-    }
-
-    function resetCountdown (): void {
-      clearCountdownInterval()
-      secondsRemaining.value = deps.confirmDelaySec
-    }
-
-    function startCountdown (): void {
-      resetCountdown()
-      intervalId = deps.setInterval(() => {
-        if (secondsRemaining.value > 1) {
-          secondsRemaining.value -= 1
-        } else {
-          secondsRemaining.value = 0
-          clearCountdownInterval()
-        }
-      }, 1000)
-    }
+    const countdown = createFaDeleteConfirmCountdown(deps)
 
     function onMenuShow (): void {
-      startCountdown()
+      countdown.startCountdown()
     }
 
     function onMenuHide (): void {
-      resetCountdown()
+      countdown.resetCountdown()
     }
 
     function closeMenu (): void {
@@ -63,29 +86,37 @@ export function createUseFaDeleteConfirmButton (deps: {
     }
 
     function onConfirmDelete (onConfirm: () => void): void {
-      if (secondsRemaining.value > 0) {
+      if (countdown.secondsRemaining.value > 0) {
         return
       }
       onConfirm()
       closeMenu()
     }
 
-    const confirmDeleteDisabled = deps.computed(() => secondsRemaining.value > 0)
-
+    const confirmDeleteDisabled = deps.computed(() => countdown.secondsRemaining.value > 0)
     const menuOffset = deps.computed(() => [0, 4] as [number, number])
+    const removeDisabled = deps.computed(() => input.isRemoveDisabled())
 
     deps.watch(menuOpen, (isOpen) => {
       if (isOpen) {
-        startCountdown()
+        countdown.startCountdown()
       } else {
-        resetCountdown()
+        countdown.resetCountdown()
       }
     })
 
-    deps.onUnmounted(() => {
-      clearCountdownInterval()
+    deps.watch(removeDisabled, (isDisabled) => {
+      if (!isDisabled) {
+        return
+      }
+      menuOpen.value = false
     })
 
+    deps.onUnmounted(() => {
+      countdown.stopCountdown()
+    })
+
+    const secondsRemaining = countdown.secondsRemaining
     return {
       closeMenu,
       confirmDeleteDisabled,

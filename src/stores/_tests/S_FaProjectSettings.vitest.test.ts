@@ -91,3 +91,54 @@ test('Test that updateProjectSettings persists via bridge helper', async () => {
   })
   expect(store.root?.projectName).toBe('Applied')
 })
+
+test('Test that a refresh started first does not replace a later project settings save', async () => {
+  let releaseRefresh: (() => void) | undefined
+  const refreshHang = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  refreshFromBridgeMock.mockImplementationOnce(async (opts: {
+    applyRoot: (next: I_faProjectSettingsRoot) => void
+  }) => {
+    await refreshHang
+    opts.applyRoot({
+      projectName: 'stale',
+      schemaVersion: 1
+    })
+    return true
+  })
+  persistPatchFromStoreMock.mockImplementationOnce(async (opts: {
+    applyRoot: (next: I_faProjectSettingsRoot) => void
+  }) => {
+    opts.applyRoot({
+      projectName: 'saved',
+      schemaVersion: 1
+    })
+  })
+
+  const refreshPromise = store.refreshProjectSettings()
+  await vi.waitUntil(() => refreshFromBridgeMock.mock.calls.length === 1)
+  const updatePromise = store.updateProjectSettings({ projectName: 'saved' })
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing project settings refresh resolver')
+  }
+  finishRefresh()
+  await refreshPromise
+  await updatePromise
+
+  expect(store.root?.projectName).toBe('saved')
+})
+
+test('Test that updateProjectSettings passes the project epoch into the persist helper', async () => {
+  await store.updateProjectSettings({ projectName: 'epoch' }, 4)
+  expect(persistPatchFromStoreMock).toHaveBeenCalledWith(expect.objectContaining({
+    epochAtStart: 4,
+    patch: { projectName: 'epoch' }
+  }))
+})
+
+test('Test that updateProjectSettings rejects when persist throws', async () => {
+  persistPatchFromStoreMock.mockRejectedValueOnce(new Error('persist-boom'))
+  await expect(store.updateProjectSettings({ projectName: 'x' })).rejects.toThrow('persist-boom')
+})

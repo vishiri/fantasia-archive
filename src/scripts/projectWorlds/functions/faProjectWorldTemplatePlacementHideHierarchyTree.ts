@@ -40,9 +40,13 @@ export async function syncHideHierarchyTreeWhenNoWorldTemplatePlacements (input:
   getHideHierarchyTree: () => boolean
   getWorlds: () => ReadonlyArray<{ readonly placements: ReadonlyArray<unknown> }>
   patchHideHierarchyTree: (hideHierarchyTree: boolean) => Promise<void>
+  projectStillCurrent?: () => boolean
   refreshLayout: () => Promise<void>
 }): Promise<void> {
   await input.refreshLayout()
+  if (input.projectStillCurrent?.() === false) {
+    return
+  }
   if (hasAnyFaProjectWorldTemplatePlacement(input.getWorlds())) {
     return
   }

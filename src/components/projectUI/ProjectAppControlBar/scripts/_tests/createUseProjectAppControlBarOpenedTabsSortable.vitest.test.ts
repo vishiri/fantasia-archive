@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { expect, test, vi } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
@@ -36,7 +36,7 @@ const sampleTab = (documentId: string): I_faOpenedDocumentTab => {
   }
 }
 
-test('Test that useProjectAppControlBarOpenedTabsSortable syncs tabs and reports reorder indexes', () => {
+test('Test that useProjectAppControlBarOpenedTabsSortable syncs tabs and reports reorder indexes', async () => {
   const openedTabs = ref([sampleTab('doc-1'), sampleTab('doc-2'), sampleTab('doc-3')])
   const onTabReorder = vi.fn()
   const useSortable = createUseProjectAppControlBarOpenedTabsSortable({
@@ -69,5 +69,21 @@ test('Test that useProjectAppControlBarOpenedTabsSortable syncs tabs and reports
     newIndex: 2
   })
   api.onTabsDragEnd({})
+  expect(onTabReorder).toHaveBeenCalledTimes(1)
+
+  openedTabs.value = [sampleTab('doc-1'), sampleTab('doc-9'), sampleTab('doc-3')]
+  await nextTick()
+  expect(api.sortableTabs.value.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-9', 'doc-3'])
+
+  api.onTabsDragStart()
+  openedTabs.value = [sampleTab('doc-1'), sampleTab('doc-2'), sampleTab('doc-3')]
+  await nextTick()
+  expect(api.sortableTabs.value.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-9', 'doc-3'])
+
+  api.onTabsDragEnd({
+    oldIndex: 0,
+    newIndex: 0
+  })
+  expect(api.sortableTabs.value.map((tab) => tab.documentId)).toEqual(['doc-1', 'doc-2', 'doc-3'])
   expect(onTabReorder).toHaveBeenCalledTimes(1)
 })

@@ -10,6 +10,49 @@ import type {
   T_importExportView
 } from 'app/types/I_dialogImportExportAppConfig'
 
+function readImportExportIncludeFlags (b: I_importExportDialogActionBindings): {
+  includeAppNoteboard: boolean
+  includeAppSettings: boolean
+  includeAppStyling: boolean
+  includeKeybinds: boolean
+} {
+  const includeAppNoteboard = b.exportIncludeAppNoteboard.value
+  const includeAppSettings = b.exportIncludeAppSettings.value
+  const includeAppStyling = b.exportIncludeAppStyling.value
+  const includeKeybinds = b.exportIncludeKeybinds.value
+  return {
+    includeAppNoteboard,
+    includeAppSettings,
+    includeAppStyling,
+    includeKeybinds
+  }
+}
+
+function readImportExportApplyInput (b: I_importExportDialogActionBindings): {
+  applyAppNoteboard: boolean
+  applyAppSettings: boolean
+  applyAppStyling: boolean
+  applyKeybinds: boolean
+  sessionId: string
+} {
+  const applyAppNoteboard = b.importApplyAppNoteboard.value
+  const applyAppSettings = b.importApplyAppSettings.value
+  const applyAppStyling = b.importApplyAppStyling.value
+  const applyKeybinds = b.importApplyKeybinds.value
+  const sessionId = b.importSessionId.value
+  return {
+    applyAppNoteboard,
+    applyAppSettings,
+    applyAppStyling,
+    applyKeybinds,
+    sessionId
+  }
+}
+
+function importExportSnapshotsMatch (left: unknown, right: unknown): boolean {
+  return JSON.stringify(left) === JSON.stringify(right)
+}
+
 export function createDialogImportExportAppConfig (deps: {
   S_DialogComponent: () => I_dialogComponentStoreLike
   Notify: { create: (opts: Record<string, unknown>) => void }
@@ -36,7 +79,7 @@ export function createDialogImportExportAppConfig (deps: {
   registerComponentDialogStackGuard: (dialogModel: Ref<boolean>) => void
   Result: {
     fromThrowable: <T, E>(fn: () => T, onError: (error: unknown) => E) => () => {
-      unwrapOr: (defaultValue: T) => T
+      unwrapOr: <D>(defaultValue: D) => T | D
     }
   }
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
@@ -330,23 +373,31 @@ export function createDialogImportExportAppConfig (deps: {
     }
   }
 
+  let importExportIoInFlight = false
+
   async function importExportDialogClickCreateExport (b: I_importExportDialogActionBindings): Promise<void> {
-    const inc = {
-      includeAppNoteboard: b.exportIncludeAppNoteboard.value,
-      includeAppSettings: b.exportIncludeAppSettings.value,
-      includeAppStyling: b.exportIncludeAppStyling.value,
-      includeKeybinds: b.exportIncludeKeybinds.value
-    }
-    const ok = await deps.runFaActionAwait('exportAppConfigPackage', inc)
-    if (!ok) {
+    const inc = readImportExportIncludeFlags(b)
+    if (importExportIoInFlight) {
       return
     }
-    deps.Notify.create({
-      group: false,
-      message: deps.i18n.global.t('dialogs.importExportAppConfig.toasts.exportSuccess'),
-      type: 'positive'
-    })
-    b.onRequestClose()
+    importExportIoInFlight = true
+    try {
+      const ok = await deps.runFaActionAwait('exportAppConfigPackage', inc)
+      if (!ok) {
+        return
+      }
+      deps.Notify.create({
+        group: false,
+        message: deps.i18n.global.t('dialogs.importExportAppConfig.toasts.exportSuccess'),
+        type: 'positive'
+      })
+      if (!importExportSnapshotsMatch(readImportExportIncludeFlags(b), inc)) {
+        return
+      }
+      b.onRequestClose()
+    } finally {
+      importExportIoInFlight = false
+    }
   }
 
   async function importExportDialogClickPrepareImport (b: I_importExportDialogActionBindings): Promise<void> {
@@ -354,26 +405,34 @@ export function createDialogImportExportAppConfig (deps: {
     if (api === undefined) {
       return
     }
-    const r = await api.prepareImport()
-    if (r.outcome === 'canceled') {
-      void deps.runFaAction('importAppConfigStageResult', { status: 'canceled' })
+    if (importExportIoInFlight) {
       return
     }
-    if (r.outcome === 'error' || r.sessionId === undefined || r.parts === undefined) {
+    importExportIoInFlight = true
+    try {
+      const r = await api.prepareImport()
+      if (r.outcome === 'canceled') {
+        void deps.runFaAction('importAppConfigStageResult', { status: 'canceled' })
+        return
+      }
+      if (r.outcome === 'error' || r.sessionId === undefined || r.parts === undefined) {
+        void deps.runFaAction('importAppConfigStageResult', {
+          errorCode: r.errorName,
+          errorMessage: r.errorMessage,
+          status: 'fail'
+        })
+        return
+      }
       void deps.runFaAction('importAppConfigStageResult', {
-        errorCode: r.errorName,
-        errorMessage: r.errorMessage,
-        status: 'fail'
+        sessionId: r.sessionId,
+        status: 'pass'
       })
-      return
+      b.importSessionId.value = r.sessionId
+      b.importParts.value = r.parts
+      b.view.value = 'importSelect'
+    } finally {
+      importExportIoInFlight = false
     }
-    void deps.runFaAction('importAppConfigStageResult', {
-      sessionId: r.sessionId,
-      status: 'pass'
-    })
-    b.importSessionId.value = r.sessionId
-    b.importParts.value = r.parts
-    b.view.value = 'importSelect'
   }
 
   async function importExportDialogClickApplyImport (b: I_importExportDialogActionBindings): Promise<void> {
@@ -381,23 +440,28 @@ export function createDialogImportExportAppConfig (deps: {
     if (api === undefined || b.importSessionId.value === '') {
       return
     }
-    const input = {
-      applyAppNoteboard: b.importApplyAppNoteboard.value,
-      applyAppSettings: b.importApplyAppSettings.value,
-      applyAppStyling: b.importApplyAppStyling.value,
-      applyKeybinds: b.importApplyKeybinds.value,
-      sessionId: b.importSessionId.value
-    }
-    const ok = await deps.runFaActionAwait('importAppConfigApply', input)
-    if (!ok) {
+    if (importExportIoInFlight) {
       return
     }
-    deps.Notify.create({
-      group: false,
-      message: deps.i18n.global.t('dialogs.importExportAppConfig.toasts.importSuccess'),
-      type: 'positive'
-    })
-    b.onRequestClose()
+    importExportIoInFlight = true
+    try {
+      const input = readImportExportApplyInput(b)
+      const ok = await deps.runFaActionAwait('importAppConfigApply', input)
+      if (!ok) {
+        return
+      }
+      deps.Notify.create({
+        group: false,
+        message: deps.i18n.global.t('dialogs.importExportAppConfig.toasts.importSuccess'),
+        type: 'positive'
+      })
+      if (!importExportSnapshotsMatch(readImportExportApplyInput(b), input)) {
+        return
+      }
+      b.onRequestClose()
+    } finally {
+      importExportIoInFlight = false
+    }
   }
 
   function useDialogImportExportAppConfigDialog (opts: { onRequestClose: () => void }) {
@@ -420,36 +484,54 @@ export function createDialogImportExportAppConfig (deps: {
     const onClickImport = async (): Promise<void> => importExportDialogClickPrepareImport(bindings)
     const onClickImportSelected = async (): Promise<void> => importExportDialogClickApplyImport(bindings)
 
+    const {
+      appNoteboardImportEnabled,
+      appSettingsImportEnabled,
+      appStylingImportEnabled,
+      createExportDisabled,
+      dialogModel,
+      exportIncludeAppNoteboard,
+      exportIncludeAppSettings,
+      exportIncludeAppStyling,
+      exportIncludeKeybinds,
+      importApplyDisabled,
+      importApplyAppNoteboard,
+      importApplyAppSettings,
+      importApplyAppStyling,
+      importApplyKeybinds,
+      importSessionId,
+      keybindsImportEnabled,
+      view
+    } = m
     return {
-      appNoteboardImportEnabled: m.appNoteboardImportEnabled,
-      appSettingsImportEnabled: m.appSettingsImportEnabled,
-      appStylingImportEnabled: m.appStylingImportEnabled,
-      createExportDisabled: m.createExportDisabled,
-      dialogModel: m.dialogModel,
-      exportIncludeAppNoteboard: m.exportIncludeAppNoteboard,
-      exportIncludeAppSettings: m.exportIncludeAppSettings,
-      exportIncludeAppStyling: m.exportIncludeAppStyling,
-      exportIncludeKeybinds: m.exportIncludeKeybinds,
-      importApplyDisabled: m.importApplyDisabled,
-      importApplyAppNoteboard: m.importApplyAppNoteboard,
-      importApplyAppSettings: m.importApplyAppSettings,
-      importApplyAppStyling: m.importApplyAppStyling,
-      importApplyKeybinds: m.importApplyKeybinds,
-      importSessionId: m.importSessionId,
-      keybindsImportEnabled: m.keybindsImportEnabled,
+      appNoteboardImportEnabled,
+      appSettingsImportEnabled,
+      appStylingImportEnabled,
+      createExportDisabled,
+      dialogModel,
+      exportIncludeAppNoteboard,
+      exportIncludeAppSettings,
+      exportIncludeAppStyling,
+      exportIncludeKeybinds,
+      importApplyDisabled,
+      importApplyAppNoteboard,
+      importApplyAppSettings,
+      importApplyAppStyling,
+      importApplyKeybinds,
+      importSessionId,
+      keybindsImportEnabled,
       onClickCreateExport,
       onClickImport,
       onClickImportSelected,
-      view: m.view
+      view
     }
   }
 
   function resolveDialogComponentStore (): I_dialogComponentStoreLike | null {
-    try {
-      return deps.S_DialogComponent()
-    } catch {
-      return null
-    }
+    return deps.Result.fromThrowable(
+      () => deps.S_DialogComponent(),
+      () => null
+    )().unwrapOr(null)
   }
 
   function useDialogImportExportAppConfigLifecycle (opts: {

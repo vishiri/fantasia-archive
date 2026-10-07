@@ -169,6 +169,76 @@ test('Test that drag commit wiring skips emit when suppressTreeEmit is true', as
   vi.unstubAllGlobals()
 })
 
+test('Test that drag commit wiring waits until a newer layout drag ends before emit', async () => {
+  const frames: FrameRequestCallback[] = []
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    frames.push(callback)
+    return frames.length
+  })
+  const dragCommitPending = ref(true)
+  const dragCommitScheduled = ref(false)
+  const isTreeDragActive = ref(true)
+  let emitCount = 0
+  scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit({
+    dragCommitPending,
+    dragCommitScheduled,
+    emitLayoutFromTreeDataIfChanged: () => {
+      emitCount += 1
+    },
+    isTreeDragActive,
+    nextTick: async () => {},
+    removeDragCancelListeners: () => {},
+    suppressTreeEmit: ref(false)
+  })
+  frames.shift()?.(performance.now())
+  await flushPromises()
+  expect(emitCount).toBe(0)
+  expect(dragCommitPending.value).toBe(true)
+  isTreeDragActive.value = false
+  frames.shift()?.(performance.now())
+  await flushPromises()
+  expect(emitCount).toBe(1)
+  expect(dragCommitPending.value).toBe(false)
+  vi.unstubAllGlobals()
+})
+
+test('Test that drag commit wiring ignores an older layout commit after a newer drop', async () => {
+  const frames: FrameRequestCallback[] = []
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    frames.push(callback)
+    return frames.length
+  })
+  const dragCommitPending = ref(true)
+  const dragCommitScheduled = ref(false)
+  const isTreeDragActive = ref(true)
+  let emitCount = 0
+  const deps = {
+    dragCommitPending,
+    dragCommitScheduled,
+    emitLayoutFromTreeDataIfChanged: () => {
+      emitCount += 1
+    },
+    isTreeDragActive,
+    nextTick: async () => {},
+    removeDragCancelListeners: () => {},
+    suppressTreeEmit: ref(false)
+  }
+  scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit(deps)
+  frames.shift()?.(performance.now())
+  await flushPromises()
+  expect(emitCount).toBe(0)
+  dragCommitScheduled.value = false
+  isTreeDragActive.value = false
+  scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit(deps)
+  while (frames.length > 0) {
+    frames.shift()?.(performance.now())
+    await flushPromises()
+  }
+  expect(emitCount).toBe(1)
+  expect(dragCommitPending.value).toBe(false)
+  vi.unstubAllGlobals()
+})
+
 /**
  * dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring
  * Resyncs tree nodes from props without emitting layout changes.
@@ -554,8 +624,7 @@ test('Test that drag cancel wiring logs pointerup nextTick failures', async () =
     removeDragCancelListeners: () => {}
   })
   wiring.onWindowPointerUpDuringDrag()
-  await Promise.resolve()
-  await Promise.resolve()
+  await flushPromises()
   expect(consoleError).toHaveBeenCalled()
   consoleError.mockRestore()
 })

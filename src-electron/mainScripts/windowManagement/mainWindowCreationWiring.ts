@@ -1,4 +1,5 @@
 import { BrowserWindow, app, screen, shell } from 'electron'
+import { ResultAsync } from 'neverthrow'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
@@ -30,30 +31,28 @@ const currentDir = fileURLToPath(new URL('.', import.meta.url))
 /**
  * Prevents app from launching a secondary instance
  */
-export const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
-  // Do not limit the window amount if we are in auto-test mode
-  if (process.env.TEST_ENV && (process.env.TEST_ENV === 'components' || process.env.TEST_ENV === 'e2e')) {
-    return
+export function preventSecondaryAppInstance (): boolean {
+  if (process.env.TEST_ENV === 'components' || process.env.TEST_ENV === 'e2e') {
+    return true
   }
 
-  // Determines if the app is the primary instance
-  // - This exists as a variable due to the app bugging out if used directly from "app" (Electron bug?)
   const isPrimaryInstance = app.requestSingleInstanceLock()
-
-  // Check this is NOT the primary app instance
   if (!isPrimaryInstance) {
     app.quit()
-  } else {
-    // Maximize the primary app window and refocus it
-    app.on('second-instance', () => {
-      if (appWindow) {
-        if (appWindow.isMinimized()) {
-          appWindow.restore()
-        }
-        appWindow.focus()
-      }
-    })
+    return false
   }
+
+  app.on('second-instance', () => {
+    const win = appWindow
+    if (win === undefined) {
+      return
+    }
+    if (win.isMinimized()) {
+      win.restore()
+    }
+    win.focus()
+  })
+  return true
 }
 
 function resolvePreloadPath (): string {
@@ -74,9 +73,15 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
     if (!checkIfExternalUrl(url)) {
       return
     }
-    void shell.openExternal(url).catch((error: unknown) => {
-      console.error('[faMainWindowNavigation] openExternal failed', error)
-    })
+    void ResultAsync.fromPromise(
+      shell.openExternal(url),
+      (error): unknown => error
+    ).match(
+      () => undefined,
+      (error) => {
+        console.error('[faMainWindowNavigation] openExternal failed', error)
+      }
+    )
   })
   if (typeof win.webContents.setWindowOpenHandler === 'function') {
     win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
@@ -129,9 +134,6 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
     appWindow = undefined
   })
 
-  // Check if we are on the primary or secondary instance of the app
-  preventSecondaryAppInstance(win)
-
   // Hook up spellchecker (webPreferences.spellcheck stays true so enable can toggle live)
   setupSpellChecker(win)
   const userSettings = getFaUserSettings().store
@@ -146,6 +148,10 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   * Creates the main app window
   */
 export const mainWindowCreation = async () => {
+  if (!preventSecondaryAppInstance()) {
+    return
+  }
+
   // Retrieve actual display size to stop flicker/debounce that happens with "maximize" function at first
   const displaySizes = screen.getPrimaryDisplay().workAreaSize
 

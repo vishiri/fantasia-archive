@@ -14,16 +14,19 @@ import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 import { resolveHardenedFaProjectFilePath } from './faProjectFilePathHardeningWiring'
 
 function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
+  const filters: OpenDialogOptions['filters'] = [
+    {
+      extensions: [FA_PROJECT_FILE_EXTENSION],
+      name: 'Fantasia Archive project'
+    }
+  ]
+  const properties: OpenDialogOptions['properties'] = ['openFile']
+  const title = 'Open Fantasia Archive project'
   return {
     defaultPath,
-    filters: [
-      {
-        extensions: [FA_PROJECT_FILE_EXTENSION],
-        name: 'Fantasia Archive project'
-      }
-    ],
-    properties: ['openFile'],
-    title: 'Open Fantasia Archive project'
+    filters,
+    properties,
+    title
   }
 }
 
@@ -32,11 +35,12 @@ function resolveExplicitIpcOpenPath (
 ): I_faProjectOpenResolveResult {
   const hardened = resolveHardenedFaProjectFilePath(ipcPath)
   if (hardened === null) {
+    const errorMessage = ipcPath.trim().length === 0 || !pathLooksLikeFaProjectFile(ipcPath)
+      ? 'Selected file must be a .faproject file'
+      : 'Project file does not exist or is not a regular file'
     return {
       attemptedFilePath: ipcPath,
-      errorMessage: ipcPath.trim().length === 0 || !pathLooksLikeFaProjectFile(ipcPath)
-        ? 'Selected file must be a .faproject file'
-        : 'Project file does not exist or is not a regular file',
+      errorMessage,
       errorName: 'FileError',
       ipcExplicitPathFailed: true
     }
@@ -89,10 +93,11 @@ export async function resolveFaProjectOpenTargetPath (
   }
   const hardened = resolveHardenedFaProjectFilePath(first)
   if (hardened === null) {
+    const errorMessage = !pathLooksLikeFaProjectFile(first)
+      ? 'Selected file must be a .faproject file'
+      : 'Project file does not exist or is not a regular file'
     return {
-      errorMessage: !pathLooksLikeFaProjectFile(first)
-        ? 'Selected file must be a .faproject file'
-        : 'Project file does not exist or is not a regular file',
+      errorMessage,
       errorName: 'FileError'
     }
   }

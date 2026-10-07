@@ -107,6 +107,55 @@ test('importExportDialogClickCreateExport on success notifies and closes', async
   expect(onRequestCloseMock).toHaveBeenCalled()
 })
 
+test('Test that importExportDialogClickCreateExport stays open when include flags change during export', async () => {
+  const b = makeBindings()
+  runFaActionAwaitMock.mockImplementationOnce(async () => {
+    b.exportIncludeKeybinds.value = false
+    return true
+  })
+  await importExportDialogClickCreateExport(b)
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('exportAppConfigPackage', {
+    includeKeybinds: true,
+    includeAppNoteboard: true,
+    includeAppSettings: true,
+    includeAppStyling: true
+  })
+  expect(notifyCreateMock).toHaveBeenCalled()
+  expect(onRequestCloseMock).not.toHaveBeenCalled()
+})
+
+test('Test that importExportDialogClickCreateExport ignores a second click while export is in flight', async () => {
+  const b = makeBindings()
+  let releaseExport = (): void => {}
+  runFaActionAwaitMock.mockImplementationOnce(() => new Promise((resolve) => {
+    releaseExport = () => {
+      resolve(true)
+    }
+  }))
+  const first = importExportDialogClickCreateExport(b)
+  await Promise.resolve()
+  await importExportDialogClickCreateExport(b)
+  expect(runFaActionAwaitMock).toHaveBeenCalledTimes(1)
+  releaseExport()
+  await first
+})
+
+test('Test that importExportDialogClickPrepareImport ignores a second click while the file dialog is open', async () => {
+  const b = makeBindings()
+  let releasePrepare = (): void => {}
+  prepareImportMock.mockImplementationOnce(() => new Promise((resolve) => {
+    releasePrepare = () => {
+      resolve({ outcome: 'canceled' })
+    }
+  }))
+  const first = importExportDialogClickPrepareImport(b)
+  await Promise.resolve()
+  await importExportDialogClickPrepareImport(b)
+  expect(prepareImportMock).toHaveBeenCalledTimes(1)
+  releasePrepare()
+  await first
+})
+
 test('importExportDialogClickCreateExport does not close when export action fails', async () => {
   const b = makeBindings()
   runFaActionAwaitMock.mockResolvedValueOnce(false)
@@ -216,6 +265,50 @@ test('importExportDialogClickApplyImport does not close when the action is rejec
   await importExportDialogClickApplyImport(b)
   expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(onRequestCloseMock).not.toHaveBeenCalled()
+})
+
+test('Test that importExportDialogClickApplyImport stays open when apply flags change during import', async () => {
+  const b = makeBindings()
+  b.importSessionId.value = 's'
+  runFaActionAwaitMock.mockImplementationOnce(async () => {
+    b.importApplyAppSettings.value = false
+    return true
+  })
+  await importExportDialogClickApplyImport(b)
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('importAppConfigApply', {
+    applyKeybinds: true,
+    applyAppNoteboard: true,
+    applyAppSettings: true,
+    applyAppStyling: true,
+    sessionId: 's'
+  })
+  expect(notifyCreateMock).toHaveBeenCalled()
+  expect(onRequestCloseMock).not.toHaveBeenCalled()
+})
+
+test('Test that a second import apply is ignored while the first apply is in flight', async () => {
+  const b = makeBindings()
+  b.importSessionId.value = 's'
+  let releaseApply: (() => void) | undefined
+  const applyGate = new Promise<boolean>((resolve) => {
+    releaseApply = () => {
+      resolve(true)
+    }
+  })
+  runFaActionAwaitMock.mockImplementationOnce(() => applyGate)
+  const firstApply = importExportDialogClickApplyImport(b)
+  const secondApply = importExportDialogClickApplyImport(b)
+  await Promise.resolve()
+  expect(runFaActionAwaitMock).toHaveBeenCalledTimes(1)
+  const finishApply = releaseApply
+  if (finishApply === undefined) {
+    throw new Error('missing apply resolver')
+  }
+  finishApply()
+  await firstApply
+  await secondApply
+  expect(runFaActionAwaitMock).toHaveBeenCalledTimes(1)
+  expect(onRequestCloseMock).toHaveBeenCalledOnce()
 })
 
 test('importExportDialogClickApplyImport notifies and closes on success', async () => {

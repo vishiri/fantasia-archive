@@ -7,17 +7,62 @@ import type { I_openedDocumentTabUnsavedCompareInput } from 'app/types/I_faOpene
  */
 const FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY = Number.MIN_SAFE_INTEGER
 
+const FA_DOCUMENT_APPEARANCE_COLOR_HEX = /^#[0-9A-F]{6}$/
+const FA_DOCUMENT_APPEARANCE_COLOR_SHORT_HEX = /^#([0-9A-F])([0-9A-F])([0-9A-F])$/
+
+/**
+ * Maps a trimmed uppercase draft to #RRGGBB. Short #RGB expands. Anything else is empty.
+ */
+function resolveOpenedDocumentAppearanceStorageColor (trimmedUpper: string): string | null {
+  if (FA_DOCUMENT_APPEARANCE_COLOR_HEX.test(trimmedUpper)) {
+    return trimmedUpper
+  }
+  const shortMatch = FA_DOCUMENT_APPEARANCE_COLOR_SHORT_HEX.exec(trimmedUpper)
+  if (shortMatch === null) {
+    return null
+  }
+  const red = shortMatch[1] ?? ''
+  const green = shortMatch[2] ?? ''
+  const blue = shortMatch[3] ?? ''
+  return `#${red}${red}${green}${green}${blue}${blue}`
+}
+
 /**
  * Maps tab appearance color drafts to nullable SQLite values.
+ * Invalid text becomes null so a bad color does not fail the document save or the tab snapshot.
  */
 export function resolveOpenedDocumentAppearanceColorDraftForPersist (
   draft: string
 ): string | null {
-  const trimmed = draft.trim()
-  if (trimmed.length === 0) {
+  const trimmedUpper = draft.trim().toUpperCase()
+  if (trimmedUpper.length === 0) {
     return null
   }
-  return trimmed.toUpperCase()
+  return resolveOpenedDocumentAppearanceStorageColor(trimmedUpper)
+}
+
+function normalizeOpenedDocumentAppearanceColorField (draft: string | undefined): string {
+  const stored = resolveOpenedDocumentAppearanceColorDraftForPersist(draft ?? '')
+  if (stored === null) {
+    return ''
+  }
+  return stored
+}
+
+/**
+ * Same stored #RRGGBB with only letter case differing is not a draft change.
+ * Invalid text and short #RGB stay unequal to the saved string.
+ */
+function openedDocumentAppearanceColorsMatch (draft: string, saved: string): boolean {
+  if (draft === saved) {
+    return true
+  }
+  const storedDraft = resolveOpenedDocumentAppearanceColorDraftForPersist(draft)
+  const storedSaved = resolveOpenedDocumentAppearanceColorDraftForPersist(saved)
+  if (storedDraft === null || storedSaved === null || storedDraft !== storedSaved) {
+    return false
+  }
+  return draft.toUpperCase() === saved.toUpperCase()
 }
 
 /**
@@ -28,10 +73,18 @@ export function resolveOpenedDocumentAppearanceColorDraftForPersist (
 export function computeOpenedDocumentHasUnsavedChanges (
   input: I_openedDocumentTabUnsavedCompareInput
 ): boolean {
+  const textColorChanged = !openedDocumentAppearanceColorsMatch(
+    input.documentTextColorDraft,
+    input.savedDocumentTextColor
+  )
+  const backgroundColorChanged = !openedDocumentAppearanceColorsMatch(
+    input.documentBackgroundColorDraft,
+    input.savedDocumentBackgroundColor
+  )
   return (
     input.displayNameDraft !== input.savedDisplayName ||
-    input.documentTextColorDraft !== input.savedDocumentTextColor ||
-    input.documentBackgroundColorDraft !== input.savedDocumentBackgroundColor ||
+    textColorChanged ||
+    backgroundColorChanged ||
     input.isCategoryDraft !== input.savedIsCategory ||
     input.isFinishedDraft !== input.savedIsFinished ||
     input.isMinorDraft !== input.savedIsMinor ||
@@ -44,32 +97,80 @@ export function computeOpenedDocumentHasUnsavedChanges (
 }
 
 /**
+ * A dirty tab keeps an edited draft. A snapshot that never stored the field
+ * uses the database value, so a later save does not wipe it.
+ */
+export function resolveOpenedDocumentHydrateUnsavedDraft<Draft, Saved> (input: {
+  databaseDraft: Draft
+  hasUnsavedChanges: boolean
+  missingDraft: Draft
+  missingSaved: Saved
+  snapshotDraft: Draft
+  snapshotSaved: Saved
+}): Draft {
+  const snapshotFieldMissing = input.snapshotDraft === input.missingDraft &&
+    input.snapshotSaved === input.missingSaved
+  if (!input.hasUnsavedChanges || snapshotFieldMissing) {
+    return input.databaseDraft
+  }
+  return input.snapshotDraft
+}
+
+/**
  * Ensures tab rows loaded from persistence always carry appearance color baselines.
  */
 export function normalizeOpenedDocumentTabAppearanceColors (
   tab: I_faOpenedDocumentTab
 ): I_faOpenedDocumentTab {
+  const documentBackgroundColorDraft = normalizeOpenedDocumentAppearanceColorField(
+    tab.documentBackgroundColorDraft
+  )
+  const documentTextColorDraft = normalizeOpenedDocumentAppearanceColorField(
+    tab.documentTextColorDraft
+  )
+  const isCategoryDraft = tab.isCategoryDraft ?? false
+  const isFinishedDraft = tab.isFinishedDraft ?? false
+  const isMinorDraft = tab.isMinorDraft ?? false
+  const isDeadDraft = tab.isDeadDraft ?? false
+  const savedDocumentBackgroundColor = normalizeOpenedDocumentAppearanceColorField(
+    tab.savedDocumentBackgroundColor
+  )
+  const savedDocumentTextColor = normalizeOpenedDocumentAppearanceColorField(
+    tab.savedDocumentTextColor
+  )
+  const savedIsCategory = tab.savedIsCategory ?? false
+  const savedIsFinished = tab.savedIsFinished ?? false
+  const savedIsMinor = tab.savedIsMinor ?? false
+  const savedIsDead = tab.savedIsDead ?? false
+  const parentDocumentIdDraft = tab.parentDocumentIdDraft ?? ''
+  const savedParentDocumentId = tab.savedParentDocumentId ?? ''
+  const treeOrderNumberDraft = tab.treeOrderNumberDraft ?? ''
+  const savedTreeOrderNumber = tab.savedTreeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
+  const extraClassesDraft = tab.extraClassesDraft ?? ''
+  const savedExtraClasses = tab.savedExtraClasses ?? ''
+  const tagsDraft = tab.tagsDraft
+  const savedTags = tab.savedTags
   return {
     ...tab,
-    documentBackgroundColorDraft: tab.documentBackgroundColorDraft ?? '',
-    documentTextColorDraft: tab.documentTextColorDraft ?? '',
-    isCategoryDraft: tab.isCategoryDraft ?? false,
-    isFinishedDraft: tab.isFinishedDraft ?? false,
-    isMinorDraft: tab.isMinorDraft ?? false,
-    isDeadDraft: tab.isDeadDraft ?? false,
-    savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor ?? '',
-    savedDocumentTextColor: tab.savedDocumentTextColor ?? '',
-    savedIsCategory: tab.savedIsCategory ?? false,
-    savedIsFinished: tab.savedIsFinished ?? false,
-    savedIsMinor: tab.savedIsMinor ?? false,
-    savedIsDead: tab.savedIsDead ?? false,
-    parentDocumentIdDraft: tab.parentDocumentIdDraft ?? '',
-    savedParentDocumentId: tab.savedParentDocumentId ?? '',
-    treeOrderNumberDraft: tab.treeOrderNumberDraft ?? '',
-    savedTreeOrderNumber: tab.savedTreeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
-    extraClassesDraft: tab.extraClassesDraft ?? '',
-    savedExtraClasses: tab.savedExtraClasses ?? '',
-    tagsDraft: tab.tagsDraft ?? [],
-    savedTags: tab.savedTags ?? []
+    documentBackgroundColorDraft,
+    documentTextColorDraft,
+    extraClassesDraft,
+    isCategoryDraft,
+    isDeadDraft,
+    isFinishedDraft,
+    isMinorDraft,
+    parentDocumentIdDraft,
+    savedDocumentBackgroundColor,
+    savedDocumentTextColor,
+    savedExtraClasses,
+    savedIsCategory,
+    savedIsDead,
+    savedIsFinished,
+    savedIsMinor,
+    savedParentDocumentId,
+    savedTags,
+    savedTreeOrderNumber,
+    tagsDraft,
+    treeOrderNumberDraft
   }
 }

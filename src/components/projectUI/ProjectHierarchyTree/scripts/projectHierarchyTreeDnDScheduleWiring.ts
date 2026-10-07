@@ -1,5 +1,7 @@
 import type { Ref } from 'vue'
 
+import { ResultAsync } from 'neverthrow'
+
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
@@ -7,21 +9,24 @@ import {
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from './projectHierarchyTreeDnDOrderPostDropWiring'
-import { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } from './projectHierarchyTreeDnDOrderSupportWiring'
 import {
   PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS,
   PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS
 } from '../functions/projectHierarchyTreeConstants'
 import { createWaitForProjectHierarchyTreeDragCommitWindow } from '../functions/waitForProjectHierarchyTreeDragCommitWindow'
 import { finalizeProjectHierarchyTreeDragCommitAfterPersist } from './projectHierarchyTreeDnDCommitAfterPersistWiring'
-import { commitProjectHierarchyTreeDraggedDocumentMove } from './projectHierarchyTreeDnDCommitWiring'
+import { runProjectHierarchyTreeDragCommitPersistPhase } from './projectHierarchyTreeDnDCommitWiring'
 import {
-  prepareProjectHierarchyTreeDragCommitOrderSnapshot,
+  prepareDragCommitOrderSnapshotFromSchedule,
   readProjectHierarchyTreeDragSiblingOrderFromGetData
 } from './projectHierarchyTreeDnDOrderCaptureWiring'
-import { refreshProjectHierarchyTreeDragCommitTargetContainer } from './projectHierarchyTreeDnDCommitWiring'
 import { runWithPreservedProjectHierarchyTreeScrollTop } from './projectHierarchyTreeScrollPreserveWiring'
-import { resolveProjectHierarchyTreeDragCommitGate } from './projectHierarchyTreeDnDCommitGateWiring'
+import {
+  beginProjectHierarchyTreeDragCommitSerial,
+  isProjectHierarchyTreeDragCommitSerialCurrent,
+  releaseProjectHierarchyTreeDragCommitWhenProjectChanged,
+  resolveProjectHierarchyTreeDragCommitGate
+} from './projectHierarchyTreeDnDCommitGateWiring'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
   clearDragSessionFlags: () => void
@@ -35,7 +40,10 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   readDragParentDocumentIdAtDragStart: () => string | null
   readDragScrollTopPxAtDragStart: () => number
   readDragSiblingOrderSnapshot: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  isProjectReplacementInFlight?: () => boolean
+  readProjectContentEpoch?: () => number
   draggedDocumentId: () => string | null
+  draggedTreeNodeId?: () => string | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
@@ -70,86 +78,61 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }
 
-async function runProjectHierarchyTreeDragCommitPersistPhase (deps: {
-  dragParentDocumentIdAtDragStart: string | null
-  dragSiblingOrderSnapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+async function settleProjectHierarchyTreeDragCommitBeforePersist (
+  deps: T_projectHierarchyTreeDragCommitScheduleDeps,
   draggedDocumentId: string | null
+): Promise<{
   getDataSettle: { attempts: number, settled: boolean }
-  parentChangedFromDragStart: boolean
-  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   suppressWait: { attempts: number, ready: boolean }
-  suppressTreeEmit: boolean
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-} & Pick<T_projectHierarchyTreeDragCommitScheduleDeps,
-  'reindexDocumentSiblingsInHierarchy' | 'refreshLayout' | 'resyncTreeDataFromLayout'
->): Promise<import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragCommitResult> {
-  const commitResult = await commitProjectHierarchyTreeDraggedDocumentMove({
-    documentId: deps.draggedDocumentId,
-    dragCommitSuppressWaitAttempts: deps.suppressWait.attempts,
-    dragCommitSuppressWaitReady: deps.suppressWait.ready,
-    dragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot,
-    modelSettleAttempts: deps.getDataSettle.attempts,
-    modelSettleReady: deps.getDataSettle.settled,
-    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
-    refreshLayout: deps.refreshLayout,
-    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
-    suppressTreeEmit: deps.suppressTreeEmit,
-    treeData: deps.treeData.value
-  })
-  await refreshProjectHierarchyTreeDragCommitTargetContainer({
-    commitResult,
-    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase
-  })
-  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
-    committed: commitResult.committed,
-    draggedDocumentId: deps.draggedDocumentId,
-    dragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot,
-    treeData: deps.treeData.value
-  })
-  return commitResult
-}
-
-async function finishProjectHierarchyTreeDragCommit (
-  deps: T_projectHierarchyTreeDragCommitScheduleDeps
-): Promise<void> {
-  await finishProjectHierarchyTreeDragCommitBody(deps)
-}
-
-async function finishProjectHierarchyTreeDragCommitBody (
-  deps: T_projectHierarchyTreeDragCommitScheduleDeps
-): Promise<void> {
-  deps.dragCommitScheduled.value = false
-  deps.removeDragCancelListeners()
-  clearFaVerticalDraggableTabsDocumentDragCursor()
+}> {
   const waitForDragCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
     maxAttempts: PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS,
     nextTick: deps.nextTick,
     readSuppressTreeEmit: () => deps.suppressTreeEmit.value
   })
   const suppressWait = await waitForDragCommitWindow()
-  const draggedDocumentId = deps.draggedDocumentId()
   const waitForGetDataOrderStable = createWaitForProjectHierarchyTreeDragGetDataOrderStable({
     maxAttempts: PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS,
     nextTick: deps.nextTick,
     readSiblingOrderFromGetData: () => readProjectHierarchyTreeDragSiblingOrderFromGetData({
       documentId: draggedDocumentId,
-      getTreeRef: deps.getTreeRef
+      getTreeRef: deps.getTreeRef,
+      preferredNodeId: deps.draggedTreeNodeId?.() ?? null
     })
   })
   const getDataSettle = await waitForGetDataOrderStable()
+  return {
+    getDataSettle,
+    suppressWait
+  }
+}
+
+async function finishProjectHierarchyTreeDragCommit (
+  deps: T_projectHierarchyTreeDragCommitScheduleDeps,
+  epochAtSchedule: number | undefined,
+  commitSerial: number
+): Promise<void> {
+  const dragCommitStillCurrent = (): boolean => {
+    return isProjectHierarchyTreeDragCommitSerialCurrent(
+      deps.dragCommitScheduled,
+      commitSerial
+    )
+  }
+  deps.dragCommitScheduled.value = false
+  deps.removeDragCancelListeners()
+  clearFaVerticalDraggableTabsDocumentDragCursor()
+  const draggedDocumentId = deps.draggedDocumentId()
+  const { getDataSettle, suppressWait } = await settleProjectHierarchyTreeDragCommitBeforePersist(
+    deps,
+    draggedDocumentId
+  )
   const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
   const expandedSnapshotSet = new Set(expandedSnapshot)
-  const dragSiblingOrderSnapshot = prepareProjectHierarchyTreeDragCommitOrderSnapshot({
-    dragSiblingOrderAtDragStart: deps.dragSiblingOrderAtDragStart(),
+  const dragSiblingOrderSnapshot = prepareDragCommitOrderSnapshotFromSchedule(
+    deps,
     draggedDocumentId,
-    existingDragSiblingOrderSnapshot: deps.readDragSiblingOrderSnapshot(),
-    getDataOrderReady: getDataSettle.settled,
-    getDataSettleAttempts: getDataSettle.attempts,
-    getTreeRef: deps.getTreeRef,
-    getTreeScrollHost: deps.getTreeScrollHost,
-    setDragSiblingOrderSnapshot: deps.setDragSiblingOrderSnapshot,
-    treeData: deps.treeData.value
-  })
+    getDataSettle
+  )
   const dragStartOrder = deps.dragSiblingOrderAtDragStart()
   const dragParentDocumentIdAtDragStart = deps.readDragParentDocumentIdAtDragStart()
   const { orderChangedFromDragStart, parentChangedFromDragStart } = resolveProjectHierarchyTreeDragCommitGate({
@@ -157,14 +140,19 @@ async function finishProjectHierarchyTreeDragCommitBody (
     dragSiblingOrderSnapshot,
     dragStartOrder
   })
+  if (releaseProjectHierarchyTreeDragCommitWhenProjectChanged(deps, epochAtSchedule)) {
+    return
+  }
+  if (!dragCommitStillCurrent()) {
+    return
+  }
   let commitResult: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragCommitResult
   if (orderChangedFromDragStart) {
     commitResult = await runProjectHierarchyTreeDragCommitPersistPhase({
-      dragParentDocumentIdAtDragStart,
       dragSiblingOrderSnapshot,
       draggedDocumentId,
       getDataSettle,
-      parentChangedFromDragStart,
+      isDragCommitStillCurrent: dragCommitStillCurrent,
       refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
       reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
       refreshLayout: deps.refreshLayout,
@@ -181,9 +169,16 @@ async function finishProjectHierarchyTreeDragCommitBody (
       reloadChildrenNodeId: null
     }
   }
+  if (releaseProjectHierarchyTreeDragCommitWhenProjectChanged(deps, epochAtSchedule)) {
+    return
+  }
+  if (!dragCommitStillCurrent()) {
+    return
+  }
   await finalizeProjectHierarchyTreeDragCommitAfterPersist({
     clearDragSessionFlags: deps.clearDragSessionFlags,
     commitResult,
+    isDragCommitStillCurrent: dragCommitStillCurrent,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     dragParentDocumentIdAtDragStart,
@@ -218,20 +213,28 @@ export function scheduleProjectHierarchyTreeDragCommit (
     return
   }
   deps.dragCommitScheduled.value = true
+  const commitSerial = beginProjectHierarchyTreeDragCommitSerial(deps.dragCommitScheduled)
+  const epochAtSchedule = deps.readProjectContentEpoch?.()
   const logNextTickFailure = (err: unknown): void => {
     console.error('[ProjectHierarchyTree] drag commit nextTick chain failed', err)
   }
-  void runWithPreservedProjectHierarchyTreeScrollTop({
-    dragSessionScrollTopPx: deps.readDragScrollTopPxAtDragStart(),
-    getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
-    getTreeScrollHost: deps.getTreeScrollHost,
-    nextTick: deps.nextTick,
-    requestAnimationFrame: deps.requestAnimationFrame,
-    ...(deps.scrollTopPx === undefined ? {} : { scrollTopPx: deps.scrollTopPx }),
-    run: async () => {
-      await deps.nextTick()
-      await deps.nextTick()
-      await finishProjectHierarchyTreeDragCommit(deps)
-    }
-  }).catch(logNextTickFailure)
+  void ResultAsync.fromPromise(
+    runWithPreservedProjectHierarchyTreeScrollTop({
+      dragSessionScrollTopPx: deps.readDragScrollTopPxAtDragStart(),
+      getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
+      getTreeScrollHost: deps.getTreeScrollHost,
+      nextTick: deps.nextTick,
+      requestAnimationFrame: deps.requestAnimationFrame,
+      ...(deps.scrollTopPx === undefined ? {} : { scrollTopPx: deps.scrollTopPx }),
+      run: async () => {
+        await deps.nextTick()
+        await deps.nextTick()
+        await finishProjectHierarchyTreeDragCommit(deps, epochAtSchedule, commitSerial)
+      }
+    }),
+    (error): unknown => error
+  ).match(
+    () => undefined,
+    logNextTickFailure
+  )
 }

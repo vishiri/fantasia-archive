@@ -13,10 +13,15 @@ const FA_OPENED_DOCUMENTS_SINGLETON_ROW_ID = 1
 function duplicateFaOpenedDocumentsSnapshot (
   snapshot: I_faOpenedDocumentsSnapshot
 ): I_faOpenedDocumentsSnapshot {
+  const schemaVersion = snapshot.schemaVersion
+  const activeDocumentId = snapshot.activeDocumentId
+  const tabs = snapshot.tabs.map((tab) => {
+    return { ...tab }
+  })
   return {
-    schemaVersion: snapshot.schemaVersion,
-    activeDocumentId: snapshot.activeDocumentId,
-    tabs: snapshot.tabs.map((tab) => ({ ...tab }))
+    schemaVersion,
+    activeDocumentId,
+    tabs
   }
 }
 

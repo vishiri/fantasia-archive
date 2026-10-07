@@ -108,4 +108,19 @@ test('Test that migrateLegacyFaUserSettingsKeys maps boolean appTheme onto fanta
 test('Test that migrateLegacyFaUserSettingsKeys returns an empty record for non-object input', () => {
   expect(migrateLegacyFaUserSettingsKeys(null)).toEqual({})
   expect(migrateLegacyFaUserSettingsKeys('x')).toEqual({})
+  expect(migrateLegacyFaUserSettingsKeys(new Date())).toEqual({})
+})
+
+/**
+ * migrateLegacyFaUserSettingsKeys
+ * electron-store exposes a null-prototype record. Saved flags must survive cleanup.
+ */
+test('Test that migrateLegacyFaUserSettingsKeys keeps saved flags on a null-prototype record', () => {
+  const raw = Object.create(null) as Record<string, unknown>
+  raw.skipWelcomeScreen = true
+  raw.disableDocumentControlBarGuides = true
+  const migrated = migrateLegacyFaUserSettingsKeys(raw)
+  expect(migrated.skipWelcomeScreen).toBe(true)
+  expect(migrated.disableAppControlBarGuides).toBe(true)
+  expect(migrated.disableDocumentControlBarGuides).toBeUndefined()
 })

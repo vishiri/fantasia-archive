@@ -4,17 +4,19 @@ import type {
 } from 'app/types/I_faProjectStylingDomain'
 
 /**
- * After a silent partial KV write, merges read-back CSS with in-memory editor text when the patch omitted 'css'.
+ * After a silent partial KV write, keeps in-memory CSS when the patch omitted 'css' or the draft changed during the round trip.
  */
 export function mergeProjectStylingRootAfterSilentPersist (
   snapshot: I_faProjectStylingRoot,
   patch: I_faProjectStylingPatch,
-  cssSnapshotBeforePersist: string
+  currentCss: string,
+  cssAtStart: string
 ): I_faProjectStylingRoot {
-  if (patch.css === undefined) {
+  const cssChangedDuringSave = currentCss !== cssAtStart
+  if (patch.css === undefined || cssChangedDuringSave) {
     return {
       ...snapshot,
-      css: cssSnapshotBeforePersist
+      css: currentCss
     }
   }
   return snapshot

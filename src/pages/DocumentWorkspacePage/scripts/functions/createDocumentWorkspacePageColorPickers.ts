@@ -63,6 +63,23 @@ function createDocumentWorkspacePageColorModels (deps: {
   }
 }
 
+/**
+ * Prefer the world id captured at the append click.
+ * An empty id means a draft append with no saved world, so use the open document world.
+ */
+export function resolveDocumentWorkspacePaletteAppendWorldId (
+  emittedWorldId: string,
+  currentWorldId: string | null
+): string | null {
+  if (emittedWorldId.length > 0) {
+    return emittedWorldId
+  }
+  if (currentWorldId === null || currentWorldId.length === 0) {
+    return null
+  }
+  return currentWorldId
+}
+
 export function createDocumentWorkspacePageColorPickers (
   deps: T_createDocumentWorkspacePageColorPickersDeps
 ): {
@@ -70,7 +87,7 @@ export function createDocumentWorkspacePageColorPickers (
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
-    onAppendToWorldPalette: (colorPalette: string) => void
+    onAppendToWorldPalette: (colorPalette: string, worldId: string) => void
     textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
@@ -92,10 +109,12 @@ export function createDocumentWorkspacePageColorPickers (
     if (world === null) {
       return undefined
     }
+    const worldColorPalette = world.colorPalette
+    const worldId = world.id
     return {
       mode: 'persist',
-      worldColorPalette: world.colorPalette,
-      worldId: world.id
+      worldColorPalette,
+      worldId
     }
   })
 
@@ -109,12 +128,13 @@ export function createDocumentWorkspacePageColorPickers (
 
   const colorModels = createDocumentWorkspacePageColorModels(deps)
 
-  function onAppendToWorldPalette (colorPalette: string): void {
-    const world = documentWorld.value
-    if (world === null) {
+  function onAppendToWorldPalette (colorPalette: string, worldId: string): void {
+    const currentWorldId = documentWorld.value?.id ?? null
+    const targetWorldId = resolveDocumentWorkspacePaletteAppendWorldId(worldId, currentWorldId)
+    if (targetWorldId === null) {
       return
     }
-    deps.patchWorldColorPaletteInLayout(world.id, colorPalette)
+    deps.patchWorldColorPaletteInLayout(targetWorldId, colorPalette)
   }
 
   const textColorFieldDescription = deps.computed(() => {

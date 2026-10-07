@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
+
 import type {
   I_faProjectDialogUiPrefGetInput,
   I_faProjectDialogUiPrefSetInput
@@ -15,15 +17,6 @@ const faProjectDialogUiPrefSetInputSchema = z.object({
   key: faProjectDialogUiPrefKeySchema,
   value: z.string().max(255)
 }).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses IPC get payload for an allowlisted dialog UI preference key.

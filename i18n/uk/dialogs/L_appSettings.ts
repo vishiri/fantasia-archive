@@ -1,5 +1,6 @@
 export default {
   title: 'Налаштування Fantasia Archive',
+  loadError: 'Не вдалося завантажити налаштування.',
   saveButton: 'Зберегти налаштування',
   closeButton: 'Закрити без збереження',
   settingsSearchPlaceholder: 'Пошук налаштувань...',

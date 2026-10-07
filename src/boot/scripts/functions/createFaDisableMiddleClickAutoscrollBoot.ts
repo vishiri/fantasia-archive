@@ -17,8 +17,9 @@ export function createFaDisableMiddleClickAutoscrollBoot (deps: {
     )
   }
 
+  const handleFaDisableMiddleClickAutoscrollMouseDown = deps.handleFaDisableMiddleClickAutoscrollMouseDown
   return {
-    handleFaDisableMiddleClickAutoscrollMouseDown: deps.handleFaDisableMiddleClickAutoscrollMouseDown,
+    handleFaDisableMiddleClickAutoscrollMouseDown,
     runFaDisableMiddleClickAutoscrollBoot
   }
 }

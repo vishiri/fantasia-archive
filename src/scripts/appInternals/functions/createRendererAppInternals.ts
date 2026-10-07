@@ -13,6 +13,16 @@ function resolveVitePublicAssetPath (pathFromPublicRoot: string): string {
   return `${baseWithSlash}${trimmed}`
 }
 
+function shouldShowStartupTipsNotification (
+  skippedWelcomeScreen: boolean,
+  hasActiveProject: boolean
+): boolean {
+  if (skippedWelcomeScreen) {
+    return false
+  }
+  return !hasActiveProject
+}
+
 function determineTestingComponentName (
   testingType: string | false | undefined,
   testingComponentName: string | false | undefined
@@ -29,6 +39,7 @@ export function createRendererAppInternals (deps: {
     languageCode: T_faUserSettingsLanguageCode,
     currentLanguageCode: T_faUserSettingsLanguageCode
   ) => Promise<void>
+  hasActiveProject: () => boolean
   isFantasiaStorybookCanvas: () => boolean
   markWelcomeScreenAutoLoadBootAttempted: () => void
   getPlaywrightTestEnv: () => Promise<string | undefined>
@@ -86,7 +97,11 @@ export function createRendererAppInternals (deps: {
         await deps.waitForSkipWelcomeScreenBridgeWhenElectron()
         await deps.refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch()
         const skippedWelcomeScreen = await deps.tryRunSkipWelcomeScreenOnLaunch()
-        if (!skippedWelcomeScreen) {
+        const showStartupTips = shouldShowStartupTipsNotification(
+          skippedWelcomeScreen,
+          deps.hasActiveProject()
+        )
+        if (showStartupTips) {
           deps.runFaAction('showStartupTipsNotification', undefined)
         }
         const testEnv = await deps.getPlaywrightTestEnv()
@@ -103,13 +118,19 @@ export function createRendererAppInternals (deps: {
       })
   }
 
+  const {
+    applyFaI18nLocaleFromLanguageCode,
+    applyFaUserSettingsLanguageSelection,
+    isFantasiaStorybookCanvas,
+    setFantasiaStorybookCanvasFlag
+  } = deps
   return {
-    applyFaI18nLocaleFromLanguageCode: deps.applyFaI18nLocaleFromLanguageCode,
-    applyFaUserSettingsLanguageSelection: deps.applyFaUserSettingsLanguageSelection,
+    applyFaI18nLocaleFromLanguageCode,
+    applyFaUserSettingsLanguageSelection,
     determineTestingComponentName,
-    isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,
+    isFantasiaStorybookCanvas,
     resolveVitePublicAssetPath,
     runAppStartupRouting,
-    setFantasiaStorybookCanvasFlag: deps.setFantasiaStorybookCanvasFlag
+    setFantasiaStorybookCanvasFlag
   }
 }

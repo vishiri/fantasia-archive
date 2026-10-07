@@ -336,7 +336,7 @@ test('Test that collectProjectHierarchyTreeTagAddDocumentPlacementOptions filter
 
 /**
  * mapProjectHierarchyTreeDocumentsUnderTagToNodes
- * Tie-breaks equal sortOrder rows by document id.
+ * Equal sort and name use createdAtMs, then document id.
  */
 test('Test that mapProjectHierarchyTreeDocumentsUnderTagToNodes tie-breaks by document id', () => {
   const nodes = mapProjectHierarchyTreeDocumentsUnderTagToNodes({
@@ -376,6 +376,52 @@ test('Test that mapProjectHierarchyTreeDocumentsUnderTagToNodes tie-breaks by do
     worldId: 'world-1'
   })
   expect(nodes.map((node) => node.documentId)).toEqual(['doc-a', 'doc-b'])
+})
+
+/**
+ * mapProjectHierarchyTreeDocumentsUnderTagToNodes
+ * Older createdAtMs stays ahead of a smaller document id.
+ */
+test('Test that mapProjectHierarchyTreeDocumentsUnderTagToNodes keeps older createdAt before document id', () => {
+  const nodes = mapProjectHierarchyTreeDocumentsUnderTagToNodes({
+    items: [
+      {
+        createdAtMs: 2000,
+        documentBackgroundColor: '',
+        documentId: 'doc-aaa',
+        documentTextColor: '',
+        displayName: 'Same',
+        extraClasses: '',
+        isCategory: false,
+        isDead: false,
+        isFinished: false,
+        isMinor: false,
+        sortOrder: 0,
+        templateId: null,
+        treeOrderNumber: 0
+      },
+      {
+        createdAtMs: 1000,
+        documentBackgroundColor: '',
+        documentId: 'doc-zzz',
+        documentTextColor: '',
+        displayName: 'Same',
+        extraClasses: '',
+        isCategory: false,
+        isDead: false,
+        isFinished: false,
+        isMinor: false,
+        sortOrder: 0,
+        templateId: null,
+        treeOrderNumber: 0
+      }
+    ],
+    resolvePlacementDisplayIcon: () => 'mdi-file',
+    tagId: 'tag-1',
+    worldColor: '#111',
+    worldId: 'world-1'
+  })
+  expect(nodes.map((node) => node.documentId)).toEqual(['doc-zzz', 'doc-aaa'])
 })
 
 /**
@@ -1998,6 +2044,8 @@ test('Test that bindProjectHierarchyTreeTagSessionWiring invokes session-bound i
     noTags: false,
     tagsAtTop: false
   }
+  await Promise.resolve()
+  await Promise.resolve()
   sessionApi.onAddNewDocumentToThisTagFromContextMenuClick('placement-1')
   await Promise.resolve()
   expect(createTemporaryDocument.mock.calls.length).toBeGreaterThanOrEqual(2)
@@ -2018,8 +2066,7 @@ test('Test that bindProjectHierarchyTreeTagSessionWiring invokes session-bound i
   } as unknown as MouseEvent)
   sessionApi.onDeleteTagFromContextMenuClick()
   sessionApi.onConfirmDeleteTag()
-  await nextTick()
-  await Promise.resolve()
+  await vi.waitUntil(() => replaceOpenedDocumentTabs.mock.calls.length > 0)
   expect(replaceOpenedDocumentTabs).toHaveBeenCalled()
 
   preview.value = {

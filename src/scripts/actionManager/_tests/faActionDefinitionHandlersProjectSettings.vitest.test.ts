@@ -107,7 +107,7 @@ test('Test that handleSaveProjectSettings delegates to S_FaProjectSettings', asy
   })
   const patch = { projectName: 'Renamed' }
   await handleSaveProjectSettings({ settings: patch })
-  expect(updateProjectSettingsMock).toHaveBeenCalledWith(patch)
+  expect(updateProjectSettingsMock).toHaveBeenCalledWith(patch, expect.any(Number))
   expect(persistWorldsSnapshotMock).not.toHaveBeenCalled()
   expect(bumpDocumentCensusRefreshGenerationMock).not.toHaveBeenCalled()
 })
@@ -133,7 +133,7 @@ test('Test that handleSaveProjectSettings persists worlds snapshot when provided
     settings: { projectName: 'Renamed' },
     worlds
   })
-  expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
+  expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' }, expect.any(Number))
   expect(persistWorldsSnapshotMock).toHaveBeenCalledWith(worlds)
   expect(refreshWorkspaceWorldsMock).toHaveBeenCalledTimes(1)
   expect(reloadDocumentIndexFromBridgeMock).toHaveBeenCalledTimes(1)
@@ -162,7 +162,7 @@ test('Test that handleSaveProjectSettings persists document templates snapshot w
     documentTemplates,
     settings: { projectName: 'Renamed' }
   })
-  expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
+  expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' }, expect.any(Number))
   expect(persistDocumentTemplatesSnapshotMock).toHaveBeenCalledWith(documentTemplates)
   expect(reloadDocumentIndexFromBridgeMock).not.toHaveBeenCalled()
   expect(bumpDocumentCensusRefreshGenerationMock).toHaveBeenCalledTimes(1)
@@ -236,4 +236,142 @@ test('Test that handleSaveProjectSettings emits success notify after persistence
     message: 'globalFunctionality.faProjectSettings.saveSuccess',
     type: 'positive'
   })
+})
+
+function activeProjectFixture (id: string): {
+  filePath: string
+  id: string
+  name: string
+} {
+  const filePath = `C:\\${id}.faproject`
+  const name = id
+  return {
+    filePath,
+    id,
+    name
+  }
+}
+
+/**
+ * handleSaveProjectSettings
+ * A project switch during the settings write must not persist templates or worlds.
+ */
+test('Test that handleSaveProjectSettings skips snapshots after the project changes', async () => {
+  let releaseUpdate = (): void => undefined
+  updateProjectSettingsMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseUpdate = () => {
+        resolve(undefined)
+      }
+    })
+  })
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  const { FaActionUserCanceledError } = await import('../functions/faActionUserCanceledError')
+  S_FaActiveProject().setActiveProject(activeProjectFixture('project-a'))
+  const pending = handleSaveProjectSettings({
+    documentTemplates: [
+      {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {}
+      }
+    ],
+    settings: { projectName: 'Renamed' },
+    worlds: [
+      {
+        displayNameTranslations: { 'en-US': 'Realm' },
+        id: '550e8400-e29b-41d4-a716-446655440001'
+      }
+    ]
+  })
+  S_FaActiveProject().setActiveProject(activeProjectFixture('project-b'))
+  releaseUpdate()
+  await expect(pending).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(persistDocumentTemplatesSnapshotMock).not.toHaveBeenCalled()
+  expect(persistWorldsSnapshotMock).not.toHaveBeenCalled()
+  expect(refreshWorkspaceWorldsMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
+/**
+ * handleSaveProjectSettings
+ * An open already in flight has not moved the epoch yet. Snapshot writes must still stop.
+ */
+test('Test that handleSaveProjectSettings skips snapshots while a project open is in flight', async () => {
+  let releaseUpdate = (): void => undefined
+  updateProjectSettingsMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseUpdate = () => {
+        resolve(undefined)
+      }
+    })
+  })
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  const { FaActionUserCanceledError } = await import('../functions/faActionUserCanceledError')
+  const { S_FaActiveProject: activeProjectStore } = await import('app/src/stores/S_FaActiveProject')
+  activeProjectStore().setActiveProject(activeProjectFixture('project-a'))
+  const pending = handleSaveProjectSettings({
+    documentTemplates: [
+      {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {}
+      }
+    ],
+    settings: { projectName: 'Renamed' },
+    worlds: [
+      {
+        displayNameTranslations: { 'en-US': 'Realm' },
+        id: '550e8400-e29b-41d4-a716-446655440001'
+      }
+    ]
+  })
+  vi.spyOn(activeProjectStore(), 'isProjectReplacementInFlight').mockReturnValue(true)
+  releaseUpdate()
+  await expect(pending).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(persistDocumentTemplatesSnapshotMock).not.toHaveBeenCalled()
+  expect(persistWorldsSnapshotMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
+/**
+ * handleSaveProjectSettings
+ * A project switch during the template snapshot must not persist worlds.
+ */
+test('Test that handleSaveProjectSettings skips worlds after templates when the project changes', async () => {
+  let releaseTemplates = (): void => undefined
+  persistDocumentTemplatesSnapshotMock.mockImplementationOnce(() => {
+    return new Promise<undefined>((resolve) => {
+      releaseTemplates = () => {
+        resolve(undefined)
+      }
+    })
+  })
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  const { FaActionUserCanceledError } = await import('../functions/faActionUserCanceledError')
+  S_FaActiveProject().setActiveProject(activeProjectFixture('project-a'))
+  const pending = handleSaveProjectSettings({
+    documentTemplates: [
+      {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {}
+      }
+    ],
+    settings: { projectName: 'Renamed' },
+    worlds: [
+      {
+        displayNameTranslations: { 'en-US': 'Realm' },
+        id: '550e8400-e29b-41d4-a716-446655440001'
+      }
+    ]
+  })
+  await vi.waitUntil(() => persistDocumentTemplatesSnapshotMock.mock.calls.length === 1)
+  S_FaActiveProject().setActiveProject(activeProjectFixture('project-b'))
+  releaseTemplates()
+  await expect(pending).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(persistWorldsSnapshotMock).not.toHaveBeenCalled()
+  expect(refreshWorkspaceWorldsMock).not.toHaveBeenCalled()
+  expect(reloadDocumentIndexFromBridgeMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })

@@ -18,6 +18,7 @@ export function createDocumentWorkspacePageRouteEffects (deps: {
   findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
   hydrationComplete: { value: boolean }
   onMounted: (hook: () => void) => void
+  readActiveDocumentId: () => string | null
 }): {
     routeDocumentId: I_computedRef<string>
   } {
@@ -26,8 +27,22 @@ export function createDocumentWorkspacePageRouteEffects (deps: {
     return typeof raw === 'string' ? raw : ''
   })
 
+  function focusedOpenTabOwnsRoute (): boolean {
+    const activeDocumentId = deps.readActiveDocumentId()
+    if (activeDocumentId === null || activeDocumentId.length === 0) {
+      return false
+    }
+    if (activeDocumentId === routeDocumentId.value) {
+      return false
+    }
+    return deps.findTabByDocumentId(activeDocumentId) !== null
+  }
+
   async function ensureTabExistsOrRedirect (): Promise<void> {
     if (!deps.hydrationComplete.value) {
+      return
+    }
+    if (focusedOpenTabOwnsRoute()) {
       return
     }
     if (routeDocumentId.value.length === 0) {

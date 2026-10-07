@@ -74,5 +74,6 @@ export function listFaProjectMediaForDocument (
         'ORDER BY m.display_name COLLATE NOCASE ASC, m.created_at_ms ASC'
     )
     .all(documentId) as I_faSqlMediaRow[]
-  return { items: rows.map(mapFaProjectMediaRow) }
+  const items = rows.map(mapFaProjectMediaRow)
+  return { items }
 }

@@ -35,7 +35,8 @@ export function resolveFaProjectDocumentPlacementId (
   templateId: string | null,
   placementId: string | null | undefined
 ): string | null {
-  if (placementId !== undefined && placementId !== null) {
+  // null is an explicit unplaced document. undefined asks for the template placement lookup.
+  if (placementId !== undefined) {
     return placementId
   }
   if (templateId === null) {

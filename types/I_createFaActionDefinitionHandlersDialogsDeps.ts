@@ -9,9 +9,13 @@ import type { T_dialogName, T_documentName } from 'app/types/T_appDialogsAndDocu
 export interface I_createFaActionDefinitionHandlersDialogsDeps {
   S_FaActiveProject: () => {
     activeProject: DeepReadonly<I_faActiveProject> | null
-    createProjectFromUserInput: (projectName: string) => Promise<'canceled' | 'created'>
+    createProjectFromUserInput: (
+      projectName: string
+    ) => Promise<'canceled' | 'created' | 'superseded'>
     hasActiveProject: boolean
+    isProjectReplacementInFlight: () => boolean
     openProjectFromKnownPath: (filePath: string) => Promise<'canceled' | 'opened' | 'reused' | 'superseded'>
+    readProjectContentEpoch: () => number
     openProjectFromUserDialog: () => Promise<'canceled' | 'opened' | 'reused' | 'superseded'>
   }
   S_FaRecentProjects: () => {

@@ -29,9 +29,10 @@ export function createDialogAppSettings (deps: {
   onMounted: (hook: () => void) => void
   ref: <T>(value: T) => Ref<T>
   registerComponentDialogStackGuard: (dialogModel: Ref<boolean>) => void
+  reportAppSettingsLoadFailure?: (error: unknown) => void
   Result: {
     fromThrowable: <T, E>(fn: () => T, onError: (error: unknown) => E) => () => {
-      unwrapOr: (defaultValue: T) => T
+      unwrapOr: <D>(defaultValue: D) => T | D
     }
   }
   runFaActionAwait: (
@@ -55,7 +56,8 @@ export function createDialogAppSettings (deps: {
     resolveDialogComponentStore: () => I_dialogComponentStoreLike | null
     syncLocalAppSettingsFromStore: (
       localSettings: Ref<I_faUserSettings | null>,
-      appSettingsTree: Ref<T_appSettingsRenderTree>
+      appSettingsTree: Ref<T_appSettingsRenderTree>,
+      isStillCurrent?: () => boolean
     ) => Promise<void>
     registerDialogAppSettingsWatchers: (params: {
       openDialog: (input: T_dialogName) => void
@@ -105,24 +107,23 @@ export function createDialogAppSettings (deps: {
   }
 
   function tryResolveFaUserSettingsStoreForSync (): T_appSettingsFaUserSettingsStoreForSync | null {
-    try {
-      return deps.S_FaUserSettings()
-    } catch {
-      return null
-    }
+    return deps.Result.fromThrowable(
+      () => deps.S_FaUserSettings(),
+      () => null
+    )().unwrapOr(null)
   }
 
   function resolveDialogComponentStore (): I_dialogComponentStoreLike | null {
-    try {
-      return deps.S_DialogComponent()
-    } catch {
-      return null
-    }
+    return deps.Result.fromThrowable(
+      () => deps.S_DialogComponent(),
+      () => null
+    )().unwrapOr(null)
   }
 
   async function syncLocalAppSettingsFromStore (
     localSettings: Ref<I_faUserSettings | null>,
-    appSettingsTree: Ref<T_appSettingsRenderTree>
+    appSettingsTree: Ref<T_appSettingsRenderTree>,
+    isStillCurrent?: () => boolean
   ): Promise<void> {
     const faUserSettingsStore = tryResolveFaUserSettingsStoreForSync()
     if (faUserSettingsStore === null) {
@@ -131,6 +132,10 @@ export function createDialogAppSettings (deps: {
 
     if (faUserSettingsStore.settings === null) {
       await faUserSettingsStore.refreshSettings()
+    }
+
+    if (isStillCurrent !== undefined && !isStillCurrent()) {
+      return
     }
 
     if (faUserSettingsStore.settings !== null) {
@@ -292,6 +297,8 @@ export function createDialogAppSettings (deps: {
       searchSettingsQuery
     } = params
 
+    let appSettingsOpenGeneration = 0
+
     function captureBaselineFromLocalSettings (): void {
       if (localSettings.value === null) {
         baselineSettings.value = null
@@ -301,6 +308,9 @@ export function createDialogAppSettings (deps: {
     }
 
     function openDialog (input: T_dialogName): void {
+      appSettingsOpenGeneration += 1
+      const openGeneration = appSettingsOpenGeneration
+      const isStillCurrent = (): boolean => openGeneration === appSettingsOpenGeneration
       documentName.value = input
       dialogModel.value = true
       searchSettingsQuery.value = ''
@@ -318,18 +328,36 @@ export function createDialogAppSettings (deps: {
         return
       }
 
-      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree).then(() => {
+      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree, isStillCurrent).then(() => {
+        if (!isStillCurrent()) {
+          return
+        }
         captureBaselineFromLocalSettings()
+      }).catch((error: unknown) => {
+        if (!isStillCurrent()) {
+          return
+        }
+        localSettings.value = null
+        baselineSettings.value = null
+        appSettingsTree.value = {}
+        console.error('[DialogAppSettings] load settings failed', error)
+        deps.reportAppSettingsLoadFailure?.(error)
       })
     }
 
     async function saveAndCloseDialog (): Promise<void> {
-      if (localSettings.value !== null) {
-        const plainSettingsSnapshot: I_faUserSettings = { ...deps.toRaw(localSettings.value) }
-        await deps.runFaActionAwait('saveAppSettings', { settings: plainSettingsSnapshot })
-        captureBaselineFromLocalSettings()
+      if (localSettings.value === null) {
+        return
       }
-
+      const savedSettings: I_faUserSettings = { ...deps.toRaw(localSettings.value) }
+      const saved = await deps.runFaActionAwait('saveAppSettings', { settings: savedSettings })
+      if (!saved) {
+        return
+      }
+      baselineSettings.value = { ...savedSettings }
+      if (!deps.areFaJsonSnapshotsEqual(localSettings.value, savedSettings)) {
+        return
+      }
       dialogModel.value = false
     }
 
@@ -420,19 +448,24 @@ export function createDialogAppSettings (deps: {
       }
       return !deps.areFaJsonSnapshotsEqual(localSettings.value, baselineSettings.value)
     })
+    const hasActiveSearchQuery = searchComputed.hasActiveSearchQuery
+    const hasSearchNoMatchingSettings = searchComputed.hasSearchNoMatchingSettings
+    const saveAndCloseDialog = actions.saveAndCloseDialog
+    const searchFilteredAppSettingsTree = searchComputed.searchFilteredAppSettingsTree
+    const updateLocalSetting = actions.updateLocalSetting
     return {
       dialogModel,
       documentName,
-      hasActiveSearchQuery: searchComputed.hasActiveSearchQuery,
-      hasSearchNoMatchingSettings: searchComputed.hasSearchNoMatchingSettings,
+      hasActiveSearchQuery,
+      hasSearchNoMatchingSettings,
       isDirty,
       localSettings,
       appSettingsTree,
-      saveAndCloseDialog: actions.saveAndCloseDialog,
-      searchFilteredAppSettingsTree: searchComputed.searchFilteredAppSettingsTree,
+      saveAndCloseDialog,
+      searchFilteredAppSettingsTree,
       searchSettingsQuery,
       selectedCategoryTab,
-      updateLocalSetting: actions.updateLocalSetting
+      updateLocalSetting
     }
   }
 

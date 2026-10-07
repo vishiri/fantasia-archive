@@ -21,6 +21,10 @@ import {
 } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { createProjectHierarchyTreeHeTreeResyncController } from './projectHierarchyTreeHeTreeHelpersWiring'
 import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from '../functions/projectHierarchyTreeSuppressEmitDepth'
+import {
   reapplyProjectHierarchyTreeLatentDescendantExpandState
 } from './projectHierarchyTreeLatentExpandReapplyWiring'
 
@@ -130,10 +134,10 @@ function syncHeTreeAfterForceSublevelCollapse (deps: {
   reapplyHeTreeOpenState: () => void
   suppressTreeEmit: Ref<boolean>
 }): void {
-  deps.suppressTreeEmit.value = true
+  beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
   deps.getTreeRef()?.closeAll()
   deps.reapplyHeTreeOpenState()
-  deps.suppressTreeEmit.value = false
+  endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
 }
 
 export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {

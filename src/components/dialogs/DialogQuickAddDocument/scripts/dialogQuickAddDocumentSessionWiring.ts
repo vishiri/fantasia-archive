@@ -115,32 +115,48 @@ export function runDialogQuickAddDocumentSession (
     if (current === null) {
       return
     }
+    const worldIdAtEnter = current.id
     void (async () => {
       await deps.nextTick()
       // Programmatic hidePopup refocuses the world field after QMenu transitionDuration (~300ms).
       // Opening the template before that refocus lands makes Quasar filter()/focusout drop the menu.
       await deps.sleep(Math.max(deps.templateFocusMs, 350))
+      if (session.selectedWorldId.value !== worldIdAtEnter) {
+        return
+      }
       selectHandlers.onWorldSelect(current)
     })()
   }
 
+  const {
+    dialogModel,
+    documentName,
+    selectedTemplateId,
+    selectedWorldId,
+    showWorldSelect,
+    templateOptions,
+    templateSelectRef,
+    worldOptions
+  } = session
+  const { onDialogHide, onDialogShow } = openClose
+  const { onTemplateSelect, onWorldSelect } = selectHandlers
   return {
     bindTemplateSelectRef,
     bindWorldSelectRef,
-    dialogModel: session.dialogModel,
-    documentName: session.documentName,
-    onDialogHide: openClose.onDialogHide,
-    onDialogShow: openClose.onDialogShow,
-    onTemplateSelect: selectHandlers.onTemplateSelect,
+    dialogModel,
+    documentName,
+    onDialogHide,
+    onDialogShow,
+    onTemplateSelect,
     onWorldFilterEnter,
-    onWorldSelect: selectHandlers.onWorldSelect,
-    selectedTemplateId: session.selectedTemplateId,
+    onWorldSelect,
+    selectedTemplateId,
     selectedTemplateOption,
-    selectedWorldId: session.selectedWorldId,
+    selectedWorldId,
     selectedWorldOption,
-    showWorldSelect: session.showWorldSelect,
-    templateOptions: session.templateOptions,
-    templateSelectRef: session.templateSelectRef,
-    worldOptions: session.worldOptions
+    showWorldSelect,
+    templateOptions,
+    templateSelectRef,
+    worldOptions
   }
 }

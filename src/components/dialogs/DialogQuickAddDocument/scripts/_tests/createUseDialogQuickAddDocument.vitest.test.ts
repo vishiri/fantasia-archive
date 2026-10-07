@@ -99,6 +99,7 @@ function createDeps (overrides?: Partial<I_createUseDialogQuickAddDocumentDeps>)
     readLastSelectedWorldId: async () => null,
     ref,
     registerComponentDialogStackGuard: vi.fn(),
+    reportTemporaryDocumentCreateFailure: vi.fn(),
     resolveDialogComponentStoreOrNull: () => dialogStore,
     resolveNewDocumentDisplayName: () => 'Heroes',
     resolvePreferredLanguageCode: () => 'en-US',
@@ -272,6 +273,32 @@ test('Test that runDialogQuickAddDocumentSession onWorldFilterEnter reselects cu
   api.onWorldFilterEnter(new Event('keydown'))
   await flushPromises()
   expect(openPopup).not.toHaveBeenCalled()
+})
+
+test('Test that runDialogQuickAddDocumentSession onWorldFilterEnter keeps a world chosen during the wait', async () => {
+  let releaseSleep: (() => void) | undefined
+  const openPopup = vi.fn()
+  const { deps } = createDeps({
+    onMounted: () => undefined,
+    sleep: () => {
+      return new Promise<void>((resolve) => {
+        releaseSleep = resolve
+      })
+    },
+    templateFocusMs: 0
+  })
+  const useDialog = createUseDialogQuickAddDocument(deps)
+  const api = useDialog({})
+  api.dialogModel.value = true
+  api.onDialogShow()
+  await flushPromises()
+  api.templateSelectRef.value = { openPopup }
+  openPopup.mockClear()
+  api.onWorldFilterEnter(new Event('keydown'))
+  api.selectedWorldId.value = 'world-b'
+  releaseSleep?.()
+  await flushPromises()
+  expect(api.selectedWorldId.value).toBe('world-b')
 })
 
 /**

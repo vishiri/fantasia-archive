@@ -2,9 +2,9 @@ import { z } from 'zod'
 
 import {
   faProjectContentIdSchema,
+  parseFaProjectContentDroppedRecord,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
-import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import type {
   I_faProjectHierarchyTreeListPlacementChildrenInput,
   I_faProjectHierarchyTreeMoveDocumentInput,
@@ -42,10 +42,10 @@ export const faProjectHierarchyTreeSearchInputSchema = z.object({
 export function parseFaProjectHierarchyTreeListPlacementChildrenInput (
   payload: unknown
 ): I_faProjectHierarchyTreeListPlacementChildrenInput {
-  const parsed = faProjectHierarchyTreeListPlacementChildrenInputSchema.parse(
-    parseFaProjectContentPlainRecord(payload)
+  return parseFaProjectContentDroppedRecord(
+    faProjectHierarchyTreeListPlacementChildrenInputSchema,
+    payload
   )
-  return dropUndefinedRecordValues(parsed) as I_faProjectHierarchyTreeListPlacementChildrenInput
 }
 
 export function parseFaProjectHierarchyTreeMoveDocumentInput (

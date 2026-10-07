@@ -35,25 +35,27 @@ const noExportedTypesOutsideTypes = {
       return {}
     }
 
-    return {
-      ExportNamedDeclaration (node) {
-        if (node.exportKind === 'type') {
-          context.report({
-            node,
-            message:
-              'Export type aliases from repository-root types/ (import with app/types/...), not from implementation modules.'
-          })
-          return
-        }
-
-        if (node.declaration?.type === 'TSInterfaceDeclaration') {
-          context.report({
-            node,
-            message:
-              'Export interfaces from repository-root types/ (import with app/types/...), not from implementation modules.'
-          })
-        }
+    const ExportNamedDeclaration = (node) => {
+      if (node.exportKind === 'type') {
+        context.report({
+          node,
+          message:
+            'Export type aliases from repository-root types/ (import with app/types/...), not from implementation modules.'
+        })
+        return
       }
+
+      if (node.declaration?.type === 'TSInterfaceDeclaration') {
+        context.report({
+          node,
+          message:
+            'Export interfaces from repository-root types/ (import with app/types/...), not from implementation modules.'
+        })
+      }
+    }
+
+    return {
+      ExportNamedDeclaration
     }
   }
 }

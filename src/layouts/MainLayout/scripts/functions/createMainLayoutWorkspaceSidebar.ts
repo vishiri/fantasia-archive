@@ -1,70 +1,135 @@
 import type { I_ref } from 'app/types/I_vueCompositionShims'
-import type { StoreGeneric } from 'app/types/I_vuePiniaInjected'
+import type { T_mainLayoutWorkspaceSidebarDeps } from 'app/types/I_mainLayoutWorkspaceSidebar'
 
-type T_createMainLayoutWorkspaceSidebarDeps = {
-  S_FaActiveProject: () => StoreGeneric & {
-    activeProject: { id: string } | null
-    hasActiveProject: boolean
+function readMainLayoutActiveProjectId (
+  deps: T_mainLayoutWorkspaceSidebarDeps
+): string | null {
+  return deps.S_FaActiveProject().activeProject?.id ?? null
+}
+
+async function hydrateMainLayoutWorkspaceProjectSession (input: {
+  deps: T_mainLayoutWorkspaceSidebarDeps
+  projectId: string
+  sidebarWidthAtHydrateStart: number
+  sidebarWidthModel: I_ref<number>
+  syncSidebarWidthFromStore: () => void
+}): Promise<void> {
+  await input.deps.S_FaProjectSidebar().refreshProjectSidebar()
+  if (readMainLayoutActiveProjectId(input.deps) !== input.projectId) {
+    return
   }
-  S_FaProjectHierarchyTree: () => StoreGeneric & {
-    flushUiStatePersist: () => void
-    refreshLayout: () => Promise<void>
-    resetOnProjectClose: () => void
+  await input.deps.S_FaProjectHierarchyTree().refreshLayout()
+  if (readMainLayoutActiveProjectId(input.deps) !== input.projectId) {
+    return
   }
-  S_FaProjectSidebar: () => StoreGeneric & {
-    persistSidebarWidth: (widthPx: number) => Promise<boolean>
-    refreshProjectSidebar: () => Promise<boolean>
-    resetToDefault: () => void
-    setLiveWorkspaceSidebarWidthPx: (widthPx: number) => void
-    widthPx: number
+  await input.deps.S_FaOpenedDocuments().hydrateFromProjectDatabase()
+  if (readMainLayoutActiveProjectId(input.deps) !== input.projectId) {
+    return
   }
-  S_FaOpenedDocuments: () => StoreGeneric & {
-    clearSession: () => Promise<void>
-    flushPersistSnapshot: () => Promise<boolean>
-    hydrateFromProjectDatabase: () => Promise<void>
+  if (input.sidebarWidthModel.value === input.sidebarWidthAtHydrateStart) {
+    input.syncSidebarWidthFromStore()
   }
-  attachWorkspaceSidebarLiveWidthSync: (input: {
-    onWidthPx: (widthPx: number) => void
-    panelElement: HTMLElement
-  }) => () => void
-  bindWorkspaceSidebarLiveWidthSync: (input: {
-    attachWorkspaceSidebarLiveWidthSync: (options: {
-      onWidthPx: (widthPx: number) => void
-      panelElement: HTMLElement
-    }) => () => void
-    onUnmounted: (hook: () => void) => void
-    ref: <T>(value: T) => I_ref<T>
-    setLiveWorkspaceSidebarWidthPx: (widthPx: number) => void
-    watch: (
-      source: () => HTMLElement | null,
-      effect: (panelElement: HTMLElement | null) => void
-    ) => void
-  }) => I_ref<HTMLElement | null>
-  debounceSidebarWidthPersist: <T extends (...args: never[]) => void>(
-    fn: T,
-    waitMs: number
-  ) => T & { flush: () => void }
-  nextTick: (fn?: () => void) => Promise<void>
-  onMounted: (hook: () => void) => void
-  onUnmounted: (hook: () => void) => void
-  ref: <T>(value: T) => I_ref<T>
-  sidebarDefaultWidthPx: number
+}
+
+function bindMainLayoutWorkspaceProjectSession (input: {
+  deps: T_mainLayoutWorkspaceSidebarDeps
+  scheduleSidebarWidthPersist: { cancel: () => void }
+  sidebarWidthModel: I_ref<number>
+  setSuppressSidebarWidthPersist: (suppress: boolean) => void
+  syncSidebarWidthFromStore: () => void
+}): void {
+  input.deps.onMounted(() => {
+    const projectId = readMainLayoutActiveProjectId(input.deps)
+    if (projectId === null) {
+      return
+    }
+    void hydrateMainLayoutWorkspaceProjectSession({
+      deps: input.deps,
+      projectId,
+      sidebarWidthAtHydrateStart: input.sidebarWidthModel.value,
+      sidebarWidthModel: input.sidebarWidthModel,
+      syncSidebarWidthFromStore: input.syncSidebarWidthFromStore
+    })
+  })
+
+  input.deps.watch(
+    () => input.deps.S_FaActiveProject().activeProject?.id ?? null,
+    async (projectId) => {
+      input.scheduleSidebarWidthPersist.cancel()
+      if (projectId === null) {
+        input.deps.S_FaProjectSidebar().resetToDefault()
+        input.deps.S_FaProjectHierarchyTree().flushUiStatePersist()
+        input.deps.S_FaProjectHierarchyTree().resetOnProjectClose()
+        void input.deps.S_FaOpenedDocuments().flushPersistSnapshot()
+        void input.deps.S_FaOpenedDocuments().clearSession()
+        input.setSuppressSidebarWidthPersist(true)
+        input.sidebarWidthModel.value = input.deps.sidebarDefaultWidthPx
+        void input.deps.nextTick(() => {
+          input.setSuppressSidebarWidthPersist(false)
+        })
+        return
+      }
+      await hydrateMainLayoutWorkspaceProjectSession({
+        deps: input.deps,
+        projectId,
+        sidebarWidthAtHydrateStart: input.sidebarWidthModel.value,
+        sidebarWidthModel: input.sidebarWidthModel,
+        syncSidebarWidthFromStore: input.syncSidebarWidthFromStore
+      })
+    }
+  )
+}
+
+function createPersistSidebarWidthAfterDrag (input: {
+  hasActiveProject: () => boolean
+  persistSidebarWidth: (
+    widthPx: number,
+    options?: { ignoreReplacementFlight?: true }
+  ) => Promise<boolean>
   sidebarMinWidthPx: number
-  sidebarWidthPersistDebounceMs: number
-  watch: {
-    (
-      source: () => string | null,
-      effect: (projectId: string | null) => void | Promise<void>
-    ): void
-    (
-      source: () => HTMLElement | null,
-      effect: (panelElement: HTMLElement | null) => void
-    ): void
+  sidebarWidthModel: I_ref<number>
+}): (options?: { ignoreReplacementFlight?: true }) => Promise<void> {
+  let sidebarWidthPersistInFlight: Promise<void> | null = null
+
+  async function writeSidebarWidthAfterDrag (options?: {
+    ignoreReplacementFlight?: true
+  }): Promise<void> {
+    if (!input.hasActiveProject()) {
+      return
+    }
+    if (!Number.isFinite(input.sidebarWidthModel.value)) {
+      return
+    }
+    const ceiled = Math.max(input.sidebarMinWidthPx, Math.ceil(input.sidebarWidthModel.value))
+    input.sidebarWidthModel.value = ceiled
+    if (options?.ignoreReplacementFlight === true) {
+      await input.persistSidebarWidth(ceiled, { ignoreReplacementFlight: true })
+      return
+    }
+    await input.persistSidebarWidth(ceiled)
+  }
+
+  return async function persistSidebarWidthAfterDrag (options?: {
+    ignoreReplacementFlight?: true
+  }): Promise<void> {
+    const pendingPersist = sidebarWidthPersistInFlight
+    if (pendingPersist !== null) {
+      await pendingPersist
+    }
+    const write = writeSidebarWidthAfterDrag(options)
+    sidebarWidthPersistInFlight = write
+    try {
+      await write
+    } finally {
+      if (sidebarWidthPersistInFlight === write) {
+        sidebarWidthPersistInFlight = null
+      }
+    }
   }
 }
 
 export function createMainLayoutWorkspaceSidebar (
-  deps: T_createMainLayoutWorkspaceSidebarDeps
+  deps: T_mainLayoutWorkspaceSidebarDeps
 ): () => {
     onSidebarSplitterWidthUpdate: (widthPx: number) => void
     sidebarMinWidthPx: number
@@ -97,21 +162,30 @@ export function createMainLayoutWorkspaceSidebar (
       })
     }
 
-    async function persistSidebarWidthAfterDrag (): Promise<void> {
-      if (!deps.S_FaActiveProject().hasActiveProject) {
-        return
-      }
-      if (!Number.isFinite(sidebarWidthModel.value)) {
-        return
-      }
-      const ceiled = Math.max(sidebarMinWidthPx, Math.ceil(sidebarWidthModel.value))
-      sidebarWidthModel.value = ceiled
-      await deps.S_FaProjectSidebar().persistSidebarWidth(ceiled)
-    }
+    const persistSidebarWidthAfterDrag = createPersistSidebarWidthAfterDrag({
+      hasActiveProject: () => deps.S_FaActiveProject().hasActiveProject,
+      persistSidebarWidth: (widthPx, options) => {
+        if (options === undefined) {
+          return deps.S_FaProjectSidebar().persistSidebarWidth(widthPx)
+        }
+        return deps.S_FaProjectSidebar().persistSidebarWidth(widthPx, options)
+      },
+      sidebarMinWidthPx,
+      sidebarWidthModel
+    })
 
     const scheduleSidebarWidthPersist = deps.debounceSidebarWidthPersist(() => {
       void persistSidebarWidthAfterDrag()
     }, deps.sidebarWidthPersistDebounceMs)
+
+    async function persistScheduledSidebarWidthBeforeProjectReplacement (): Promise<void> {
+      scheduleSidebarWidthPersist.cancel()
+      await persistSidebarWidthAfterDrag({ ignoreReplacementFlight: true })
+    }
+
+    deps.S_FaProjectSidebar().registerSidebarWidthPersistBeforeProjectReplacement(
+      persistScheduledSidebarWidthBeforeProjectReplacement
+    )
 
     /**
      * Applies a QSplitter width emit. Ignores non-finite values from a separator click without pan.
@@ -134,37 +208,15 @@ export function createMainLayoutWorkspaceSidebar (
       scheduleSidebarWidthPersist.flush()
     })
 
-    deps.onMounted(() => {
-      const projectId = deps.S_FaActiveProject().activeProject?.id ?? null
-      if (projectId !== null) {
-        void deps.S_FaProjectHierarchyTree().refreshLayout()
-        void deps.S_FaOpenedDocuments().hydrateFromProjectDatabase()
-      }
+    bindMainLayoutWorkspaceProjectSession({
+      deps,
+      scheduleSidebarWidthPersist,
+      sidebarWidthModel,
+      setSuppressSidebarWidthPersist: (suppress) => {
+        suppressSidebarWidthPersist = suppress
+      },
+      syncSidebarWidthFromStore
     })
-
-    deps.watch(
-      () => deps.S_FaActiveProject().activeProject?.id ?? null,
-      async (projectId) => {
-        scheduleSidebarWidthPersist.flush()
-        if (projectId === null) {
-          deps.S_FaProjectSidebar().resetToDefault()
-          deps.S_FaProjectHierarchyTree().flushUiStatePersist()
-          deps.S_FaProjectHierarchyTree().resetOnProjectClose()
-          void deps.S_FaOpenedDocuments().flushPersistSnapshot()
-          void deps.S_FaOpenedDocuments().clearSession()
-          suppressSidebarWidthPersist = true
-          sidebarWidthModel.value = deps.sidebarDefaultWidthPx
-          void deps.nextTick(() => {
-            suppressSidebarWidthPersist = false
-          })
-          return
-        }
-        await deps.S_FaProjectSidebar().refreshProjectSidebar()
-        await deps.S_FaProjectHierarchyTree().refreshLayout()
-        await deps.S_FaOpenedDocuments().hydrateFromProjectDatabase()
-        syncSidebarWidthFromStore()
-      }
-    )
 
     return {
       onSidebarSplitterWidthUpdate,

@@ -2,6 +2,8 @@ import { expect, test } from 'vitest'
 
 import type { I_faProjectMediaMassEditRow } from 'app/types/I_faProjectMediaDomain'
 
+import { decodeFaProjectMediaUrlSegmentOrRaw } from '../../faProjectMediaDisplayNameDecodeWiring'
+
 import {
   appendFaProjectMediaMassEditIntakeRows,
   applyFaProjectMediaMassEditExternalTypePatch,
@@ -63,20 +65,23 @@ test('Test that hasFaProjectMediaOnlineUrlDraftContent ignores blank and whitesp
 })
 
 test('Test that resolveFaProjectMediaDisplayNameFromUrl uses last path segment without suffix', () => {
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/foo/bar.png?x=1#h')).toBe(
-    'bar'
-  )
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/')).toBe('')
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com')).toBe('')
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/foo/')).toBe('foo')
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/a%20b.png')).toBe('a b')
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/%E0%A4%A')).toBe('%E0%A4%A')
-  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/readme')).toBe('readme')
+  const decodeSegment = decodeFaProjectMediaUrlSegmentOrRaw
+  expect(resolveFaProjectMediaDisplayNameFromUrl(
+    'https://cdn.example.com/foo/bar.png?x=1#h',
+    decodeSegment
+  )).toBe('bar')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/', decodeSegment)).toBe('')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com', decodeSegment)).toBe('')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/foo/', decodeSegment)).toBe('foo')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/a%20b.png', decodeSegment)).toBe('a b')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/%E0%A4%A', decodeSegment)).toBe('%E0%A4%A')
+  expect(resolveFaProjectMediaDisplayNameFromUrl('https://cdn.example.com/readme', decodeSegment)).toBe('readme')
 })
 
 test('Test that createFaProjectMediaMassEditRowFromOnlineUrl builds an external linked row', () => {
   const row = createFaProjectMediaMassEditRowFromOnlineUrl({
     createId: () => 'uuid-1',
+    decodeSegment: decodeFaProjectMediaUrlSegmentOrRaw,
     url: 'https://cdn.example.com/foo/bar.png'
   })
   expect(row.id).toBe('uuid-1')
@@ -94,6 +99,7 @@ test('Test that createFaProjectMediaMassEditRowFromOnlineUrl builds an external 
 test('Test that createFaProjectMediaMassEditRowsFromOnlineUrlsDraft maps non-blank lines', () => {
   const rows = createFaProjectMediaMassEditRowsFromOnlineUrlsDraft({
     createId: createIdSequence(),
+    decodeSegment: decodeFaProjectMediaUrlSegmentOrRaw,
     draft: 'https://a.test/one.png\n\nhttps://b.test/two.jpg'
   })
   expect(rows).toHaveLength(2)

@@ -21,6 +21,12 @@ test('Test that coerceFaProjectWorldColorForStorage normalizes valid hex colors'
   expect(coerceFaProjectWorldColorForStorage('#aabbcc', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe(
     '#AABBCC'
   )
+  expect(coerceFaProjectWorldColorForStorage('#abc', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe(
+    '#AABBCC'
+  )
+  expect(coerceFaProjectWorldColorForStorage(' #AbC ', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe(
+    '#AABBCC'
+  )
 })
 
 /**

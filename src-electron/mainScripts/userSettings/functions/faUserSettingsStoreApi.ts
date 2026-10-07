@@ -2,6 +2,20 @@ import type { I_faUserSettingsStoreApiDeps } from 'app/types/I_faElectronMainSto
 import type { I_faElectronStoreHandle } from 'app/types/I_faElectronStoreHandle'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
+function faUserSettingsNeedRewrite (
+  currentSettings: Record<string, unknown>,
+  sanitized: I_faUserSettings,
+  hadUnexpectedKeys: boolean
+): boolean {
+  if (hadUnexpectedKeys) {
+    return true
+  }
+  const sanitizedRecord = sanitized as unknown as Record<string, unknown>
+  return Object.keys(currentSettings).some((key) => {
+    return currentSettings[key] !== sanitizedRecord[key]
+  })
+}
+
 /**
  * Removes persisted keys that no longer exist in defaults and rewrites the settings file once per launch when stale/unknown keys are found.
  */
@@ -19,9 +33,10 @@ export function createFaUserSettingsStoreApi (deps: I_faUserSettingsStoreApiDeps
     } = deps.buildSanitizedFaUserSettings(
       migrated as Partial<I_faUserSettings>,
       deps.defaults,
-      deps.isFaUserSettingsAppTheme
+      deps.isFaUserSettingsAppTheme,
+      deps.isFaUserSettingsLanguageCode
     )
-    if (hadUnexpectedKeysBeforeMigrate) {
+    if (faUserSettingsNeedRewrite(currentSettings, sanitized, hadUnexpectedKeysBeforeMigrate)) {
       store.store = sanitized
     }
   }

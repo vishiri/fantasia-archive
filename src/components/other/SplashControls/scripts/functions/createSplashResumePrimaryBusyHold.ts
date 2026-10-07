@@ -16,7 +16,8 @@ type T_createSplashResumePrimaryBusyHoldDeps = {
 export function resolveSplashResumePrimaryLabelKey (
   activeProject: { filePath?: string } | null
 ): T_splashResumePrimaryLabelKey {
-  if (activeProject !== null) {
+  const filePath = activeProject?.filePath?.trim() ?? ''
+  if (filePath.length > 0) {
     return 'splashPage.resumeCurrentProject'
   }
   return 'splashPage.resumeLatestProject'

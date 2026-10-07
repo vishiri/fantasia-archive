@@ -109,20 +109,25 @@ export function mapProjectHierarchyTreeTagWrapperNode (input: {
     tags: input.tags,
     world: input.world
   })
+  const hasChildren = tagChildren.length > 0
+  const id = resolveProjectHierarchyTreeTagWrapperNodeId(input.world.id)
+  const label = input.tagsLabel
+  const worldColor = input.world.color
+  const worldId = input.world.id
   return {
     children: tagChildren,
     childrenLoaded: true,
     documentId: null,
     groupId: null,
-    hasChildren: tagChildren.length > 0,
+    hasChildren,
     icon: PROJECT_HIERARCHY_TREE_TAG_WRAPPER_ICON,
-    id: resolveProjectHierarchyTreeTagWrapperNodeId(input.world.id),
-    label: input.tagsLabel,
+    id,
+    label,
     nodeKind: 'tagWrapper',
     placementId: null,
     tagId: null,
-    worldColor: input.world.color,
-    worldId: input.world.id
+    worldColor,
+    worldId
   }
 }
 
@@ -194,30 +199,54 @@ export function mapProjectHierarchyTreeDocumentsUnderTagToNodes (input: {
     const nameDelta = left.displayName.localeCompare(right.displayName, undefined, {
       sensitivity: 'accent'
     })
-    return nameDelta !== 0 ? nameDelta : left.documentId.localeCompare(right.documentId)
+    if (nameDelta !== 0) {
+      return nameDelta
+    }
+    const createdAtDelta = (left.createdAtMs ?? 0) - (right.createdAtMs ?? 0)
+    if (createdAtDelta !== 0) {
+      return createdAtDelta
+    }
+    return left.documentId.localeCompare(right.documentId)
   })
   return orderedItems.map((item) => {
+    const children: I_faProjectHierarchyTreeHeTreeNode[] = []
+    const documentBackgroundColor = item.documentBackgroundColor
+    const documentId = item.documentId
+    const documentTextColor = item.documentTextColor
+    const templateIcon = item.templateIcon ?? ''
+    const icon = input.resolvePlacementDisplayIcon(templateIcon)
+    const id = resolveProjectHierarchyTreeDocumentUnderTagNodeId(input.tagId, item.documentId)
+    const isCategory = item.isCategory
+    const isDead = item.isDead
+    const isFinished = item.isFinished
+    const isMinor = item.isMinor
+    const label = item.displayName
+    const nodeKind = 'document' as const
+    const tagId = input.tagId
+    const treeOrderNumber = item.treeOrderNumber
+    const worldColor = input.worldColor
+    const worldId = input.worldId
     return {
-      children: [],
+      children,
       childrenLoaded: true,
-      documentBackgroundColor: item.documentBackgroundColor,
-      documentId: item.documentId,
-      documentTextColor: item.documentTextColor,
+      documentBackgroundColor,
+      documentId,
+      documentTextColor,
       groupId: null,
       hasChildren: false,
-      icon: input.resolvePlacementDisplayIcon(''),
-      id: resolveProjectHierarchyTreeDocumentUnderTagNodeId(input.tagId, item.documentId),
-      isCategory: item.isCategory,
-      isDead: item.isDead,
-      isFinished: item.isFinished,
-      isMinor: item.isMinor,
-      label: item.displayName,
-      nodeKind: 'document' as const,
+      icon,
+      id,
+      isCategory,
+      isDead,
+      isFinished,
+      isMinor,
+      label,
+      nodeKind,
       placementId: null,
-      tagId: input.tagId,
-      treeOrderNumber: item.treeOrderNumber,
-      worldColor: input.worldColor,
-      worldId: input.worldId
+      tagId,
+      treeOrderNumber,
+      worldColor,
+      worldId
     }
   })
 }

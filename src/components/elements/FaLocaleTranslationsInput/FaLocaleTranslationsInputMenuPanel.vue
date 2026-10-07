@@ -227,8 +227,9 @@ function localeRowInputRefBinding (localeRowIndex: number): {
     return {}
   }
 
+  const ref = props.setPreferredLanguageInputRef
   return {
-    ref: props.setPreferredLanguageInputRef
+    ref
   }
 }
 </script>

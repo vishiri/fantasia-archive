@@ -153,34 +153,54 @@ export function resolveOpenedDocumentTabsAfterForceClose (input: {
     tabs: input.tabs
   })
   if (nextTabs.length === input.tabs.length) {
+    const nextActiveDocumentId = input.activeDocumentId
+    const copiedTabs = duplicateOpenedDocumentTabs(input.tabs)
     return {
-      nextActiveDocumentId: input.activeDocumentId,
-      nextTabs: duplicateOpenedDocumentTabs(input.tabs),
+      nextActiveDocumentId,
+      nextTabs: copiedTabs,
       shouldNavigateHome: false
     }
   }
   if (nextTabs.length === 0) {
+    const emptyTabs: I_faOpenedDocumentTab[] = []
     return {
       nextActiveDocumentId: null,
-      nextTabs: [],
+      nextTabs: emptyTabs,
       shouldNavigateHome: true
     }
   }
 
   const exceptDocumentId = input.exceptDocumentId
-  if (exceptDocumentId !== null) {
-    return {
-      nextActiveDocumentId: exceptDocumentId,
-      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
-      shouldNavigateHome: false
+  const copiedNextTabs = duplicateOpenedDocumentTabs(nextTabs)
+  return {
+    nextActiveDocumentId: exceptDocumentId,
+    nextTabs: copiedNextTabs,
+    shouldNavigateHome: false
+  }
+}
+
+function findRemainingTabIdNearestClosedActive (
+  tabs: readonly I_faOpenedDocumentTab[],
+  nextTabs: readonly I_faOpenedDocumentTab[],
+  removedIndex: number
+): string | null {
+  if (removedIndex < 0) {
+    return null
+  }
+  const remainingIds = new Set(nextTabs.map((tab) => tab.documentId))
+  for (let index = removedIndex + 1; index < tabs.length; index += 1) {
+    const documentId = tabs[index]?.documentId
+    if (documentId !== undefined && remainingIds.has(documentId)) {
+      return documentId
     }
   }
-
-  return {
-    nextActiveDocumentId: null,
-    nextTabs: [],
-    shouldNavigateHome: true
+  for (let index = removedIndex - 1; index >= 0; index -= 1) {
+    const documentId = tabs[index]?.documentId
+    if (documentId !== undefined && remainingIds.has(documentId)) {
+      return documentId
+    }
   }
+  return null
 }
 
 /**
@@ -200,20 +220,24 @@ export function resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges (input: {
     tabs: input.tabs
   })
   if (nextTabs.length === input.tabs.length) {
+    const nextActiveDocumentId = input.activeDocumentId
+    const copiedTabs = duplicateOpenedDocumentTabs(input.tabs)
     return {
-      nextActiveDocumentId: input.activeDocumentId,
-      nextTabs: duplicateOpenedDocumentTabs(input.tabs),
+      nextActiveDocumentId,
+      nextTabs: copiedTabs,
       shouldNavigateHome: false
     }
   }
   if (nextTabs.length === 0) {
+    const emptyTabs: I_faOpenedDocumentTab[] = []
     return {
       nextActiveDocumentId: null,
-      nextTabs: [],
+      nextTabs: emptyTabs,
       shouldNavigateHome: true
     }
   }
 
+  const copiedNextTabs = duplicateOpenedDocumentTabs(nextTabs)
   const activeDocumentId = input.activeDocumentId
   if (
     activeDocumentId !== null &&
@@ -221,7 +245,7 @@ export function resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges (input: {
   ) {
     return {
       nextActiveDocumentId: activeDocumentId,
-      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+      nextTabs: copiedNextTabs,
       shouldNavigateHome: false
     }
   }
@@ -229,31 +253,16 @@ export function resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges (input: {
   const removedIndex = activeDocumentId === null
     ? -1
     : findOpenedDocumentTabIndexByDocumentId(input.tabs, activeDocumentId)
-  const focusIndex = resolveOpenedDocumentTabFocusIndexAfterClose(
-    removedIndex,
-    nextTabs.length
+  const nextActiveDocumentId = findRemainingTabIdNearestClosedActive(
+    input.tabs,
+    nextTabs,
+    removedIndex
   )
-  if (focusIndex < 0) {
-    return {
-      nextActiveDocumentId: null,
-      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
-      shouldNavigateHome: true
-    }
-  }
-
-  const nextTab = nextTabs[focusIndex]
-  if (nextTab === undefined) {
-    return {
-      nextActiveDocumentId: null,
-      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
-      shouldNavigateHome: true
-    }
-  }
-
+  const shouldNavigateHome = nextActiveDocumentId === null
   return {
-    nextActiveDocumentId: nextTab.documentId,
-    nextTabs: duplicateOpenedDocumentTabs(nextTabs),
-    shouldNavigateHome: false
+    nextActiveDocumentId,
+    nextTabs: copiedNextTabs,
+    shouldNavigateHome
   }
 }
 

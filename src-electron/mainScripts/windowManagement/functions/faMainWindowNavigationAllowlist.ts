@@ -3,33 +3,24 @@
  * Foreign http(s) are denied here so 'will-navigate' can open them via 'shell.openExternal' instead.
  */
 export function isFaMainWindowNavigationAllowed (rawUrl: string): boolean {
-  let parsed: URL
-
-  try {
-    parsed = new URL(rawUrl)
-  } catch {
+  if (!URL.canParse(rawUrl)) {
     return false
   }
+
+  const parsed = new URL(rawUrl)
 
   if (parsed.protocol === 'app:') {
     return true
   }
 
-  if (process.env.DEV && parsed.protocol === 'http:') {
-    const devUrl = process.env.APP_URL
-
-    if (devUrl !== undefined && devUrl.length > 0) {
-      try {
-        const devOrigin = new URL(devUrl).origin
-
-        if (parsed.origin === devOrigin) {
-          return true
-        }
-      } catch {
-        return false
-      }
-    }
+  if (!process.env.DEV || parsed.protocol !== 'http:') {
+    return false
   }
 
-  return false
+  const devUrl = process.env.APP_URL
+  if (devUrl === undefined || devUrl.length === 0 || !URL.canParse(devUrl)) {
+    return false
+  }
+
+  return parsed.origin === new URL(devUrl).origin
 }

@@ -63,10 +63,13 @@ export function resolveProjectHierarchyTreeDragContext (
   ) {
     return null
   }
+  const documentId = node.documentId
+  const placementId = node.placementId
+  const worldId = node.worldId
   return {
-    documentId: node.documentId,
-    placementId: node.placementId,
-    worldId: node.worldId
+    documentId,
+    placementId,
+    worldId
   }
 }
 

@@ -13,17 +13,13 @@ export const FA_DIALOG_QUICK_ADD_DOCUMENT_TEMPLATE_FOCUS_MS = 100
 export const FA_DIALOG_QUICK_ADD_DOCUMENT_WORLD_ICON = 'mdi-earth'
 
 /**
- * Sorts world rows by Project Settings sortOrder ascending (stable for equal sortOrder).
+ * Sorts world rows by Project Settings sortOrder ascending.
+ * Equal sortOrder keeps the incoming list order (worlds query: created_at_ms, then id).
  */
 export function sortDialogQuickAddDocumentWorldsBySortOrder (
   worlds: readonly I_dialogQuickAddDocumentWorldSource[]
 ): I_dialogQuickAddDocumentWorldSource[] {
-  return [...worlds].sort((a, b) => {
-    if (a.sortOrder !== b.sortOrder) {
-      return a.sortOrder - b.sortOrder
-    }
-    return a.id.localeCompare(b.id)
-  })
+  return [...worlds].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
 /**
@@ -128,11 +124,14 @@ export function buildDialogQuickAddDocumentWorldOptions (input: {
       world.displayNameTranslations,
       input.preferredLanguageCode
     )
+    const color = world.color
+    const id = world.id
+    const name = label.length > 0 ? label : world.id
     return {
-      color: world.color,
+      color,
       icon: FA_DIALOG_QUICK_ADD_DOCUMENT_WORLD_ICON,
-      id: world.id,
-      name: label.length > 0 ? label : world.id
+      id,
+      name
     }
   })
 }

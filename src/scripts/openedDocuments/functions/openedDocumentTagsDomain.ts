@@ -6,14 +6,32 @@ import type {
 /**
  * Stable fingerprint for opened-document tags dirty compare (id order + names).
  */
+/**
+ * True when the saved tag id set changed, ignoring order.
+ */
+export function openedDocumentSavedTagIdSetsDiffer (
+  previousIds: readonly string[],
+  nextIds: readonly string[]
+): boolean {
+  if (previousIds.length !== nextIds.length) {
+    return true
+  }
+  const previousSorted = [...previousIds].sort()
+  const nextSorted = [...nextIds].sort()
+  return previousSorted.some((id, index) => id !== nextSorted[index])
+}
+
 export function resolveOpenedDocumentTagsFingerprint (
   tags: readonly I_faProjectDocumentTagAssignmentInput[] | readonly I_faProjectDocumentTagRef[]
 ): string {
   const normalized = tags.map((tag) => {
+    const id = tag.id
+    const isNew = 'isNew' in tag && tag.isNew === true
+    const name = tag.name.trim()
     return {
-      id: tag.id,
-      isNew: 'isNew' in tag && tag.isNew === true,
-      name: tag.name.trim()
+      id,
+      isNew,
+      name
     }
   }).sort((left, right) => left.id.localeCompare(right.id))
   return JSON.stringify(normalized)
@@ -26,9 +44,11 @@ export function mapOpenedDocumentSavedTagsToDraft (
   tags: readonly I_faProjectDocumentTagRef[]
 ): I_faProjectDocumentTagAssignmentInput[] {
   return tags.map((tag) => {
+    const id = tag.id
+    const name = tag.name
     return {
-      id: tag.id,
-      name: tag.name
+      id,
+      name
     }
   })
 }

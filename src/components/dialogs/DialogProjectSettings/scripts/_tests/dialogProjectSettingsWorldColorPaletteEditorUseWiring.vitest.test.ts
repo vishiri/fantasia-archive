@@ -85,20 +85,22 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor emits pale
   api.onDragEnd()
   expect(emitted.length).toBeGreaterThan(1)
 
-  api.setOpenSwatchIndex(0)
-  expect(api.openSwatchIndex.value).toBe(0)
-  api.setOpenSwatchIndex(null)
-  expect(api.openSwatchIndex.value).toBeNull()
-
-  api.onSwatchDuplicate(firstEntryId)
-  expect(emitted[emitted.length - 1]).toBe('#AABBCC;#AABBCC;#FFFFFF')
+  api.setOpenSwatchEntryId(firstEntryId)
+  expect(api.openSwatchEntryId.value).toBe(firstEntryId)
+  api.setOpenSwatchEntryId(null)
+  expect(api.openSwatchEntryId.value).toBeNull()
 
   const whiteEntryId = api.colorPaletteEntries.value.find((entry) => entry.hex === '#FFFFFF')?.id ?? ''
+  api.setOpenSwatchEntryId(whiteEntryId)
+  api.onSwatchDuplicate(firstEntryId)
+  expect(api.openSwatchEntryId.value).toBe(whiteEntryId)
+  expect(emitted[emitted.length - 1]).toBe('#AABBCC;#AABBCC;#FFFFFF')
+
   api.onSwatchDelete(whiteEntryId)
 
-  api.setOpenSwatchIndex(1)
+  api.setOpenSwatchEntryId(firstEntryId)
   api.onSwatchDelete(firstEntryId)
-  expect(api.openSwatchIndex.value).toBeNull()
+  expect(api.openSwatchEntryId.value).toBeNull()
   expect(emitted[emitted.length - 1]).toBe('#AABBCC')
 })
 
@@ -186,6 +188,23 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips appe
 
 /**
  * createUseDialogProjectSettingsWorldColorPaletteEditor
+ * Add follows the visible swatches, so stored junk that the editor cannot show does not block a new color.
+ */
+test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor allows add when stored junk hides no swatches', () => {
+  entryCounter = 0
+  const props = {
+    colorPalette: 'x'.repeat(FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH)
+  }
+  const api = useEditor(props, () => undefined)
+  expect(api.colorPaletteEntries.value).toHaveLength(0)
+  expect(api.isAddDisabled.value).toBe(false)
+  api.onAddColor()
+  expect(api.colorPaletteEntries.value).toHaveLength(1)
+  expect(api.colorPaletteEntries.value[0]?.hex).toBe(FA_PROJECT_WORLD_COLOR_PALETTE_APPEND_DEFAULT_HEX)
+})
+
+/**
+ * createUseDialogProjectSettingsWorldColorPaletteEditor
  * Exposes duplicate hex keys when the palette repeats a color.
  */
 test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor tracks duplicate hex keys', () => {
@@ -259,11 +278,11 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips bloc
   expect(wouldDuplicateExceed).toHaveBeenCalled()
   expect(duplicateAfter).not.toHaveBeenCalled()
 
-  api.setOpenSwatchIndex(0)
+  api.setOpenSwatchEntryId(firstEntryId)
   api.onSwatchDelete(firstEntryId)
   expect(removeEntry).toHaveBeenCalled()
   expect(emitted).toHaveLength(0)
-  expect(api.openSwatchIndex.value).toBe(0)
+  expect(api.openSwatchEntryId.value).toBe(firstEntryId)
 })
 
 /**

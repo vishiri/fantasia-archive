@@ -401,6 +401,42 @@ test('Test that AppControlSingleMenu passes triggerArguments into the menu item 
 
 /**
  * AppControlSingleMenu
+ * A disabled row still receives the click listener, so the trigger must stay idle.
+ */
+test('Test that AppControlSingleMenu skips the trigger when the row is disabled', async () => {
+  const trigger = vi.fn()
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: false,
+            mode: 'item',
+            text: 'Closed',
+            trigger
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const rows = document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(rows.length).toBeGreaterThan(0)
+  ;(rows[rows.length - 1] as HTMLElement).click()
+  await flushPromises()
+
+  expect(trigger).not.toHaveBeenCalled()
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
  * Item clicks should call trigger with no arguments when triggerArguments is absent.
  */
 test('Test that AppControlSingleMenu calls trigger without arguments when triggerArguments is omitted', async () => {

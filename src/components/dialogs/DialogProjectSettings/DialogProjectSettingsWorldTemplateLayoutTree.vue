@@ -124,8 +124,9 @@ const treeWiring = createDialogProjectSettingsWorldTemplateLayoutTreeWiring({
 })
 
 const treeRootClassList = computed(() => {
+  const listDragging = isTreeDragActive.value
   return {
-    'dialogProjectSettingsWorldTemplateLayoutTree--listDragging': isTreeDragActive.value
+    'dialogProjectSettingsWorldTemplateLayoutTree--listDragging': listDragging
   }
 })
 

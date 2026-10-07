@@ -7,9 +7,11 @@ export function createNormalizeFaLocaleSingularPluralTranslations (deps: {
   return function normalizeFaLocaleSingularPluralTranslations (
     translations: I_faLocaleSingularPluralTranslations
   ): I_faLocaleSingularPluralTranslations {
+    const plural = deps.normalizeMap(translations.plural)
+    const singular = deps.normalizeMap(translations.singular)
     return {
-      plural: deps.normalizeMap(translations.plural),
-      singular: deps.normalizeMap(translations.singular)
+      plural,
+      singular
     }
   }
 }

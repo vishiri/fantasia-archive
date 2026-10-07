@@ -58,16 +58,17 @@ test('installFaProjectFailsafePathReplyListener registers the reply channel once
 
 test('request resolves null when payload is not an object, after timeout', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents()
     const p = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
     handler(makeReplyEvent(wc), null)
     await vi.advanceTimersByTimeAsync(2000)
     await expect(p).resolves.toBeNull()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 test('request resolves trimmed valid absolute path from renderer reply', async () => {
@@ -95,7 +96,7 @@ test('request resolves null when filePath fails pathLooksLikeFaProjectFile', asy
 
 test('request ignores reply from mismatched webContents sender', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents(42)
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
@@ -106,14 +107,15 @@ test('request ignores reply from mismatched webContents sender', async () => {
     })
     await vi.advanceTimersByTimeAsync(2000)
     await expect(pending).resolves.toBeNull()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 test('unknown correlation id times out with null', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
@@ -123,14 +125,15 @@ test('unknown correlation id times out with null', async () => {
     })
     await vi.advanceTimersByTimeAsync(2000)
     await expect(pending).resolves.toBeNull()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 test('non-string correlation id in reply is treated as empty and does not clear the pending request', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
@@ -140,22 +143,24 @@ test('non-string correlation id in reply is treated as empty and does not clear 
     })
     await vi.advanceTimersByTimeAsync(2000)
     await expect(pending).resolves.toBeNull()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 test('timeout deletes pending entry so stuck resolve is skipped safely', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     getReplyHandler()
     await vi.advanceTimersByTimeAsync(2000)
     await expect(pending).resolves.toBeNull()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 test('request resolves null when correlation matches but filePath is empty', async () => {
@@ -182,7 +187,7 @@ test('request resolves null when filePath is not a string', async () => {
 
 test('timeout fires after reply without rejecting a settled request', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
@@ -192,7 +197,8 @@ test('timeout fires after reply without rejecting a settled request', async () =
     })
     await expect(pending).resolves.toBe('D:\\world\\p.faproject')
     await vi.advanceTimersByTimeAsync(2000)
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })

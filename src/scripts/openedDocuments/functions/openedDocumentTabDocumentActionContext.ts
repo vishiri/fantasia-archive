@@ -9,12 +9,15 @@ export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
   ResultAsync: T_injectedResultAsync
   getDocumentById: (documentId: string) => Promise<{
     parentDocumentId: string | null
+    placementId?: string | null | undefined
     templateId: string | null
     worldId: string
   }>
+  isMissingProjectContentRow: (error: unknown) => boolean
   sourceTab: I_faOpenedDocumentTab
 }): Promise<{
   parentDocumentId: string | null
+  placementId?: string | null | undefined
   templateId: string
   worldId: string
 } | null> {
@@ -25,8 +28,18 @@ export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
       return null
     }
 
+    const parentDocumentId = deps.sourceTab.parentDocumentId ?? null
+    const placementId = deps.sourceTab.placementId
+    if (placementId === undefined) {
+      return {
+        parentDocumentId,
+        templateId,
+        worldId
+      }
+    }
     return {
-      parentDocumentId: deps.sourceTab.parentDocumentId ?? null,
+      parentDocumentId,
+      placementId,
       templateId,
       worldId
     }
@@ -37,7 +50,11 @@ export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
     (error): unknown => error
   )
   if (documentResult.isErr()) {
-    return null
+    if (deps.isMissingProjectContentRow(documentResult.error)) {
+      return null
+    }
+    const error = documentResult.error
+    throw error instanceof Error ? error : new Error(String(error))
   }
 
   const document = documentResult.value
@@ -47,8 +64,18 @@ export async function resolveOpenedDocumentTabDocumentActionContext (deps: {
     return null
   }
 
+  const parentDocumentId = document.parentDocumentId
+  const placementId = document.placementId
+  if (placementId === undefined) {
+    return {
+      parentDocumentId,
+      templateId,
+      worldId
+    }
+  }
   return {
-    parentDocumentId: document.parentDocumentId,
+    parentDocumentId,
+    placementId,
     templateId,
     worldId
   }

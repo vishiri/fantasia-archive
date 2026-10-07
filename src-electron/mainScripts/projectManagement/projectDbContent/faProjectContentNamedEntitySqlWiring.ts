@@ -9,6 +9,18 @@ import type {
 } from 'app/types/I_faProjectContentShared'
 import type { I_faSqlNamedEntityRow } from 'app/types/I_faProjectContentRowMap'
 
+function readFaProjectNamedEntityRow (
+  db: Database,
+  tableName: string,
+  id: string
+): I_faSqlNamedEntityRow | undefined {
+  return db
+    .prepare(
+      `SELECT id, display_name, created_at_ms, updated_at_ms FROM ${tableName} WHERE id = ?`
+    )
+    .get(id) as I_faSqlNamedEntityRow | undefined
+}
+
 function assertRowExists (
   row: I_faSqlNamedEntityRow | undefined,
   spec: I_faProjectNamedEntityTableSpec,
@@ -36,11 +48,7 @@ export function createFaProjectNamedEntity (
     nowMs,
     nowMs
   )
-  const row = db
-    .prepare(
-      `SELECT id, display_name, created_at_ms, updated_at_ms FROM ${spec.tableName} WHERE id = ?`
-    )
-    .get(id) as I_faSqlNamedEntityRow | undefined
+  const row = readFaProjectNamedEntityRow(db, spec.tableName, id)
   return mapFaProjectNamedEntityRow(assertRowExists(row, spec, id))
 }
 
@@ -50,11 +58,7 @@ export function updateFaProjectNamedEntity (
   id: string,
   displayName: string | undefined
 ): I_faProjectContentNamedEntity {
-  const existing = db
-    .prepare(
-      `SELECT id, display_name, created_at_ms, updated_at_ms FROM ${spec.tableName} WHERE id = ?`
-    )
-    .get(id) as I_faSqlNamedEntityRow | undefined
+  const existing = readFaProjectNamedEntityRow(db, spec.tableName, id)
   assertRowExists(existing, spec, id)
   if (displayName !== undefined) {
     const nowMs = Date.now()
@@ -66,11 +70,7 @@ export function updateFaProjectNamedEntity (
       id
     )
   }
-  const row = db
-    .prepare(
-      `SELECT id, display_name, created_at_ms, updated_at_ms FROM ${spec.tableName} WHERE id = ?`
-    )
-    .get(id) as I_faSqlNamedEntityRow | undefined
+  const row = readFaProjectNamedEntityRow(db, spec.tableName, id)
   return mapFaProjectNamedEntityRow(assertRowExists(row, spec, id))
 }
 

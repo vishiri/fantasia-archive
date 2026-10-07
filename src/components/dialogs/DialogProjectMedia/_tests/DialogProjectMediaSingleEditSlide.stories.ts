@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Project Media list single-edit slide-out: 700px right panel (max-width 100%) over a blocking dim backdrop, Previous/Next (body duplicates; Previous incoming from the left, Next from the right; footer stays; ArrowLeft/Right match those buttons unless an edit field is focused; same dirty/animating/end locks as clicks), Close, Save without close, and Save and close, no heading. Escape blurs a focused field first, then closes the slide when clean, and does not bounce the sticky dialog. Preview is full-width 300px (contain image, playable video/audio, raw embed HTML).'
+          'Project Media list single-edit slide-out: 700px right panel (max-width 100%) over a blocking dim backdrop, Previous/Next (body duplicates; Previous incoming from the left, Next from the right; footer stays; ArrowLeft/Right match those buttons unless an edit field is focused; same dirty/animating/end locks as clicks), Close, Save Without Close, and Save and Close, no heading. Escape blurs a focused field first, then closes the slide when clean, and does not bounce the sticky dialog. Preview is full-width 300px (contain image, playable video/audio, raw embed HTML).'
       }
     },
     layout: 'padded'

@@ -110,9 +110,11 @@ export function buildInventory (files) {
   for (const k of Object.keys(byDomain)) {
     byDomain[k].sort()
   }
+  const generatedAt = new Date().toISOString()
+  const totalFiles = files.length
   return {
-    generatedAt: new Date().toISOString(),
-    totalFiles: files.length,
+    generatedAt,
+    totalFiles,
     byDomain
   }
 }

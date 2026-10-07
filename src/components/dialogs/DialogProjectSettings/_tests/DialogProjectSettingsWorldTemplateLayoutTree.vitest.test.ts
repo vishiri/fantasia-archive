@@ -173,6 +173,7 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
   ]
   heTreeEmitters.updateModelValue?.(treeNodes)
   heTreeEmitters.afterDrop?.()
+  heTreeEmitters.dragend?.()
   await flushPromises()
   await nextTick()
   await nextTick()

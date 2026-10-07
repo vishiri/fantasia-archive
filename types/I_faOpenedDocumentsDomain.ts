@@ -61,6 +61,11 @@ export interface I_faOpenedDocumentTab {
   /** Set when persistenceState is temporary. */
   parentDocumentId?: string | null | undefined
   /**
+   * Template placement for a temporary document. null stays unplaced.
+   * Omitted falls back to the template placement lookup at first save.
+   */
+  placementId?: string | null | undefined
+  /**
    * Ordered ancestor document ids from intended parent upward; used to resolve parent at first save
    * when the intended parent was deleted before persist.
    */
@@ -109,6 +114,7 @@ export interface I_faTemporaryOpenedDocumentCreateInput {
   worldId: string
   templateId: string
   parentDocumentId?: string | null | undefined
+  placementId?: string | null | undefined
   documentId?: string | undefined
   openMode?: T_faOpenedDocumentOpenMode | undefined
   temporaryParentResolveDocumentIds?: readonly string[] | undefined

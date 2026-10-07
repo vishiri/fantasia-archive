@@ -36,6 +36,35 @@ export function readProjectHierarchyTreeDragSiblingOrderFromGetData (input: {
   return snapshot?.orderedDocumentIds ?? null
 }
 
+export function prepareDragCommitOrderSnapshotFromSchedule (deps: {
+  dragSiblingOrderAtDragStart: () => string[] | null
+  draggedTreeNodeId?: () => string | null
+  getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
+  getTreeScrollHost: () => HTMLElement | null
+  readDragSiblingOrderSnapshot: () => I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  setDragSiblingOrderSnapshot: (
+    value: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  ) => void
+  treeData: { value: I_faProjectHierarchyTreeHeTreeNode[] }
+}, draggedDocumentId: string | null, getDataSettle: {
+  attempts: number
+  settled: boolean
+}): I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null {
+  const preferredNodeId = deps.draggedTreeNodeId?.() ?? null
+  return prepareProjectHierarchyTreeDragCommitOrderSnapshot({
+    dragSiblingOrderAtDragStart: deps.dragSiblingOrderAtDragStart(),
+    draggedDocumentId,
+    existingDragSiblingOrderSnapshot: deps.readDragSiblingOrderSnapshot(),
+    getDataOrderReady: getDataSettle.settled,
+    getDataSettleAttempts: getDataSettle.attempts,
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    preferredNodeId,
+    setDragSiblingOrderSnapshot: deps.setDragSiblingOrderSnapshot,
+    treeData: deps.treeData.value
+  })
+}
+
 export function prepareProjectHierarchyTreeDragCommitOrderSnapshot (deps: {
   dragSiblingOrderAtDragStart: string[] | null
   draggedDocumentId: string | null
@@ -44,6 +73,7 @@ export function prepareProjectHierarchyTreeDragCommitOrderSnapshot (deps: {
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   getDataSettleAttempts: number
+  preferredNodeId?: string | null
   setDragSiblingOrderSnapshot: (
     value: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   ) => void
@@ -53,9 +83,11 @@ export function prepareProjectHierarchyTreeDragCommitOrderSnapshot (deps: {
     deps.setDragSiblingOrderSnapshot(null)
     return null
   }
+  const preferredNodeId = deps.preferredNodeId ?? null
   const treeDataSnapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(
     deps.treeData,
-    deps.draggedDocumentId
+    deps.draggedDocumentId,
+    preferredNodeId
   )
   if (deps.existingDragSiblingOrderSnapshot !== null) {
     return deps.existingDragSiblingOrderSnapshot
@@ -65,6 +97,7 @@ export function prepareProjectHierarchyTreeDragCommitOrderSnapshot (deps: {
     draggedDocumentId: deps.draggedDocumentId,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
+    preferredNodeId,
     treeData: deps.treeData,
     treeDataSnapshot
   })
@@ -86,10 +119,16 @@ function buildSiblingOrderSnapshotFromOrderedDocumentIds (input: {
   const parentDocumentId = resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId({
     treeDataParentDocumentId: input.treeDataSnapshot.parentDocumentId
   })
+  const orderedDocumentIds = input.orderedDocumentIds
+  const placementId = input.treeDataSnapshot.placementId
+  const tagId = input.treeDataSnapshot.tagId ?? null
+  const treeNodeId = input.treeDataSnapshot.treeNodeId ?? null
   return {
-    orderedDocumentIds: input.orderedDocumentIds,
+    orderedDocumentIds,
     parentDocumentId,
-    placementId: input.treeDataSnapshot.placementId
+    placementId,
+    tagId,
+    treeNodeId
   }
 }
 
@@ -98,6 +137,7 @@ export function resolveProjectHierarchyTreeDragCommitOrderFallback (deps: {
   draggedDocumentId: string
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  preferredNodeId?: string | null
   treeData: I_faProjectHierarchyTreeHeTreeNode[]
   treeDataSnapshot: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
 }): {
@@ -108,6 +148,7 @@ export function resolveProjectHierarchyTreeDragCommitOrderFallback (deps: {
     orderSource: 'computed' | 'dom' | 'getData' | 'parentStats' | 'treeData'
     parentStatsOrderedDocumentIds: string[] | null
   } {
+  const preferredNodeId = deps.preferredNodeId ?? null
   const parentStatsOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats()
   const computedOrderedDocumentIds = computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext({
     dragStartOrderedDocumentIds: deps.dragSiblingOrderAtDragStart,
@@ -116,12 +157,13 @@ export function resolveProjectHierarchyTreeDragCommitOrderFallback (deps: {
   const domOrderedDocumentIds = readProjectHierarchyTreeDragSiblingOrderFromDom({
     getTreeScrollHost: deps.getTreeScrollHost,
     movedDocumentId: deps.draggedDocumentId,
+    preferredNodeId,
     treeData: deps.treeData
   })
   const liveData = readProjectHierarchyTreeHeTreeLiveData(deps.getTreeRef())
   const getDataSnapshot = liveData === null
     ? null
-    : resolveProjectHierarchyTreeDragSiblingOrderSnapshot(liveData, deps.draggedDocumentId)
+    : resolveProjectHierarchyTreeDragSiblingOrderSnapshot(liveData, deps.draggedDocumentId, preferredNodeId)
   const computedSnapshot = buildSiblingOrderSnapshotFromOrderedDocumentIds({
     orderedDocumentIds: computedOrderedDocumentIds,
     treeDataSnapshot: deps.treeDataSnapshot
@@ -161,7 +203,8 @@ export function resolveProjectHierarchyTreeDragCommitOrderFallback (deps: {
     applyProjectHierarchyTreeSiblingOrderToTreeData(
       deps.treeData,
       deps.draggedDocumentId,
-      commitSnapshot.orderedDocumentIds
+      commitSnapshot.orderedDocumentIds,
+      preferredNodeId
     )
   }
   return {

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
+
 import {
   FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
@@ -16,15 +18,6 @@ export const faProjectCreateInputSchema = z.object({
 }).strict()
 
 import type { I_faProjectCreateInputParsed } from 'app/types/I_faProjectCreateInputParsed'
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses renderer IPC payload for project creation.

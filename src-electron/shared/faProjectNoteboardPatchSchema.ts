@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import { FA_APP_NOTEBOARD_MAX_TEXT_LENGTH } from './faAppNoteboardPatchSchema'
@@ -20,15 +21,6 @@ export const faProjectNoteboardPatchSchema = z.object({
   ]).optional(),
   text: z.string().max(FA_APP_NOTEBOARD_MAX_TEXT_LENGTH).optional()
 }).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses an IPC payload patching the active project noteboard. Throws when the payload fails Zod.

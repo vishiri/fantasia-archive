@@ -9,12 +9,24 @@ import {
   hasAnyDialogProjectSettingsWorldTemplatePlacement,
   resolveHideHierarchyTreeAfterEmptyWorldTemplateGate
 } from 'app/src/scripts/projectWorlds/functions/faProjectWorldTemplatePlacementHideHierarchyTree'
-import { captureDialogProjectSettingsBaselines } from './dialogProjectSettingsDialogBaselineWiring'
+import { areFaJsonSnapshotsEqual } from 'app/src/scripts/_utilities/functions/faJsonSnapshotsEqual'
+import {
+  applyDialogProjectSettingsSavedBaselines,
+  cloneDialogProjectSettingsDraftsForSave
+} from './dialogProjectSettingsDialogBaselineWiring'
 import { mapDialogProjectSettingsDocumentTemplatesToSnapshot } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSettingsDialogSaveValidation'
 import { mapDialogProjectSettingsWorldsToSnapshot } from './dialogProjectSettingsWorldsSnapshotDraft'
 
-export async function persistDialogProjectSettingsDraft (deps: {
+let dialogProjectSettingsSaveTail: Promise<void> | undefined
+
+function clearDialogProjectSettingsSaveTail (settled: Promise<void>): void {
+  if (dialogProjectSettingsSaveTail === settled) {
+    dialogProjectSettingsSaveTail = undefined
+  }
+}
+
+async function persistDialogProjectSettingsDraftNow (deps: {
   patchHideHierarchyTreeSilently: (hideHierarchyTree: boolean) => Promise<void>
   runFaActionAwait: (
     id: 'saveProjectSettings',
@@ -42,26 +54,28 @@ export async function persistDialogProjectSettingsDraft (deps: {
     localSettings,
     localWorlds
   } = params
-  if (
-    localSettings.value === null ||
-    localWorlds.value === null ||
-    localDocumentTemplates.value === null
-  ) {
+  const savedDraft = cloneDialogProjectSettingsDraftsForSave({
+    localDocumentTemplates,
+    localSettings,
+    localWorlds
+  })
+  if (savedDraft === null) {
     return false
   }
-  const trimmedName = localSettings.value.projectName.trim()
+  const hadPlacementsBeforeDialogOpen = hadWorldTemplatePlacementsAtDialogOpen.value
+  const trimmedName = savedDraft.settings.projectName.trim()
   if (
     isDialogProjectSettingsFullDialogSaveDisabled(
       trimmedName,
-      localWorlds.value,
-      localDocumentTemplates.value
+      savedDraft.worlds,
+      savedDraft.documentTemplates
     )
   ) {
     return false
   }
-  const worldsSnapshot = mapDialogProjectSettingsWorldsToSnapshot(localWorlds.value)
+  const worldsSnapshot = mapDialogProjectSettingsWorldsToSnapshot(savedDraft.worlds)
   const documentTemplatesSnapshot = mapDialogProjectSettingsDocumentTemplatesToSnapshot(
-    localDocumentTemplates.value
+    savedDraft.documentTemplates
   )
   const saved = await deps.runFaActionAwait('saveProjectSettings', {
     documentTemplates: documentTemplatesSnapshot,
@@ -74,21 +88,38 @@ export async function persistDialogProjectSettingsDraft (deps: {
     return false
   }
   const nextHideHierarchyTree = resolveHideHierarchyTreeAfterEmptyWorldTemplateGate({
-    hadPlacementsBeforeDialogOpen: hadWorldTemplatePlacementsAtDialogOpen.value,
-    hasPlacementsAfterSave: hasAnyDialogProjectSettingsWorldTemplatePlacement(localWorlds.value)
+    hadPlacementsBeforeDialogOpen,
+    hasPlacementsAfterSave: hasAnyDialogProjectSettingsWorldTemplatePlacement(savedDraft.worlds)
   })
   if (nextHideHierarchyTree !== null) {
     await deps.patchHideHierarchyTreeSilently(nextHideHierarchyTree)
   }
-  captureDialogProjectSettingsBaselines({
+  applyDialogProjectSettingsSavedBaselines({
     baselineDocumentTemplates,
     baselineSettings,
     baselineWorlds,
-    localDocumentTemplates,
-    localSettings,
-    localWorlds
+    savedDocumentTemplates: savedDraft.documentTemplates,
+    savedSettings: savedDraft.settings,
+    savedWorlds: savedDraft.worlds
   })
   return true
+}
+
+export async function persistDialogProjectSettingsDraft (
+  deps: Parameters<typeof persistDialogProjectSettingsDraftNow>[0],
+  params: Parameters<typeof persistDialogProjectSettingsDraftNow>[1]
+): Promise<boolean> {
+  const previous = dialogProjectSettingsSaveTail
+  const run = previous === undefined
+    ? persistDialogProjectSettingsDraftNow(deps, params)
+    : previous.then(() => persistDialogProjectSettingsDraftNow(deps, params))
+  const settled = run.then(() => {
+    clearDialogProjectSettingsSaveTail(settled)
+  }, () => {
+    clearDialogProjectSettingsSaveTail(settled)
+  })
+  dialogProjectSettingsSaveTail = settled
+  return await run
 }
 
 export async function saveDialogProjectSettingsDraftWithoutClosing (
@@ -138,6 +169,12 @@ export async function saveDialogProjectSettingsDraftAndClose (deps: {
     localWorlds
   })
   if (!saved) {
+    return
+  }
+  const draftsStillMatchSave = areFaJsonSnapshotsEqual(localSettings.value, baselineSettings.value) &&
+    areFaJsonSnapshotsEqual(localWorlds.value, baselineWorlds.value) &&
+    areFaJsonSnapshotsEqual(localDocumentTemplates.value, baselineDocumentTemplates.value)
+  if (!draftsStillMatchSave) {
     return
   }
   dialogModel.value = false

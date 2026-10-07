@@ -59,8 +59,9 @@ export async function faOpenedDocumentsPersistSnapshotFromBridge (
 }
 
 export function createEmptyFaOpenedDocumentsSnapshot (): I_faOpenedDocumentsSnapshot {
+  const tabs: I_faOpenedDocumentsSnapshot['tabs'] = []
   return {
     ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
-    tabs: []
+    tabs
   }
 }

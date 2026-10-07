@@ -1,5 +1,6 @@
 export default {
   title: 'Projektiasetukset',
+  loadError: 'Projektiasetuksia ei voitu ladata.',
   closeButton: 'Sulje tallentamatta',
   saveButton: 'Tallenna asetukset',
   saveWithoutClosingButton: 'Tallenna sulkematta',

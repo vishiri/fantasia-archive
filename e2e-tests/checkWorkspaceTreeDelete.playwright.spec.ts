@@ -1,6 +1,7 @@
 import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
+import { ResultAsync } from 'neverthrow'
 import {
   e2eExpectFaActiveProjectStoreName
 } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
@@ -168,12 +169,11 @@ test.describe.serial('Opened documents E2E — delete document from hierarchy tr
     ).toBeVisible()
 
     await expect.poll(async () => {
-      try {
-        await e2eGetDocumentById(appWindow, e2eTreeDeleteDocumentId)
-        return 'found'
-      } catch {
-        return 'missing'
-      }
+      const found = await ResultAsync.fromPromise(
+        e2eGetDocumentById(appWindow, e2eTreeDeleteDocumentId),
+        () => null
+      )
+      return found.isOk() ? 'found' : 'missing'
     }).toBe('missing')
 
     await appWindow.waitForTimeout(OPENED_DOCUMENTS_PERSIST_SETTLE_MS)
@@ -239,12 +239,11 @@ test.describe.serial('Opened documents E2E — cold restart after tree delete', 
       appWindow.locator(`[data-test-locator="projectAppControlBar-tab-${e2eTreeDeleteDocumentId}"]`)
     ).toHaveCount(0)
     await expect.poll(async () => {
-      try {
-        await e2eGetDocumentById(appWindow, e2eTreeDeleteDocumentId)
-        return 'found'
-      } catch {
-        return 'missing'
-      }
+      const found = await ResultAsync.fromPromise(
+        e2eGetDocumentById(appWindow, e2eTreeDeleteDocumentId),
+        () => null
+      )
+      return found.isOk() ? 'found' : 'missing'
     }).toBe('missing')
   })
 })

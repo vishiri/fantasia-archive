@@ -102,6 +102,14 @@ test('Test that parseFaProjectSetDocumentTemplatePayload accepts null template i
  * parseFaProjectDocumentPatch
  * Drops undefined optional keys from parsed patch objects.
  */
+test('Test that parseFaProjectDocumentPatch keeps a display name longer than 120 characters', () => {
+  const longName = 'N'.repeat(121)
+  const parsed = parseFaProjectDocumentPatch({
+    displayName: `  ${longName}  `
+  })
+  expect(parsed.displayName).toBe(longName)
+})
+
 test('Test that parseFaProjectDocumentPatch keeps only provided patch keys', () => {
   const parsed = parseFaProjectDocumentPatch({ displayName: 'Renamed' })
   expect(parsed.displayName).toBe('Renamed')

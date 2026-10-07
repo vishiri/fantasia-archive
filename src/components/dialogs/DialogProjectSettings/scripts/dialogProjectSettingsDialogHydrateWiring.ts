@@ -9,11 +9,29 @@ import { hasAnyDialogProjectSettingsWorldTemplatePlacement } from 'app/src/scrip
 import { captureDialogProjectSettingsBaselines } from './dialogProjectSettingsDialogBaselineWiring'
 import { syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels } from './dialogProjectSettingsDocumentTemplateLayoutTitleSyncWiring'
 
+function dialogProjectSettingsHydrateDraftsChanged (input: {
+  localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
+  localSettings: Ref<I_faProjectSettingsRoot | null>
+  localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
+  settingsAtStart: string
+  templatesAtStart: string
+  worldsAtStart: string
+}): boolean {
+  const settingsNow = JSON.stringify(input.localSettings.value)
+  const worldsNow = JSON.stringify(input.localWorlds.value)
+  const templatesNow = JSON.stringify(input.localDocumentTemplates.value)
+  return settingsNow !== input.settingsAtStart ||
+    worldsNow !== input.worldsAtStart ||
+    templatesNow !== input.templatesAtStart
+}
+
 export async function hydrateDialogProjectSettingsDrafts (deps: {
   faProjectDocumentTemplatesFetchFreshForDialog: () => Promise<I_dialogProjectSettingsDocumentTemplateDraft[]>
   faProjectSettingsFetchFreshForDialog: () => Promise<I_faProjectSettingsRoot>
   faProjectWorldsFetchFreshForDialog: () => Promise<I_dialogProjectSettingsWorldDraft[]>
   getCurrentLanguageCode: () => T_faUserSettingsLanguageCode
+  isStillCurrent?: () => boolean
+  readProjectContentEpoch?: () => number
 }, params: {
   baselineDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
   baselineSettings: Ref<I_faProjectSettingsRoot | null>
@@ -34,26 +52,52 @@ export async function hydrateDialogProjectSettingsDrafts (deps: {
     localWorlds,
     props
   } = params
+  const settingsAtStart = JSON.stringify(localSettings.value)
+  const worldsAtStart = JSON.stringify(localWorlds.value)
+  const templatesAtStart = JSON.stringify(localDocumentTemplates.value)
+  const epochAtStart = deps.readProjectContentEpoch?.()
+  let nextSettings: I_faProjectSettingsRoot
   if (props.directSettingsSnapshot !== undefined) {
-    localSettings.value = { ...props.directSettingsSnapshot }
+    nextSettings = { ...props.directSettingsSnapshot }
   } else {
     const snapshot = await deps.faProjectSettingsFetchFreshForDialog()
-    localSettings.value = { ...snapshot }
+    nextSettings = { ...snapshot }
   }
+  let nextWorlds: I_dialogProjectSettingsWorldDraft[]
   if (props.directWorldsSnapshot !== undefined) {
-    localWorlds.value = props.directWorldsSnapshot.map((world) => ({ ...world }))
+    nextWorlds = props.directWorldsSnapshot.map((world) => ({ ...world }))
   } else {
     const worlds = await deps.faProjectWorldsFetchFreshForDialog()
-    localWorlds.value = worlds.map((world) => ({ ...world }))
+    nextWorlds = worlds.map((world) => ({ ...world }))
   }
+  let nextTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
   if (props.directDocumentTemplatesSnapshot !== undefined) {
-    localDocumentTemplates.value = props.directDocumentTemplatesSnapshot.map((template) => ({
-      ...template
-    }))
+    nextTemplates = props.directDocumentTemplatesSnapshot.map((template) => ({ ...template }))
   } else {
     const templates = await deps.faProjectDocumentTemplatesFetchFreshForDialog()
-    localDocumentTemplates.value = templates.map((template) => ({ ...template }))
+    nextTemplates = templates.map((template) => ({ ...template }))
   }
+  const epochNow = deps.readProjectContentEpoch?.()
+  if (epochNow !== epochAtStart) {
+    return
+  }
+  if (deps.isStillCurrent !== undefined && !deps.isStillCurrent()) {
+    return
+  }
+  const draftsChanged = dialogProjectSettingsHydrateDraftsChanged({
+    localDocumentTemplates,
+    localSettings,
+    localWorlds,
+    settingsAtStart,
+    templatesAtStart,
+    worldsAtStart
+  })
+  if (draftsChanged) {
+    return
+  }
+  localSettings.value = nextSettings
+  localWorlds.value = nextWorlds
+  localDocumentTemplates.value = nextTemplates
   syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels({
     getCurrentLanguageCode: deps.getCurrentLanguageCode,
     localDocumentTemplates,

@@ -116,11 +116,8 @@ async function readOpenedTabDocumentIds (page: Page): Promise<string[]> {
 
 async function readClipboardTextBestEffort (page: Page): Promise<string | null> {
   return page.evaluate(async () => {
-    try {
-      return await navigator.clipboard.readText()
-    } catch {
-      return null
-    }
+    // Browser realm inside page.evaluate cannot import neverthrow.
+    return navigator.clipboard.readText().catch(() => null)
   })
 }
 

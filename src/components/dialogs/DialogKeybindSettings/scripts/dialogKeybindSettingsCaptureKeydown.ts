@@ -5,6 +5,8 @@ import type { T_dialogKeybindSettingsCaptureKeydownModuleDeps } from 'app/types/
 
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
+import { shouldAcceptFaEnterOutsideIme } from 'app/src/scripts/dom/dom_manager'
+
 export function restorePendingChordAndLabelFromBaseline (
   deps: T_dialogKeybindSettingsCaptureKeydownModuleDeps,
   params: {
@@ -114,6 +116,9 @@ export function runDialogKeybindCaptureKeydown (
   e: KeyboardEvent,
   keydownDeps: T_dialogKeybindCaptureKeydownDeps
 ): void {
+  if (!shouldAcceptFaEnterOutsideIme(e)) {
+    return
+  }
   if (e.key === 'Escape' || e.code === 'Escape') {
     e.preventDefault()
     e.stopPropagation()

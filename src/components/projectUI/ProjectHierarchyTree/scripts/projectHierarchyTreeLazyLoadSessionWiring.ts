@@ -147,13 +147,14 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (
     requestAnimationFrame: deps.requestAnimationFrame
   })
 
+  const publishedUiStateWiring = {
+    ...uiStateWiring,
+    attachScrollPersist
+  }
   return {
     lazyLoadWiring,
     runDeferredLazyLoadBatch,
-    uiStateWiring: {
-      ...uiStateWiring,
-      attachScrollPersist
-    }
+    uiStateWiring: publishedUiStateWiring
   }
 }
 
@@ -216,25 +217,45 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
     treeData: deps.treeData
   })
 
-  return {
-    attachScrollPersist: () => attachProjectHierarchyTreeUiStateScrollListeners({
+  const attachScrollPersist = (): (() => void) => {
+    return attachProjectHierarchyTreeUiStateScrollListeners({
       getTreeRef: deps.getTreeRef,
       getTreeScrollHost: deps.getTreeScrollHost,
       queuePersistScrollTopPx: deps.queuePersistScrollTopPx,
       requestAnimationFrame: deps.requestAnimationFrame
-    }),
-    awaitHeTreeResyncIdle: expandWiring.awaitHeTreeResyncIdle,
-    isProgrammaticHeTreeResyncActive: expandWiring.isProgrammaticHeTreeResyncActive,
-    markNodeClosed: expandWiring.markNodeClosed,
-    markNodeOpen: expandWiring.markNodeOpen,
-    onUnmountedCleanup: () => {
-      deps.flushUiStatePersist()
-    },
-    reapplyHeTreeOpenState: expandWiring.reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState: expandWiring.reapplyLatentDescendantExpandState,
-    resyncHeTreeAfterExpandPublish: expandWiring.resyncHeTreeAfterExpandPublish,
-    restoreExpandedSnapshot: restoreWiring.restoreExpandedSnapshot,
-    restoreUiStateFromStore: restoreWiring.restoreUiStateFromStore,
-    revealPendingPath: restoreWiring.revealPendingPath
+    })
+  }
+  const onUnmountedCleanup = (): void => {
+    deps.flushUiStatePersist()
+  }
+
+  const {
+    awaitHeTreeResyncIdle,
+    isProgrammaticHeTreeResyncActive,
+    markNodeClosed,
+    markNodeOpen,
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState,
+    resyncHeTreeAfterExpandPublish
+  } = expandWiring
+  const {
+    restoreExpandedSnapshot,
+    restoreUiStateFromStore,
+    revealPendingPath
+  } = restoreWiring
+
+  return {
+    attachScrollPersist,
+    awaitHeTreeResyncIdle,
+    isProgrammaticHeTreeResyncActive,
+    markNodeClosed,
+    markNodeOpen,
+    onUnmountedCleanup,
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState,
+    resyncHeTreeAfterExpandPublish,
+    restoreExpandedSnapshot,
+    restoreUiStateFromStore,
+    revealPendingPath
   }
 }

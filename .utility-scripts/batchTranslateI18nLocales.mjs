@@ -8,6 +8,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ResultAsync } from 'neverthrow'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const enUsRoot = path.join(repoRoot, 'i18n', 'en-US')
@@ -154,21 +155,23 @@ async function googleTranslate (text, targetLang) {
 
   let lastError = null
   for (let attempt = 0; attempt < 6; attempt += 1) {
-    try {
+    const translated = await ResultAsync.fromPromise((async () => {
       const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`Translate HTTP ${response.status} for ${targetLang}`)
       }
 
       const payload = await response.json()
-      const translated = payload?.[0]?.map((row) => row?.[0]).join('') ?? text
-      translationCache.set(cacheKey, translated)
+      const value = payload?.[0]?.map((row) => row?.[0]).join('') ?? text
+      translationCache.set(cacheKey, value)
       await sleep(180 + attempt * 120)
-      return translated
-    } catch (error) {
-      lastError = error
-      await sleep(800 + attempt * 1200)
+      return value
+    })(), (error) => error)
+    if (translated.isOk()) {
+      return translated.value
     }
+    lastError = translated.error
+    await sleep(800 + attempt * 1200)
   }
 
   throw lastError ?? new Error(`Translate failed for ${targetLang}`)

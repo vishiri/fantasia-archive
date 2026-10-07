@@ -137,7 +137,7 @@ test('Test that createFaLocaleTranslationsInputMenuState invokes preferred focus
   deps.scheduleFaLocaleTranslationsMenuInputFocus = (scheduleDeps) => {
     capturedFocusMenuInput = scheduleDeps.focusMenuInput
   }
-  createFaLocaleTranslationsInputMenuState(deps, {
+  const api = createFaLocaleTranslationsInputMenuState(deps, {
     currentLanguageCode: ref('en-US'),
     emitModelValue: vi.fn(),
     inputMode: ref('singleLine'),
@@ -148,8 +148,13 @@ test('Test that createFaLocaleTranslationsInputMenuState invokes preferred focus
       callback()
       return 1
     }
-  }).onTranslationsMenuShow()
+  })
+  api.translationsMenuOpen.value = true
+  api.onTranslationsMenuShow()
 
+  capturedFocusMenuInput?.()
+  expect(focusPreferred).toHaveBeenCalledTimes(1)
+  api.translationsMenuOpen.value = false
   capturedFocusMenuInput?.()
   expect(focusPreferred).toHaveBeenCalledTimes(1)
 })

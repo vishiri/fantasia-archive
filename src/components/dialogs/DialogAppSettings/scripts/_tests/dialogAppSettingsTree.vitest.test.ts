@@ -30,12 +30,12 @@ import {
 
 const appSettingsCategoryTitleByKey: Record<string, string> = {
   accessibility: 'Accessibility',
-  developerSettings: 'Developer settings',
-  documentViewEdit: 'Page: Document view/edit',
-  hierarchicalTree: 'Hierarchical tree',
-  popupsFloatingWindows: 'Popups & floating windows',
-  projectOverview: 'Page: Project overview',
-  visualAccessibility: 'Visuals & app-wide functionality',
+  developerSettings: 'Developer Settings',
+  documentViewEdit: 'Page: Document View/Edit',
+  hierarchicalTree: 'Hierarchical Tree',
+  popupsFloatingWindows: 'Popups & Floating Windows',
+  projectOverview: 'Page: Project Overview',
+  visualAccessibility: 'Visuals & App-Wide Functionality',
   welcomeScreen: 'Page: Welcome Screen'
 }
 
@@ -106,12 +106,12 @@ test('Test that compareAppSettingsCategoryOrder orders visuals tree popups pages
 
   const titleByKey: Record<string, string> = {
     accessibility: 'Accessibility',
-    developerSettings: 'Developer settings',
-    documentViewEdit: 'Page: Document view/edit',
-    hierarchicalTree: 'Hierarchical tree',
-    popupsFloatingWindows: 'Popups & floating windows',
-    projectOverview: 'Page: Project overview',
-    visualAccessibility: 'Visuals & app-wide functionality',
+    developerSettings: 'Developer Settings',
+    documentViewEdit: 'Page: Document View/Edit',
+    hierarchicalTree: 'Hierarchical Tree',
+    popupsFloatingWindows: 'Popups & Floating Windows',
+    projectOverview: 'Page: Project Overview',
+    visualAccessibility: 'Visuals & App-Wide Functionality',
     welcomeScreen: 'Page: Welcome Screen'
   }
 
@@ -137,9 +137,9 @@ test('Test that compareAppSettingsCategoryOrder orders visuals tree popups pages
  */
 test('Test that sortSettingsListByTranslatedTitle orders by translated title then key', () => {
   const input: Record<string, I_appSettingsSettingRenderItem> = {
-    noProjectName: stubSetting('Hide project name in tree'),
-    forceSublevelCollapseInTree: stubSetting('Force sublevel collapse in the tree'),
-    invertCategoryPosition: stubSetting('Invert category position')
+    noProjectName: stubSetting('Hide Project Name in Tree'),
+    forceSublevelCollapseInTree: stubSetting('Force Sublevel Collapse in the Tree'),
+    invertCategoryPosition: stubSetting('Invert Category Position')
   }
 
   const orderedKeys = Object.keys(sortSettingsListByTranslatedTitle(input))

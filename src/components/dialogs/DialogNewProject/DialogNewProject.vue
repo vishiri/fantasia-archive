@@ -31,7 +31,7 @@
             lazy-rules
             :maxlength="FA_PROJECT_NAME_MAX_LEN"
             outlined
-            @keyup.enter="void onClickCreate()"
+            @keydown.enter="onNameInputEnter"
           />
         </div>
       </q-card-section>
@@ -84,6 +84,7 @@ const {
   nameInputRef,
   onClickCreate,
   onDialogShow,
+  onNameInputEnter,
   projectName
 } = useDialogNewProject(props)
 </script>

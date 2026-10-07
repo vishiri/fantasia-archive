@@ -70,6 +70,130 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi = {
   templateNicknameTooltipText: ComputedRef<string>
 }
 
+function bindActionTooltipUseApiFields (actionTooltipsWiring: T_actionTooltipsWiring) {
+  const {
+    armEditTooltip,
+    armPlacementNicknameHoverTooltip,
+    armRemoveTooltip,
+    editTooltipHoverEnabled,
+    editTooltipRef,
+    hidePlacementNicknameHoverTooltip,
+    placementNicknameHoverTooltipEnabled,
+    placementNicknameHoverTooltipRef,
+    removeTooltipHoverEnabled,
+    removeTooltipRef,
+    revealPlacementNicknameHoverTooltip,
+    suppressPlacementNicknameHoverTooltip
+  } = actionTooltipsWiring
+  return {
+    armEditTooltip,
+    armPlacementNicknameHoverTooltip,
+    armRemoveTooltip,
+    editTooltipHoverEnabled,
+    editTooltipRef,
+    hidePlacementNicknameHoverTooltip,
+    placementNicknameHoverTooltipEnabled,
+    placementNicknameHoverTooltipRef,
+    removeTooltipHoverEnabled,
+    removeTooltipRef,
+    revealPlacementNicknameHoverTooltip,
+    suppressPlacementNicknameHoverTooltip
+  }
+}
+
+function bindPresentationUseApiFields (presentationWiring: T_presentationWiring) {
+  const {
+    displayIconName,
+    editTooltipText,
+    missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText,
+    nodeRootClassList,
+    nodeTestLocator,
+    placementNicknameHoverTooltipNicknameLine,
+    placementNicknameHoverTooltipOffset,
+    placementNicknameHoverTooltipOriginalNameLine,
+    placementNicknameHoverTooltipTestText,
+    removeDisabled,
+    removeTooltipText,
+    rowHasValidationError,
+    showMissingTranslationsWarning,
+    showPlacementNicknameHoverTooltip
+  } = presentationWiring
+  return {
+    displayIconName,
+    editTooltipText,
+    missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText,
+    nodeRootClassList,
+    nodeTestLocator,
+    placementNicknameHoverTooltipNicknameLine,
+    placementNicknameHoverTooltipOffset,
+    placementNicknameHoverTooltipOriginalNameLine,
+    placementNicknameHoverTooltipTestText,
+    removeDisabled,
+    removeTooltipText,
+    rowHasValidationError,
+    showMissingTranslationsWarning,
+    showPlacementNicknameHoverTooltip
+  }
+}
+
+function bindInteractionUseApiFields (interactionWiring: T_interactionWiring) {
+  const {
+    onEditClick,
+    onRemoveClick,
+    onRenameContextMenu
+  } = interactionWiring
+  return {
+    onEditClick,
+    onRemoveClick,
+    onRenameContextMenu
+  }
+}
+
+function bindRenameMenuUseApiFields (renameMenuWiring: T_renameMenuWiring) {
+  const {
+    hasMenuPinnedAside,
+    menuPinnedAsideLabelValue,
+    menuPinnedAsideTooltipValue,
+    menuPinnedAsideValue,
+    onRenameTranslationsDraftUpdate,
+    renameHasError,
+    renameInputLabel,
+    renameInputTestLocator,
+    renameInputTestLocatorValue,
+    renameMenuErrorMessage,
+    renameMenuOpen,
+    renameMenuStyle,
+    renameTranslationsDraft,
+    showTemplatePinnedAside,
+    templateCanonicalName,
+    templateCanonicalNameLabel,
+    templateCanonicalNameTooltipText,
+    templateNicknameTooltipText
+  } = renameMenuWiring
+  return {
+    hasMenuPinnedAside,
+    menuPinnedAsideLabelValue,
+    menuPinnedAsideTooltipValue,
+    menuPinnedAsideValue,
+    onRenameTranslationsDraftUpdate,
+    renameHasError,
+    renameInputLabel,
+    renameInputTestLocator,
+    renameInputTestLocatorValue,
+    renameMenuErrorMessage,
+    renameMenuOpen,
+    renameMenuStyle,
+    renameTranslationsDraft,
+    showTemplatePinnedAside,
+    templateCanonicalName,
+    templateCanonicalNameLabel,
+    templateCanonicalNameTooltipText,
+    templateNicknameTooltipText
+  }
+}
+
 export function bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi (params: {
   actionTooltipsWiring: T_actionTooltipsWiring
   interactionWiring: T_interactionWiring
@@ -77,62 +201,18 @@ export function bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi (para
   presentationWiring: T_presentationWiring
   renameMenuWiring: T_renameMenuWiring
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi {
-  const actionTooltipsWiring = params.actionTooltipsWiring
-  const interactionWiring = params.interactionWiring
+  const actionFields = bindActionTooltipUseApiFields(params.actionTooltipsWiring)
+  const interactionFields = bindInteractionUseApiFields(params.interactionWiring)
   const nodeAnchorRef = params.nodeAnchorRef
-  const presentationWiring = params.presentationWiring
+  const presentationFields = bindPresentationUseApiFields(params.presentationWiring)
+  const renameFields = bindRenameMenuUseApiFields(params.renameMenuWiring)
   const renameMenuWiring = params.renameMenuWiring
-
   return {
-    armEditTooltip: actionTooltipsWiring.armEditTooltip,
-    armPlacementNicknameHoverTooltip: actionTooltipsWiring.armPlacementNicknameHoverTooltip,
-    armRemoveTooltip: actionTooltipsWiring.armRemoveTooltip,
-    displayIconName: presentationWiring.displayIconName,
-    editTooltipHoverEnabled: actionTooltipsWiring.editTooltipHoverEnabled,
-    editTooltipRef: actionTooltipsWiring.editTooltipRef,
-    editTooltipText: presentationWiring.editTooltipText,
-    hasMenuPinnedAside: renameMenuWiring.hasMenuPinnedAside,
-    menuPinnedAsideLabelValue: renameMenuWiring.menuPinnedAsideLabelValue,
-    menuPinnedAsideTooltipValue: renameMenuWiring.menuPinnedAsideTooltipValue,
-    menuPinnedAsideValue: renameMenuWiring.menuPinnedAsideValue,
-    hidePlacementNicknameHoverTooltip: actionTooltipsWiring.hidePlacementNicknameHoverTooltip,
-    missingTranslationsWarningTestLocator: presentationWiring.missingTranslationsWarningTestLocator,
-    missingTranslationsWarningTooltipText: presentationWiring.missingTranslationsWarningTooltipText,
+    ...actionFields,
+    ...presentationFields,
+    ...interactionFields,
+    ...renameFields,
     nodeAnchorRef,
-    nodeRootClassList: presentationWiring.nodeRootClassList,
-    nodeTestLocator: presentationWiring.nodeTestLocator,
-    onEditClick: interactionWiring.onEditClick,
-    onRemoveClick: interactionWiring.onRemoveClick,
-    onRenameContextMenu: interactionWiring.onRenameContextMenu,
-    onRenameTranslationsDraftUpdate: renameMenuWiring.onRenameTranslationsDraftUpdate,
-    placementNicknameHoverTooltipEnabled: actionTooltipsWiring.placementNicknameHoverTooltipEnabled,
-    placementNicknameHoverTooltipNicknameLine: presentationWiring.placementNicknameHoverTooltipNicknameLine,
-    placementNicknameHoverTooltipOffset: presentationWiring.placementNicknameHoverTooltipOffset,
-    placementNicknameHoverTooltipOriginalNameLine: presentationWiring.placementNicknameHoverTooltipOriginalNameLine,
-    placementNicknameHoverTooltipRef: actionTooltipsWiring.placementNicknameHoverTooltipRef,
-    placementNicknameHoverTooltipTestText: presentationWiring.placementNicknameHoverTooltipTestText,
-    removeDisabled: presentationWiring.removeDisabled,
-    removeTooltipHoverEnabled: actionTooltipsWiring.removeTooltipHoverEnabled,
-    removeTooltipRef: actionTooltipsWiring.removeTooltipRef,
-    removeTooltipText: presentationWiring.removeTooltipText,
-    renameHasError: renameMenuWiring.renameHasError,
-    renameInputLabel: renameMenuWiring.renameInputLabel,
-    renameInputTestLocator: renameMenuWiring.renameInputTestLocator,
-    renameInputTestLocatorValue: renameMenuWiring.renameInputTestLocatorValue,
-    renameMenuErrorMessage: renameMenuWiring.renameMenuErrorMessage,
-    renameMenuOpen: renameMenuWiring.renameMenuOpen,
-    renameMenuStyle: renameMenuWiring.renameMenuStyle,
-    renameMenuWiring,
-    renameTranslationsDraft: renameMenuWiring.renameTranslationsDraft,
-    revealPlacementNicknameHoverTooltip: actionTooltipsWiring.revealPlacementNicknameHoverTooltip,
-    rowHasValidationError: presentationWiring.rowHasValidationError,
-    showMissingTranslationsWarning: presentationWiring.showMissingTranslationsWarning,
-    showPlacementNicknameHoverTooltip: presentationWiring.showPlacementNicknameHoverTooltip,
-    showTemplatePinnedAside: renameMenuWiring.showTemplatePinnedAside,
-    suppressPlacementNicknameHoverTooltip: actionTooltipsWiring.suppressPlacementNicknameHoverTooltip,
-    templateCanonicalName: renameMenuWiring.templateCanonicalName,
-    templateCanonicalNameLabel: renameMenuWiring.templateCanonicalNameLabel,
-    templateCanonicalNameTooltipText: renameMenuWiring.templateCanonicalNameTooltipText,
-    templateNicknameTooltipText: renameMenuWiring.templateNicknameTooltipText
+    renameMenuWiring
   }
 }

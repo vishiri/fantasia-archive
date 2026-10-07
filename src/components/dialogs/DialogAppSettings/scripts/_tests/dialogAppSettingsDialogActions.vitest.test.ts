@@ -1,3 +1,4 @@
+import { flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -18,9 +19,21 @@ vi.mock('src/stores/S_FaUserSettings', () => ({
   S_FaUserSettings: vi.fn()
 }))
 
-const { runFaActionAwaitMock } = vi.hoisted(() => ({
+const { notifyCreateMock, runFaActionAwaitMock } = vi.hoisted(() => ({
+  notifyCreateMock: vi.fn(),
   runFaActionAwaitMock: vi.fn(async () => true)
 }))
+
+vi.mock('quasar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('quasar')>()
+  return {
+    ...actual,
+    Notify: {
+      ...actual.Notify,
+      create: notifyCreateMock
+    }
+  }
+})
 
 vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: vi.fn(),
@@ -29,6 +42,7 @@ vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
 
 beforeEach(() => {
   vi.mocked(S_FaUserSettings).mockReset()
+  notifyCreateMock.mockReset()
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValue(true)
 })
@@ -129,11 +143,146 @@ test('openDialog captures baselineSettings from directSettingsSnapshot', () => {
   expect(baselineSettings.value).not.toEqual(localSettings.value)
 })
 
+test('openDialog drops a settings sync from an older open', async () => {
+  let resolveRefresh: (() => void) | undefined
+  const pendingRefresh = new Promise<void>((resolve) => {
+    resolveRefresh = resolve
+  })
+  const store = createAppSettingsStoreMock({
+    settings: null,
+    refreshSettings: () => pendingRefresh.then(() => {
+      store.settings = {
+        ...FA_USER_SETTINGS_DEFAULTS,
+        showDocumentID: false
+      }
+    })
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+  const dialogModel = ref(false)
+  const documentName = ref('')
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+  const searchSettingsQuery = ref<string | null>('')
+  const { openDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
+
+  openDialog('AppSettings')
+  await Promise.resolve()
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    showDocumentID: true
+  }
+  openDialog('AppSettings')
+  await flushPromises()
+  expect(localSettings.value?.showDocumentID).toBe(true)
+  const finishRefresh = resolveRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing settings refresh resolver')
+  }
+  finishRefresh()
+  await flushPromises()
+  expect(localSettings.value?.showDocumentID).toBe(true)
+})
+
+test('openDialog toasts when the settings load fails', async () => {
+  const store = createAppSettingsStoreMock({
+    settings: null,
+    refreshSettings: async () => {
+      throw new Error('settings unavailable')
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+  const dialogModel = ref(false)
+  const documentName = ref('')
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+  const searchSettingsQuery = ref<string | null>('')
+  const { openDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
+
+  openDialog('AppSettings')
+  await flushPromises()
+
+  expect(dialogModel.value).toBe(true)
+  expect(localSettings.value).toBe(null)
+  expect(notifyCreateMock).toHaveBeenCalledWith(expect.objectContaining({
+    message: 'dialogs.appSettings.loadError',
+    type: 'negative'
+  }))
+})
+
+test('openDialog drops a previous snapshot when the next settings load fails', async () => {
+  const store = createAppSettingsStoreMock({
+    settings: null,
+    refreshSettings: async () => {
+      throw new Error('settings unavailable')
+    }
+  })
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+  const dialogModel = ref(false)
+  const documentName = ref('')
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    showDocumentID: true
+  })
+  const baselineSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({
+    visualAccessibility: {
+      title: 'Visual',
+      subCategories: {}
+    }
+  })
+  const searchSettingsQuery = ref<string | null>('')
+  const { openDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      baselineSettings,
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
+
+  openDialog('AppSettings')
+  await flushPromises()
+
+  expect(dialogModel.value).toBe(true)
+  expect(localSettings.value).toBe(null)
+  expect(baselineSettings.value).toBe(null)
+  expect(appSettingsTree.value).toEqual({})
+})
+
 /**
  * createDialogAppSettingsDialogActions
- * saveAndCloseDialog still closes the dialog even when the local snapshot is null and no action is dispatched.
+ * saveAndCloseDialog stays open when the local snapshot never loaded.
  */
-test('saveAndCloseDialog closes dialog without dispatching when local settings are null', async () => {
+test('saveAndCloseDialog stays open without dispatching when local settings are null', async () => {
   const dialogModel = ref(true)
   const documentName = ref('')
   const localSettings = ref<I_faUserSettings | null>(null)
@@ -153,7 +302,7 @@ test('saveAndCloseDialog closes dialog without dispatching when local settings a
 
   await saveAndCloseDialog()
 
-  expect(dialogModel.value).toBe(false)
+  expect(dialogModel.value).toBe(true)
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()
 })
 
@@ -192,6 +341,66 @@ test('saveAndCloseDialog dispatches saveAppSettings action when local snapshot e
     })
   )
   expect(dialogModel.value).toBe(false)
+})
+
+test('saveAndCloseDialog stays open when saveAppSettings fails', async () => {
+  runFaActionAwaitMock.mockResolvedValueOnce(false)
+  const dialogModel = ref(true)
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    appTheme: 'darkThemeFantasy'
+  })
+  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree: ref<T_appSettingsRenderTree>({}),
+      props: {},
+      searchSettingsQuery: ref<string | null>(null)
+    })
+  )
+  await saveAndCloseDialog()
+  expect(dialogModel.value).toBe(true)
+})
+
+test('saveAndCloseDialog stays open when settings change during save', async () => {
+  let finishSave: ((ok: boolean) => void) | undefined
+  const pendingSave = new Promise<boolean>((resolve) => {
+    finishSave = resolve
+  })
+  runFaActionAwaitMock.mockReturnValueOnce(pendingSave)
+  const dialogModel = ref(true)
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    appTheme: 'darkThemeFantasy'
+  })
+  const baselineSettings = ref<I_faUserSettings | null>(null)
+  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      baselineSettings,
+      dialogModel,
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree: ref<T_appSettingsRenderTree>({}),
+      props: {},
+      searchSettingsQuery: ref<string | null>(null)
+    })
+  )
+  const savePromise = saveAndCloseDialog()
+  localSettings.value = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    appTheme: 'lightThemeFlat'
+  }
+  const finish = finishSave
+  if (finish === undefined) {
+    throw new Error('missing save resolver')
+  }
+  finish(true)
+  await savePromise
+  expect(dialogModel.value).toBe(true)
+  expect(baselineSettings.value?.appTheme).toBe('darkThemeFantasy')
+  expect(localSettings.value.appTheme).toBe('lightThemeFlat')
 })
 
 /**

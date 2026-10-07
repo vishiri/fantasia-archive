@@ -22,11 +22,13 @@ type T_faDocumentWorkspaceKeybindHandlerDeps = {
       t: (key: string) => string
     }
   }
+  isProjectReplacementInFlight: () => boolean
   notifyCreate: (options: {
     group: boolean
     message: string
     type: 'positive'
   }) => void
+  readProjectContentEpoch: () => number
   resolveAdjacentOpenedDocumentTabId: (
     tabs: readonly I_faOpenedDocumentTab[],
     activeDocumentId: string | null,
@@ -60,10 +62,13 @@ function readOpenedDocumentsSession (
     tabs: readonly I_faOpenedDocumentTab[]
   } {
   const store = deps.S_FaOpenedDocuments()
+  const activeDocumentId = store.activeDocumentId
+  const routePath = deps.getCurrentRoutePath()
+  const tabs = store.tabs
   return {
-    activeDocumentId: store.activeDocumentId,
-    routePath: deps.getCurrentRoutePath(),
-    tabs: store.tabs
+    activeDocumentId,
+    routePath,
+    tabs
   }
 }
 
@@ -109,13 +114,21 @@ function createHandleSaveOpenedDocumentDisplayName (
     documentId: string
     keepEditMode: boolean
   }): Promise<void> {
+    const epochAtStart = deps.readProjectContentEpoch()
     await deps.S_FaOpenedDocuments().saveDocumentDisplayName(payload.documentId, {
       keepEditMode: payload.keepEditMode
     })
+    if (deps.isProjectReplacementInFlight()) {
+      return
+    }
+    if (deps.readProjectContentEpoch() !== epochAtStart) {
+      return
+    }
+    const saveSuccessMessage = deps.i18n.global.t('globalFunctionality.faOpenedDocuments.saveSuccess')
     deps.notifyCreate({
       group: false,
       type: 'positive',
-      message: deps.i18n.global.t('globalFunctionality.faOpenedDocuments.saveSuccess')
+      message: saveSuccessMessage
     })
   }
 }

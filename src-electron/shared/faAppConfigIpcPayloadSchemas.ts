@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
+
 import type {
   I_faAppConfigApplyInput,
   I_faAppConfigExportOptions
@@ -35,15 +37,6 @@ export const faAppConfigApplyInputSchema = z.object({
   applyKeybinds: z.boolean(),
   sessionId: z.string().min(1)
 }).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses export options from an IPC payload.

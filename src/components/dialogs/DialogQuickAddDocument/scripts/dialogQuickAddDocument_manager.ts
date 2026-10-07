@@ -11,6 +11,7 @@ import {
   readFaProjectLastSelectedWorldId,
   writeFaProjectLastSelectedWorldId
 } from 'app/src/scripts/projectDialogUiPref/projectDialogUiPref_manager'
+import { reportFaTemporaryDocumentCreateFailure } from 'app/src/scripts/openedDocuments/reportFaTemporaryDocumentCreateFailureWiring'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaOpenedDocuments } from 'src/stores/S_FaOpenedDocuments'
 
@@ -54,6 +55,7 @@ export const useDialogQuickAddDocument = createUseDialogQuickAddDocument({
   readLastSelectedWorldId: readFaProjectLastSelectedWorldId,
   ref,
   registerComponentDialogStackGuard,
+  reportTemporaryDocumentCreateFailure: reportFaTemporaryDocumentCreateFailure,
   resolveDialogComponentStoreOrNull: resolveDialogComponentStoreOrNullBinding,
   resolveNewDocumentDisplayName: resolveProjectHierarchyTreeNewDocumentDisplayName,
   resolvePreferredLanguageCode: resolveDialogQuickAddDocumentPreferredLanguageCode,

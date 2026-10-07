@@ -122,10 +122,12 @@ test('Test that wouldFaProjectWorldColorPaletteExceedMaxLength respects the stor
 test('Test that parseFaProjectWorldColorPaletteToHexListPreservingDuplicates skips invalid and empty segments', () => {
   expect(parseFaProjectWorldColorPaletteToHexListPreservingDuplicates('')).toEqual([])
   expect(parseFaProjectWorldColorPaletteToHexListPreservingDuplicates('#112233;;bad')).toEqual(['#112233'])
+  expect(parseFaProjectWorldColorPaletteToHexListPreservingDuplicates('#abc')).toEqual(['#AABBCC'])
 })
 
 test('Test that serializeFaProjectWorldColorPaletteFromHexList skips blank and invalid entries', () => {
   expect(serializeFaProjectWorldColorPaletteFromHexList(['', 'bad', '#aabbcc'])).toBe('#AABBCC')
+  expect(serializeFaProjectWorldColorPaletteFromHexList(['#abc'])).toBe('#AABBCC')
 })
 
 test('Test that collectFaProjectWorldColorPaletteDuplicateHexKeys ignores blank and invalid entries', () => {
@@ -133,9 +135,11 @@ test('Test that collectFaProjectWorldColorPaletteDuplicateHexKeys ignores blank 
   expect(duplicateKeys.size).toBe(0)
 })
 
-test('Test that isFaProjectWorldStorageHexColor accepts only #RRGGBB values', () => {
+test('Test that isFaProjectWorldStorageHexColor accepts #RRGGBB and #RGB shorthand', () => {
   expect(isFaProjectWorldStorageHexColor('#112233')).toBe(true)
   expect(isFaProjectWorldStorageHexColor(' #aabbcc ')).toBe(true)
+  expect(isFaProjectWorldStorageHexColor('#abc')).toBe(true)
+  expect(isFaProjectWorldStorageHexColor('#ab')).toBe(false)
   expect(isFaProjectWorldStorageHexColor('')).toBe(false)
   expect(isFaProjectWorldStorageHexColor('red')).toBe(false)
 })
@@ -143,6 +147,7 @@ test('Test that isFaProjectWorldStorageHexColor accepts only #RRGGBB values', ()
 test('Test that faProjectWorldColorPaletteContainsHex matches case-insensitively', () => {
   expect(faProjectWorldColorPaletteContainsHex('#112233;#445566', '#445566')).toBe(true)
   expect(faProjectWorldColorPaletteContainsHex('#112233;#445566', '#AABBCC')).toBe(false)
+  expect(faProjectWorldColorPaletteContainsHex('#AABBCC', '#abc')).toBe(true)
   expect(faProjectWorldColorPaletteContainsHex('', '#112233')).toBe(false)
   expect(faProjectWorldColorPaletteContainsHex('#112233', 'bad')).toBe(false)
   expect(faProjectWorldColorPaletteContainsHex('#112233;;bad', '#112233')).toBe(true)
@@ -154,5 +159,11 @@ test('Test that appendFaProjectWorldColorPaletteHex appends unique valid colors'
   expect(appendFaProjectWorldColorPaletteHex('#112233', '#445566', 2000)).toBe('#112233;#445566')
   expect(appendFaProjectWorldColorPaletteHex('#112233', '#112233', 2000)).toBe(null)
   expect(appendFaProjectWorldColorPaletteHex('#112233', 'bad', 2000)).toBe(null)
+  expect(appendFaProjectWorldColorPaletteHex('#112233', '#abc', 2000)).toBe('#112233;#AABBCC')
+  expect(appendFaProjectWorldColorPaletteHex('#AABBCC', '#abc', 2000)).toBe(null)
   expect(appendFaProjectWorldColorPaletteHex('#112233', '#445566', 12)).toBe(null)
+  expect(appendFaProjectWorldColorPaletteHex('not-a-color', '#112233', 7)).toBe('#112233')
+  expect(appendFaProjectWorldColorPaletteHex(`${'x'.repeat(2000)};#aabbcc`, '#112233', 2000)).toBe(
+    '#AABBCC;#112233'
+  )
 })

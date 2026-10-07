@@ -3,6 +3,7 @@ import {
   markWelcomeScreenAutoLoadBootCompletion
 } from 'app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import {
   isFantasiaStorybookCanvas,
@@ -56,6 +57,7 @@ const rendererAppInternalsApi = createRendererAppInternals({
     const testEnv = snapshot.TEST_ENV
     return typeof testEnv === 'string' ? testEnv : undefined
   },
+  hasActiveProject: () => S_FaActiveProject().hasActiveProject,
   isFantasiaStorybookCanvas,
   markWelcomeScreenAutoLoadBootAttempted,
   markWelcomeScreenAutoLoadBootCompletion,

@@ -24,8 +24,9 @@ export function registerFaProjectManagementDialogUiPrefIpc (): void {
         return readFaProjectDialogUiPref(db, parsed.key)
       })
       if (!ran.ok) {
+        const key = parsed.key
         return {
-          key: parsed.key,
+          key,
           value: null
         }
       }

@@ -18,6 +18,7 @@ vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
 })
 
 import type { I_faProjectMedia } from 'app/types/I_faProjectMediaDomain'
+import { i18n } from 'app/i18n/externalFileLoader'
 import * as dialogStores from 'app/src/stores/S_Dialog'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
@@ -797,6 +798,49 @@ test('Test that DialogProjectMedia mass-edit save buttons persist', async () => 
   )
   await flushPromises()
   closeSave.unmount()
+})
+
+/**
+ * DialogProjectMedia
+ * A blank title uses the untitled label from the language active at save time.
+ */
+test('Test that DialogProjectMedia blank media title uses the current untitled label', async () => {
+  const translate = i18n.global.t
+  i18n.global.t = (key: string) => {
+    if (key === 'dialogs.projectMedia.untitledDisplayName') {
+      return 'Nameless'
+    }
+    return key
+  }
+  const w = mount(DialogProjectMedia, {
+    global: projectMediaDialogGlobal,
+    props: {
+      directInput: 'ProjectMedia',
+      initialPanel: 'mediaAdd'
+    }
+  })
+
+  try {
+    await flushPromises()
+    await w.get('[data-test-locator="dialogProjectMedia-addOnlineMediaButton"]').trigger('click')
+    await flushPromises()
+    await w.get('[data-test-locator="dialogProjectMedia-addOnlineUrlsInput"] textarea')
+      .setValue('https://example.com')
+    await w.get('[data-test-locator="dialogProjectMedia-addOnlineUrlsSubmit"]').trigger('click')
+    await flushPromises()
+    await w.get('[data-test-locator="dialogProjectMedia-button-saveAndClose"]').trigger('click')
+    await flushPromises()
+    expect(runFaActionAwaitMock).toHaveBeenCalledWith('saveProjectMedia', expect.objectContaining({
+      items: [
+        expect.objectContaining({
+          displayName: 'Nameless'
+        })
+      ]
+    }))
+  } finally {
+    i18n.global.t = translate
+    w.unmount()
+  }
 })
 
 /**

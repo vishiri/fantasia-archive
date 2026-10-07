@@ -67,7 +67,9 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu rende
 test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu focuses input on show and closes on escape', async () => {
   const onClose = vi.fn()
   const onShow = vi.fn()
-  const focusPreferredLanguageInput = vi.fn()
+  const focusPreferredLanguageInput = vi.fn((stillOpen: () => boolean) => {
+    stillOpen()
+  })
 
   const focusableFaLocaleStub = defineComponent({
     name: 'FaLocaleTranslationsInput',
@@ -297,4 +299,46 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu syncs
 
   await wrapper.find('[data-test-locator="close-menu"]').trigger('click')
   expect(wrapper.emitted('update:renameMenuOpen')?.at(-1)).toEqual([false])
+})
+
+test('Test that rename menu show skips focus when the menu is already closed', async () => {
+  const wrapper = mount(DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu, {
+    props: {
+      contextMenuTestLocator: 'treeNode-renameMenu',
+      currentLanguageCode: 'en-US',
+      errorMessage: undefined,
+      hasError: false,
+      inputTestLocator: 'treeNode-renameInput',
+      maxLength: 120,
+      menuOffset: [0, 4],
+      menuPinnedAsideLabel: undefined,
+      menuPinnedAsideTestLocator: undefined,
+      menuPinnedAsideTooltip: undefined,
+      menuPinnedAsideValue: undefined,
+      menuTarget: null,
+      onBeforeShow: () => {},
+      onClose: () => {},
+      onHide: () => {},
+      onShow: () => {},
+      onTranslationsDraftUpdate: () => {},
+      renameMenuOpen: false,
+      translationForms: 'single',
+      translationsDraft: { 'en-US': 'Character' }
+    },
+    global: {
+      stubs: {
+        FaLocaleTranslationsInput: faLocaleTranslationsInputStub,
+        QMenu: defineComponent({
+          name: 'QMenu',
+          emits: ['show'],
+          mounted (): void {
+            this.$emit('show')
+          },
+          template: '<div class="q-menu-stub" />'
+        })
+      }
+    }
+  })
+  await flushPromises()
+  expect(wrapper.find('.q-menu-stub').exists()).toBe(true)
 })

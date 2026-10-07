@@ -148,6 +148,59 @@ test('Test that onWorldSelect clears docs and skips reopen during hydrate', asyn
 })
 
 /**
+ * wireDialogQuickSearchDocumentSelectHandlers
+ * A slower document list from the previous world does not replace the current world's list.
+ */
+test('Test that onWorldSelect drops documents after the world changes', async () => {
+  const resolvers: Array<(value: I_dialogQuickSearchDocumentDocumentSource[]) => void> = []
+  const loadDocumentsForWorld = vi.fn(() => new Promise<I_dialogQuickSearchDocumentDocumentSource[]>((resolve) => {
+    resolvers.push(resolve)
+  }))
+  const deps = makeDeps({ loadDocumentsForWorld })
+  const session = makeSession()
+  const { onWorldSelect } = wireDialogQuickSearchDocumentSelectHandlers(deps, session, vi.fn())
+  const staleDocument: I_dialogQuickSearchDocumentDocumentSource = {
+    displayName: 'From A',
+    documentTextColor: null,
+    id: 'doc-a',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }
+  const currentDocument: I_dialogQuickSearchDocumentDocumentSource = {
+    displayName: 'From B',
+    documentTextColor: null,
+    id: 'doc-b',
+    isCategory: false,
+    sortOrder: 0,
+    templateId: null
+  }
+
+  onWorldSelect({
+    id: 'world-a',
+    name: 'A'
+  })
+  await Promise.resolve()
+  onWorldSelect({
+    id: 'world-b',
+    name: 'B'
+  })
+  await Promise.resolve()
+  const resolveWorldA = resolvers[0]
+  const resolveWorldB = resolvers[1]
+  if (resolveWorldA === undefined || resolveWorldB === undefined) {
+    throw new Error('missing document resolvers')
+  }
+  resolveWorldA([staleDocument])
+  await flushPromises()
+  expect(session.documents.value).toEqual([])
+  resolveWorldB([currentDocument])
+  await flushPromises()
+  expect(session.selectedWorldId.value).toBe('world-b')
+  expect(session.documents.value).toEqual([currentDocument])
+})
+
+/**
  * wireDialogQuickSearchDocumentOpenClose
  * Aborts open when a newer focus generation supersedes in-flight hydrate.
  */
@@ -180,6 +233,39 @@ test('Test that openDialog aborts when focus generation is superseded', async ()
   resolveHydrate?.()
   await flushPromises()
   expect(session.dialogModel.value).toBe(false)
+  expect(session.skipNextWorldChangeReopen.value).toBe(true)
+})
+
+/**
+ * wireDialogQuickSearchDocumentOpenClose
+ * A second open while the dialog is already showing does not get another @show,
+ * so the world-change skip must clear when that hydrate finishes.
+ */
+test('Test that openDialog clears the world-change skip when the dialog is already open', async () => {
+  let resolveHydrate: (() => void) | undefined
+  const deps = makeDeps({
+    loadQuickSearchDocumentSources: () => new Promise((resolve) => {
+      resolveHydrate = () => {
+        resolve({
+          templates: [],
+          worlds: []
+        })
+      }
+    }),
+    onBeforeUnmount: () => undefined,
+    onMounted: () => undefined
+  })
+  const session = makeSession()
+  session.dialogModel.value = true
+  const props = reactive<{ directInput?: 'QuickSearchDocument' | undefined }>({})
+  wireDialogQuickSearchDocumentOpenClose(deps, session, props)
+
+  props.directInput = 'QuickSearchDocument'
+  await nextTick()
+  expect(session.skipNextWorldChangeReopen.value).toBe(true)
+  resolveHydrate?.()
+  await flushPromises()
+  expect(session.dialogModel.value).toBe(true)
   expect(session.skipNextWorldChangeReopen.value).toBe(false)
 })
 /**

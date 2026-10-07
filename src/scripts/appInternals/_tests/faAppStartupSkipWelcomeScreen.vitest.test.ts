@@ -136,3 +136,24 @@ test('Test that tryRunSkipWelcomeScreenOnLaunch delegates to welcome auto-load',
   await expect(tryRunSkipWelcomeScreenOnLaunch()).resolves.toBe(true)
   expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledTimes(1)
 })
+
+/**
+ * runSkipWelcomeScreenRedirect
+ * A failed settings read stays on the welcome screen instead of rejecting.
+ */
+test('Test that runSkipWelcomeScreenRedirect returns false when settings read fails', async () => {
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  assignFaContentBridgeApis({
+    faUserSettings: {
+      async getSettings () {
+        throw new Error('settings unavailable')
+      }
+    },
+    projectManagement: {}
+  })
+
+  await expect(runSkipWelcomeScreenRedirect()).resolves.toBe(false)
+  expect(openWelcomeScreenAutoLoadProjectMock).not.toHaveBeenCalled()
+  expect(consoleErrorSpy).toHaveBeenCalled()
+  consoleErrorSpy.mockRestore()
+})

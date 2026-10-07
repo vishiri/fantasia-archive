@@ -65,3 +65,9 @@ test('Test that FaLabeledBooleanToggle ignores toggle updates when disabled', as
 
   expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 })
+
+test('Test that FaLabeledBooleanToggle names the help icon with the description', () => {
+  const wrapper = mountFaLabeledBooleanToggle()
+
+  expect(wrapper.get('.faHelpTooltipIcon').attributes('aria-label')).toBe('Category description')
+})

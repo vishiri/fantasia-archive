@@ -251,7 +251,7 @@ test('Test that DialogProjectMediaMassEditBlock warns when the preview URL is em
 test('Test that DialogProjectMediaMassEditBlock hides a failed preview until URL changes', async () => {
   vi.useFakeTimers()
   const w = mountBlock({ ...sampleRow })
-  try {
+  const run = (async () => {
     await w.get('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').trigger('error')
     await flushPromises()
     expect(
@@ -289,10 +289,11 @@ test('Test that DialogProjectMediaMassEditBlock hides a failed preview until URL
     expect(w.find('[data-test-locator="dialogProjectMedia-massEdit-previewWarning-row-1"]').exists()).toBe(
       false
     )
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
     vi.useRealTimers()
-  }
+  })
 })
 
 /**
@@ -360,7 +361,7 @@ test('Test that DialogProjectMediaMassEditBlock shows a video type icon after me
     ...sampleRow,
     externalLink: 'https://cdn.example.com/clip.mp4'
   })
-  try {
+  const run = (async () => {
     expect(w.find('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').exists()).toBe(
       false
     )
@@ -384,9 +385,10 @@ test('Test that DialogProjectMediaMassEditBlock shows a video type icon after me
     expect(w.find('[data-test-locator="dialogProjectMedia-massEdit-previewWarning-row-1"]').exists()).toBe(
       false
     )
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
-  }
+  })
 })
 
 /**
@@ -398,7 +400,7 @@ test('Test that DialogProjectMediaMassEditBlock shows an audio type icon after m
     ...sampleRow,
     externalLink: 'https://cdn.example.com/track.mp3'
   })
-  try {
+  const run = (async () => {
     await w.get('[data-test-locator="dialogProjectMedia-massEdit-previewAudio-row-1"]').trigger(
       'loadedmetadata'
     )
@@ -409,43 +411,45 @@ test('Test that DialogProjectMediaMassEditBlock shows an audio type icon after m
     expect(
       w.get('[data-test-locator="dialogProjectMedia-massEdit-previewTypeIcon-row-1"]').attributes('color')
     ).toBe('accent')
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
-  }
+  })
 })
 
 /**
  * DialogProjectMediaMassEditBlock
  * Text-like extensions try as an image, not a type icon.
  */
-test('Test that DialogProjectMediaMassEditBlock treats text URLs as images', () => {
+test('Test that DialogProjectMediaMassEditBlock treats text URLs as images', async () => {
   const w = mountBlock({
     ...sampleRow,
     externalLink: 'https://cdn.example.com/note.md'
   })
-  try {
+  const run = (async () => {
     expect(
       w.get('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').attributes('src')
     ).toBe('https://cdn.example.com/note.md')
     expect(
       w.find('[data-test-locator="dialogProjectMedia-massEdit-previewTypeIcon-row-1"]').exists()
     ).toBe(false)
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
-  }
+  })
 })
 
 /**
  * DialogProjectMediaMassEditBlock
  * Embed type shows the embed body instead of External link.
  */
-test('Test that DialogProjectMediaMassEditBlock shows embed body instead of external link', () => {
+test('Test that DialogProjectMediaMassEditBlock shows embed body instead of external link', async () => {
   const w = mountBlock({
     ...sampleRow,
     externalType: 'embed',
     externalEmbed: '<iframe src="https://www.youtube.com/embed/x"></iframe>'
   })
-  try {
+  const run = (async () => {
     expect(
       w.find('[data-test-locator="dialogProjectMedia-massEdit-externalEmbed-row-1"]').exists()
     ).toBe(true)
@@ -461,23 +465,24 @@ test('Test that DialogProjectMediaMassEditBlock shows embed body instead of exte
     expect(
       w.get('[data-test-locator="dialogProjectMedia-massEdit-previewTypeIcon-row-1"]').attributes('color')
     ).toBe('accent')
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
-  }
+  })
 })
 
 /**
  * DialogProjectMediaMassEditBlock
  * Empty embed body shows the invalid preview warning.
  */
-test('Test that DialogProjectMediaMassEditBlock warns when the embed body is empty', () => {
+test('Test that DialogProjectMediaMassEditBlock warns when the embed body is empty', async () => {
   const w = mountBlock({
     ...sampleRow,
     externalType: 'embed',
     externalEmbed: '   ',
     externalLink: 'https://cdn.example.com/foo/bar.png'
   })
-  try {
+  const run = (async () => {
     expect(w.find('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').exists()).toBe(
       false
     )
@@ -487,9 +492,10 @@ test('Test that DialogProjectMediaMassEditBlock warns when the embed body is emp
     expect(
       w.find('[data-test-locator="dialogProjectMedia-massEdit-previewTypeIcon-row-1"]').exists()
     ).toBe(false)
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
-  }
+  })
 })
 
 /**

@@ -60,6 +60,30 @@ test('Test that refreshWebContentsAndHide dispatches the refreshWebContentsAfter
   expect(showSpellcheckRefresh.value).toBe(false)
 })
 
+test('Test that refreshWebContentsAndHide keeps the hint when the language changes during refresh', async () => {
+  let releaseRefresh: ((ok: boolean) => void) | undefined
+  runFaActionAwaitMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseRefresh = resolve
+    })
+  })
+  const {
+    noteLanguageApplied,
+    refreshWebContentsAndHide,
+    showSpellcheckRefresh
+  } = useGlobalLanguageSelectorSpellcheckRefresh()
+  noteLanguageApplied('en-US', 'de')
+  const pending = refreshWebContentsAndHide()
+  noteLanguageApplied('de', 'fr')
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing spellcheck refresh resolver')
+  }
+  finishRefresh(true)
+  await pending
+  expect(showSpellcheckRefresh.value).toBe(true)
+})
+
 test('Test that refreshWebContentsAndHide still clears the hint even when the action resolves false', async () => {
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValueOnce(false)

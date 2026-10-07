@@ -1,52 +1,13 @@
 import type {
   I_faProjectHierarchyTreeHeTreeNode,
-  I_faProjectHierarchyTreeTagSettings,
+  I_faProjectHierarchyTreeSkeletonDeps,
   I_faProjectHierarchyTreeWorkspaceGroup,
   I_faProjectHierarchyTreeWorkspacePlacement,
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-type T_lazyApi = {
-  resolveLazyChildren: (parent: I_faProjectHierarchyTreeHeTreeNode) => I_faProjectHierarchyTreeHeTreeNode[]
-  syncProjectHierarchyTreeNodeLazyChildren: (node: I_faProjectHierarchyTreeHeTreeNode) => void
-}
-type T_tagBranchApi = {
-  mergeWorldChildrenWithTags: (input: {
-    structuralChildren: I_faProjectHierarchyTreeHeTreeNode[]
-    tagBranchNodes: I_faProjectHierarchyTreeHeTreeNode[]
-    tagsAtTop: boolean
-  }) => I_faProjectHierarchyTreeHeTreeNode[]
-  patchTagBranchLabelsInPlace: (input: {
-    lazyPlaceholderApi: T_lazyApi
-    resolveTagsLabel: () => string
-    tagSettings: I_faProjectHierarchyTreeTagSettings
-    world: I_faProjectHierarchyTreeWorkspaceWorld
-    worldNode: I_faProjectHierarchyTreeHeTreeNode
-  }) => void
-  resolveTagBranchNodes: (input: {
-    lazyPlaceholderApi: T_lazyApi
-    tagSettings: I_faProjectHierarchyTreeTagSettings
-    tagsLabel: string
-    world: I_faProjectHierarchyTreeWorkspaceWorld
-  }) => I_faProjectHierarchyTreeHeTreeNode[]
-}
-type T_skeletonDeps = {
-  groupIcon: string
-  lazyPlaceholderApi: T_lazyApi
-  patchPlacementNodeInPlace: (input: {
-    lazyPlaceholderApi: T_lazyApi
-    placement: I_faProjectHierarchyTreeWorkspacePlacement
-    placementNode: I_faProjectHierarchyTreeHeTreeNode
-    resolvePlacementDisplayIcon: (icon: string) => string
-  }) => void
-  resolvePlacementDisplayIcon: (icon: string) => string
-  resolveTagsLabel: () => string
-  resolveTagSettings: () => I_faProjectHierarchyTreeTagSettings
-  tagBranchApi: T_tagBranchApi
-}
-
 function mapPlacementToNode (
-  deps: T_skeletonDeps,
+  deps: I_faProjectHierarchyTreeSkeletonDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): I_faProjectHierarchyTreeHeTreeNode {
@@ -77,7 +38,7 @@ function mapPlacementToNode (
 }
 
 function mapGroupToNode (
-  deps: T_skeletonDeps,
+  deps: I_faProjectHierarchyTreeSkeletonDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   group: I_faProjectHierarchyTreeWorkspaceGroup
 ): I_faProjectHierarchyTreeHeTreeNode {
@@ -85,25 +46,32 @@ function mapGroupToNode (
     .filter((placement) => placement.groupId === group.id)
     .sort((left, right) => (left.groupSortOrder ?? 0) - (right.groupSortOrder ?? 0))
     .map((placement) => mapPlacementToNode(deps, world, placement))
+  const groupId = group.id
+  const hasChildren = group.hasChildren
+  const icon = deps.groupIcon
+  const id = group.id
+  const label = group.displayName
+  const worldColor = world.color
+  const worldId = world.id
   return {
     children,
     childrenLoaded: true,
     documentId: null,
-    groupId: group.id,
-    hasChildren: group.hasChildren,
-    icon: deps.groupIcon,
-    id: group.id,
-    label: group.displayName,
+    groupId,
+    hasChildren,
+    icon,
+    id,
+    label,
     nodeKind: 'group',
     placementId: null,
     tagId: null,
-    worldColor: world.color,
-    worldId: world.id
+    worldColor,
+    worldId
   }
 }
 
 function mapStructuralWorldChildren (
-  deps: T_skeletonDeps,
+  deps: I_faProjectHierarchyTreeSkeletonDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld
 ): I_faProjectHierarchyTreeHeTreeNode[] {
   const groupById = new Map(world.groups.map((group) => [group.id, group]))
@@ -131,7 +99,7 @@ function mapStructuralWorldChildren (
 }
 
 function mapWorldToNode (
-  deps: T_skeletonDeps,
+  deps: I_faProjectHierarchyTreeSkeletonDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld
 ): I_faProjectHierarchyTreeHeTreeNode {
   const tagSettings = deps.resolveTagSettings()
@@ -148,25 +116,30 @@ function mapWorldToNode (
     tagsAtTop: tagSettings.tagsAtTop
   })
   const hasStructuralChildren = world.groups.length > 0 || world.placements.length > 0
+  const hasChildren = hasStructuralChildren || tagBranchNodes.length > 0
+  const id = world.id
+  const label = world.displayName
+  const worldColor = world.color
+  const worldId = world.id
   return {
     children,
     childrenLoaded: true,
     documentId: null,
     groupId: null,
-    hasChildren: hasStructuralChildren || tagBranchNodes.length > 0,
+    hasChildren,
     icon: '',
-    id: world.id,
-    label: world.displayName,
+    id,
+    label,
     nodeKind: 'world',
     placementId: null,
     tagId: null,
-    worldColor: world.color,
-    worldId: world.id
+    worldColor,
+    worldId
   }
 }
 
 function patchStructuralWorldChildrenInPlace (
-  deps: T_skeletonDeps,
+  deps: I_faProjectHierarchyTreeSkeletonDeps,
   worldNode: I_faProjectHierarchyTreeHeTreeNode,
   world: I_faProjectHierarchyTreeWorkspaceWorld
 ): void {
@@ -208,7 +181,7 @@ function patchStructuralWorldChildrenInPlace (
   }
 }
 
-export function createMapWorkspaceLayoutToHierarchyTreeSkeleton (deps: T_skeletonDeps) {
+export function createMapWorkspaceLayoutToHierarchyTreeSkeleton (deps: I_faProjectHierarchyTreeSkeletonDeps) {
   function mapWorkspaceLayoutToHierarchyTreeSkeleton (
     worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
   ): I_faProjectHierarchyTreeHeTreeNode[] {

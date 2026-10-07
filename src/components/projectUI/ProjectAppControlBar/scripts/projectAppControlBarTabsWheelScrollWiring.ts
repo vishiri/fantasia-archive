@@ -23,9 +23,11 @@ export function onProjectAppControlBarTabsWheel (event: WheelEvent): void {
     deltaX: event.deltaX,
     deltaY: event.deltaY
   })
+  const direction = getComputedStyle(content).direction === 'rtl' ? 'rtl' : 'ltr'
   const nextScrollLeft = resolveProjectAppControlBarTabsWheelScrollLeft({
     clientWidth: content.clientWidth,
     delta,
+    direction,
     scrollLeft: content.scrollLeft,
     scrollWidth: content.scrollWidth
   })

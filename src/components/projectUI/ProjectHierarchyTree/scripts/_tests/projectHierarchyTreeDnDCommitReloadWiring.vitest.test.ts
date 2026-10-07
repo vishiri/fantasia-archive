@@ -40,6 +40,66 @@ test('Test that resolveProjectHierarchyTreeDragCommitSourceReloadNodeId uses pla
   expect(nodeId).toBe('placement-1')
 })
 
+test('Test that resolveProjectHierarchyTreeDragCommitSourceReloadNodeId skips a tag copy of the old parent', () => {
+  const tagCopy: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-tag',
+    id: 'tag-1__doc__doc-parent',
+    label: 'Parent',
+    nodeKind: 'document',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const tagNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [tagCopy],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-tag',
+    id: 'tag-1',
+    label: 'Heroes',
+    nodeKind: 'tag',
+    placementId: null,
+    tagId: 'tag-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const treeData: I_faProjectHierarchyTreeHeTreeNode[] = [
+    tagNode,
+    {
+      children: [buildDocumentNode('doc-parent')],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-home',
+      id: 'placement-1',
+      label: 'Buildings',
+      nodeKind: 'templatePlacement',
+      placementId: 'placement-1',
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  const nodeId = resolveProjectHierarchyTreeDragCommitSourceReloadNodeId({
+    dragParentDocumentIdAtDragStart: 'doc-parent',
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-a'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeData
+  })
+  expect(nodeId).toBe('doc-parent')
+})
+
 test('Test that refreshProjectHierarchyTreeDragCommitTargetContainer reloads target only', async () => {
   const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   await refreshProjectHierarchyTreeDragCommitTargetContainer({

@@ -6,6 +6,7 @@
  */
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Result, ResultAsync } from 'neverthrow'
@@ -18,20 +19,50 @@ const distElectronPath = path.join(root, 'dist', 'electron')
  * Quasar clears dist/electron with fs-extra removeSync; on Windows that can throw ENOTEMPTY when
  * another process briefly holds a handle, leaving a half-deleted tree and a follow-on ENOENT
  * under UnPackaged. Pre-remove with Node retries makes testbatch builds reliable.
+ * electron-builder then renames win-unpacked.tmp. A workspace file watcher can lock
+ * that folder and the rename fails with EPERM. The build therefore writes outside
+ * the repo, then copies UnPackaged back to dist/electron for Playwright.
  */
+const unlockedDistPath = path.join(os.tmpdir(), 'fantasia-archive-electron-build')
+
 function removeDistElectronIfPresent () {
   if (!fs.existsSync(distElectronPath)) {
-    return
+    return true
   }
-  fs.rmSync(distElectronPath, {
+  const remove = Result.fromThrowable(
+    () => {
+      fs.rmSync(distElectronPath, {
+        force: true,
+        maxRetries: 8,
+        recursive: true,
+        retryDelay: 250
+      })
+    },
+    (error) => error
+  )
+  return remove().isOk()
+}
+
+function useUnlockedDistOutsideWorkspace () {
+  removeDistElectronIfPresent()
+  fs.rmSync(unlockedDistPath, {
     force: true,
     maxRetries: 8,
     recursive: true,
     retryDelay: 250
   })
+  process.env.FA_QUASAR_DIST_DIR = unlockedDistPath
 }
 
-removeDistElectronIfPresent()
+function mirrorUnlockedUnpackagedForPlaywright () {
+  const unpackagedSource = path.join(unlockedDistPath, 'UnPackaged')
+  const unpackagedDest = path.join(distElectronPath, 'UnPackaged')
+  fs.cpSync(unpackagedSource, unpackagedDest, {
+    recursive: true
+  })
+}
+
+useUnlockedDistOutsideWorkspace()
 
 fs.mkdirSync(path.dirname(logPath), {
   recursive: true
@@ -96,6 +127,8 @@ if (exitCode !== 0) {
   writeStderrLogOrPlaceholder()
   process.exit(exitCode)
 }
+
+mirrorUnlockedUnpackagedForPlaywright()
 
 process.stdout.write(
   `Electron production build finished OK (full log: ${logPath})\n`

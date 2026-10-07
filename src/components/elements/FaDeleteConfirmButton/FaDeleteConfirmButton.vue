@@ -104,7 +104,9 @@ const {
   menuOpen,
   onConfirmDelete,
   secondsRemaining
-} = useFaDeleteConfirmButton()
+} = useFaDeleteConfirmButton({
+  isRemoveDisabled: () => props.removeDisabled
+})
 
 const confirmDeleteCountdownActiveClass = computed(() => {
   if (confirmDeleteDisabled.value) {

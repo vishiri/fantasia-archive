@@ -16,9 +16,11 @@ const FA_PROJECT_SETTINGS_KV_PROJECT_NAME = 'project_name'
  * Reads persisted project settings KV rows after migrations.
  */
 export function readFaProjectSettingsRoot (db: Database): I_faProjectSettingsRoot {
+  const projectName = readFaProjectStoredDisplayName(db)
+  const schemaVersion = 1
   return {
-    projectName: readFaProjectStoredDisplayName(db),
-    schemaVersion: 1
+    projectName,
+    schemaVersion
   }
 }
 

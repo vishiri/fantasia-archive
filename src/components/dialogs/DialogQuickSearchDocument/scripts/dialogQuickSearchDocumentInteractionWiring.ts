@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type {
   I_createUseDialogQuickSearchDocumentDeps,
   I_dialogQuickSearchDocumentSession
@@ -10,7 +12,7 @@ import {
   focusDialogQuickSearchDocumentSelectAfterShow,
   hydrateDialogQuickSearchDocumentDocuments,
   hydrateDialogQuickSearchDocumentWorlds,
-  scheduleDialogQuickSearchDocumentFocus
+  reloadDialogQuickSearchDocumentDocumentsForSelectedWorld
 } from './dialogQuickSearchDocumentFocusHydrateWiring'
 import { wireDialogQuickSearchDocumentContextMenuHandlers } from './dialogQuickSearchDocumentContextMenuWiring'
 import {
@@ -33,6 +35,7 @@ export function wireDialogQuickSearchDocumentOpenClose (
     onDialogShow: () => void
   } {
   const openDialog = (input: T_dialogName): void => {
+    const alreadyOpen = session.dialogModel.value === true
     session.documentName.value = input
     session.documents.value = []
     session.selectedDocumentId.value = null
@@ -40,16 +43,18 @@ export function wireDialogQuickSearchDocumentOpenClose (
     const openGeneration = session.focusGeneration.value + 1
     session.focusGeneration.value = openGeneration
     void (async () => {
-      try {
-        await hydrateDialogQuickSearchDocumentWorlds(deps, session)
-      } catch {
-        // Still open so the user is not stuck if worlds IPC fails.
-      }
+      // Still open so the user is not stuck if worlds IPC fails.
+      await ResultAsync.fromPromise(
+        hydrateDialogQuickSearchDocumentWorlds(deps, session),
+        () => undefined
+      )
       if (session.focusGeneration.value !== openGeneration) {
-        session.skipNextWorldChangeReopen.value = false
         return
       }
       session.dialogModel.value = true
+      if (alreadyOpen) {
+        session.skipNextWorldChangeReopen.value = false
+      }
     })()
   }
 
@@ -62,17 +67,18 @@ export function wireDialogQuickSearchDocumentOpenClose (
     session.skipNextWorldChangeReopen.value = true
     const focusGeneration = session.focusGeneration.value + 1
     session.focusGeneration.value = focusGeneration
-    void (async () => {
-      try {
-        if (session.worlds.value.length === 0) {
-          await hydrateDialogQuickSearchDocumentWorlds(deps, session)
-        }
-        await hydrateDialogQuickSearchDocumentDocuments(deps, session)
-      } finally {
-        session.skipNextWorldChangeReopen.value = false
+    const hydrateSearch = (async () => {
+      if (session.worlds.value.length === 0) {
+        await hydrateDialogQuickSearchDocumentWorlds(deps, session)
       }
-      await focusDialogQuickSearchDocumentSelectAfterShow(deps, session, focusGeneration)
+      await hydrateDialogQuickSearchDocumentDocuments(deps, session)
     })()
+    void hydrateSearch.finally(() => {
+      if (session.focusGeneration.value !== focusGeneration) {
+        return
+      }
+      session.skipNextWorldChangeReopen.value = false
+    }).then(() => focusDialogQuickSearchDocumentSelectAfterShow(deps, session, focusGeneration))
   }
 
   const onDialogHide = (): void => {
@@ -215,14 +221,11 @@ export function wireDialogQuickSearchDocumentSelectHandlers (
     if (session.skipNextWorldChangeReopen.value) {
       return
     }
-    void (async () => {
-      if (nextWorldId === null || nextWorldId.length === 0) {
-        session.documents.value = []
-        return
-      }
-      session.documents.value = await deps.loadDocumentsForWorld(nextWorldId)
-      scheduleDialogQuickSearchDocumentFocus(deps, session)
-    })()
+    void reloadDialogQuickSearchDocumentDocumentsForSelectedWorld(
+      deps,
+      session,
+      nextWorldId
+    )
   }
 
   const onDocumentSelect = createDialogQuickSearchDocumentSelectHandler(
@@ -241,18 +244,33 @@ export function wireDialogQuickSearchDocumentSelectHandlers (
   )
   const onDocumentOptionAuxClick = wireDialogQuickSearchDocumentOptionAuxClickHandler(deps)
 
+  const {
+    onDocumentAddUnderClick,
+    onDocumentCopyClick,
+    onDocumentEditClick
+  } = trailing
+  const {
+    onDocumentContextAddUnder,
+    onDocumentContextCopyBackgroundColor,
+    onDocumentContextCopyDocument,
+    onDocumentContextCopyName,
+    onDocumentContextCopyTextColor,
+    onDocumentContextDelete,
+    onDocumentContextEdit,
+    onDocumentContextOpen
+  } = contextMenu
   return {
-    onDocumentAddUnderClick: trailing.onDocumentAddUnderClick,
-    onDocumentContextAddUnder: contextMenu.onDocumentContextAddUnder,
-    onDocumentContextCopyBackgroundColor: contextMenu.onDocumentContextCopyBackgroundColor,
-    onDocumentContextCopyDocument: contextMenu.onDocumentContextCopyDocument,
-    onDocumentContextCopyName: contextMenu.onDocumentContextCopyName,
-    onDocumentContextCopyTextColor: contextMenu.onDocumentContextCopyTextColor,
-    onDocumentContextDelete: contextMenu.onDocumentContextDelete,
-    onDocumentContextEdit: contextMenu.onDocumentContextEdit,
-    onDocumentContextOpen: contextMenu.onDocumentContextOpen,
-    onDocumentCopyClick: trailing.onDocumentCopyClick,
-    onDocumentEditClick: trailing.onDocumentEditClick,
+    onDocumentAddUnderClick,
+    onDocumentContextAddUnder,
+    onDocumentContextCopyBackgroundColor,
+    onDocumentContextCopyDocument,
+    onDocumentContextCopyName,
+    onDocumentContextCopyTextColor,
+    onDocumentContextDelete,
+    onDocumentContextEdit,
+    onDocumentContextOpen,
+    onDocumentCopyClick,
+    onDocumentEditClick,
     onDocumentOptionAuxClick,
     onDocumentSelect,
     onWorldSelect

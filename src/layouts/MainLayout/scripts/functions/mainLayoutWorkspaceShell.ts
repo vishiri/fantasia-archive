@@ -8,8 +8,10 @@ export function resolveMainLayoutShowWorkspaceDrawer (routePath: string): boolea
 export function resolveMainLayoutRouteClass (
   showWorkspaceDrawer: boolean
 ): Record<string, boolean> {
+  const welcome = !showWorkspaceDrawer
+  const workspace = showWorkspaceDrawer
   return {
-    'appShellLayout--welcome': !showWorkspaceDrawer,
-    'appShellLayout--workspace': showWorkspaceDrawer
+    'appShellLayout--welcome': welcome,
+    'appShellLayout--workspace': workspace
   }
 }

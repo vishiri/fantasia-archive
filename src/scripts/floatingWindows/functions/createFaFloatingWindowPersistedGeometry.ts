@@ -60,11 +60,17 @@ export function createFaFloatingWindowPersistedGeometry (deps: {
     }
     const rect = raw as I_faFloatingWindowPersistedRect
     if (isUsableFaFloatingWindowPersistedRect(rect, layout)) {
+      const {
+        height,
+        width,
+        x,
+        y
+      } = rect
       return {
-        height: rect.height,
-        width: rect.width,
-        x: rect.x,
-        y: rect.y
+        height,
+        width,
+        x,
+        y
       }
     }
     return null
@@ -89,8 +95,9 @@ export function createFaFloatingWindowPersistedGeometry (deps: {
     )
   }
 
+  const FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX = deps.FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX
   return {
-    FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX: deps.FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX,
+    FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX,
     isUsableFaFloatingWindowPersistedRect,
     normalizePersistedRectForStorage,
     persistedFloatingWindowFramesAreEquivalent

@@ -1,5 +1,6 @@
 export default {
   title: 'Configuración del proyecto',
+  loadError: 'No se pudieron cargar los ajustes del proyecto.',
   closeButton: 'Cerrar sin guardar',
   saveButton: 'Guardar configuración',
   saveWithoutClosingButton: 'Guardar sin cerrar',

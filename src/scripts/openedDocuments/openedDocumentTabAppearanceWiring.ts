@@ -7,7 +7,8 @@ import { resolveOpenedDocumentTreeOrderNumberDraftForPersist } from './functions
 export {
   computeOpenedDocumentHasUnsavedChanges,
   normalizeOpenedDocumentTabAppearanceColors,
-  resolveOpenedDocumentAppearanceColorDraftForPersist
+  resolveOpenedDocumentAppearanceColorDraftForPersist,
+  resolveOpenedDocumentHydrateUnsavedDraft
 } from './functions/openedDocumentTabAppearance'
 export {
   normalizeOpenedDocumentAppearanceColorFromDb,
@@ -26,6 +27,13 @@ export {
 export function recomputeOpenedDocumentTabHasUnsavedChanges (
   tab: I_faOpenedDocumentTab
 ): boolean {
+  const tagsUnloaded = tab.tagsDraft === undefined
+  const tagsDraftFingerprint = tagsUnloaded
+    ? ''
+    : resolveOpenedDocumentTagsFingerprint(tab.tagsDraft ?? [])
+  const savedTagsFingerprint = tagsUnloaded
+    ? ''
+    : resolveOpenedDocumentTagsFingerprint(tab.savedTags ?? [])
   return computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: tab.displayNameDraft,
     documentBackgroundColorDraft: tab.documentBackgroundColorDraft,
@@ -49,7 +57,7 @@ export function recomputeOpenedDocumentTabHasUnsavedChanges (
     savedTreeOrderNumber: tab.savedTreeOrderNumber,
     extraClassesDraft: tab.extraClassesDraft,
     savedExtraClasses: tab.savedExtraClasses,
-    tagsDraftFingerprint: resolveOpenedDocumentTagsFingerprint(tab.tagsDraft ?? []),
-    savedTagsFingerprint: resolveOpenedDocumentTagsFingerprint(tab.savedTags ?? [])
+    tagsDraftFingerprint,
+    savedTagsFingerprint
   })
 }

@@ -13,6 +13,10 @@ type T_createDialogNewProjectDeps = {
   ref: <T>(value: T) => I_ref<T>
   registerComponentDialogStackGuard: (dialogModel: I_ref<boolean>) => void
   resolveDialogComponentStoreOrNull: () => I_dialogComponentStoreLike | null
+  shouldSubmitDialogNewProjectOnEnter: (event: {
+    isComposing: boolean
+    keyCode: number
+  }) => boolean
   runFaActionAwait: (
     id: 'createNewProject',
     payload: { projectName: string }
@@ -23,16 +27,33 @@ type T_createDialogNewProjectDeps = {
   ) => void
 }
 
+let dialogNewProjectCreateInFlight = false
+
 async function runDialogNewProjectCreate (
   deps: T_createDialogNewProjectDeps,
   projectName: string,
-  closeDialog: () => void
+  closeDialog: () => void,
+  readLiveProjectName: (() => string) | undefined
 ): Promise<void> {
-  const ok = await deps.runFaActionAwait('createNewProject', { projectName })
-  if (!ok) {
+  if (dialogNewProjectCreateInFlight) {
     return
   }
-  closeDialog()
+  dialogNewProjectCreateInFlight = true
+  try {
+    const ok = await deps.runFaActionAwait('createNewProject', { projectName })
+    if (!ok) {
+      return
+    }
+    if (
+      readLiveProjectName !== undefined &&
+      readLiveProjectName().trim() !== projectName
+    ) {
+      return
+    }
+    closeDialog()
+  } finally {
+    dialogNewProjectCreateInFlight = false
+  }
 }
 
 async function focusDialogNewProjectNameInputAfterShow (
@@ -66,6 +87,7 @@ function useDialogNewProject (
     nameInputRef: I_ref<{ focus: () => void } | null>
     onClickCreate: () => Promise<void>
     onDialogShow: () => void
+    onNameInputEnter: (event: { isComposing: boolean; keyCode: number }) => void
     projectName: I_ref<string>
   } {
   const dialogModel = deps.ref(false)
@@ -100,7 +122,19 @@ function useDialogNewProject (
     if (createDisabled.value) {
       return
     }
-    await runDialogNewProjectCreate(deps, projectName.value.trim(), closeDialog)
+    await runDialogNewProjectCreate(
+      deps,
+      projectName.value.trim(),
+      closeDialog,
+      () => projectName.value
+    )
+  }
+
+  const onNameInputEnter = (event: { isComposing: boolean; keyCode: number }): void => {
+    if (!deps.shouldSubmitDialogNewProjectOnEnter(event)) {
+      return
+    }
+    void onClickCreate()
   }
 
   deps.watch(() => deps.resolveDialogComponentStoreOrNull()?.dialogUUID, () => {
@@ -132,6 +166,7 @@ function useDialogNewProject (
     nameInputRef,
     onClickCreate,
     onDialogShow,
+    onNameInputEnter,
     projectName
   }
 }
@@ -140,13 +175,28 @@ export function createDialogNewProject (deps: T_createDialogNewProjectDeps): {
   resolveDialogComponentStoreOrNull: () => I_dialogComponentStoreLike | null
   runDialogNewProjectCreate: (
     projectName: string,
-    closeDialog: () => void
+    closeDialog: () => void,
+    readLiveProjectName?: () => string
   ) => Promise<void>
   useDialogNewProject: (props: { directInput?: T_dialogName | undefined }) => ReturnType<typeof useDialogNewProject>
 } {
+  const resolveDialogComponentStoreOrNull = deps.resolveDialogComponentStoreOrNull
+  const runDialogNewProjectCreateBound = (
+    projectName: string,
+    closeDialog: () => void,
+    readLiveProjectName?: () => string
+  ): Promise<void> => {
+    return runDialogNewProjectCreate(deps, projectName, closeDialog, readLiveProjectName)
+  }
+  const useDialogNewProjectBound = (
+    props: { directInput?: T_dialogName | undefined }
+  ): ReturnType<typeof useDialogNewProject> => {
+    return useDialogNewProject(deps, props)
+  }
+
   return {
-    resolveDialogComponentStoreOrNull: deps.resolveDialogComponentStoreOrNull,
-    runDialogNewProjectCreate: (projectName, closeDialog) => runDialogNewProjectCreate(deps, projectName, closeDialog),
-    useDialogNewProject: (props) => useDialogNewProject(deps, props)
+    resolveDialogComponentStoreOrNull,
+    runDialogNewProjectCreate: runDialogNewProjectCreateBound,
+    useDialogNewProject: useDialogNewProjectBound
   }
 }

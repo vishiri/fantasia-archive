@@ -80,18 +80,29 @@ function buildDialogKeybindCaptureActionDeps (params: {
     t,
     workingOverrides
   } = params
+  const {
+    captureActionName,
+    captureBaselineChord,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    editingCommandId,
+    pendingChord
+  } = refs
 
   return {
-    captureActionName: refs.captureActionName,
-    captureBaselineChord: refs.captureBaselineChord,
-    captureError: refs.captureError,
-    captureErrorMessage: refs.captureErrorMessage,
-    captureInfoMessage: refs.captureInfoMessage,
-    captureLabel: refs.captureLabel,
-    captureOpen: refs.captureOpen,
-    editingCommandId: refs.editingCommandId,
+    captureActionName,
+    captureBaselineChord,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    editingCommandId,
     handleCaptureKeydown,
-    pendingChord: refs.pendingChord,
+    pendingChord,
     platform,
     removeCaptureListener,
     t,
@@ -118,9 +129,21 @@ export function createDialogKeybindSettingsCaptureInfrastructure (
       removeCaptureListener: () => void
     }) => void
   } {
+  const createDialogKeybindCaptureRefsBound = (): T_dialogKeybindCaptureRefsBundle => {
+    return createDialogKeybindCaptureRefs(deps)
+  }
+  const registerDialogKeybindCaptureOpenWatchBound = (params: {
+    captureActionName: I_ref<string>
+    captureOpen: I_ref<boolean>
+    editingCommandId: I_ref<T_faKeybindCommandId | null>
+    removeCaptureListener: () => void
+  }): void => {
+    registerDialogKeybindCaptureOpenWatch(deps, params)
+  }
+
   return {
     buildDialogKeybindCaptureActionDeps,
-    createDialogKeybindCaptureRefs: () => createDialogKeybindCaptureRefs(deps),
-    registerDialogKeybindCaptureOpenWatch: (params) => registerDialogKeybindCaptureOpenWatch(deps, params)
+    createDialogKeybindCaptureRefs: createDialogKeybindCaptureRefsBound,
+    registerDialogKeybindCaptureOpenWatch: registerDialogKeybindCaptureOpenWatchBound
   }
 }

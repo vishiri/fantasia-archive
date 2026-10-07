@@ -64,6 +64,7 @@ export interface I_bindDialogProjectMediaSingleEditInput {
     computed: I_bindDialogProjectMediaSingleEditInput['computed']
     dialogModel: I_bindDialogProjectMediaSingleEditInput['dialogModel']
     isSingleEditDirty: I_computedRef<boolean>
+    isSingleEditSlideOpen: I_ref<boolean>
     listLoadGeneration: I_bindDialogProjectMediaSingleEditInput['listLoadGeneration']
     listMediaItems: I_bindDialogProjectMediaSingleEditInput['listMediaItems']
     loadListMedia: I_bindDialogProjectMediaSingleEditInput['loadListMedia']

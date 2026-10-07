@@ -1,20 +1,15 @@
 /**
- * Best-effort parse of a translations JSON map for overview chart labels.
+ * String entries from a parsed translations object. Non-objects become an empty map.
  */
-export function parseProjectOverviewTranslationsJson (raw: string): Record<string, string> {
-  try {
-    const parsed: unknown = JSON.parse(raw)
-    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      return {}
-    }
-    const result: Record<string, string> = {}
-    for (const [key, value] of Object.entries(parsed)) {
-      if (typeof value === 'string') {
-        result[key] = value
-      }
-    }
-    return result
-  } catch {
+export function mapProjectOverviewTranslationStrings (parsed: unknown): Record<string, string> {
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return {}
   }
+  const result: Record<string, string> = {}
+  for (const [key, value] of Object.entries(parsed)) {
+    if (typeof value === 'string') {
+      result[key] = value
+    }
+  }
+  return result
 }

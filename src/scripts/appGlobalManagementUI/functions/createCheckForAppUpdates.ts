@@ -14,6 +14,7 @@ export function createCheckForAppUpdates (deps: {
   fetchLatestGithubReleaseVersion: () => Promise<T_faGithubLatestVersionResult>
   getLocalVersion: () => Promise<string>
   getHideMascot: () => Promise<boolean>
+  getInstalledVersionUnreadableMessage: () => string
   isFaRemoteSemverNewer: (localStripped: string, remoteStripped: string) => boolean
   setUpdateNotifyDismiss: (dismiss: (() => void) | undefined) => void
   showAlreadyNewestVersionNotification: () => void
@@ -26,17 +27,27 @@ export function createCheckForAppUpdates (deps: {
 }): {
     checkForAppUpdates: (source: T_faAppUpdateCheckSource) => Promise<void>
   } {
+  let checkSerial = 0
+
   const checkForAppUpdates = async (source: T_faAppUpdateCheckSource): Promise<void> => {
+    checkSerial += 1
+    const serial = checkSerial
     const localRaw = await deps.getLocalVersion()
+    if (serial !== checkSerial) {
+      return
+    }
     const localStripped = deps.stripFaSemverVersion(localRaw)
     if (localStripped.length === 0) {
       if (source === 'menu') {
-        throw new Error('Could not read the installed app version.')
+        throw new Error(deps.getInstalledVersionUnreadableMessage())
       }
       return
     }
 
     const remoteResult = await deps.fetchLatestGithubReleaseVersion()
+    if (serial !== checkSerial) {
+      return
+    }
     if (remoteResult.isErr()) {
       if (source === 'menu') {
         throw remoteResult.error
@@ -54,6 +65,9 @@ export function createCheckForAppUpdates (deps: {
 
     deps.dismissExistingUpdateNotify()
     const hideMascot = await deps.getHideMascot()
+    if (serial !== checkSerial) {
+      return
+    }
     deps.showAppUpdateAvailableNotification({
       hideMascot,
       onShown: (dismiss) => {

@@ -9,11 +9,17 @@ vi.mock('../projectHierarchyTreeSessionHandlersWiring', () => {
     createProjectHierarchyTreeSessionHandlersWiring: (deps: {
       getPersistedScrollTopPx: () => number
       getTreeScrollHost: () => HTMLElement | null
-      queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+      queuePersistExpandedNodeIds: (
+        expandedNodeIds: string[],
+        options?: { allowEmpty?: boolean }
+      ) => void
       refreshHierarchyTreeNodes: (nodeIds: string[]) => void
       requestAnimationFrame: (callback: () => void) => number
     }) => {
       deps.queuePersistExpandedNodeIds(['world-1'])
+      deps.queuePersistExpandedNodeIds([], {
+        allowEmpty: true
+      })
       deps.refreshHierarchyTreeNodes(['tag-1'])
       expect(deps.getPersistedScrollTopPx()).toBe(42)
       expect(deps.getTreeScrollHost()).toBeInstanceOf(HTMLElement)
@@ -88,7 +94,10 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
     treeData: ref([])
   })
 
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenNthCalledWith(1, ['world-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenNthCalledWith(2, [], {
+    allowEmpty: true
+  })
   expect(refreshHierarchyTreeNodes).toHaveBeenCalledWith(['tag-1'])
   expect(wiring.onNodeRowContextMenu).toBeDefined()
 })

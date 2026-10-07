@@ -22,6 +22,12 @@ const activeProjectRef = vi.hoisted(() => {
   }
 })
 
+const replacementInFlightRef = vi.hoisted(() => {
+  return {
+    value: false
+  }
+})
+
 const hasWelcomeScreenAutoLoadMruHeadFailedMock = vi.hoisted(() => {
   return vi.fn(() => {
     return false
@@ -62,7 +68,8 @@ vi.mock('app/src/stores/S_FaActiveProject', () => {
       return {
         get activeProject () {
           return activeProjectRef.value
-        }
+        },
+        isProjectReplacementInFlight: () => replacementInFlightRef.value
       }
     }
   }
@@ -107,6 +114,7 @@ beforeEach(() => {
   navigateToWorkspaceRouteForActiveProjectMock.mockResolvedValue(undefined)
   resolveRecentProjectMruHeadForOpenMock.mockReset()
   activeProjectRef.value = null
+  replacementInFlightRef.value = false
   runFaActionAwaitMock.mockResolvedValue(true)
   refreshRecentProjectsMock.mockResolvedValue(undefined)
   assignFaContentBridgeApis({
@@ -234,6 +242,49 @@ test('Test that openWelcomeScreenAutoLoadProject returns false when target is no
  * openWelcomeScreenAutoLoadProject
  * Returns false when loadExistingProject action fails.
  */
+test('Test that openWelcomeScreenAutoLoadProject skips MRU load when another project opened during resolve', async () => {
+  let releaseResolve: (() => void) | undefined
+  resolveRecentProjectMruHeadForOpenMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseResolve = () => {
+        resolve({
+          entry: {
+            filePath: 'C:\\data\\latest.faproject',
+            name: 'Latest'
+          },
+          outcome: 'ready'
+        })
+      }
+    })
+  })
+
+  const opening = openWelcomeScreenAutoLoadProject()
+  await vi.waitUntil(() => releaseResolve !== undefined)
+  activeProjectRef.value = {
+    filePath: 'C:\\data\\other.faproject'
+  }
+  releaseResolve?.()
+
+  await expect(opening).resolves.toBe(false)
+  expect(runFaActionAwaitMock).not.toHaveBeenCalled()
+})
+
+test('Test that openWelcomeScreenAutoLoadProject skips MRU load when a project open is already in flight', async () => {
+  resolveRecentProjectMruHeadForOpenMock.mockImplementationOnce(async () => {
+    replacementInFlightRef.value = true
+    return {
+      entry: {
+        filePath: 'C:\\data\\latest.faproject',
+        name: 'Latest'
+      },
+      outcome: 'ready'
+    }
+  })
+
+  await expect(openWelcomeScreenAutoLoadProject()).resolves.toBe(false)
+  expect(runFaActionAwaitMock).not.toHaveBeenCalled()
+})
+
 test('Test that openWelcomeScreenAutoLoadProject returns false when load action fails', async () => {
   resolveRecentProjectMruHeadForOpenMock.mockResolvedValueOnce({
     entry: {

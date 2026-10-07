@@ -10,34 +10,45 @@ import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_ma
 
 export function buildDocumentsMenu (session: I_appMenuBuildSession): I_appMenuList {
   const gate = session.hasActiveProject
+  const openQuickAddDocumentDialog = (): void => {
+    runFaAction('openQuickAddDocumentDialog', undefined)
+  }
+  const openQuickSearchDocumentDialog = (): void => {
+    runFaAction('openQuickSearchDocumentDialog', undefined)
+  }
+  const openProjectMediaDialog = (): void => {
+    runFaAction('openProjectMediaDialog', undefined)
+  }
+  const data = [
+    faMenuItem('appControlMenus.documents.items.quickAddNewDocument', 'mdi-text-box-plus-outline', {
+      conditions: gate,
+      keybindCommandId: 'quickNewDocument',
+      trigger: openQuickAddDocumentDialog
+    }),
+    faMenuItem('appControlMenus.documents.items.quickSearchDocument', 'mdi-database-search', {
+      conditions: gate,
+      keybindCommandId: 'quickExistingDocument',
+      trigger: openQuickSearchDocumentDialog
+    }),
+    faMenuItem('appControlMenus.documents.items.projectMedia', 'fa-solid fa-photo-film', {
+      conditions: gate,
+      keybindCommandId: 'openProjectMedia',
+      trigger: openProjectMediaDialog
+    }),
+    faMenuSeparator('documents-sep-after-search'),
+    faMenuItem('appControlMenus.documents.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
+      conditions: false,
+      specialColor: 'secondary'
+    }),
+    faMenuSeparator('documents-sep-before-export'),
+    faMenuItem('appControlMenus.documents.items.exportProjectDocuments', 'mdi-database-export-outline', {
+      conditions: false
+    })
+  ]
+  const title = i18n.global.t('appControlMenus.documents.title')
 
   return {
-    data: [
-      faMenuItem('appControlMenus.documents.items.quickAddNewDocument', 'mdi-text-box-plus-outline', {
-        conditions: gate,
-        keybindCommandId: 'quickNewDocument',
-        trigger: () => runFaAction('openQuickAddDocumentDialog', undefined)
-      }),
-      faMenuItem('appControlMenus.documents.items.quickSearchDocument', 'mdi-database-search', {
-        conditions: gate,
-        keybindCommandId: 'quickExistingDocument',
-        trigger: () => runFaAction('openQuickSearchDocumentDialog', undefined)
-      }),
-      faMenuItem('appControlMenus.documents.items.projectMedia', 'fa-solid fa-photo-film', {
-        conditions: gate,
-        keybindCommandId: 'openProjectMedia',
-        trigger: () => runFaAction('openProjectMediaDialog', undefined)
-      }),
-      faMenuSeparator('documents-sep-after-search'),
-      faMenuItem('appControlMenus.documents.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
-        conditions: false,
-        specialColor: 'secondary'
-      }),
-      faMenuSeparator('documents-sep-before-export'),
-      faMenuItem('appControlMenus.documents.items.exportProjectDocuments', 'mdi-database-export-outline', {
-        conditions: false
-      })
-    ],
-    title: i18n.global.t('appControlMenus.documents.title')
+    data,
+    title
   }
 }

@@ -62,6 +62,12 @@ export default defineConfig((ctx) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      ...(process.env.FA_QUASAR_DIST_DIR === undefined
+        ? {}
+        : {
+            distDir: process.env.FA_QUASAR_DIST_DIR
+          }),
+
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node22'

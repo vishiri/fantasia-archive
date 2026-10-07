@@ -40,7 +40,11 @@ type T_createMainLayoutDeps = {
     shellPageTransitionBindings: T_faAppShellPageTransitionBindings
     toRoutePath: string
   }) => T_faAppShellPageTransitionResolution
-  S_FaActiveProject: () => { hasActiveProject: boolean }
+  S_FaActiveProject: () => {
+    hasActiveProject: boolean
+    isProjectReplacementInFlight: () => boolean
+    readProjectContentEpoch: () => number
+  }
   S_FaAppNoteboard: () => T_faNoteboardAutoOpenWindowStore & {
     refreshNoteboard: () => Promise<boolean>
   }
@@ -190,14 +194,22 @@ function useMainLayout (
     }
   })
 
+  const resolveMainLayoutOutletKeyFromRouteBound = (
+    childRoute: { fullPath?: string; path?: string } | undefined
+  ): string => {
+    return resolveMainLayoutOutletKeyFromRoute(deps, childRoute)
+  }
+
+  const FA_APP_SHELL_DRAWER_TRANSITION_MS = deps.FA_APP_SHELL_DRAWER_TRANSITION_MS
+  const isFantasiaStorybookCanvas = deps.isFantasiaStorybookCanvas
   return {
-    FA_APP_SHELL_DRAWER_TRANSITION_MS: deps.FA_APP_SHELL_DRAWER_TRANSITION_MS,
+    FA_APP_SHELL_DRAWER_TRANSITION_MS,
     appShellPageTransitionBindingProps,
     appShellPageTransitionMode,
     appShellLayoutQuasarView,
     appShellLayoutRouteClass,
-    isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,
-    resolveMainLayoutOutletKeyFromRoute: (childRoute) => resolveMainLayoutOutletKeyFromRoute(deps, childRoute),
+    isFantasiaStorybookCanvas,
+    resolveMainLayoutOutletKeyFromRoute: resolveMainLayoutOutletKeyFromRouteBound,
     showWorkspaceDrawer
   }
 }
@@ -210,8 +222,12 @@ export function createMainLayout (deps: T_createMainLayoutDeps): {
     computed: deps.computed
   })
 
+  const useMainLayoutBound = (): ReturnType<typeof useMainLayout> => {
+    return useMainLayout(deps, useAppShellLayoutDrawerRail)
+  }
+
   return {
     useAppShellLayoutDrawerRail,
-    useMainLayout: () => useMainLayout(deps, useAppShellLayoutDrawerRail)
+    useMainLayout: useMainLayoutBound
   }
 }

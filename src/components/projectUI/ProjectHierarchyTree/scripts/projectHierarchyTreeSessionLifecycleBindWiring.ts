@@ -150,78 +150,44 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
   subWiring: T_subWiring
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
+  const {
+    handlersWiring,
+    isTreeDragActive,
+    openIconExpandAnimationWiring,
+    subWiring,
+    treeData
+  } = deps
+  const {
+    isOpenIconExpandAnimationPending,
+    isProjectHierarchyTreeOpenIconExpandedForOpenIcon
+  } = openIconExpandAnimationWiring
+  const { onBeforeDragOpen } = subWiring.beforeDragOpenWiring
+  const {
+    onBeforeDragStart,
+    onTreeAfterDrop,
+    onTreeDataUpdate,
+    onTreeDragEndCleanup
+  } = subWiring.dndWiring
+  const forceResyncTreeDataFromLayout = subWiring.forceResyncTreeDataFromLayout
+  const restoreExpandedSnapshot = subWiring.uiStateWiring.restoreExpandedSnapshot
+  const treeRootClassList = subWiring.treeRootClassList
+  const treeStyle = subWiring.treeStyle
+  const heTreeNodeKey = resolveProjectHierarchyTreeHeTreeNodeKey
   return {
-    addDocumentPlacementOptions: deps.handlersWiring.addDocumentPlacementOptions,
-    contextMenuAddNewRowIcon: deps.handlersWiring.contextMenuAddNewRowIcon,
-    contextMenuAddNewRowLabel: deps.handlersWiring.contextMenuAddNewRowLabel,
-    contextMenuAnchorNodeId: deps.handlersWiring.contextMenuAnchorNodeId,
-    contextMenuShowsBulkExpandRows: deps.handlersWiring.contextMenuShowsBulkExpandRows,
-    contextMenuShowsCopyRows: deps.handlersWiring.contextMenuShowsCopyRows,
-    contextMenuShowsDocumentOpenEditRows: deps.handlersWiring.contextMenuShowsDocumentOpenEditRows,
-    contextMenuShowsSortByRows: deps.handlersWiring.contextMenuShowsSortByRows,
-    contextMenuSortByDirectScopeOnly: deps.handlersWiring.contextMenuSortByDirectScopeOnly,
-    contextMenuShowsTagMenuRows: deps.handlersWiring.contextMenuShowsTagMenuRows,
-    deleteTagConfirmOpen: deps.handlersWiring.deleteTagConfirmOpen,
-    deleteTagName: deps.handlersWiring.deleteTagName,
-    eachDraggableHandler: deps.handlersWiring.eachDraggableHandler,
-    eachDroppableHandler: deps.handlersWiring.eachDroppableHandler,
-    isNodeContextMenuOpen: deps.handlersWiring.isNodeContextMenuOpen,
-    isOpenIconExpandAnimationPending: deps.openIconExpandAnimationWiring.isOpenIconExpandAnimationPending,
-    isProjectHierarchyTreeOpenIconExpandedForOpenIcon:
-      deps.openIconExpandAnimationWiring.isProjectHierarchyTreeOpenIconExpandedForOpenIcon,
-    isTreeDragActive: deps.isTreeDragActive,
-    nodeMenuPointerPosition: deps.handlersWiring.nodeMenuPointerPosition,
-    onAddNewDocumentFromContextMenuClick: deps.handlersWiring.onAddNewDocumentFromContextMenuClick,
-    onAddNewDocumentToThisTagFromContextMenuClick:
-      deps.handlersWiring.onAddNewDocumentToThisTagFromContextMenuClick,
-    onAddNewDocumentUnderThisFromContextMenuClick:
-      deps.handlersWiring.onAddNewDocumentUnderThisFromContextMenuClick,
-    onCollapseAllUnderNodeClick: deps.handlersWiring.onCollapseAllUnderNodeClick,
-    onConfirmDeleteTag: deps.handlersWiring.onConfirmDeleteTag,
-    onConfirmRenameTag: deps.handlersWiring.onConfirmRenameTag,
-    onCopyBackgroundColorFromContextMenuClick: deps.handlersWiring.onCopyBackgroundColorFromContextMenuClick,
-    onCopyDocumentFromContextMenuClick: deps.handlersWiring.onCopyDocumentFromContextMenuClick,
-    onCopyNameFromContextMenuClick: deps.handlersWiring.onCopyNameFromContextMenuClick,
-    onCopyTextColorFromContextMenuClick: deps.handlersWiring.onCopyTextColorFromContextMenuClick,
-    onDeleteDocumentFromContextMenuClick: deps.handlersWiring.onDeleteDocumentFromContextMenuClick,
-    onDeleteTagFromContextMenuClick: deps.handlersWiring.onDeleteTagFromContextMenuClick,
-    onDismissDeleteTagDialog: deps.handlersWiring.onDismissDeleteTagDialog,
-    onDismissRenameTagDialog: deps.handlersWiring.onDismissRenameTagDialog,
-    onDocumentRowAuxClick: deps.handlersWiring.onDocumentRowAuxClick,
-    onEditDocumentFromContextMenuClick: deps.handlersWiring.onEditDocumentFromContextMenuClick,
-    onExpandAllUnderNodeClick: deps.handlersWiring.onExpandAllUnderNodeClick,
-    onNodeClick: deps.handlersWiring.onNodeClick,
-    onNodeClose: deps.handlersWiring.onNodeClose,
-    onNodeContextMenuHide: deps.handlersWiring.onNodeContextMenuHide,
-    onNodeOpen: deps.handlersWiring.onNodeOpen,
-    onNodeOpenIconClick: deps.handlersWiring.onNodeOpenIconClick,
-    onNodeOpenIconPointerDown: deps.handlersWiring.onNodeOpenIconPointerDown,
-    onNodeRowContextMenu: deps.handlersWiring.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: deps.handlersWiring.onOpenDocumentFromContextMenuClick,
-    onRenameTagFromContextMenuClick: deps.handlersWiring.onRenameTagFromContextMenuClick,
-    onSortByItemFromContextMenuClick: deps.handlersWiring.onSortByItemFromContextMenuClick,
-    renameTagCanConfirm: deps.handlersWiring.renameTagCanConfirm,
-    renameTagCurrentName: deps.handlersWiring.renameTagCurrentName,
-    renameTagDialogOpen: deps.handlersWiring.renameTagDialogOpen,
-    renameTagMergeWarning: deps.handlersWiring.renameTagMergeWarning,
-    renameTagNameDraft: deps.handlersWiring.renameTagNameDraft,
-    onNonWorldOpenIconClick: deps.handlersWiring.onNonWorldOpenIconClick,
-    onNonWorldOpenIconPointerDown: deps.handlersWiring.onNonWorldOpenIconPointerDown,
-    onWorldNodeRowClick: deps.handlersWiring.onWorldNodeRowClick,
-    onWorldNodeRowPointerDown: deps.handlersWiring.onWorldNodeRowPointerDown,
-    onBeforeDragOpen: deps.subWiring.beforeDragOpenWiring.onBeforeDragOpen,
-    onTreeAfterDrop: deps.subWiring.dndWiring.onTreeAfterDrop,
-    onBeforeDragStart: deps.subWiring.dndWiring.onBeforeDragStart,
-    onTreeDataUpdate: deps.subWiring.dndWiring.onTreeDataUpdate,
-    onTreeDragEndCleanup: deps.subWiring.dndWiring.onTreeDragEndCleanup,
-    forceResyncTreeDataFromLayout: deps.subWiring.forceResyncTreeDataFromLayout,
-    restoreExpandedSnapshot: deps.subWiring.uiStateWiring.restoreExpandedSnapshot,
-    heTreeNodeKey: resolveProjectHierarchyTreeHeTreeNodeKey,
-    rootDroppableHandler: deps.handlersWiring.rootDroppableHandler,
-    setTreeComponentRef: deps.handlersWiring.setTreeComponentRef,
-    setTreeScrollHostRef: deps.handlersWiring.setTreeScrollHostRef,
-    treeData: deps.treeData,
-    treeRootClassList: deps.subWiring.treeRootClassList,
-    treeStyle: deps.subWiring.treeStyle
+    ...handlersWiring,
+    forceResyncTreeDataFromLayout,
+    heTreeNodeKey,
+    isOpenIconExpandAnimationPending,
+    isProjectHierarchyTreeOpenIconExpandedForOpenIcon,
+    isTreeDragActive,
+    onBeforeDragOpen,
+    onBeforeDragStart,
+    onTreeAfterDrop,
+    onTreeDataUpdate,
+    onTreeDragEndCleanup,
+    restoreExpandedSnapshot,
+    treeData,
+    treeRootClassList,
+    treeStyle
   }
 }

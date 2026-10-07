@@ -6,6 +6,7 @@ import { Result } from 'neverthrow'
 import { i18n } from 'app/i18n/externalFileLoader'
 
 import { loadFaProjectMediaListFromBridge } from 'app/src/scripts/faProjectMedia/faProjectMediaHasAnyWiring'
+import { decodeFaProjectMediaUrlSegmentOrRaw } from 'app/src/scripts/faProjectMedia/faProjectMediaDisplayNameDecodeWiring'
 import {
   createFaProjectMediaMassEditRowsFromOnlineUrlsDraft,
   hasFaProjectMediaOnlineUrlDraftContent,
@@ -36,8 +37,6 @@ import {
 } from './functions/dialogProjectMediaSingleEdit'
 import { createResolveDialogComponentStore } from './functions/createResolveDialogComponentStore'
 
-const untitledDisplayName = i18n.global.t('dialogs.projectMedia.untitledDisplayName')
-
 const resolveDialogComponentStoreBinding = createResolveDialogComponentStore({
   fromThrowable: Result.fromThrowable,
   getDialogComponentStore: () => S_DialogComponent()
@@ -56,6 +55,7 @@ const dialogProjectMediaApi = createDialogProjectMedia({
   computed,
   createMassEditRowsFromOnlineUrlsDraft: (draft) => createFaProjectMediaMassEditRowsFromOnlineUrlsDraft({
     createId: () => crypto.randomUUID(),
+    decodeSegment: decodeFaProjectMediaUrlSegmentOrRaw,
     draft
   }),
   detachWindowKeydown: (handler) => {
@@ -71,10 +71,13 @@ const dialogProjectMediaApi = createDialogProjectMedia({
   isMassEditRowDirty: isFaProjectMediaMassEditRowDirty,
   loadListMedia: loadFaProjectMediaListFromBridge,
   mapMediaToMassEditRow: mapFaProjectMediaToMassEditRow,
-  mapRowToUpsertItem: (row) => mapFaProjectMediaMassEditRowToUpsertItem(row, untitledDisplayName),
+  mapRowToUpsertItem: (row) => mapFaProjectMediaMassEditRowToUpsertItem(
+    row,
+    i18n.global.t('dialogs.projectMedia.untitledDisplayName')
+  ),
   mapRowsToUpsertItems: (rows) => mapFaProjectMediaMassEditRowsToUpsertItems(
     rows,
-    untitledDisplayName
+    i18n.global.t('dialogs.projectMedia.untitledDisplayName')
   ),
   normalizeFaProjectMediaPanel,
   onBeforeUnmount,

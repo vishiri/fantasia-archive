@@ -171,6 +171,70 @@ test('Test that listFaProjectDocumentDistribution orders templates by sort_order
 })
 
 /**
+ * listFaProjectDocumentDistribution
+ * Equal sort_order follows created_at_ms, then id — same as the template list.
+ */
+test('Test that listFaProjectDocumentDistribution orders equal template sort by created time', () => {
+  db = openQueryTestDb()
+  const world = createFaProjectWorld(db, { displayName: 'Realm' })
+  const zebra = createFaProjectDocumentTemplate(db, {
+    displayName: 'Zebras',
+    icon: 'mdi-z'
+  })
+  const apples = createFaProjectDocumentTemplate(db, {
+    displayName: 'Apples',
+    icon: 'mdi-a'
+  })
+  updateFaProjectDocumentTemplate(db, zebra.id, { sortOrder: 0 })
+  updateFaProjectDocumentTemplate(db, apples.id, { sortOrder: 0 })
+  const zebraCreated = db.prepare(
+    'SELECT created_at_ms AS created_at_ms FROM document_templates WHERE id = ?'
+  ).get(zebra.id) as { created_at_ms: number }
+  db.prepare('UPDATE document_templates SET created_at_ms = ? WHERE id = ?').run(
+    zebraCreated.created_at_ms + 1000,
+    apples.id
+  )
+  replaceFaProjectWorldTemplateLayoutSnapshot(db, world.id, {
+    groups: [],
+    placements: [zebra, apples].map((template, index) => ({
+      id: `placement-tie-${template.id}`,
+      documentTemplateId: template.id,
+      groupId: null,
+      rootSortOrder: index,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }))
+  })
+
+  const result = listFaProjectDocumentDistribution(db)
+  expect(result.templates.map((row) => row.templateId)).toEqual([zebra.id, apples.id])
+})
+
+/**
+ * listFaProjectDocumentDistribution
+ * Equal world sort_order follows created_at_ms, then id — same as the hierarchy layout.
+ */
+test('Test that listFaProjectDocumentDistribution orders equal world sort by created time', () => {
+  db = openQueryTestDb()
+  const earlier = createFaProjectWorld(db, { displayName: 'Later name' })
+  const later = createFaProjectWorld(db, { displayName: 'Earlier name' })
+  updateFaProjectWorld(db, earlier.id, { sortOrder: 4 })
+  updateFaProjectWorld(db, later.id, { sortOrder: 4 })
+  const laterCreated = db.prepare(
+    'SELECT created_at_ms AS created_at_ms FROM worlds WHERE id = ?'
+  ).get(later.id) as { created_at_ms: number }
+  db.prepare('UPDATE worlds SET created_at_ms = ? WHERE id = ?').run(
+    laterCreated.created_at_ms + 1000,
+    earlier.id
+  )
+
+  const result = listFaProjectDocumentDistribution(db)
+  expect(result.worlds.map((world) => world.worldId)).toEqual([later.id, earlier.id])
+})
+
+/**
  * listFaProjectDocumentLastOpened
  * Maps category/dead flags, colors, and null template icon after template delete path.
  */
@@ -301,4 +365,53 @@ test('Test that listFaProjectDocumentLastOpened reflects updated category and de
     isCategory: true,
     isDead: true
   })
+})
+
+/**
+ * listFaProjectDocumentLastOpened
+ * Same opened_at_ms keeps the later row first, matching the MRU trim.
+ */
+test('Test that listFaProjectDocumentLastOpened orders equal timestamps by newest row', () => {
+  db = openQueryTestDb()
+  const world = createFaProjectWorld(db, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db, { displayName: 'Character' })
+  const placementId = 'placement-query-tie'
+  replaceFaProjectWorldTemplateLayoutSnapshot(db, world.id, {
+    groups: [],
+    placements: [{
+      id: placementId,
+      documentTemplateId: template.id,
+      groupId: null,
+      rootSortOrder: 0,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }]
+  })
+  const earlier = createFaProjectDocument(db, {
+    worldId: world.id,
+    templateId: template.id,
+    placementId,
+    displayName: 'Earlier',
+    sortOrder: 0
+  })
+  const later = createFaProjectDocument(db, {
+    worldId: world.id,
+    templateId: template.id,
+    placementId,
+    displayName: 'Later',
+    parentDocumentId: earlier.id,
+    sortOrder: 1
+  })
+  const openedAtMs = 1_700_000_000_000
+  db.prepare(
+    'INSERT INTO document_last_opened (document_id, opened_at_ms) VALUES (?, ?)'
+  ).run(earlier.id, openedAtMs)
+  db.prepare(
+    'INSERT INTO document_last_opened (document_id, opened_at_ms) VALUES (?, ?)'
+  ).run(later.id, openedAtMs)
+
+  const listed = listFaProjectDocumentLastOpened(db)
+  expect(listed.items.map((item) => item.documentId)).toEqual([later.id, earlier.id])
 })

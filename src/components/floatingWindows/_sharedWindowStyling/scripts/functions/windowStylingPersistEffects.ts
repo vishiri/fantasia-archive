@@ -50,14 +50,18 @@ export function createWireStylingWindowOpenFromMenuAndProps (deps: {
 }
 
 export function createReadFaDialogComponentStoreOrNull (deps: {
+  Result: {
+    fromThrowable: <T, E>(fn: () => T, onError: (error: unknown) => E) => () => {
+      unwrapOr: <D>(defaultValue: D) => T | D
+    }
+  }
   S_DialogComponent: () => { dialogToOpen?: unknown; dialogUUID?: unknown }
 }): () => { dialogToOpen?: unknown; dialogUUID?: unknown } | null {
   return function readFaDialogComponentStoreOrNull (): ReturnType<typeof deps.S_DialogComponent> | null {
-    try {
-      return deps.S_DialogComponent()
-    } catch {
-      return null
-    }
+    return deps.Result.fromThrowable(
+      () => deps.S_DialogComponent(),
+      () => null
+    )().unwrapOr(null)
   }
 }
 
@@ -97,11 +101,14 @@ export function createWireStylingPersistedCssIntoOpenEditor (deps: {
   }): void {
     deps.watch(
       (): string => opts.getPersistedCss(),
-      (next: string) => {
+      (next: string, prev: string | undefined) => {
         if (!opts.windowModel.value) {
           return
         }
         if (opts.workingCss.value === next) {
+          return
+        }
+        if (prev !== undefined && opts.workingCss.value !== prev) {
           return
         }
         opts.workingCss.value = next

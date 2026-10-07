@@ -83,6 +83,43 @@ test('Test that createUseFaProjectWorldColorPaletteFromBridge reloads when the a
   expect(paletteHexList.value).toEqual(['#112233', '#445566'])
 })
 
+test('Test that createUseFaProjectWorldColorPaletteFromBridge drops a palette from an older project', async () => {
+  let resolvePalette: ((value: readonly string[]) => void) | undefined
+  const pendingPalette = new Promise<readonly string[]>((resolve) => {
+    resolvePalette = resolve
+  })
+  let epoch = 1
+  const projectId = ref('project-1')
+  const usePalette = createUseFaProjectWorldColorPaletteFromBridge({
+    aggregateFaProjectWorldColorPaletteHexList: () => ['#aabbcc'],
+    computed,
+    getActiveProjectId: () => projectId.value,
+    listWorldColorPaletteStrings: () => pendingPalette,
+    readProjectContentEpoch: () => epoch,
+    ref,
+    watch: (source, callback, options) => {
+      if (options?.immediate === true) {
+        callback()
+      }
+      return () => {
+        void source()
+      }
+    }
+  })
+
+  const { paletteHexList } = usePalette({ enabled: computed(() => true) })
+  await Promise.resolve()
+  epoch = 2
+  projectId.value = 'project-2'
+  const finishPalette = resolvePalette
+  if (finishPalette === undefined) {
+    throw new Error('missing palette resolver')
+  }
+  finishPalette(['#112233'])
+  await flushPromises()
+  expect(paletteHexList.value).toEqual([])
+})
+
 test('Test that createUseFaProjectWorldColorPaletteFromBridge clears palettes without an active project', async () => {
   const listWorldColorPaletteStrings = vi.fn(async () => ['#112233'])
 
@@ -108,5 +145,40 @@ test('Test that createUseFaProjectWorldColorPaletteFromBridge clears palettes wi
   await Promise.resolve()
 
   expect(listWorldColorPaletteStrings).not.toHaveBeenCalled()
+  expect(paletteHexList.value).toEqual([])
+})
+
+test('Test that createUseFaProjectWorldColorPaletteFromBridge drops a palette when the project id changes', async () => {
+  let resolvePalette: ((value: readonly string[]) => void) | undefined
+  const pendingPalette = new Promise<readonly string[]>((resolve) => {
+    resolvePalette = resolve
+  })
+  const projectId = ref('project-1')
+  const usePalette = createUseFaProjectWorldColorPaletteFromBridge({
+    aggregateFaProjectWorldColorPaletteHexList: () => ['#aabbcc'],
+    computed,
+    getActiveProjectId: () => projectId.value,
+    listWorldColorPaletteStrings: () => pendingPalette,
+    readProjectContentEpoch: () => 1,
+    ref,
+    watch: (source, callback, options) => {
+      if (options?.immediate === true) {
+        callback()
+      }
+      return () => {
+        void source()
+      }
+    }
+  })
+
+  const { paletteHexList } = usePalette({ enabled: computed(() => true) })
+  await Promise.resolve()
+  projectId.value = 'project-2'
+  const finishPalette = resolvePalette
+  if (finishPalette === undefined) {
+    throw new Error('missing palette resolver')
+  }
+  finishPalette(['#112233'])
+  await flushPromises()
   expect(paletteHexList.value).toEqual([])
 })

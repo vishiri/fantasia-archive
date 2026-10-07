@@ -10,6 +10,14 @@ import {
   shouldResyncDialogProjectSettingsWorldColorPaletteFromProp
 } from './functions/dialogProjectSettingsWorldColorPalette'
 
+export function readDialogProjectSettingsWorldColorPaletteSerializedEntries (
+  deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
+  entries: readonly I_dialogProjectSettingsWorldColorPaletteEntry[]
+): string {
+  const hexList = readDialogProjectSettingsWorldColorPaletteEntryHexList(entries)
+  return deps.serializeFaProjectWorldColorPaletteFromHexList(hexList)
+}
+
 export function registerDialogProjectSettingsWorldColorPaletteEditorWatch (
   deps: T_dialogProjectSettingsWorldColorPaletteEditorUseDeps,
   params: {
@@ -58,8 +66,8 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
     emitColorPaletteFromEntries: (
       entries: I_dialogProjectSettingsWorldColorPaletteEntry[]
     ) => void
-    openSwatchIndex: I_ref<number | null>
-    setOpenSwatchIndex: (index: number | null) => void
+    openSwatchEntryId: I_ref<string | null>
+    setOpenSwatchEntryId: (entryId: string | null) => void
   }
 ): {
     onSwatchColorUpdate: (entryId: string, hex: string) => void
@@ -110,8 +118,8 @@ export function createDialogProjectSettingsWorldColorPaletteEditorSwatchMutation
       return
     }
     params.emitColorPaletteFromEntries(nextEntries)
-    if (params.openSwatchIndex.value !== null) {
-      params.setOpenSwatchIndex(null)
+    if (params.openSwatchEntryId.value !== null) {
+      params.setOpenSwatchEntryId(null)
     }
   }
 

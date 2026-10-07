@@ -6,6 +6,7 @@ import {
   ref,
   watch
 } from 'vue'
+import { Result, ResultAsync } from 'neverthrow'
 import debounce from 'lodash-es/debounce.js'
 
 import {
@@ -24,6 +25,7 @@ import {
 import * as dialogStoreModule from 'src/stores/S_Dialog'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
+import { registerFaProjectReplacementPersistHook } from 'app/src/scripts/floatingWindows/faProjectReplacementPersistHooksWiring'
 import { createWindowStylingFrame } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/createWindowStylingFrame'
 import { createWindowStylingColorPanel } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingColorPanel'
 import { createWindowStylingFrameLifecycle } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingFrameLifecycle'
@@ -66,6 +68,7 @@ const getFaProjectStylingStore = createGetFaProjectStylingStore({
 })
 
 const readFaDialogComponentStoreOrNull = createReadFaDialogComponentStoreOrNull({
+  Result,
   S_DialogComponent: () => dialogStoreModule.S_DialogComponent()
 })
 
@@ -96,14 +99,20 @@ const refreshPersistedProjectStylingAndCloseWindow = createRefreshPersistedProje
 })
 
 const useWindowProjectStylingCssPersist = createWindowProjectStylingCssPersist({
+  ResultAsync,
   createDebounced: debounce,
   getFaProjectStylingStore,
+  isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+  readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
+  registerBeforeProjectReplacement: registerFaProjectReplacementPersistHook,
   runFaAction,
   watch
 })
 
 const useWindowProjectStylingFramePersist = createWindowProjectStylingFramePersist({
   getFaProjectStylingStore,
+  isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+  readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
   useFaFloatingWindowFramePersist
 })
 

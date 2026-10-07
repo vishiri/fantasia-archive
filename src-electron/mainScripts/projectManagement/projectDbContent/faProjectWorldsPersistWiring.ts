@@ -81,7 +81,8 @@ export function getFaProjectWorldById (db: Database, id: string): I_faProjectWor
 }
 
 export function listFaProjectWorlds (db: Database): I_faProjectWorldListResult {
-  return { items: listFaProjectWorldRows(db) }
+  const items = listFaProjectWorldRows(db)
+  return { items }
 }
 
 export function listFaProjectWorldsForProjectSettings (

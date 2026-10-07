@@ -23,6 +23,7 @@ import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeHelpers
 import {
   reapplyProjectHierarchyTreeLatentDescendantExpandState
 } from './projectHierarchyTreeLatentExpandReapplyWiring'
+import { projectHierarchyTreeRevealPathsMatch } from '../functions/projectHierarchyTreeRevealPath'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
@@ -87,16 +88,16 @@ export async function restoreProjectHierarchyTreeUiState (deps: {
       deps.treeData.value,
       expandedNodeIds
     )
-    deps.openNodeIds.value = new Set(pruned)
     const expandedNodeIdsForPersist = collectProjectHierarchyTreePersistedExpandedNodeIds(
       deps.treeData.value,
-      deps.openNodeIds.value
+      new Set(pruned)
     )
-    if (shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
+    const persistRestoredExpandedNodeIds = shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
       intendedExpandedNodeIds: expandedNodeIds,
-      restoredExpandedNodeIds: expandedNodeIdsForPersist,
-      treeNodeCount: deps.treeData.value.length
-    })) {
+      restoredExpandedNodeIds: expandedNodeIdsForPersist
+    })
+    if (persistRestoredExpandedNodeIds) {
+      deps.openNodeIds.value = new Set(pruned)
       deps.onExpandedNodeIdsChange(expandedNodeIdsForPersist)
     }
 
@@ -133,7 +134,7 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
   runDeferredLazyLoadBatch?: (runBatch: () => Promise<void>) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  const path = deps.getPendingRevealPath()
+  const path = [...deps.getPendingRevealPath()]
   if (path.length === 0) {
     return
   }
@@ -142,9 +143,19 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
     return
   }
 
+  function revealPathStillCurrent (): boolean {
+    return projectHierarchyTreeRevealPathsMatch(deps.getPendingRevealPath(), path)
+  }
+
   async function loadRevealPathNodes (): Promise<void> {
     for (const nodeId of path) {
+      if (!revealPathStillCurrent()) {
+        return
+      }
       await deps.loadChildrenAlongRevealPath([nodeId])
+      if (!revealPathStillCurrent()) {
+        return
+      }
       const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
       if (node === null) {
         continue
@@ -167,13 +178,26 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
     await deps.runDeferredLazyLoadBatch(loadRevealPathNodes)
   } else {
     await loadRevealPathNodes()
+    if (!revealPathStillCurrent()) {
+      return
+    }
     openRevealPathInHeTree(treeRef)
+  }
+
+  if (!revealPathStillCurrent()) {
+    return
   }
 
   const focusId = path[path.length - 1]
   if (focusId !== undefined) {
     await deps.nextTick()
+    if (!revealPathStillCurrent()) {
+      return
+    }
     deps.requestAnimationFrame(() => {
+      if (!revealPathStillCurrent()) {
+        return
+      }
       const scrollContainer = resolveProjectHierarchyTreeScrollContainer(deps.getTreeScrollHost())
       const row = scrollContainer?.querySelector(`[data-test-hierarchy-node-id="${focusId}"]`)
       if (row instanceof HTMLElement) {

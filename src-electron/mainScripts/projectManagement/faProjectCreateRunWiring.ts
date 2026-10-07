@@ -11,8 +11,12 @@ import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectCons
 import type { I_faProjectCreateResult, I_faProjectManagementActiveSnapshot } from 'app/types/I_faProjectManagementDomain'
 
 import {
+  discardFaProjectCreateBackupFile,
+  faProjectCreateStagingFilePath,
   openFaProjectDatabase,
+  promoteFaProjectCreateStagingFile,
   replaceFaProjectActiveDatabase,
+  restoreFaProjectCreateBackupFile,
   unlinkFaProjectFileIfExists
 } from './faProjectActiveDatabaseWiring'
 import { applyFaProjectMigrations } from './faProjectDbMigrateWiring'
@@ -31,15 +35,17 @@ import { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailure
 import { recordRecentProjectEntry } from './faRecentProjectListRuntimeWiring'
 
 function buildSaveDialogOptions (defaultPath: string): SaveDialogOptions {
+  const filters: SaveDialogOptions['filters'] = [
+    {
+      extensions: [FA_PROJECT_FILE_EXTENSION],
+      name: 'Fantasia Archive project'
+    }
+  ]
+  const title = 'Create Fantasia Archive project'
   return {
     defaultPath,
-    filters: [
-      {
-        extensions: [FA_PROJECT_FILE_EXTENSION],
-        name: 'Fantasia Archive project'
-      }
-    ],
-    title: 'Create Fantasia Archive project'
+    filters,
+    title
   }
 }
 
@@ -85,6 +91,48 @@ async function resolveCreateTargetPath (
   return withExt
 }
 
+function discardFaProjectCreateBackupBestEffort (filePath: string): void {
+  void Result.fromThrowable(
+    (): void => {
+      discardFaProjectCreateBackupFile(filePath)
+    },
+    (): undefined => undefined
+  )()
+}
+
+function failFaProjectCreate (input: {
+  adoptedActiveDatabase: boolean
+  cleanupAfterFailedCreate: () => void
+  error: unknown
+  filePath: string
+  promotedStaging: boolean
+}): I_faProjectCreateResult {
+  input.cleanupAfterFailedCreate()
+  if (input.promotedStaging && !input.adoptedActiveDatabase) {
+    void Result.fromThrowable(
+      (): void => {
+        restoreFaProjectCreateBackupFile(input.filePath)
+      },
+      (): undefined => undefined
+    )()
+  }
+  const err = input.error instanceof Error
+    ? input.error
+    : new Error(String(input.error))
+  console.error('[faProjectManagement] create failed', {
+    err,
+    filePath: input.filePath
+  })
+  const errorMessage = err.message
+  const errorName = err.name
+  const outcome = 'error' as const
+  return {
+    errorMessage,
+    errorName,
+    outcome
+  }
+}
+
 /**
  * Creates a new '.faproject' file from an IPC payload (validated in main); updates the active DB handle on success.
  */
@@ -108,17 +156,23 @@ export async function runFaProjectCreateFromIpc (
     return { outcome: 'canceled' }
   }
   if (typeof target === 'object' && 'errorMessage' in target) {
+    const errorMessage = target.errorMessage
+    const errorName = target.errorName
+    const outcome = 'error' as const
     return {
-      errorMessage: target.errorMessage,
-      errorName: target.errorName,
-      outcome: 'error'
+      errorMessage,
+      errorName,
+      outcome
     }
   }
 
   const filePath = target
-  unlinkFaProjectFileIfExists(filePath)
+  const stagingPath = faProjectCreateStagingFilePath(filePath)
+  unlinkFaProjectFileIfExists(stagingPath)
 
   let db: Database | null = null
+  let promotedStaging = false
+  let adoptedActiveDatabase = false
 
   function cleanupAfterFailedCreate (): void {
     if (db !== null) {
@@ -130,42 +184,44 @@ export async function runFaProjectCreateFromIpc (
       )()
     }
     void Result.fromThrowable(
-      (): void => unlinkFaProjectFileIfExists(filePath),
+      (): void => unlinkFaProjectFileIfExists(stagingPath),
       (): undefined => undefined
     )()
   }
 
   const createResult = Result.fromThrowable((): I_faProjectManagementActiveSnapshot => {
-    db = openFaProjectDatabase(filePath)
+    db = openFaProjectDatabase(stagingPath)
     db.pragma('foreign_keys = ON')
     db.pragma('busy_timeout = 5000')
     db.pragma('journal_mode = DELETE')
     applyFaProjectMigrations(db, parsed.projectName)
     assertFaProjectDatabaseQuickCheck(db)
     const projectUuid = readFaProjectStoredProjectUuid(db)
-    replaceFaProjectActiveDatabase(db, filePath)
+    const stagingDb = db
     db = null
+    stagingDb.close()
+    promoteFaProjectCreateStagingFile(stagingPath, filePath)
+    promotedStaging = true
+    const activeDb = openFaProjectDatabase(filePath)
+    replaceFaProjectActiveDatabase(activeDb, filePath)
+    adoptedActiveDatabase = true
+    discardFaProjectCreateBackupBestEffort(filePath)
+    const name = parsed.projectName
     return {
       filePath,
       id: projectUuid,
-      name: parsed.projectName
+      name
     }
   }, (e): unknown => e)()
 
   if (createResult.isErr()) {
-    cleanupAfterFailedCreate()
-    const err = createResult.error instanceof Error
-      ? createResult.error
-      : new Error(String(createResult.error))
-    console.error('[faProjectManagement] create failed', {
-      err,
-      filePath
+    return failFaProjectCreate({
+      adoptedActiveDatabase,
+      cleanupAfterFailedCreate,
+      error: createResult.error,
+      filePath,
+      promotedStaging
     })
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
   }
 
   recordRecentProjectEntry({
@@ -173,8 +229,10 @@ export async function runFaProjectCreateFromIpc (
     name: createResult.value.name
   })
 
+  const outcome = 'created' as const
+  const project = createResult.value
   return {
-    outcome: 'created',
-    project: createResult.value
+    outcome,
+    project
   }
 }

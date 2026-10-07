@@ -41,11 +41,15 @@ function resolveProjectOverviewApexColumnSegmentRects (
   const segmentBars = bars.length > 0 ? bars : [hoveredBar]
   return segmentBars.map((segment) => {
     const rect = segment.getBoundingClientRect()
+    const bottom = rect.bottom
+    const left = rect.left
+    const right = rect.right
+    const top = rect.top
     return {
-      bottom: rect.bottom,
-      left: rect.left,
-      right: rect.right,
-      top: rect.top
+      bottom,
+      left,
+      right,
+      top
     }
   })
 }
@@ -175,14 +179,17 @@ export function attachProjectOverviewApexTooltipAboveBarEvents (
       : {}
   ) as Record<string, unknown>
 
+  const aboveBarEvents = createProjectOverviewApexTooltipAboveBarChartEvents()
+  const events = {
+    ...existingEvents,
+    ...aboveBarEvents
+  }
+  const chart = {
+    ...existingChart,
+    events
+  }
   return {
     ...chartOptions,
-    chart: {
-      ...existingChart,
-      events: {
-        ...existingEvents,
-        ...createProjectOverviewApexTooltipAboveBarChartEvents()
-      }
-    }
+    chart
   }
 }

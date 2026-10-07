@@ -23,8 +23,10 @@ function syncTabsInlineEndBlendFromContent (session: T_tabsInlineEndBlendSession
     session.setScrolledToInlineEnd(true)
     return
   }
+  const direction = getComputedStyle(session.contentEl).direction === 'rtl' ? 'rtl' : 'ltr'
   session.setScrolledToInlineEnd(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
     clientWidth: session.contentEl.clientWidth,
+    direction,
     scrollLeft: session.contentEl.scrollLeft,
     scrollWidth: session.contentEl.scrollWidth
   }))
@@ -87,6 +89,7 @@ export function useProjectAppControlBarTabsInlineEndBlend (input: {
     tabsScrolledToInlineEnd: Ref<boolean>
   } {
   const tabsScrolledToInlineEnd = ref(true)
+  let disposed = false
   const session: T_tabsInlineEndBlendSession = {
     contentEl: null,
     mutationObserver: null,
@@ -99,6 +102,9 @@ export function useProjectAppControlBarTabsInlineEndBlend (input: {
 
   function attachFromTabsRootRef (): void {
     void nextTick(() => {
+      if (disposed) {
+        return
+      }
       attachTabsInlineEndBlendToRoot(session, input.tabsRootRef.value)
     })
   }
@@ -118,12 +124,16 @@ export function useProjectAppControlBarTabsInlineEndBlend (input: {
     input.watchSource,
     () => {
       void nextTick(() => {
+        if (disposed) {
+          return
+        }
         syncTabsInlineEndBlendFromContent(session)
       })
     }
   )
 
   onBeforeUnmount(() => {
+    disposed = true
     detachTabsInlineEndBlendContent(session)
   })
 

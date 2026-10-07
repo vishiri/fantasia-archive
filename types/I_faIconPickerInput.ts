@@ -47,6 +47,7 @@ export type I_faIconPickerInputComposableDeps = {
     isCatalogLoading: import('app/types/I_vueCompositionShims').I_ref<boolean>
     loadFaIconPickerMergedCatalogAsync: () => Promise<string[]>
     loadedCatalog: import('app/types/I_vueCompositionShims').I_ref<string[]>
+    requestSerialBox: { current: number }
   }) => Promise<void>
   ref: <T>(value: T) => import('app/types/I_vueCompositionShims').I_ref<T>
   searchDebounceMs: number

@@ -122,3 +122,78 @@ test('Test that runFaKeybindsUpdateKeybinds refreshes and notifies on success', 
     })
   )
 })
+
+test('Test that runFaKeybindsUpdateKeybinds keeps saved overrides when refresh fails', async () => {
+  vi.resetModules()
+  notifyCreateMock.mockReset()
+  setKeybindsMock.mockReset()
+  setKeybindsMock.mockResolvedValue(undefined)
+  const refresh = vi.fn(async () => {
+    throw new Error('reload failed')
+  })
+  const applySavedOverrides = vi.fn(() => true)
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faKeybinds: { setKeybinds: setKeybindsMock }
+      }
+    },
+    writable: true
+  })
+
+  const { runFaKeybindsUpdateKeybinds } = await import('../scripts/sFaKeybindsBridgeUpdate')
+  const overrides = {
+    openAppSettings: {
+      code: 'KeyZ',
+      mods: ['alt' as const]
+    }
+  }
+  const ok = await runFaKeybindsUpdateKeybinds(
+    {
+      replaceAllOverrides: true,
+      overrides
+    },
+    refresh,
+    applySavedOverrides
+  )
+
+  expect(ok).toBe(true)
+  expect(applySavedOverrides).toHaveBeenCalledWith(overrides)
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      type: 'positive'
+    })
+  )
+})
+
+test('Test that runFaKeybindsUpdateKeybinds returns false when refresh fails and overrides cannot be kept', async () => {
+  vi.resetModules()
+  notifyCreateMock.mockReset()
+  setKeybindsMock.mockReset()
+  setKeybindsMock.mockResolvedValue(undefined)
+  const refresh = vi.fn(async () => {
+    throw new Error('reload failed')
+  })
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faKeybinds: { setKeybinds: setKeybindsMock }
+      }
+    },
+    writable: true
+  })
+
+  const { runFaKeybindsUpdateKeybinds } = await import('../scripts/sFaKeybindsBridgeUpdate')
+  const ok = await runFaKeybindsUpdateKeybinds(
+    {
+      replaceAllOverrides: true,
+      overrides: {}
+    },
+    refresh
+  )
+
+  expect(ok).toBe(false)
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})

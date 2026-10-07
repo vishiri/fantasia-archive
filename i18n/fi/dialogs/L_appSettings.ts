@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Asetukset',
+  loadError: 'Asetuksia ei voitu ladata.',
   saveButton: 'Tallenna asetukset',
   closeButton: 'Sulje tallentamatta',
   settingsSearchPlaceholder: 'Hae asetuksista...',

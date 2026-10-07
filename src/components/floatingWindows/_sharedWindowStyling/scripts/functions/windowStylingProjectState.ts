@@ -36,10 +36,12 @@ export function createWindowProjectStylingUse (
     }
 
     async function saveAndCloseWindow (): Promise<void> {
-      const ok = await deps.runFaActionAwait('saveProjectStyling', { css: workingCss.value })
-      if (ok) {
-        windowModel.value = false
+      const cssToSave = workingCss.value
+      const ok = await deps.runFaActionAwait('saveProjectStyling', { css: cssToSave })
+      if (!ok || workingCss.value !== cssToSave) {
+        return
       }
+      windowModel.value = false
     }
 
     deps.wireWindowStylingSession({

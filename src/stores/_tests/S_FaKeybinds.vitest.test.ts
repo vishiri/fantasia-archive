@@ -170,6 +170,31 @@ test('Test that updateKeybinds returns false without notifying when setKeybinds 
   expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
+test('Test that updateKeybinds keeps the saved overrides when the reload fails', async () => {
+  await store.refreshKeybinds()
+  getKeybindsMock.mockRejectedValueOnce(new Error('reload failed'))
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const overrides = {
+    openAppSettings: {
+      code: 'KeyZ',
+      mods: ['alt' as const]
+    }
+  }
+
+  const ok = await store.updateKeybinds({
+    overrides,
+    replaceAllOverrides: true
+  })
+
+  expect(ok).toBe(true)
+  expect(store.snapshot?.store.overrides.openAppSettings).toEqual({
+    code: 'KeyZ',
+    mods: ['alt']
+  })
+  expect(notifyCreateMock).toHaveBeenCalled()
+  consoleErrorSpy.mockRestore()
+})
+
 /**
  * S_FaKeybinds / updateKeybinds
  * Returns false when setKeybinds is missing.
@@ -201,6 +226,67 @@ test('Test that updateKeybinds returns false when setKeybinds is unavailable', a
  * S_FaKeybinds / setSuspendGlobalKeybindDispatch
  * Toggles the suspend flag used by the global keydown router.
  */
+test('Test that a refresh started first does not replace a later keybind save', async () => {
+  let releaseFirstGet: ((snapshot: I_faKeybindsSnapshot) => void) | undefined
+  const firstGet = new Promise<I_faKeybindsSnapshot>((resolve) => {
+    releaseFirstGet = resolve
+  })
+  const savedSnap: I_faKeybindsSnapshot = {
+    platform: 'win32',
+    store: {
+      ...FA_KEYBINDS_STORE_DEFAULTS,
+      overrides: {
+        openAppSettings: null
+      }
+    }
+  }
+  getKeybindsMock.mockImplementationOnce(() => firstGet)
+  getKeybindsMock.mockResolvedValueOnce(savedSnap)
+
+  const refreshPromise = store.refreshKeybinds()
+  await vi.waitUntil(() => getKeybindsMock.mock.calls.length === 1)
+  const updatePromise = store.updateKeybinds({
+    overrides: {
+      openAppSettings: null
+    },
+    replaceAllOverrides: true
+  })
+  const finishFirstGet = releaseFirstGet
+  if (finishFirstGet === undefined) {
+    throw new Error('missing keybind read resolver')
+  }
+  finishFirstGet({
+    platform: 'win32',
+    store: {
+      ...FA_KEYBINDS_STORE_DEFAULTS,
+      overrides: {
+        openAppSettings: {
+          code: 'KeyA',
+          mods: ['ctrl']
+        }
+      }
+    }
+  })
+  await refreshPromise
+  const ok = await updatePromise
+
+  expect(ok).toBe(true)
+  expect(store.snapshot).toEqual(savedSnap)
+  expect(setKeybindsMock).toHaveBeenCalledOnce()
+})
+
+test('Test that updateKeybinds skips applying overrides when the snapshot was never loaded', async () => {
+  getKeybindsMock.mockRejectedValue(new Error('reload failed'))
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const ok = await store.updateKeybinds({
+    overrides: {},
+    replaceAllOverrides: true
+  })
+  expect(ok).toBe(false)
+  expect(store.snapshot).toBeNull()
+  consoleErrorSpy.mockRestore()
+})
+
 test('Test that setSuspendGlobalKeybindDispatch updates the flag', () => {
   expect(store.suspendGlobalKeybindDispatch).toBe(false)
   store.setSuspendGlobalKeybindDispatch(true)

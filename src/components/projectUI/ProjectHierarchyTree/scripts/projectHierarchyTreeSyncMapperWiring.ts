@@ -9,6 +9,10 @@ import { resolveTrimmedIconOrDefault } from 'app/src/scripts/faIcons/faIconDispl
 import type { I_faProjectHierarchyTreeTagSettings } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createMapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapHierarchyDocumentChildrenToTreeNodes'
+import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from '../functions/projectHierarchyTreeSuppressEmitDepth'
 import { createMapWorkspaceLayoutToHierarchyTreeSkeleton } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
 import { patchWorkspaceLayoutPlacementNodeInPlace } from '../functions/mapWorkspaceLayoutPlacementNodePatch'
 import {
@@ -27,6 +31,7 @@ import {
   collectProjectHierarchyTreeTagIds,
   publishProjectHierarchyTreeRootRevisionIfTagsRemoved
 } from './projectHierarchyTreeTagMembershipRevisionWiring'
+import { startProjectHierarchyTreeAddNewDocumentCreate } from './projectHierarchyTreeAddNewDocumentCreateOnce'
 import {
   isProjectHierarchyTreeAddNewDocumentCreateSourceNode,
   refreshProjectHierarchyTreeAddNewDocumentLabelsInTree
@@ -96,10 +101,10 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
   function applySkeletonTreeData (
     nextSkeleton: I_faProjectHierarchyTreeHeTreeNode[]
   ): void {
-    deps.suppressTreeEmit.value = true
+    beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
     deps.treeData.value = nextSkeleton
     void deps.nextTick().then(() => {
-      deps.suppressTreeEmit.value = false
+      endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
     })
   }
 
@@ -132,7 +137,8 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
         treeData: deps.treeData,
         treeTagIdsBefore
       })
-      return { structureMatched: !tagsRemoved }
+      const structureMatched = !tagsRemoved
+      return { structureMatched }
     }
     applySkeletonTreeData(nextSkeleton)
     return { structureMatched: false }
@@ -172,6 +178,7 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
     initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: T_faOpenedDocumentOpenMode
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>
@@ -187,6 +194,7 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
     displayName: string
     openMode: T_faOpenedDocumentOpenMode
     parentDocumentId: null
+    placementId: string | null
     templateId: string
     worldId: string
   } | null {
@@ -202,12 +210,15 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
       titlePluralTranslations: node.titlePluralTranslations ?? {},
       titleSingularTranslations: node.titleSingularTranslations ?? {}
     })
+    const worldId = node.worldId
+    const placementId = node.placementId
     return {
       displayName,
       openMode,
       parentDocumentId: null,
+      placementId,
       templateId,
-      worldId: node.worldId
+      worldId
     }
   }
 
@@ -220,7 +231,7 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
       return
     }
     event?.stopPropagation()
-    void deps.createTemporaryDocument(input)
+    startProjectHierarchyTreeAddNewDocumentCreate(deps.createTemporaryDocument, input)
   }
 
   function onAddNewDocumentRowAuxClick (
@@ -236,7 +247,7 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
     }
     event.preventDefault()
     event.stopPropagation()
-    void deps.createTemporaryDocument(input)
+    startProjectHierarchyTreeAddNewDocumentCreate(deps.createTemporaryDocument, input)
   }
 
   return {

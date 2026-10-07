@@ -69,6 +69,9 @@ test('Test that runFaAction reports unknown action ids', () => {
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({ type: 'negative' })
   )
+  const lastRow = S_FaActionManager().actionHistory.at(-1)
+  expect(lastRow?.status).toBe('failed')
+  expect(lastRow?.errorMessage).toContain('Unknown action id')
 })
 
 /**
@@ -247,6 +250,9 @@ test('Test that runFaActionAwait resolves false on FaActionUserCanceledError wit
 test('Test that runFaActionAwait resolves false on unknown action id', async () => {
   findFaActionDefinitionMock.mockReturnValue(undefined)
   await expect(runFaActionAwait('toggleDeveloperTools', undefined)).resolves.toBe(false)
+  const lastRow = S_FaActionManager().actionHistory.at(-1)
+  expect(lastRow?.status).toBe('failed')
+  expect(lastRow?.errorMessage).toContain('Unknown action id')
 })
 
 /**

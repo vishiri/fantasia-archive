@@ -19,6 +19,7 @@ export function createProjectHierarchyTreeTagDialogsWiring (deps: {
     initialTagsDraft: Array<{ id: string, name: string }>
     openMode: 'leftNavigate'
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>
@@ -85,20 +86,9 @@ export function createProjectHierarchyTreeTagDialogsWiring (deps: {
 
   return {
     addDocumentPlacementOptions,
-    deleteTagConfirmOpen: deleteWiring.deleteTagConfirmOpen,
-    deleteTagName: deleteWiring.deleteTagName,
+    ...deleteWiring,
     onAddNewDocumentToThisTagClick,
-    onConfirmDeleteTag: deleteWiring.onConfirmDeleteTag,
-    onConfirmRenameTag: renameWiring.onConfirmRenameTag,
-    onDeleteTagFromContextMenuClick: deleteWiring.onDeleteTagFromContextMenuClick,
-    onDismissDeleteTagDialog: deleteWiring.onDismissDeleteTagDialog,
-    onDismissRenameTagDialog: renameWiring.onDismissRenameTagDialog,
-    onRenameTagFromContextMenuClick: renameWiring.onRenameTagFromContextMenuClick,
-    renameTagCanConfirm: renameWiring.renameTagCanConfirm,
-    renameTagCurrentName: renameWiring.renameTagCurrentName,
-    renameTagDialogOpen: renameWiring.renameTagDialogOpen,
-    renameTagMergeWarning: renameWiring.renameTagMergeWarning,
-    renameTagNameDraft: renameWiring.renameTagNameDraft,
+    ...renameWiring,
     resolveTagContextMenuAnchor,
     setTagContextMenuAnchorNodeId
   }

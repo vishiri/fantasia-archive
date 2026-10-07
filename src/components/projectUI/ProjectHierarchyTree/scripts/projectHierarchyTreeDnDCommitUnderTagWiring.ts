@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type {
   I_faProjectHierarchyTreeDragCommitResult,
   I_faProjectHierarchyTreeDragSiblingOrderSnapshot,
@@ -5,6 +7,18 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { isProjectHierarchyTreeDocumentSiblingRow } from '../functions/projectHierarchyTreeDnD'
+
+function projectHierarchyTreeUnderTagDragResult (
+  committed: boolean
+): I_faProjectHierarchyTreeDragCommitResult {
+  const emptiedParentDocumentIds: string[] = []
+  return {
+    committed,
+    emptiedParentDocumentIds,
+    nestParentDocumentId: null,
+    reloadChildrenNodeId: null
+  }
+}
 
 function readPersistSiblingOrder (
   siblings: I_faProjectHierarchyTreeHeTreeNode[],
@@ -38,35 +52,22 @@ export async function persistProjectHierarchyTreeDraggedDocumentUnderTagReorder 
     return isProjectHierarchyTreeDocumentSiblingRow(row)
   })
   const orderedDocumentIds = readPersistSiblingOrder(siblings, input.dragSiblingOrderSnapshot)
-  try {
-    const api = window.faContentBridgeAPIs?.projectContent
-    if (typeof api?.reorderDocumentsUnderTag !== 'function') {
-      return {
-        committed: false,
-        emptiedParentDocumentIds: [],
-        nestParentDocumentId: null,
-        reloadChildrenNodeId: null
-      }
-    }
-    await api.reorderDocumentsUnderTag({
+  const api = window.faContentBridgeAPIs?.projectContent
+  if (typeof api?.reorderDocumentsUnderTag !== 'function') {
+    return projectHierarchyTreeUnderTagDragResult(false)
+  }
+  const reordered = await ResultAsync.fromPromise(
+    api.reorderDocumentsUnderTag({
       orderedDocumentIds,
       tagId
-    })
-    return {
-      committed: true,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null,
-      reloadChildrenNodeId: null
-    }
-  } catch (error) {
-    console.error('[ProjectHierarchyTree] reorderDocumentsUnderTag failed', error)
+    }),
+    (error: unknown) => error
+  )
+  if (reordered.isErr()) {
+    console.error('[ProjectHierarchyTree] reorderDocumentsUnderTag failed', reordered.error)
     input.resyncTreeDataFromLayout()
     await input.refreshLayout()
-    return {
-      committed: false,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null,
-      reloadChildrenNodeId: null
-    }
+    return projectHierarchyTreeUnderTagDragResult(false)
   }
+  return projectHierarchyTreeUnderTagDragResult(true)
 }

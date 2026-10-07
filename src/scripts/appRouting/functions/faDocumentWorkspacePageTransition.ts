@@ -73,14 +73,18 @@ export function resolveFaAppShellPageTransitionForRouteChange (input: {
   toRoutePath: string
 }): T_faAppShellPageTransitionResolution {
   if (usesFaDocumentWorkspacePageTransition(input.fromRoutePath, input.toRoutePath)) {
+    const bindings = input.documentWorkspacePageTransitionBindings
+    const mode = 'out-in' as const
     return {
-      bindings: input.documentWorkspacePageTransitionBindings,
-      mode: 'out-in'
+      bindings,
+      mode
     }
   }
 
+  const bindings = input.shellPageTransitionBindings
+  const mode = 'out-in' as const
   return {
-    bindings: input.shellPageTransitionBindings,
-    mode: 'out-in'
+    bindings,
+    mode
   }
 }

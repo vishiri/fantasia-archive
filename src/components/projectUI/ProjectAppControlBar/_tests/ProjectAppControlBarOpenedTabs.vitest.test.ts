@@ -125,6 +125,7 @@ vi.mock('../scripts/projectAppControlBar_manager', () => {
         return { ...tab }
       })
       return {
+        onTabsDragStart: () => undefined,
         onTabsDragEnd: (event: { newIndex?: number, oldIndex?: number }) => {
           onTabsDragEnd(event)
           const { oldIndex, newIndex } = event

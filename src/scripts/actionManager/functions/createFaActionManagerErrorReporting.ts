@@ -136,12 +136,24 @@ export function createFaActionManagerErrorReporting (deps: T_createFaActionManag
   normalizeFaActionError: (error: unknown) => { name: string, message: string, stack?: string }
   reportFaActionFailure: (entry: I_faActionQueueEntry, error: unknown) => I_faActionFailureLog
 } {
+  const buildFaActionFailureHistoryPayloadPreviewBound = (error: unknown): string | undefined => {
+    return buildFaActionFailureHistoryPayloadPreview(deps, error)
+  }
+  const buildFaActionPayloadPreviewBound = (payload: unknown, maxLength?: number): string => {
+    return buildFaActionPayloadPreview(deps, payload, maxLength)
+  }
   const normalizeFaActionError = deps.normalizeFaActionError
+  const reportFaActionFailureBound = (
+    entry: I_faActionQueueEntry,
+    error: unknown
+  ): I_faActionFailureLog => {
+    return reportFaActionFailure(deps, entry, error)
+  }
 
   return {
-    buildFaActionFailureHistoryPayloadPreview: (error) => buildFaActionFailureHistoryPayloadPreview(deps, error),
-    buildFaActionPayloadPreview: (payload, maxLength) => buildFaActionPayloadPreview(deps, payload, maxLength),
+    buildFaActionFailureHistoryPayloadPreview: buildFaActionFailureHistoryPayloadPreviewBound,
+    buildFaActionPayloadPreview: buildFaActionPayloadPreviewBound,
     normalizeFaActionError,
-    reportFaActionFailure: (entry, error) => reportFaActionFailure(deps, entry, error)
+    reportFaActionFailure: reportFaActionFailureBound
   }
 }

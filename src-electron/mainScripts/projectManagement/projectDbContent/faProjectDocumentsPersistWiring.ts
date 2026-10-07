@@ -39,6 +39,10 @@ import {
 import { getFaProjectDocumentById } from './faProjectDocumentsQueryWiring'
 import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
 import {
+  assertFaProjectDocumentTreeParentOnWrite,
+  assertFaProjectHierarchySamePlacementParent
+} from './faProjectHierarchyTreeSqlWiring'
+import {
   deleteFaProjectEmptyTagsByIds,
   listFaProjectTagIdsForDocument
 } from './faProjectTagsSqlHelpersWiring'
@@ -80,6 +84,9 @@ export function createFaProjectDocument (
     templateId,
     input.placementId
   )
+  if (placementId !== null) {
+    assertFaProjectHierarchySamePlacementParent(db, placementId, parentDocumentId)
+  }
   const sortOrder = resolveFaProjectDocumentSortOrderForCreate(
     db,
     placementId,
@@ -163,6 +170,14 @@ export function updateFaProjectDocument (
   const nextParentDocumentId = patch.parentDocumentId !== undefined
     ? patch.parentDocumentId
     : existingRow.tree_parent_document_id
+  assertFaProjectDocumentTreeParentOnWrite(
+    db,
+    id,
+    nextPlacementId,
+    existingRow.tree_placement_id,
+    nextParentDocumentId,
+    existingRow.tree_parent_document_id
+  )
   const nextSortOrder = patch.sortOrder ?? existingRow.tree_custom_sort_order
   const nextDisplayName = patch.displayName ?? existingRow.display_name
   const { documentBackgroundColor: nextDocumentBackgroundColor, documentTextColor: nextDocumentTextColor } =

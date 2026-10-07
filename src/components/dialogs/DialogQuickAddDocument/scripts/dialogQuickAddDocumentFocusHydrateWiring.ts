@@ -34,10 +34,6 @@ export function cancelDialogQuickAddDocumentTemplateFocus (
 /**
  * FA 1.0-style timing (nextTick + sleep) + opt-in FaSelectInput openPopup.
  * First-option keyboard highlight is owned by FaSelectInput on popup-show.
- */
-/**
- * FA 1.0-style timing (nextTick + sleep) + opt-in FaSelectInput openPopup.
- * First-option keyboard highlight is owned by FaSelectInput on popup-show.
  * Retries openPopup once: Quasar showPopup with onFilter requires focused; after another
  * select's hidePopup, Quasar focus-manager wait flags can defer focus so the first
  * showPopup's filter() bails with menu still closed.
@@ -111,21 +107,26 @@ export function bindDialogQuickAddDocumentTemplateSelectRef (
 export async function hydrateDialogQuickAddDocumentWorlds (
   deps: I_createUseDialogQuickAddDocumentDeps,
   session: {
+    focusGeneration: I_ref<number>
     selectedTemplateId: I_ref<string | null>
     selectedWorldId: I_ref<string | null>
     templatesById: I_ref<Map<string, I_dialogQuickAddDocumentTemplateSource>>
     worlds: I_ref<I_dialogQuickAddDocumentWorldSource[]>
   }
 ): Promise<void> {
+  const focusGeneration = session.focusGeneration.value
   const sources = await deps.loadQuickAddDocumentSources()
-  session.worlds.value = sources.worlds
+  const savedWorldId = await deps.readLastSelectedWorldId()
+  if (session.focusGeneration.value !== focusGeneration) {
+    return
+  }
   const nextMap = new Map<string, I_dialogQuickAddDocumentTemplateSource>()
   for (const template of sources.templates) {
     nextMap.set(template.id, template)
   }
+  session.worlds.value = sources.worlds
   session.templatesById.value = nextMap
   session.selectedTemplateId.value = null
-  const savedWorldId = await deps.readLastSelectedWorldId()
   session.selectedWorldId.value = deps.pickWorldIdWithSavedPreference({
     worlds: sources.worlds,
     savedWorldId,
@@ -139,6 +140,7 @@ export async function hydrateDialogQuickAddDocumentWorlds (
 export async function hydrateDialogQuickAddDocumentSources (
   deps: I_createUseDialogQuickAddDocumentDeps,
   session: {
+    focusGeneration: I_ref<number>
     selectedTemplateId: I_ref<string | null>
     selectedWorldId: I_ref<string | null>
     templatesById: I_ref<Map<string, I_dialogQuickAddDocumentTemplateSource>>

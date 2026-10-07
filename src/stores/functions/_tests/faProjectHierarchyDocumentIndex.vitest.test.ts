@@ -108,6 +108,34 @@ test('Test that document index lists sorted children and derives hasChildren', (
 })
 
 /**
+ * listFaProjectHierarchyDocumentIndexPlacementChildren
+ * A child in another placement does not mark the parent as having children.
+ */
+test('Test that document index hasChildren ignores a cross-placement child', () => {
+  const index = createFaProjectHierarchyDocumentIndex()
+  replaceFaProjectHierarchyDocumentIndexFromDocuments(index, [
+    sampleDocument({
+      displayName: 'Parent',
+      id: 'parent-only',
+      sortOrder: 0
+    }),
+    sampleDocument({
+      displayName: 'Other placement child',
+      id: 'other-child',
+      parentDocumentId: 'parent-only',
+      placementId: 'placement-2',
+      sortOrder: 0
+    })
+  ])
+  const crossPlacementRoot = listFaProjectHierarchyDocumentIndexPlacementChildren(index, {
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  expect(crossPlacementRoot.map((item) => item.id)).toEqual(['parent-only'])
+  expect(crossPlacementRoot[0]?.hasChildren).toBe(false)
+})
+
+/**
  * compareFaProjectHierarchyDocumentIndexOrder
  * ASCII NOCASE fold only A-Z; id is the last tie-break.
  */
@@ -342,6 +370,168 @@ test('Test that move no-ops for missing or unplaced documents', () => {
 
 /**
  * applyFaProjectHierarchyDocumentIndexReindex
+ * Null root parent is a real bucket, not a missing parent.
+ */
+test('Test that reindex compacts the root bucket after a document leaves it', () => {
+  const index = createFaProjectHierarchyDocumentIndex()
+  replaceFaProjectHierarchyDocumentIndexFromDocuments(index, [
+    sampleDocument({
+      displayName: 'A',
+      id: 'a',
+      parentDocumentId: null,
+      sortOrder: 0
+    }),
+    sampleDocument({
+      displayName: 'B',
+      id: 'b',
+      parentDocumentId: null,
+      sortOrder: 1
+    }),
+    sampleDocument({
+      displayName: 'C',
+      id: 'c',
+      parentDocumentId: null,
+      sortOrder: 2
+    })
+  ])
+  applyFaProjectHierarchyDocumentIndexReindex(index, {
+    movedDocumentId: 'b',
+    orderedDocumentIds: ['b'],
+    parentDocumentId: 'a',
+    placementId: 'placement-1'
+  }, documentIndexMutationDeps)
+  const root = listFaProjectHierarchyDocumentIndexPlacementChildren(index, {
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  expect(root.map((item) => item.id)).toEqual(['a', 'c'])
+  expect(root.map((item) => item.sortOrder)).toEqual([0, 1])
+})
+
+/**
+ * applyFaProjectHierarchyDocumentIndexReindex
+ * A partial cross-parent order must keep destination siblings the tree did not list.
+ */
+test('Test that reindex keeps unloaded destination siblings when nesting one document', () => {
+  const index = createFaProjectHierarchyDocumentIndex()
+  replaceFaProjectHierarchyDocumentIndexFromDocuments(index, [
+    sampleDocument({
+      displayName: 'Alpha',
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      sortOrder: 0
+    }),
+    sampleDocument({
+      displayName: 'Middle',
+      id: 'middle',
+      parentDocumentId: 'parent',
+      sortOrder: 1
+    }),
+    sampleDocument({
+      displayName: 'Beta',
+      id: 'beta',
+      parentDocumentId: 'parent',
+      sortOrder: 2
+    }),
+    sampleDocument({
+      displayName: 'Moved',
+      id: 'moved',
+      parentDocumentId: null,
+      sortOrder: 0
+    })
+  ])
+  applyFaProjectHierarchyDocumentIndexReindex(index, {
+    movedDocumentId: 'moved',
+    orderedDocumentIds: ['alpha', 'moved', 'beta'],
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  }, documentIndexMutationDeps)
+  const nested = listFaProjectHierarchyDocumentIndexPlacementChildren(index, {
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  })
+  expect(nested.map((item) => item.id)).toEqual(['alpha', 'moved', 'middle', 'beta'])
+  expect(nested.map((item) => item.sortOrder)).toEqual([0, 1, 2, 3])
+})
+
+test('Test that reindex fills destination gaps before the first ordered anchor', () => {
+  const index = createFaProjectHierarchyDocumentIndex()
+  replaceFaProjectHierarchyDocumentIndexFromDocuments(index, [
+    sampleDocument({
+      displayName: 'Alpha',
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      sortOrder: 0
+    }),
+    sampleDocument({
+      displayName: 'Middle',
+      id: 'middle',
+      parentDocumentId: 'parent',
+      sortOrder: 1
+    }),
+    sampleDocument({
+      displayName: 'Beta',
+      id: 'beta',
+      parentDocumentId: 'parent',
+      sortOrder: 2
+    }),
+    sampleDocument({
+      displayName: 'Moved',
+      id: 'moved',
+      parentDocumentId: null,
+      sortOrder: 0
+    })
+  ])
+  applyFaProjectHierarchyDocumentIndexReindex(index, {
+    movedDocumentId: 'moved',
+    orderedDocumentIds: ['beta', 'alpha', 'moved'],
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  }, documentIndexMutationDeps)
+  const nested = listFaProjectHierarchyDocumentIndexPlacementChildren(index, {
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  })
+  expect(nested.map((item) => item.id)).toEqual(['middle', 'beta', 'alpha', 'moved'])
+})
+
+test('Test that reindex appends destination siblings after the last ordered anchor', () => {
+  const index = createFaProjectHierarchyDocumentIndex()
+  replaceFaProjectHierarchyDocumentIndexFromDocuments(index, [
+    sampleDocument({
+      displayName: 'Alpha',
+      id: 'alpha',
+      parentDocumentId: 'parent',
+      sortOrder: 0
+    }),
+    sampleDocument({
+      displayName: 'Tail',
+      id: 'tail',
+      parentDocumentId: 'parent',
+      sortOrder: 1
+    }),
+    sampleDocument({
+      displayName: 'Moved',
+      id: 'moved',
+      parentDocumentId: null,
+      sortOrder: 0
+    })
+  ])
+  applyFaProjectHierarchyDocumentIndexReindex(index, {
+    movedDocumentId: 'moved',
+    orderedDocumentIds: ['alpha', 'moved'],
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  }, documentIndexMutationDeps)
+  const nested = listFaProjectHierarchyDocumentIndexPlacementChildren(index, {
+    parentDocumentId: 'parent',
+    placementId: 'placement-1'
+  })
+  expect(nested.map((item) => item.id)).toEqual(['alpha', 'moved', 'tail'])
+})
+
+/**
+ * applyFaProjectHierarchyDocumentIndexReindex
  * Skips unknown ids and same-parent compact of the source bucket.
  */
 test('Test that reindex skips unknown ids and same-parent buckets', () => {
@@ -418,6 +608,11 @@ test('Test that sibling sort shift skips other buckets and lower sort orders', (
       id: 'other-parent',
       parentDocumentId: 'p',
       sortOrder: 2
+    }),
+    sampleDocument({
+      displayName: 'Excluded',
+      id: 'exclude',
+      sortOrder: 4
     })
   ])
   shiftFaProjectHierarchyDocumentIndexSiblingSortOrders(index, 'placement-1', null, 2, 1, 'exclude')
@@ -425,6 +620,7 @@ test('Test that sibling sort shift skips other buckets and lower sort orders', (
   expect(index.byId.get('mid')?.sortOrder).toBe(3)
   expect(index.byId.get('other-place')?.sortOrder).toBe(2)
   expect(index.byId.get('other-parent')?.sortOrder).toBe(2)
+  expect(index.byId.get('exclude')?.sortOrder).toBe(4)
 })
 
 /**

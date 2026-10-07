@@ -1,5 +1,20 @@
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+const childLoadGenerationByNodeId = new Map<string, number>()
+
+/**
+ * Bumps the in-flight child-list generation for one tree node.
+ * The returned checker is false after a newer load for that node starts.
+ */
+export function beginProjectHierarchyTreeChildLoad (nodeId: string): () => boolean {
+  const nextGeneration = (childLoadGenerationByNodeId.get(nodeId) ?? 0) + 1
+  childLoadGenerationByNodeId.set(nodeId, nextGeneration)
+  const isStillCurrent = (): boolean => {
+    return childLoadGenerationByNodeId.get(nodeId) === nextGeneration
+  }
+  return isStillCurrent
+}
+
 /**
  * True when listPlacementDocumentChildren failed because the parent document row is gone.
  */

@@ -1,6 +1,7 @@
 import { Notify } from 'quasar'
 import { ResultAsync } from 'neverthrow'
 
+import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsUpdatePatch } from 'app/types/I_faKeybindsBridgeUpdate'
 import { i18n } from 'app/i18n/externalFileLoader'
 
@@ -8,9 +9,30 @@ import { i18n } from 'app/i18n/externalFileLoader'
  * Persists keybind overrides via the preload bridge, refreshes snapshot, and surfaces a success toast.
  * Save failures are reported through the central faActionManager (one toast + console row); this module only writes a debugging console log on the catch branch.
  */
+async function refreshFaKeybindsAfterSave (
+  patch: I_faKeybindsUpdatePatch,
+  refreshKeybinds: () => Promise<void>,
+  applySavedOverrides: ((overrides: I_faKeybindsRoot['overrides']) => boolean) | undefined
+): Promise<boolean> {
+  try {
+    await refreshKeybinds()
+    return true
+  } catch (error: unknown) {
+    console.error('[S_FaKeybinds] refresh after setKeybinds failed', error)
+    if (patch.replaceAllOverrides !== true || patch.overrides === undefined) {
+      return false
+    }
+    if (applySavedOverrides === undefined) {
+      return false
+    }
+    return applySavedOverrides(patch.overrides)
+  }
+}
+
 export async function runFaKeybindsUpdateKeybinds (
   patch: I_faKeybindsUpdatePatch,
-  refreshKeybinds: () => Promise<void>
+  refreshKeybinds: () => Promise<void>,
+  applySavedOverrides?: (overrides: I_faKeybindsRoot['overrides']) => boolean
 ): Promise<boolean> {
   const api = window.faContentBridgeAPIs?.faKeybinds
   if (typeof api?.setKeybinds !== 'function') {
@@ -28,7 +50,10 @@ export async function runFaKeybindsUpdateKeybinds (
     return false
   }
 
-  await refreshKeybinds()
+  const refreshed = await refreshFaKeybindsAfterSave(patch, refreshKeybinds, applySavedOverrides)
+  if (!refreshed) {
+    return false
+  }
 
   Notify.create({
     group: false,

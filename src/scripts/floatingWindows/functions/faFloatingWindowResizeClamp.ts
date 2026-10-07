@@ -20,6 +20,20 @@ interface I_faFloatingWindowResizeClampWork {
   y0: number
 }
 
+function faFloatingWindowResizeClampedRect (
+  x: number,
+  y: number,
+  w: number,
+  h: number
+): { x: number; y: number; w: number; h: number } {
+  return {
+    h,
+    w,
+    x,
+    y
+  }
+}
+
 function clampFaFloatingWindowResizeToViewportForEdge (
   edge: T_faFloatingWindowResizeEdge,
   c: I_faFloatingWindowResizeClampWork
@@ -28,82 +42,58 @@ function clampFaFloatingWindowResizeToViewportForEdge (
     case 'e': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.vw - c.mr - c.x0))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.vh - c.mb - c.y0))
-      return {
-        h,
-        w,
-        x: c.x0,
-        y: c.y0
-      }
+      const x = c.x0
+      const y = c.y0
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'w': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.anchorRight - c.ml))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.vh - c.mb - c.y0))
-      return {
-        h,
-        w,
-        x: c.anchorRight - w,
-        y: c.y0
-      }
+      const x = c.anchorRight - w
+      const y = c.y0
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 's': {
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.vh - c.mb - c.y0))
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.vw - c.mr - c.x0))
-      return {
-        h,
-        w,
-        x: c.x0,
-        y: c.y0
-      }
+      const x = c.x0
+      const y = c.y0
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'n': {
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.anchorBottom - c.mt))
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.vw - c.mr - c.x0))
-      return {
-        h,
-        w,
-        x: c.x0,
-        y: c.anchorBottom - h
-      }
+      const x = c.x0
+      const y = c.anchorBottom - h
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'nw': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.anchorRight - c.ml))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.anchorBottom - c.mt))
-      return {
-        h,
-        w,
-        x: c.anchorRight - w,
-        y: c.anchorBottom - h
-      }
+      const x = c.anchorRight - w
+      const y = c.anchorBottom - h
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'ne': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.vw - c.mr - c.x0))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.anchorBottom - c.mt))
-      return {
-        h,
-        w,
-        x: c.x0,
-        y: c.anchorBottom - h
-      }
+      const x = c.x0
+      const y = c.anchorBottom - h
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'sw': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.anchorRight - c.ml))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.vh - c.mb - c.y0))
-      return {
-        h,
-        w,
-        x: c.anchorRight - w,
-        y: c.y0
-      }
+      const x = c.anchorRight - w
+      const y = c.y0
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
     case 'se': {
       const w = Math.max(c.minW, Math.min(c.candidate.w, c.vw - c.mr - c.x0))
       const h = Math.max(c.minH, Math.min(c.candidate.h, c.vh - c.mb - c.y0))
-      return {
-        h,
-        w,
-        x: c.x0,
-        y: c.y0
-      }
+      const x = c.x0
+      const y = c.y0
+      return faFloatingWindowResizeClampedRect(x, y, w, h)
     }
   }
 }

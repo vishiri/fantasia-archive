@@ -1,10 +1,30 @@
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
+const HEX_COLOR_SHORT = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/
 
 /**
- * True when value is a stored worlds.color / palette segment (#RRGGBB).
+ * Normalizes a world color or palette segment to uppercase #RRGGBB.
+ * #RGB expands. Other text returns null.
+ */
+export function resolveFaProjectWorldStorageHexColor (value: string): string | null {
+  const trimmed = value.trim()
+  if (HEX_COLOR_SEGMENT.test(trimmed)) {
+    return trimmed.toUpperCase()
+  }
+  const shortMatch = HEX_COLOR_SHORT.exec(trimmed)
+  if (shortMatch === null) {
+    return null
+  }
+  const red = shortMatch[1] ?? ''
+  const green = shortMatch[2] ?? ''
+  const blue = shortMatch[3] ?? ''
+  return `#${red}${red}${green}${green}${blue}${blue}`.toUpperCase()
+}
+
+/**
+ * True when value is a worlds.color / palette segment (#RRGGBB or #RGB shorthand).
  */
 export function isFaProjectWorldStorageHexColor (value: string): boolean {
-  return HEX_COLOR_SEGMENT.test(value.trim())
+  return resolveFaProjectWorldStorageHexColor(value) !== null
 }
 
 /**
@@ -14,24 +34,21 @@ export function faProjectWorldColorPaletteContainsHex (
   colorPalette: string,
   hex: string
 ): boolean {
-  const part = hex.trim()
-  if (!HEX_COLOR_SEGMENT.test(part)) {
+  const resolved = resolveFaProjectWorldStorageHexColor(hex)
+  if (resolved === null) {
     return false
   }
-  const key = part.toLowerCase()
+  const key = resolved.toLowerCase()
   const trimmed = colorPalette.trim()
   if (trimmed.length === 0) {
     return false
   }
   for (const segment of trimmed.split(';')) {
-    const segmentPart = segment.trim()
-    if (segmentPart.length === 0) {
+    const segmentHex = resolveFaProjectWorldStorageHexColor(segment)
+    if (segmentHex === null) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(segmentPart)) {
-      continue
-    }
-    if (segmentPart.toLowerCase() === key) {
+    if (segmentHex.toLowerCase() === key) {
       return true
     }
   }
@@ -47,22 +64,21 @@ export function appendFaProjectWorldColorPaletteHex (
   appendHex: string,
   maxLength: number
 ): string | null {
-  const part = appendHex.trim()
-  if (!HEX_COLOR_SEGMENT.test(part)) {
+  const upper = resolveFaProjectWorldStorageHexColor(appendHex)
+  if (upper === null) {
     return null
   }
-  const upper = part.toUpperCase()
-  if (faProjectWorldColorPaletteContainsHex(colorPalette, upper)) {
+  const base = parseFaProjectWorldColorPaletteToHexListPreservingDuplicates(colorPalette).join(';')
+  if (faProjectWorldColorPaletteContainsHex(base, upper)) {
     return null
   }
-  if (wouldFaProjectWorldColorPaletteExceedMaxLength(colorPalette, upper, maxLength)) {
+  if (wouldFaProjectWorldColorPaletteExceedMaxLength(base, upper, maxLength)) {
     return null
   }
-  const trimmed = colorPalette.trim()
-  if (trimmed.length === 0) {
+  if (base.length === 0) {
     return upper
   }
-  return `${trimmed};${upper}`
+  return `${base};${upper}`
 }
 
 /**
@@ -81,10 +97,11 @@ export function hasFaProjectWorldColorPaletteCaseInsensitiveDuplicates (
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const segmentHex = resolveFaProjectWorldStorageHexColor(part)
+    if (segmentHex === null) {
       continue
     }
-    const key = part.toLowerCase()
+    const key = segmentHex.toLowerCase()
     if (seen.has(key)) {
       return true
     }
@@ -110,10 +127,10 @@ export function parseFaProjectWorldColorPaletteToHexList (colorPalette: string):
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const upper = resolveFaProjectWorldStorageHexColor(part)
+    if (upper === null) {
       continue
     }
-    const upper = part.toUpperCase()
     const key = upper.toLowerCase()
     if (seen.has(key)) {
       continue
@@ -148,10 +165,11 @@ export function parseFaProjectWorldColorPaletteToHexListPreservingDuplicates (
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const upper = resolveFaProjectWorldStorageHexColor(part)
+    if (upper === null) {
       continue
     }
-    hexList.push(part.toUpperCase())
+    hexList.push(upper)
   }
   return hexList
 }
@@ -168,10 +186,11 @@ export function serializeFaProjectWorldColorPaletteFromHexList (
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const upper = resolveFaProjectWorldStorageHexColor(part)
+    if (upper === null) {
       continue
     }
-    normalized.push(part.toUpperCase())
+    normalized.push(upper)
   }
   return normalized.join(';')
 }
@@ -188,10 +207,11 @@ export function collectFaProjectWorldColorPaletteDuplicateHexKeys (
     if (part.length === 0) {
       continue
     }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
+    const segmentHex = resolveFaProjectWorldStorageHexColor(part)
+    if (segmentHex === null) {
       continue
     }
-    const key = part.toLowerCase()
+    const key = segmentHex.toLowerCase()
     counts.set(key, (counts.get(key) ?? 0) + 1)
   }
   const duplicateKeys = new Set<string>()
@@ -211,8 +231,8 @@ export function wouldFaProjectWorldColorPaletteExceedMaxLength (
   appendHex: string,
   maxLength: number
 ): boolean {
-  const normalizedAppend = appendHex.trim().toUpperCase()
-  if (!HEX_COLOR_SEGMENT.test(normalizedAppend)) {
+  const normalizedAppend = resolveFaProjectWorldStorageHexColor(appendHex)
+  if (normalizedAppend === null) {
     return true
   }
   const trimmed = colorPalette.trim()

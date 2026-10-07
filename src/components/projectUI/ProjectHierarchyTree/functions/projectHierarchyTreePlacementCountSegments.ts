@@ -22,27 +22,30 @@ export function resolveProjectHierarchyTreePlacementCountSegments (input: {
   const doubleDashDivider = input.doubleDashDocCount
 
   if (input.disableDocumentCounts && input.disableCategoryCount) {
+    const segments: I_projectHierarchyTreePlacementCountSegment[] = []
     return {
       doubleDashDivider,
-      segments: [],
+      segments,
       showDivider: false,
       shows: false
     }
   }
 
   if (input.disableDocumentCounts) {
+    const segments = [categorySegment]
     return {
       doubleDashDivider,
-      segments: [categorySegment],
+      segments,
       showDivider: false,
       shows: true
     }
   }
 
   if (input.disableCategoryCount) {
+    const segments = [documentSegment]
     return {
       doubleDashDivider,
-      segments: [documentSegment],
+      segments,
       showDivider: false,
       shows: true
     }

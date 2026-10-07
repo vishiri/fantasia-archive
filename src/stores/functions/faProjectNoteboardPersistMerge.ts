@@ -4,18 +4,41 @@ import type {
 } from 'app/types/I_faProjectNoteboardDomain'
 
 /**
- * After a silent partial KV write, merges read-back text with in-memory draft when the patch omitted 'text'.
+ * After a silent partial KV write, keeps in-memory text when the patch omitted 'text' or the draft changed during the round trip.
  */
 export function mergeProjectNoteboardRootAfterSilentPersist (
   snapshot: I_faProjectNoteboardRoot,
   patch: I_faProjectNoteboardPatch,
-  textSnapshotBeforePersist: string
+  currentText: string,
+  textAtStart: string
 ): I_faProjectNoteboardRoot {
-  if (patch.text === undefined) {
-    return {
+  const textChangedDuringSave = currentText !== textAtStart
+  if (patch.text === undefined || textChangedDuringSave) {
+    const keptText = {
       ...snapshot,
-      text: textSnapshotBeforePersist
+      text: currentText
     }
+    return keptText
   }
   return snapshot
+}
+
+/**
+ * After a noteboard read, keeps text the user typed while that read was in flight.
+ */
+export function mergeNoteboardRootKeepingTextTypedDuringRead<T extends {
+  text: string
+}> (
+  snapshot: T,
+  currentText: string,
+  textAtStart: string
+): T {
+  if (currentText === textAtStart) {
+    return snapshot
+  }
+  const keptText = {
+    ...snapshot,
+    text: currentText
+  }
+  return keptText
 }

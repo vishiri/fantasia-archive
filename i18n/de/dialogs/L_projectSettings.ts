@@ -1,5 +1,6 @@
 export default {
   title: 'Projekteinstellungen',
+  loadError: 'Projekteinstellungen konnten nicht geladen werden.',
   closeButton: 'Schließen ohne zu speichern',
   saveButton: 'Einstellungen speichern',
   saveWithoutClosingButton: 'Speichern ohne zu schließen',

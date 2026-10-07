@@ -103,7 +103,26 @@ test('Test that updateDialogProjectSettingsWorldDraftDisplayNameTranslations no-
 test('Test that updateDialogProjectSettingsWorldDraftColor updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   updateDialogProjectSettingsWorldDraftColor(localWorlds, baseWorld.id, '#aabbcc')
-  expect(localWorlds.value?.[0]!.color).toBe('#aabbcc')
+  expect(localWorlds.value?.[0]!.color).toBe('#AABBCC')
+})
+
+/**
+ * updateDialogProjectSettingsWorldDraftColor
+ * Same stored hex in another case does not rewrite the draft.
+ * Short #RGB expands. Text that is not a hex stays as typed.
+ */
+test('Test that updateDialogProjectSettingsWorldDraftColor keeps an equivalent hex and expands short form', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([{
+    ...baseWorld,
+    color: '#112233'
+  }])
+  const worldsBefore = localWorlds.value
+  updateDialogProjectSettingsWorldDraftColor(localWorlds, baseWorld.id, '#112233')
+  expect(localWorlds.value).toBe(worldsBefore)
+  updateDialogProjectSettingsWorldDraftColor(localWorlds, baseWorld.id, ' #abC ')
+  expect(localWorlds.value?.[0]!.color).toBe('#AABBCC')
+  updateDialogProjectSettingsWorldDraftColor(localWorlds, baseWorld.id, 'nope')
+  expect(localWorlds.value?.[0]!.color).toBe('nope')
 })
 
 /**
@@ -124,6 +143,25 @@ test('Test that updateDialogProjectSettingsWorldDraftColorPalette updates the ma
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#112233;#445566')
   expect(localWorlds.value?.[0]!.colorPalette).toBe('#112233;#445566')
+})
+
+/**
+ * updateDialogProjectSettingsWorldDraftColorPalette
+ * Same colors in another case do not rewrite the draft.
+ * A repeated color is a real change. Order is a real change.
+ */
+test('Test that updateDialogProjectSettingsWorldDraftColorPalette keeps an equivalent palette', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([{
+    ...baseWorld,
+    colorPalette: '#aabbcc;#112233'
+  }])
+  const worldsBefore = localWorlds.value
+  updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#AABBCC;#112233')
+  expect(localWorlds.value).toBe(worldsBefore)
+  updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#112233;#AABBCC')
+  expect(localWorlds.value?.[0]!.colorPalette).toBe('#112233;#AABBCC')
+  updateDialogProjectSettingsWorldDraftColorPalette(localWorlds, baseWorld.id, '#112233;#AABBCC;#112233')
+  expect(localWorlds.value?.[0]!.colorPalette).toBe('#112233;#AABBCC;#112233')
 })
 
 /**

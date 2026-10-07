@@ -11,6 +11,7 @@ import {
   FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TAGS,
+  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_TAGS
 } from '../functions/faProjectDbSchemaDdl'
 import {
@@ -20,17 +21,52 @@ import {
 } from './faProjectTagsSqlHelpersWiring'
 import type {
   I_faProjectDocumentTagListResult,
+  I_faProjectDocumentTagRef,
   I_faProjectListDocumentsUnderTagResult,
   I_faProjectListTagsWithDocumentCountsForWorldResult,
   I_faProjectTag,
   I_faProjectTagDocumentChild,
-  I_faProjectTagListResult
+  I_faProjectTagListResult,
+  I_faProjectTagWithDocumentCount
 } from 'app/types/I_faProjectTagDomain'
 import type { I_faSqlTagRow } from 'app/types/I_faProjectTagDomain'
+
+interface I_faSqlTagCountRow {
+  id: string
+  name: string
+  category_count: number
+  document_count: number
+}
+
+function mapFaProjectTagWithDocumentCountsRow (
+  row: I_faSqlTagCountRow
+): I_faProjectTagWithDocumentCount {
+  const id = row.id
+  const name = row.name
+  const categoryCount = Number(row.category_count) || 0
+  const documentCount = Number(row.document_count) || 0
+  return {
+    id,
+    name,
+    categoryCount,
+    documentCount
+  }
+}
 
 interface I_faSqlDocumentTagRefRow {
   id: string
   name: string
+}
+
+function mapFaProjectDocumentTagRefRow (
+  row: I_faSqlDocumentTagRefRow
+): I_faProjectDocumentTagRef {
+  const id = row.id
+  const name = row.name
+  return {
+    id,
+    name
+  }
 }
 
 interface I_faSqlTagDocumentChildRow {
@@ -46,6 +82,43 @@ interface I_faSqlTagDocumentChildRow {
   tree_order_number: number
   extra_classes: string
   sort_order: number
+  created_at_ms: number
+  template_icon: string | null
+}
+
+function mapFaProjectTagDocumentChildRow (
+  row: I_faSqlTagDocumentChildRow
+): I_faProjectTagDocumentChild {
+  const documentId = row.document_id
+  const displayName = row.display_name
+  const templateId = row.template_id
+  const isCategory = row.is_category === 1
+  const isFinished = row.is_finished === 1
+  const isMinor = row.is_minor === 1
+  const isDead = row.is_dead === 1
+  const documentTextColor = row.document_text_color
+  const documentBackgroundColor = row.document_background_color
+  const treeOrderNumber = row.tree_order_number
+  const extraClasses = row.extra_classes
+  const sortOrder = row.sort_order
+  const createdAtMs = row.created_at_ms
+  const templateIcon = row.template_icon ?? ''
+  return {
+    documentId,
+    createdAtMs,
+    displayName,
+    templateId,
+    isCategory,
+    isFinished,
+    isMinor,
+    isDead,
+    documentTextColor,
+    documentBackgroundColor,
+    treeOrderNumber,
+    extraClasses,
+    sortOrder,
+    templateIcon
+  }
 }
 
 export function listFaProjectTagsForWorld (db: Database, worldId: string): I_faProjectTagListResult {
@@ -55,7 +128,10 @@ export function listFaProjectTagsForWorld (db: Database, worldId: string): I_faP
         'WHERE world_id = ? ORDER BY name COLLATE NOCASE ASC, created_at_ms ASC'
     )
     .all(worldId) as I_faSqlTagRow[]
-  return { items: rows.map(mapFaProjectTagRow) }
+  const items = rows.map(mapFaProjectTagRow)
+  return {
+    items
+  }
 }
 
 export function listFaProjectTagsWithDocumentCountsForWorld (
@@ -74,19 +150,10 @@ export function listFaProjectTagsWithDocumentCountsForWorld (
         'GROUP BY t.id ' +
         'ORDER BY t.name COLLATE NOCASE ASC, t.created_at_ms ASC'
     )
-    .all(worldId) as Array<{
-      id: string
-      name: string
-      category_count: number
-      document_count: number
-    }>
+    .all(worldId) as I_faSqlTagCountRow[]
+  const items = rows.map(mapFaProjectTagWithDocumentCountsRow)
   return {
-    items: rows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      categoryCount: Number(row.category_count) || 0,
-      documentCount: Number(row.document_count) || 0
-    }))
+    items
   }
 }
 
@@ -103,11 +170,9 @@ export function listFaProjectDocumentTags (
         'ORDER BY t.name COLLATE NOCASE ASC'
     )
     .all(documentId) as I_faSqlDocumentTagRefRow[]
+  const items = rows.map(mapFaProjectDocumentTagRefRow)
   return {
-    items: rows.map((row) => ({
-      id: row.id,
-      name: row.name
-    }))
+    items
   }
 }
 
@@ -127,27 +192,15 @@ export function listFaProjectDocumentsUnderTag (
         `d.${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} AS document_background_color, ` +
         `d.${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN} AS tree_order_number, ` +
         `d.${FA_PROJECT_DOCUMENT_EXTRA_CLASSES_COLUMN} AS extra_classes, ` +
-        'dt.sort_order AS sort_order ' +
+        'dt.sort_order AS sort_order, d.created_at_ms AS created_at_ms, tpl.icon AS template_icon ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENT_TAGS} dt ` +
         `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENTS} d ON d.id = dt.document_id ` +
+        `LEFT JOIN ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} tpl ON tpl.id = d.template_id ` +
         'WHERE dt.tag_id = ? ' +
-        'ORDER BY dt.sort_order ASC, d.display_name COLLATE NOCASE ASC'
+        'ORDER BY dt.sort_order ASC, d.display_name COLLATE NOCASE ASC, d.created_at_ms ASC, d.id ASC'
     )
     .all(tagId) as I_faSqlTagDocumentChildRow[]
-  const items: I_faProjectTagDocumentChild[] = rows.map((row) => ({
-    documentId: row.document_id,
-    displayName: row.display_name,
-    templateId: row.template_id,
-    isCategory: row.is_category === 1,
-    isFinished: row.is_finished === 1,
-    isMinor: row.is_minor === 1,
-    isDead: row.is_dead === 1,
-    documentTextColor: row.document_text_color,
-    documentBackgroundColor: row.document_background_color,
-    treeOrderNumber: row.tree_order_number,
-    extraClasses: row.extra_classes,
-    sortOrder: row.sort_order
-  }))
+  const items = rows.map(mapFaProjectTagDocumentChildRow)
   return { items }
 }
 

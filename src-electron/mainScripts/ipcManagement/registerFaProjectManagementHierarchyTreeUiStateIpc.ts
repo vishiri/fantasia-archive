@@ -18,10 +18,13 @@ const FA_PROJECT_MANAGEMENT_FALLBACK_HIERARCHY_TREE_UI_STATE: I_faProjectHierarc
 function duplicateFaProjectHierarchyTreeUiStateSnapshot (
   next: I_faProjectHierarchyTreeUiState
 ): I_faProjectHierarchyTreeUiState {
+  const schemaVersion = next.schemaVersion
+  const expandedNodeIds = [...next.expandedNodeIds]
+  const scrollTopPx = next.scrollTopPx
   return {
-    schemaVersion: next.schemaVersion,
-    expandedNodeIds: [...next.expandedNodeIds],
-    scrollTopPx: next.scrollTopPx
+    schemaVersion,
+    expandedNodeIds,
+    scrollTopPx
   }
 }
 

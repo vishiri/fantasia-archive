@@ -84,6 +84,9 @@ export function createFaLocaleTranslationsInputMenuState (
   function onTranslationsMenuShow (): void {
     deps.scheduleFaLocaleTranslationsMenuInputFocus({
       focusMenuInput: () => {
+        if (!translationsMenuOpen.value) {
+          return
+        }
         const focusPreferredLanguageInput = options.readPreferredLanguageInputFocus()
         if (focusPreferredLanguageInput !== null) {
           focusPreferredLanguageInput()

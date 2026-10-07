@@ -18,9 +18,11 @@ const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_SIDEBAR: I_faProjectSidebarRoot = {
 function duplicateFaProjectSidebarSnapshot (
   next: I_faProjectSidebarRoot
 ): I_faProjectSidebarRoot {
+  const schemaVersion = next.schemaVersion
+  const widthPx = next.widthPx
   return {
-    schemaVersion: next.schemaVersion,
-    widthPx: next.widthPx
+    schemaVersion,
+    widthPx
   }
 }
 

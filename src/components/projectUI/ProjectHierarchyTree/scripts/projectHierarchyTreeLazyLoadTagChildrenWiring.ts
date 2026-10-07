@@ -22,6 +22,7 @@ export async function loadProjectHierarchyTreeTagNodeChildrenIfNeeded (deps: {
     nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
     nodeId: string
   ) => Promise<void>
+  isStillCurrent?: () => boolean
   stageLoadedChildrenForNode?: (
     nodeId: string,
     children: I_faProjectHierarchyTreeHeTreeNode[]
@@ -37,6 +38,9 @@ export async function loadProjectHierarchyTreeTagNodeChildrenIfNeeded (deps: {
     return true
   }
   const result = await listDocumentsUnderTag({ tagId })
+  if (deps.isStillCurrent !== undefined && !deps.isStillCurrent()) {
+    return true
+  }
   const children = mapProjectHierarchyTreeDocumentsUnderTagToNodes({
     items: result.items,
     resolvePlacementDisplayIcon: (icon) => {

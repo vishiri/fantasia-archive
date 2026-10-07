@@ -22,13 +22,23 @@ export function resolveHierarchyTreeDocumentNodeFromAnchor (
  */
 export function findProjectHierarchyTreeDocumentNodeByDocumentId (
   treeData: I_faProjectHierarchyTreeHeTreeNode[],
-  documentId: string
+  documentId: string,
+  options?: {
+    skipTagCopies?: boolean
+  }
 ): I_faProjectHierarchyTreeHeTreeNode | null {
+  const skipTagCopies = options?.skipTagCopies === true
   for (const node of treeData) {
-    if (node.nodeKind === 'document' && node.documentId === documentId) {
+    const tagId = node.tagId
+    const isTagCopy = typeof tagId === 'string' && tagId.length > 0
+    if (
+      node.nodeKind === 'document' &&
+      node.documentId === documentId &&
+      !(skipTagCopies && isTagCopy)
+    ) {
       return node
     }
-    const nested = findProjectHierarchyTreeDocumentNodeByDocumentId(node.children, documentId)
+    const nested = findProjectHierarchyTreeDocumentNodeByDocumentId(node.children, documentId, options)
     if (nested !== null) {
       return nested
     }

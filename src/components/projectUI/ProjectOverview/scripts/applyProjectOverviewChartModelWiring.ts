@@ -2,16 +2,32 @@ import type { I_faProjectDocumentDistributionResult } from 'app/types/I_faProjec
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 import type { I_faProjectOverviewChartSeries } from 'app/types/I_faProjectOverviewChart'
 
+import { Result } from 'neverthrow'
+
 import {
   buildProjectOverviewApexChartOptions
-} from '../functions/buildProjectOverviewApexChartOptions'
+} from './buildProjectOverviewApexChartOptionsWiring'
 import { buildProjectOverviewApexChartTooltipHtml } from '../functions/buildProjectOverviewApexChartTooltipHtml'
 import { buildProjectOverviewStackedChartModel } from '../functions/buildProjectOverviewStackedChartModel'
 import { createProjectOverviewApexTooltipCustom } from '../functions/createProjectOverviewApexTooltipCustom'
-import { parseProjectOverviewTranslationsJson } from '../functions/parseProjectOverviewTranslationsJson'
+import { mapProjectOverviewTranslationStrings } from '../functions/parseProjectOverviewTranslationsJson'
 import { resolveProjectOverviewApexColumnWidth } from '../functions/resolveProjectOverviewApexColumnWidth'
 import { resolveProjectOverviewGraphCardWidthPx } from '../functions/resolveProjectOverviewGraphCardWidth'
 import { attachProjectOverviewApexTooltipAboveBarEvents } from './projectOverviewApexTooltipAboveBarWiring'
+
+/**
+ * Best-effort parse of a translations JSON map for overview chart labels.
+ */
+export function parseProjectOverviewTranslationsJson (raw: string): Record<string, string> {
+  const parsed = Result.fromThrowable(
+    () => JSON.parse(raw) as unknown,
+    () => undefined
+  )().unwrapOr(undefined)
+  if (parsed === undefined) {
+    return {}
+  }
+  return mapProjectOverviewTranslationStrings(parsed)
+}
 
 /**
  * Applies distribution IPC payload into overview chart refs (series, options, width).

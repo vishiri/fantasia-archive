@@ -35,9 +35,9 @@ export function readFaProjectMediaUrlPathExtension (rawUrl: string): string {
     return ''
   }
   let path = trimmed
-  try {
+  if (URL.canParse(trimmed)) {
     path = new URL(trimmed).pathname
-  } catch {
+  } else {
     const cut = trimmed.split(/[?#]/)[0]
     path = cut ?? trimmed
   }

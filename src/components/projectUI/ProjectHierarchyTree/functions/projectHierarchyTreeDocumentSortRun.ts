@@ -182,6 +182,9 @@ export async function reindexProjectHierarchyTreeDocumentSortBucket (input: {
  * completedBuckets for partial UI refresh of buckets already persisted.
  */
 export async function runProjectHierarchyTreeDocumentSort (input: {
+  captureError: <T>(work: () => Promise<T>) => Promise<
+    { ok: true, value: T } | { ok: false, error: unknown }
+  >
   direction: T_faProjectHierarchyTreeDocumentSortDirection
   key: T_faProjectHierarchyTreeDocumentSortKey
   listPlacementDocumentChildren: (
@@ -199,8 +202,8 @@ export async function runProjectHierarchyTreeDocumentSort (input: {
     scope: input.scope
   })
   const completedBuckets: I_faProjectHierarchyTreeDocumentSortBucket[] = []
-  try {
-    for (const bucket of buckets) {
+  for (const bucket of buckets) {
+    const step = await input.captureError(async () => {
       await reindexProjectHierarchyTreeDocumentSortBucket({
         bucket,
         direction: input.direction,
@@ -208,21 +211,16 @@ export async function runProjectHierarchyTreeDocumentSort (input: {
         listPlacementDocumentChildren: input.listPlacementDocumentChildren,
         reindexDocumentSiblingsInHierarchy: input.reindexDocumentSiblingsInHierarchy
       })
-      completedBuckets.push(bucket)
-    }
-  } catch (error) {
-    if (error instanceof Error) {
+    })
+    if (!step.ok) {
+      const error = step.error instanceof Error ? step.error : new Error(String(step.error))
       const withBuckets = error as Error & {
         completedBuckets: I_faProjectHierarchyTreeDocumentSortBucket[]
       }
       withBuckets.completedBuckets = completedBuckets
       throw withBuckets
     }
-    const wrapped = new Error(String(error)) as Error & {
-      completedBuckets: I_faProjectHierarchyTreeDocumentSortBucket[]
-    }
-    wrapped.completedBuckets = completedBuckets
-    throw wrapped
+    completedBuckets.push(bucket)
   }
   return buckets
 }

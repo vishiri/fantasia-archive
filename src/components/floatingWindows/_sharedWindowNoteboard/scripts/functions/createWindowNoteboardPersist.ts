@@ -1,7 +1,22 @@
 import type { T_faActionId } from 'app/types/I_faActionManagerDomain'
+import type { I_faProjectContentEpochPersistGuards } from 'app/types/I_faProjectContentEpochPersistGuards'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 import type { StoreGeneric } from 'app/types/I_vuePiniaInjected'
+
+function definedProjectEpochGuards (deps: {
+  isProjectReplacementInFlight: (() => boolean) | undefined
+  readProjectContentEpoch: (() => number) | undefined
+}): I_faProjectContentEpochPersistGuards {
+  const guards: I_faProjectContentEpochPersistGuards = {}
+  if (deps.isProjectReplacementInFlight !== undefined) {
+    guards.isProjectReplacementInFlight = deps.isProjectReplacementInFlight
+  }
+  if (deps.readProjectContentEpoch !== undefined) {
+    guards.readProjectContentEpoch = deps.readProjectContentEpoch
+  }
+  return guards
+}
 
 export function createWireWindowNoteboardDirectInput (deps: {
   directInputDialogName: T_dialogName
@@ -40,12 +55,14 @@ export function createWireWindowNoteboardDirectInput (deps: {
 
 export function createWindowNoteboardFramePersist (deps: {
   getNoteboardStore: () => StoreGeneric
+  isProjectReplacementInFlight: (() => boolean) | undefined
   persistFrameSilent: (frame: {
     height: number
     width: number
     x: number
     y: number
   }) => Promise<void>
+  readProjectContentEpoch: (() => number) | undefined
   saveFailureActionId: T_faActionId
   useFaFloatingWindowFramePersist: (opts: {
     debounceMs?: number
@@ -56,7 +73,7 @@ export function createWindowNoteboardFramePersist (deps: {
     windowModel: Ref<boolean>
     x: Ref<number>
     y: Ref<number>
-  }) => void
+  } & I_faProjectContentEpochPersistGuards) => void
 }): (opts: {
     h: Ref<number>
     windowModel: Ref<boolean>
@@ -71,7 +88,9 @@ export function createWindowNoteboardFramePersist (deps: {
     x: Ref<number>
     y: Ref<number>
   }): void {
+    const epochGuards = definedProjectEpochGuards(deps)
     deps.useFaFloatingWindowFramePersist({
+      ...epochGuards,
       failureActionId: deps.saveFailureActionId,
       h: opts.h,
       persistFrame: async () => {
@@ -92,6 +111,8 @@ export function createWindowNoteboardFramePersist (deps: {
 
 export function createWindowNoteboardTextPersist (deps: {
   getNoteboardStore: () => StoreGeneric
+  isProjectReplacementInFlight: (() => boolean) | undefined
+  readProjectContentEpoch: (() => number) | undefined
   saveFailureActionId: T_faActionId
   useFaFloatingWindowTextPersist: (opts: {
     debounceMs?: number
@@ -99,7 +120,7 @@ export function createWindowNoteboardTextPersist (deps: {
     persistText: () => Promise<void>
     text: Ref<string>
     windowModel: Ref<boolean>
-  }) => void
+  } & I_faProjectContentEpochPersistGuards) => void
 }): (opts: {
     text: Ref<string>
     windowModel: Ref<boolean>
@@ -110,7 +131,9 @@ export function createWindowNoteboardTextPersist (deps: {
   }): void {
     const noteboard = deps.getNoteboardStore()
 
+    const epochGuards = definedProjectEpochGuards(deps)
     deps.useFaFloatingWindowTextPersist({
+      ...epochGuards,
       failureActionId: deps.saveFailureActionId,
       persistText: () => noteboard.persistCurrentTextSilent(),
       text: opts.text,

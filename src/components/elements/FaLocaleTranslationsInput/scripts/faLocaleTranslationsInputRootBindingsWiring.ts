@@ -69,23 +69,37 @@ export function buildFaLocaleTranslationsInputMenuPanelBindings (params: {
 
   if (params.isSingularPluralForms) {
     const singularPluralComposable = params.activeComposable as I_faLocaleTranslationsInputSingularPluralComposableApi
+    const readLocaleValue = (): string => {
+      return ''
+    }
+    const readPluralLocaleValue = singularPluralComposable.readPluralLocaleValue
+    const readSingularLocaleValue = singularPluralComposable.readSingularLocaleValue
+    const updateLocaleValue = (): void => {
+      return undefined
+    }
+    const updatePluralLocaleValue = singularPluralComposable.updatePluralLocaleValue
+    const updateSingularLocaleValue = singularPluralComposable.updateSingularLocaleValue
+
     return {
       ...baseBindings,
       ...optionalBindings,
-      readLocaleValue: () => '',
-      readPluralLocaleValue: singularPluralComposable.readPluralLocaleValue,
-      readSingularLocaleValue: singularPluralComposable.readSingularLocaleValue,
-      updateLocaleValue: () => {},
-      updatePluralLocaleValue: singularPluralComposable.updatePluralLocaleValue,
-      updateSingularLocaleValue: singularPluralComposable.updateSingularLocaleValue
+      readLocaleValue,
+      readPluralLocaleValue,
+      readSingularLocaleValue,
+      updateLocaleValue,
+      updatePluralLocaleValue,
+      updateSingularLocaleValue
     }
   }
   const singleComposable = params.activeComposable as I_faLocaleTranslationsInputComposableApi
+  const readLocaleValue = singleComposable.readLocaleValue
+  const updateLocaleValue = singleComposable.updateLocaleValue
+
   return {
     ...baseBindings,
     ...optionalBindings,
-    readLocaleValue: singleComposable.readLocaleValue,
-    updateLocaleValue: singleComposable.updateLocaleValue
+    readLocaleValue,
+    updateLocaleValue
   }
 }
 
@@ -156,22 +170,36 @@ export function buildFaLocaleTranslationsInputSummaryFieldBindings (params: {
 
   if (params.isSingularPluralForms) {
     const singularPluralComposable = params.activeComposable as I_faLocaleTranslationsInputSingularPluralComposableApi
+    const readLocaleValue = (): string => {
+      return ''
+    }
+    const readPluralLocaleValue = singularPluralComposable.readPluralLocaleValue
+    const readSingularLocaleValue = singularPluralComposable.readSingularLocaleValue
+    const updateLocaleValue = (): void => {
+      return undefined
+    }
+    const updatePluralLocaleValue = singularPluralComposable.updatePluralLocaleValue
+    const updateSingularLocaleValue = singularPluralComposable.updateSingularLocaleValue
+
     return {
       ...baseBindings,
       ...optionalBindings,
-      readLocaleValue: () => '',
-      readPluralLocaleValue: singularPluralComposable.readPluralLocaleValue,
-      readSingularLocaleValue: singularPluralComposable.readSingularLocaleValue,
-      updateLocaleValue: () => {},
-      updatePluralLocaleValue: singularPluralComposable.updatePluralLocaleValue,
-      updateSingularLocaleValue: singularPluralComposable.updateSingularLocaleValue
+      readLocaleValue,
+      readPluralLocaleValue,
+      readSingularLocaleValue,
+      updateLocaleValue,
+      updatePluralLocaleValue,
+      updateSingularLocaleValue
     }
   }
   const singleComposable = params.activeComposable as I_faLocaleTranslationsInputComposableApi
+  const readLocaleValue = singleComposable.readLocaleValue
+  const updateLocaleValue = singleComposable.updateLocaleValue
+
   return {
     ...baseBindings,
     ...optionalBindings,
-    readLocaleValue: singleComposable.readLocaleValue,
-    updateLocaleValue: singleComposable.updateLocaleValue
+    readLocaleValue,
+    updateLocaleValue
   }
 }

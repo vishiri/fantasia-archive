@@ -4,7 +4,7 @@ import type {
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-function isProjectHierarchyTreeDocumentParentBucketMatch (
+export function isProjectHierarchyTreeDocumentParentBucketMatch (
   node: I_faProjectHierarchyTreeHeTreeNode,
   documentId: string,
   preferredNodeId: string | null
@@ -37,10 +37,12 @@ export function findProjectHierarchyTreeDocumentParentBucket (
   const preferredNodeId = options.preferredNodeId ?? null
   for (const node of nodes) {
     if (isProjectHierarchyTreeDocumentParentBucketMatch(node, documentId, preferredNodeId)) {
+      const parentDocumentId = parentContext.parentDocumentId
+      const parentNode = parentContext.parentNode
       return {
         children: nodes,
-        parentDocumentId: parentContext.parentDocumentId,
-        parentNode: parentContext.parentNode
+        parentDocumentId,
+        parentNode
       }
     }
     const parentDocumentId = node.nodeKind === 'document' ? node.documentId : null
@@ -60,89 +62,14 @@ export function findProjectHierarchyTreeDocumentParentBucket (
   return null
 }
 
-/**
- * Resolves parent container node ids whose lazy-loaded document rows should reload.
- * When the saved document itself has loaded children, its node id is appended after
- * parent buckets so a parent remerge cannot leave an expanded subtree stale.
- */
-export function collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh (
-  treeNodes: readonly I_faProjectHierarchyTreeHeTreeNode[],
-  documentIds: readonly string[]
-): string[] {
-  const parentNodeIds = new Set<string>()
-  const loadedDocumentNodeIds = new Set<string>()
-  for (const documentId of documentIds) {
-    const bucket = findProjectHierarchyTreeDocumentParentBucket(
-      treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
-      documentId
-    )
-    if (bucket === null) {
-      continue
-    }
-    const parentNode = bucket.parentNode
-    if (parentNode !== null && parentNode.childrenLoaded) {
-      parentNodeIds.add(parentNode.id)
-    }
-    const documentNode = findProjectHierarchyTreeDocumentNodeById(
-      treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
-      documentId
-    )
-    if (
-      documentNode !== null &&
-      documentNode.childrenLoaded &&
-      documentNode.hasChildren
-    ) {
-      loadedDocumentNodeIds.add(documentNode.id)
-    }
-  }
-  return [...parentNodeIds, ...loadedDocumentNodeIds]
-}
-
-/**
- * Resolves hierarchy tree node ids whose lazy-loaded document rows should reload after delete.
- * Deepest containers reload first so parent remerges do not preserve stale nested subtrees.
- * When the deleted row still has loaded children, refresh it first to drop promoted descendants.
- */
-export function collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds (
-  treeNodes: readonly I_faProjectHierarchyTreeHeTreeNode[],
-  documentId: string
-): string[] {
-  const tree = treeNodes as I_faProjectHierarchyTreeHeTreeNode[]
-  const bucket = findProjectHierarchyTreeDocumentParentBucket(tree, documentId)
-  if (bucket === null) {
-    return []
-  }
-  const containerNode = bucket.parentNode
-  if (containerNode === null || !containerNode.childrenLoaded) {
-    return []
-  }
-  const nodeIds: string[] = []
-  if (containerNode.nodeKind === 'document' && containerNode.documentId !== null) {
-    const promotionTargetBucket = findProjectHierarchyTreeDocumentParentBucket(
-      tree,
-      containerNode.documentId
-    )
-    const promotionTargetNode = promotionTargetBucket?.parentNode
-    nodeIds.push(containerNode.id)
-    if (
-      promotionTargetNode !== null &&
-      promotionTargetNode !== undefined &&
-      promotionTargetNode.childrenLoaded
-    ) {
-      nodeIds.push(promotionTargetNode.id)
-    }
-    return nodeIds
-  }
-  nodeIds.push(containerNode.id)
-  return nodeIds
-}
-
 function findProjectHierarchyTreeDocumentNodeById (
   nodes: I_faProjectHierarchyTreeHeTreeNode[],
   documentId: string
 ): I_faProjectHierarchyTreeHeTreeNode | null {
   for (const node of nodes) {
-    if (node.nodeKind === 'document' && node.documentId === documentId) {
+    const tagId = node.tagId
+    const isTagCopy = typeof tagId === 'string' && tagId.length > 0
+    if (node.nodeKind === 'document' && node.documentId === documentId && !isTagCopy) {
       return node
     }
     const nested = findProjectHierarchyTreeDocumentNodeById(node.children, documentId)

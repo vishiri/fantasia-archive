@@ -12,7 +12,8 @@ export async function listProjectOverviewDocumentLastOpened (): Promise<I_faProj
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listDocumentLastOpened !== 'function') {
-    return { items: [] }
+    const items: I_faProjectDocumentLastOpenedListResult['items'] = []
+    return { items }
   }
   return await api.listDocumentLastOpened()
 }

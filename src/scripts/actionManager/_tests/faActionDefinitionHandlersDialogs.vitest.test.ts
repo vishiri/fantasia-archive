@@ -31,7 +31,9 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
   S_FaActiveProject: () => ({
     get hasActiveProject () {
       return mockActiveProjectGate.hasActiveProject
-    }
+    },
+    isProjectReplacementInFlight: () => false,
+    readProjectContentEpoch: () => 1
   })
 }))
 

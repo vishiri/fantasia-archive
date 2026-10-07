@@ -1,6 +1,8 @@
+import { Result } from 'neverthrow'
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 import type {
   I_faProjectHierarchyTreeUiState,
   I_faProjectHierarchyTreeUiStatePatch
@@ -13,18 +15,10 @@ export const faProjectHierarchyTreeUiStateSchema = z.object({
 }).strict()
 
 export const faProjectHierarchyTreeUiStatePatchSchema = z.object({
-  expandedNodeIds: z.array(z.string().min(1).max(64)).optional(),
+  expandedNodeIds: z.array(z.string().min(1).max(255)).optional(),
+  expandedNodeIdsBaseJson: z.string().max(100_000).optional(),
   scrollTopPx: z.number().finite().min(0).optional()
 }).strict()
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses persisted hierarchy_tree_ui_state JSON from project_data KV.
@@ -32,14 +26,18 @@ function isPlainRecord (value: unknown): value is Record<string, unknown> {
 export function parseFaProjectHierarchyTreeUiStateJson (
   raw: string
 ): I_faProjectHierarchyTreeUiState {
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw)
-  } catch {
+  const parsed = Result.fromThrowable(
+    () => JSON.parse(raw) as unknown,
+    () => undefined
+  )().unwrapOr(undefined)
+  if (parsed === undefined) {
+    const schemaVersion = 1 as const
+    const expandedNodeIds: string[] = []
+    const scrollTopPx = 0
     return {
-      schemaVersion: 1,
-      expandedNodeIds: [],
-      scrollTopPx: 0
+      schemaVersion,
+      expandedNodeIds,
+      scrollTopPx
     }
   }
   return faProjectHierarchyTreeUiStateSchema.parse(parsed) as I_faProjectHierarchyTreeUiState

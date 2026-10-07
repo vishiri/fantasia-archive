@@ -83,9 +83,13 @@ function createFaSelectInputFilterCore (
     )
   }
 
+  function getFilterNeedle (): string {
+    return filterNeedle.value
+  }
+
   return {
     filteredOptions,
-    getFilterNeedle: () => filterNeedle.value,
+    getFilterNeedle,
     onFilter,
     optionLabelHighlightSegments,
     refreshFilteredOptions
@@ -201,11 +205,15 @@ export function createFaSelectInputApi (
   }
 
   function onSelectKeydown (e: {
+    isComposing?: boolean
     key?: string
     keyCode?: number
     preventDefault?: () => void
   }): void {
     if (e.key !== 'Enter' && e.keyCode !== 13) {
+      return
+    }
+    if (!deps.shouldActivateFaSelectInputOnEnter(e)) {
       return
     }
     const opt = deps.resolveFaSelectInputEnterActivateOption({
@@ -237,22 +245,33 @@ export function createFaSelectInputApi (
     )
   }
 
+  const {
+    clearIsNewFlags,
+    onNewValue,
+    onUpdateModelValue
+  } = modelHandlers
+  const {
+    filteredOptions,
+    getFilterNeedle,
+    onFilter,
+    optionLabelHighlightSegments
+  } = filterCore
   return {
     chipColorForOption,
-    clearIsNewFlags: modelHandlers.clearIsNewFlags,
-    filteredOptions: filterCore.filteredOptions,
-    getFilterNeedle: filterCore.getFilterNeedle,
+    clearIsNewFlags,
+    filteredOptions,
+    getFilterNeedle,
     hidePopup,
     isObjectMode,
-    onFilter: filterCore.onFilter,
+    onFilter,
     onFocus,
-    onNewValue: modelHandlers.onNewValue,
+    onNewValue,
     onPopupShow,
     onSelectKeydown,
     onSelectKeyup,
-    onUpdateModelValue: modelHandlers.onUpdateModelValue,
+    onUpdateModelValue,
     openPopup,
-    optionLabelHighlightSegments: filterCore.optionLabelHighlightSegments,
+    optionLabelHighlightSegments,
     resolveOptionIcon,
     selectRef
   }

@@ -58,6 +58,31 @@ function mountBlendHost (input: {
 
 /**
  * useProjectAppControlBarTabsInlineEndBlend
+ * Unmount before the attach tick must not bind scroll observers.
+ */
+test('Test that useProjectAppControlBarTabsInlineEndBlend does not attach after unmount', async () => {
+  const content = createOverflowTabsContent()
+  const root = document.createElement('div')
+  root.appendChild(content)
+  document.body.appendChild(root)
+  const addEventListener = vi.spyOn(content, 'addEventListener')
+
+  const tabsRootRef = ref<HTMLElement | null>(root)
+  const { unmount } = mountBlendHost({
+    tabsRootRef,
+    watchSource: () => {
+      return 0
+    }
+  })
+  unmount()
+  await nextTick()
+  await nextTick()
+
+  expect(addEventListener).not.toHaveBeenCalled()
+})
+
+/**
+ * useProjectAppControlBarTabsInlineEndBlend
  * Scroll listener marks inline end when content is fully scrolled right.
  */
 test('Test that useProjectAppControlBarTabsInlineEndBlend hides blend at scroll end', async () => {
@@ -213,4 +238,43 @@ test('Test that useProjectAppControlBarTabsInlineEndBlend re-syncs on ResizeObse
   expect(tabsScrolledToInlineEnd.value).toBe(true)
 
   unmount()
+})
+
+test('Test that useProjectAppControlBarTabsInlineEndBlend reads rtl content', async () => {
+  const content = createOverflowTabsContent()
+  content.style.direction = 'rtl'
+  const root = document.createElement('div')
+  root.appendChild(content)
+  document.body.appendChild(root)
+  const tabsRootRef = ref<HTMLElement | null>(root)
+  const source = ref(0)
+  const { unmount } = mountBlendHost({
+    tabsRootRef,
+    watchSource: () => source.value
+  })
+  await nextTick()
+  await nextTick()
+  tabsRootRef.value = null
+  await nextTick()
+  await nextTick()
+  source.value = 1
+  await nextTick()
+  await nextTick()
+  unmount()
+})
+
+test('Test that useProjectAppControlBarTabsInlineEndBlend skips a watch tick after unmount', async () => {
+  const source = ref(0)
+  const { unmount } = mountBlendHost({
+    tabsRootRef: ref(null),
+    watchSource: () => source.value
+  })
+  await nextTick()
+  await nextTick()
+  source.value = 1
+  queueMicrotask(() => {
+    unmount()
+  })
+  await nextTick()
+  await nextTick()
 })

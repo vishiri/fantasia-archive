@@ -71,9 +71,10 @@ export function resolveProjectOverviewApexStackedColumnAnchorRect (
     return null
   }
 
+  const width = right - left
   return {
     left,
     top,
-    width: right - left
+    width
   }
 }

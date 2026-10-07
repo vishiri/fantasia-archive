@@ -61,12 +61,16 @@ function buildDialogKeybindSettingsRows (
         userChord !== null &&
         deps.faKeybindChordsEqual(userChord, expanded))
 
+    const commandId = def.id
+    const editable = def.editable
+    const nameLabel = t(def.messageKey)
+    const rowKey = commandId
     return {
-      commandId: def.id,
+      commandId,
       defaultLabel,
-      editable: def.editable,
-      nameLabel: t(def.messageKey),
-      rowKey: def.id,
+      editable,
+      nameLabel,
+      rowKey,
       userChord,
       userShowsAddNewCombo
     }
@@ -123,8 +127,16 @@ export function createDialogKeybindSettingsTableBuild (
       name: string
     }>
   } {
+  const buildDialogKeybindSettingsRowsBound = (params: {
+    overrides: I_faKeybindsRoot['overrides']
+    platform: NodeJS.Platform
+    t: (key: string) => string
+  }): I_dialogKeybindSettingsRow[] => {
+    return buildDialogKeybindSettingsRows(deps, params)
+  }
+
   return {
-    buildDialogKeybindSettingsRows: (params) => buildDialogKeybindSettingsRows(deps, params),
+    buildDialogKeybindSettingsRows: buildDialogKeybindSettingsRowsBound,
     buildDialogKeybindSettingsTableColumns
   }
 }

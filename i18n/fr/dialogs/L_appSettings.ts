@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Paramètres',
+  loadError: 'Impossible de charger les paramètres.',
   saveButton: 'Enregistrer les paramètres',
   closeButton: 'Fermer sans enregistrer',
   settingsSearchPlaceholder: 'Recherchez les paramètres...',

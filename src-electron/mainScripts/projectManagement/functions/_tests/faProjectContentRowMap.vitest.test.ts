@@ -3,10 +3,10 @@ import { expect, test } from 'vitest'
 import type { I_faSqlMediaRow } from 'app/types/I_faProjectContentRowMap'
 import {
   createMapFaProjectWorldRow,
-  mapFaProjectDocumentRow,
   mapFaProjectMediaRow,
   mapFaProjectNamedEntityRow
 } from '../faProjectContentRowMap'
+import { mapFaProjectDocumentRow } from '../faProjectDocumentRowMap'
 
 const mapFaProjectWorldRow = createMapFaProjectWorldRow({
   parseDisplayNameTranslationsJson: (raw) => JSON.parse(raw) as { 'en-US': string }

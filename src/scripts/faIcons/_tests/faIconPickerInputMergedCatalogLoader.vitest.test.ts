@@ -17,7 +17,8 @@ test('Test that loadFaIconPickerMergedCatalogForMenu reuses cached merged catalo
     catalogLoadError,
     isCatalogLoading,
     loadFaIconPickerMergedCatalogAsync,
-    loadedCatalog
+    loadedCatalog,
+    requestSerialBox: { current: 0 }
   })
 
   expect(loadFaIconPickerMergedCatalogAsync).not.toHaveBeenCalled()
@@ -42,7 +43,8 @@ test('Test that loadFaIconPickerMergedCatalogForMenu loads and caches merged cat
     catalogLoadError,
     isCatalogLoading,
     loadFaIconPickerMergedCatalogAsync,
-    loadedCatalog
+    loadedCatalog,
+    requestSerialBox: { current: 0 }
   })
 
   expect(loadFaIconPickerMergedCatalogAsync).toHaveBeenCalledTimes(1)
@@ -72,7 +74,8 @@ test('Test that loadFaIconPickerMergedCatalogForMenu stores Error load failures 
     catalogLoadError,
     isCatalogLoading,
     loadFaIconPickerMergedCatalogAsync,
-    loadedCatalog
+    loadedCatalog,
+    requestSerialBox: { current: 0 }
   })
 
   expect(catalogLoadError.value).toBe('catalog failed')
@@ -93,10 +96,50 @@ test('Test that loadFaIconPickerMergedCatalogForMenu stringifies non-Error load 
     catalogLoadError,
     isCatalogLoading,
     loadFaIconPickerMergedCatalogAsync,
-    loadedCatalog
+    loadedCatalog,
+    requestSerialBox: { current: 0 }
   })
 
   expect(catalogLoadError.value).toBe('catalog string failure')
   expect(loadedCatalog.value).toEqual([])
+  expect(isCatalogLoading.value).toBe(false)
+})
+
+test('Test that loadFaIconPickerMergedCatalogForMenu ignores a stale overlapping load', async () => {
+  let rejectSlow: (error: Error) => void = () => {
+    throw new Error('missing slow reject')
+  }
+  const slowLoadPromise = new Promise<string[]>((_resolve, reject) => {
+    rejectSlow = reject
+  })
+  let callCount = 0
+  const loadFaIconPickerMergedCatalogAsync = vi.fn(() => {
+    callCount += 1
+    if (callCount === 1) {
+      return slowLoadPromise
+    }
+    return Promise.resolve(['mdi-fresh'])
+  })
+  const loadedCatalog = ref<string[]>([])
+  const catalogCache = ref<string[] | null>(null)
+  const catalogLoadError = ref<string | null>(null)
+  const isCatalogLoading = ref(false)
+  const requestSerialBox = { current: 0 }
+  const deps = {
+    ResultAsync,
+    catalogCache,
+    catalogLoadError,
+    isCatalogLoading,
+    loadFaIconPickerMergedCatalogAsync,
+    loadedCatalog,
+    requestSerialBox
+  }
+  const slowLoad = loadFaIconPickerMergedCatalogForMenu(deps)
+  await loadFaIconPickerMergedCatalogForMenu(deps)
+  rejectSlow(new Error('stale fail'))
+  await slowLoad
+  expect(loadedCatalog.value).toEqual(['mdi-fresh'])
+  expect(catalogCache.value).toEqual(['mdi-fresh'])
+  expect(catalogLoadError.value).toBeNull()
   expect(isCatalogLoading.value).toBe(false)
 })

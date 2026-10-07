@@ -15,6 +15,7 @@ type T_temporaryOpenedDocumentTabCopySeedInput = {
   isFinished?: boolean | undefined
   isMinor?: boolean | undefined
   parentDocumentId: string | null
+  placementId?: string | null | undefined
   tabLabel: string
   templateIcon: string
   templateId: string
@@ -28,6 +29,7 @@ type T_temporaryOpenedDocumentTabSeedInput = {
   displayName: string
   documentId: string
   parentDocumentId: string | null
+  placementId?: string | null | undefined
   tabLabel: string
   templateIcon: string
   templateId: string
@@ -67,9 +69,19 @@ export function createCreateTemporaryOpenedDocumentTabCopySeed (deps: {
     const isMinor = input.isMinor === true
     const isDead = input.isDead === true
     const savedExtraClasses = deps.normalizeNullableStringFromDb(input.extraClasses)
-    return {
-      displayNameDraft: input.displayName,
-      documentId: input.documentId,
+    const displayNameDraft = input.displayName
+    const documentId = input.documentId
+    const rawParentDocumentId = input.parentDocumentId
+    const tabLabel = input.tabLabel
+    const templateIcon = input.templateIcon
+    const templateId = input.templateId
+    const worldId = input.worldId
+    const tagsDraft: I_faOpenedDocumentTab['tagsDraft'] = []
+    const savedTags: I_faOpenedDocumentTab['savedTags'] = []
+    const placementId = input.placementId
+    const tab: I_faOpenedDocumentTab = {
+      displayNameDraft,
+      documentId,
       documentBackgroundColorDraft: documentBackgroundColor,
       documentTextColorDraft: documentTextColor,
       editState: true,
@@ -78,11 +90,11 @@ export function createCreateTemporaryOpenedDocumentTabCopySeed (deps: {
       isFinishedDraft: isFinished,
       isMinorDraft: isMinor,
       isDeadDraft: isDead,
-      parentDocumentId: input.parentDocumentId,
+      parentDocumentId: rawParentDocumentId,
       parentDocumentIdDraft: parentDocumentId,
       savedParentDocumentId: parentDocumentId,
       persistenceState: 'temporary',
-      savedDisplayName: input.displayName,
+      savedDisplayName: displayNameDraft,
       savedDocumentBackgroundColor: documentBackgroundColor,
       savedDocumentTextColor: documentTextColor,
       savedIsCategory: isCategory,
@@ -93,14 +105,18 @@ export function createCreateTemporaryOpenedDocumentTabCopySeed (deps: {
       savedTreeOrderNumber,
       extraClassesDraft: savedExtraClasses,
       savedExtraClasses,
-      tagsDraft: [],
-      savedTags: [],
-      tabLabel: input.tabLabel,
-      templateIcon: input.templateIcon,
-      templateId: input.templateId,
+      tagsDraft,
+      savedTags,
+      tabLabel,
+      templateIcon,
+      templateId,
       temporaryParentResolveDocumentIds,
-      worldId: input.worldId
+      worldId
     }
+    if (placementId !== undefined) {
+      tab.placementId = placementId
+    }
+    return tab
   }
 }
 
@@ -118,16 +134,35 @@ export function createCreateTemporaryOpenedDocumentTabSeed (deps: {
     const initialTagsDraft = input.initialTagsDraft === undefined
       ? []
       : input.initialTagsDraft.map((tag) => {
+        const id = tag.id
+        const name = tag.name
+        if (tag.isNew === true) {
+          return {
+            id,
+            isNew: true,
+            name
+          }
+        }
         return {
-          id: tag.id,
-          name: tag.name,
-          ...(tag.isNew === true ? { isNew: true as const } : {})
+          id,
+          name
         }
       })
     const hasInitialTags = initialTagsDraft.length > 0
-    return {
-      displayNameDraft: input.displayName,
-      documentId: input.documentId,
+    const displayNameDraft = input.displayName
+    const documentId = input.documentId
+    const rawParentDocumentId = input.parentDocumentId
+    const savedTreeOrderNumber = deps.emptyTreeOrderNumber
+    const savedTags: I_faOpenedDocumentTab['savedTags'] = []
+    const tabLabel = input.tabLabel
+    const templateIcon = input.templateIcon
+    const templateId = input.templateId
+    const temporaryParentResolveDocumentIds = input.temporaryParentResolveDocumentIds
+    const worldId = input.worldId
+    const placementId = input.placementId
+    const tab: I_faOpenedDocumentTab = {
+      displayNameDraft,
+      documentId,
       documentBackgroundColorDraft: '',
       documentTextColorDraft: '',
       editState: true,
@@ -136,11 +171,11 @@ export function createCreateTemporaryOpenedDocumentTabSeed (deps: {
       isFinishedDraft: false,
       isMinorDraft: false,
       isDeadDraft: false,
-      parentDocumentId: input.parentDocumentId,
+      parentDocumentId: rawParentDocumentId,
       parentDocumentIdDraft: parentDocumentId,
       savedParentDocumentId: parentDocumentId,
       persistenceState: 'temporary',
-      savedDisplayName: input.displayName,
+      savedDisplayName: displayNameDraft,
       savedDocumentBackgroundColor: '',
       savedDocumentTextColor: '',
       savedIsCategory: false,
@@ -148,16 +183,20 @@ export function createCreateTemporaryOpenedDocumentTabSeed (deps: {
       savedIsMinor: false,
       savedIsDead: false,
       treeOrderNumberDraft: '',
-      savedTreeOrderNumber: deps.emptyTreeOrderNumber,
+      savedTreeOrderNumber,
       extraClassesDraft: '',
       savedExtraClasses: '',
       tagsDraft: initialTagsDraft,
-      savedTags: [],
-      tabLabel: input.tabLabel,
-      templateIcon: input.templateIcon,
-      templateId: input.templateId,
-      temporaryParentResolveDocumentIds: input.temporaryParentResolveDocumentIds,
-      worldId: input.worldId
+      savedTags,
+      tabLabel,
+      templateIcon,
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId
     }
+    if (placementId !== undefined) {
+      tab.placementId = placementId
+    }
+    return tab
   }
 }

@@ -19,6 +19,12 @@ export interface I_faColorPickerPaletteAppendConfig {
   worldId?: string | undefined
 }
 
+/** Palette string plus the world that owned the append click. */
+export type T_faColorPickerAppendToWorldPaletteEmit = (
+  colorPalette: string,
+  worldId: string
+) => void
+
 /** Injected dependencies for createUseFaColorPickerPaletteAppend. */
 export type T_createUseFaColorPickerPaletteAppendDeps = {
   appendFaProjectWorldColorPaletteHex: (
@@ -64,7 +70,7 @@ export type T_createUseFaColorPickerPaletteAppendDeps = {
     persistWorldColorPalette: (worldId: string, colorPalette: string) => Promise<boolean>,
     readFaColorPickerPaletteAppendWorldId: (worldId: string | undefined) => string,
     refreshProjectWorldColorPalette: () => Promise<void>,
-    emitAppendToWorldPalette: (colorPalette: string) => void,
+    emitAppendToWorldPalette: T_faColorPickerAppendToWorldPaletteEmit,
     refreshProjectColorPalette?: () => Promise<void>
   ) => Promise<void>
 }

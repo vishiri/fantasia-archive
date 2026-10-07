@@ -1,5 +1,6 @@
 export default {
   title: '项目设置',
+  loadError: '无法加载项目设置。',
   closeButton: '关闭而不保存',
   saveButton: '保存设置',
   saveWithoutClosingButton: '保存而不关闭',

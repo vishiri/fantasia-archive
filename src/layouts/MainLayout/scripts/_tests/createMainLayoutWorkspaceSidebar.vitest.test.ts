@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { createMainLayoutWorkspaceSidebar } from '../functions/createMainLayoutWorkspaceSidebar'
@@ -14,13 +14,13 @@ const attachWorkspaceSidebarLiveWidthSyncMock = vi.fn((): (() => void) => {
   return () => undefined
 })
 
-let activeProjectId: string | null = 'project-a'
+let activeProjectId = ref<string | null>('project-a')
 let sidebarWidthPx = 375
 
 function debounceSidebarWidthPersist<T extends (...args: never[]) => void> (
   fn: T,
   waitMs: number
-): T & { flush: () => void } {
+): T & { cancel: () => void, flush: () => void } {
   let timer: ReturnType<typeof setTimeout> | undefined
   const debounced = ((...args: Parameters<T>) => {
     if (timer !== undefined) {
@@ -30,7 +30,13 @@ function debounceSidebarWidthPersist<T extends (...args: never[]) => void> (
       timer = undefined
       fn(...args)
     }, waitMs)
-  }) as T & { flush: () => void }
+  }) as T & { cancel: () => void, flush: () => void }
+  debounced.cancel = () => {
+    if (timer !== undefined) {
+      clearTimeout(timer)
+      timer = undefined
+    }
+  }
   debounced.flush = () => {
     if (timer !== undefined) {
       clearTimeout(timer)
@@ -44,12 +50,13 @@ function debounceSidebarWidthPersist<T extends (...args: never[]) => void> (
 const flushOpenedDocumentsMock = vi.fn(async (): Promise<boolean> => true)
 const clearOpenedDocumentsSessionMock = vi.fn(async (): Promise<void> => undefined)
 const hydrateOpenedDocumentsMock = vi.fn(async (): Promise<void> => undefined)
+let registeredSidebarPersist: (() => Promise<void>) | null = null
 
 function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorkspaceSidebar>> {
   const useSidebar = createMainLayoutWorkspaceSidebar({
     S_FaActiveProject: () => ({
-      activeProject: activeProjectId === null ? null : { id: activeProjectId },
-      hasActiveProject: activeProjectId !== null
+      activeProject: activeProjectId.value === null ? null : { id: activeProjectId.value },
+      hasActiveProject: activeProjectId.value !== null
     }) as never,
     S_FaOpenedDocuments: () => ({
       clearSession: clearOpenedDocumentsSessionMock,
@@ -63,7 +70,11 @@ function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorksp
     }) as never,
     S_FaProjectSidebar: () => ({
       persistSidebarWidth: persistSidebarWidthMock,
+      persistSidebarWidthBeforeProjectReplacement: vi.fn(async () => undefined),
       refreshProjectSidebar: refreshProjectSidebarMock,
+      registerSidebarWidthPersistBeforeProjectReplacement: (persist: () => Promise<void>) => {
+        registeredSidebarPersist = persist
+      },
       resetToDefault: resetToDefaultMock,
       setLiveWorkspaceSidebarWidthPx: setLiveWorkspaceSidebarWidthPxMock,
       widthPx: sidebarWidthPx
@@ -109,7 +120,9 @@ function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorksp
       await Promise.resolve()
       fn?.()
     },
-    onMounted: () => undefined,
+    onMounted: (hook) => {
+      mountedHooks.push(hook)
+    },
     onUnmounted: (hook) => {
       unmountedHooks.push(hook)
     },
@@ -124,6 +137,7 @@ function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorksp
 }
 
 const unmountedHooks: Array<() => void> = []
+const mountedHooks: Array<() => void> = []
 
 beforeEach(() => {
   persistSidebarWidthMock.mockReset()
@@ -139,9 +153,11 @@ beforeEach(() => {
   attachWorkspaceSidebarLiveWidthSyncMock.mockImplementation(() => {
     return () => undefined
   })
-  activeProjectId = 'project-a'
+  registeredSidebarPersist = null
+  activeProjectId = ref<string | null>('project-a')
   sidebarWidthPx = 375
   unmountedHooks.length = 0
+  mountedHooks.length = 0
   vi.useFakeTimers()
 })
 
@@ -161,6 +177,66 @@ test('Test that splitter width updates persist ceiled width through the sidebar 
   unmountedHooks.forEach((hook) => {
     hook()
   })
+  vi.useRealTimers()
+})
+
+test('Test that project replacement persist waits for an in-flight sidebar width write', async () => {
+  let resolvePersist: ((value: boolean) => void) | undefined
+  let persistCalls = 0
+  persistSidebarWidthMock.mockImplementation(() => {
+    persistCalls += 1
+    if (persistCalls === 1) {
+      return new Promise<boolean>((resolve) => {
+        resolvePersist = resolve
+      })
+    }
+    return Promise.resolve(true)
+  })
+  const api = buildUseSidebar()
+  api.onSidebarSplitterWidthUpdate(500)
+  await vi.advanceTimersByTimeAsync(150)
+  expect(persistSidebarWidthMock).toHaveBeenCalledTimes(1)
+
+  api.onSidebarSplitterWidthUpdate(640)
+  const persistBeforeReplacement = registeredSidebarPersist
+  if (persistBeforeReplacement === null) {
+    throw new Error('missing sidebar replacement persist')
+  }
+  let replacementDone = false
+  const replacement = persistBeforeReplacement().then(() => {
+    replacementDone = true
+  })
+  await Promise.resolve()
+  expect(replacementDone).toBe(false)
+  expect(persistSidebarWidthMock).toHaveBeenCalledTimes(1)
+
+  const finishPersist = resolvePersist
+  if (finishPersist === undefined) {
+    throw new Error('missing sidebar persist resolver')
+  }
+  finishPersist(true)
+  await replacement
+
+  expect(replacementDone).toBe(true)
+  expect(persistSidebarWidthMock).toHaveBeenCalledTimes(2)
+  expect(persistSidebarWidthMock).toHaveBeenLastCalledWith(640, {
+    ignoreReplacementFlight: true
+  })
+  vi.useRealTimers()
+})
+
+test('Test that project replacement persist writes sidebar width and cancels the debounce', async () => {
+  const api = buildUseSidebar()
+
+  api.onSidebarSplitterWidthUpdate(500)
+  expect(registeredSidebarPersist).not.toBeNull()
+  await registeredSidebarPersist?.()
+  expect(persistSidebarWidthMock).toHaveBeenCalledWith(500, {
+    ignoreReplacementFlight: true
+  })
+
+  await vi.advanceTimersByTimeAsync(150)
+  expect(persistSidebarWidthMock).toHaveBeenCalledTimes(1)
   vi.useRealTimers()
 })
 
@@ -199,7 +275,7 @@ test('Test that scheduled persist skips IPC when the sidebar model is no longer 
 })
 
 test('Test that splitter width updates skip persist when no active project is loaded', async () => {
-  activeProjectId = null
+  activeProjectId.value = null
 
   const api = buildUseSidebar()
 
@@ -209,6 +285,66 @@ test('Test that splitter width updates skip persist when no active project is lo
   await vi.advanceTimersByTimeAsync(150)
 
   expect(persistSidebarWidthMock).not.toHaveBeenCalled()
+  vi.useRealTimers()
+})
+
+test('Test that project hydrate does not snap a sidebar width dragged during refresh', async () => {
+  const api = buildUseSidebar()
+  let releaseRefresh: (() => void) | undefined
+  refreshProjectSidebarMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseRefresh = () => {
+        resolve(true)
+      }
+    })
+  })
+  activeProjectId.value = 'project-b'
+  await nextTick()
+  expect(refreshProjectSidebarMock).toHaveBeenCalledTimes(1)
+  api.onSidebarSplitterWidthUpdate(640)
+  sidebarWidthPx = 400
+  const finishRefresh = releaseRefresh
+  if (finishRefresh === undefined) {
+    throw new Error('missing sidebar refresh resolver')
+  }
+  finishRefresh()
+  await nextTick()
+  await Promise.resolve()
+  expect(hydrateOpenedDocumentsMock).toHaveBeenCalledTimes(1)
+  expect(api.sidebarWidthModel.value).toBe(640)
+  vi.useRealTimers()
+})
+
+test('Test that a stale sidebar hydrate stops after the active project changes', async () => {
+  buildUseSidebar()
+  let releaseFirstRefresh: (() => void) | undefined
+  refreshProjectSidebarMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseFirstRefresh = () => {
+        resolve(true)
+      }
+    })
+  })
+  activeProjectId.value = 'project-b'
+  await nextTick()
+  activeProjectId.value = 'project-c'
+  await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(hydrateOpenedDocumentsMock).toHaveBeenCalledTimes(1)
+  expect(refreshHierarchyLayoutMock).toHaveBeenCalledTimes(1)
+
+  const finishFirstRefresh = releaseFirstRefresh
+  if (finishFirstRefresh === undefined) {
+    throw new Error('missing sidebar refresh resolver')
+  }
+  finishFirstRefresh()
+  await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
+
+  expect(hydrateOpenedDocumentsMock).toHaveBeenCalledTimes(1)
+  expect(refreshHierarchyLayoutMock).toHaveBeenCalledTimes(1)
   vi.useRealTimers()
 })
 
@@ -223,4 +359,55 @@ test('Test that workspace sidebar panel ref attaches live width sync', async () 
     onWidthPx: expect.any(Function),
     panelElement
   })
+})
+
+test('Test that a mounted sidebar copies the stored width for an already open project', async () => {
+  sidebarWidthPx = 480
+  refreshHierarchyLayoutMock.mockClear()
+  hydrateOpenedDocumentsMock.mockClear()
+  const api = buildUseSidebar()
+  mountedHooks.forEach((hook) => {
+    hook()
+  })
+  await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(refreshProjectSidebarMock).toHaveBeenCalledTimes(1)
+  expect(refreshHierarchyLayoutMock).toHaveBeenCalledTimes(1)
+  expect(hydrateOpenedDocumentsMock).toHaveBeenCalledTimes(1)
+  expect(api.sidebarWidthModel.value).toBe(480)
+  vi.useRealTimers()
+})
+
+test('Test that a mounted sidebar hydrate stops after the active project changes', async () => {
+  refreshHierarchyLayoutMock.mockClear()
+  hydrateOpenedDocumentsMock.mockClear()
+  buildUseSidebar()
+  let releaseFirstRefresh: (() => void) | undefined
+  refreshProjectSidebarMock.mockImplementationOnce(() => {
+    return new Promise((resolve) => {
+      releaseFirstRefresh = () => {
+        resolve(true)
+      }
+    })
+  })
+  mountedHooks.forEach((hook) => {
+    hook()
+  })
+  await Promise.resolve()
+  activeProjectId.value = 'project-b'
+  await nextTick()
+  await Promise.resolve()
+  const finishFirstRefresh = releaseFirstRefresh
+  if (finishFirstRefresh === undefined) {
+    throw new Error('missing sidebar refresh resolver')
+  }
+  finishFirstRefresh()
+  await nextTick()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(refreshHierarchyLayoutMock).toHaveBeenCalledTimes(1)
+  expect(hydrateOpenedDocumentsMock).toHaveBeenCalledTimes(1)
+  vi.useRealTimers()
 })

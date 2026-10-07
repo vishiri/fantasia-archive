@@ -237,6 +237,88 @@ test('Test that persistDialogProjectMediaSingleEdit staySlide rebinds after relo
   expect(dialogModel.value).toBe(true)
 })
 
+test('Test that persistDialogProjectMediaSingleEdit staySlide skips rebind when the draft changes during reload', async () => {
+  const dialogModel = createRef(true)
+  const draft = createRef(sampleRow())
+  const closeSlide = vi.fn()
+  const rebindDraftFromList = vi.fn()
+  await persistDialogProjectMediaSingleEdit({
+    afterSuccess: 'staySlide',
+    closeSlide,
+    dialogModel,
+    draft,
+    mapRowToUpsertItem: (row) => ({
+      displayName: row.displayName,
+      externalEmbed: row.externalEmbed,
+      externalLink: row.externalLink,
+      externalType: row.externalType,
+      id: row.id,
+      internalLink: row.internalLink,
+      internalType: row.internalType,
+      type: row.type
+    }),
+    rebindDraftFromList,
+    reloadList: async () => {
+      draft.value = {
+        ...sampleRow(),
+        id: 'other'
+      }
+    },
+    runFaActionAwait: async () => true
+  })
+  expect(rebindDraftFromList).not.toHaveBeenCalled()
+  expect(draft.value?.id).toBe('other')
+  expect(closeSlide).not.toHaveBeenCalled()
+  expect(dialogModel.value).toBe(true)
+})
+
+test('Test that persistDialogProjectMediaSingleEdit keeps a draft edited during save', async () => {
+  let finishSave: ((saved: boolean) => void) | undefined
+  const pendingSave = new Promise<boolean>((resolve) => {
+    finishSave = resolve
+  })
+  const dialogModel = createRef(true)
+  const draft = createRef(sampleRow())
+  const closeSlide = vi.fn()
+  const reloadList = vi.fn(async () => undefined)
+  const rebindDraftFromList = vi.fn()
+  const savePromise = persistDialogProjectMediaSingleEdit({
+    afterSuccess: 'staySlide',
+    closeSlide,
+    dialogModel,
+    draft,
+    mapRowToUpsertItem: (row) => ({
+      displayName: row.displayName,
+      externalEmbed: row.externalEmbed,
+      externalLink: row.externalLink,
+      externalType: row.externalType,
+      id: row.id,
+      internalLink: row.internalLink,
+      internalType: row.internalType,
+      type: row.type
+    }),
+    rebindDraftFromList,
+    reloadList,
+    runFaActionAwait: async () => pendingSave
+  })
+  const liveRow = draft.value
+  if (liveRow === null) {
+    throw new Error('missing draft')
+  }
+  liveRow.displayName = 'typed during save'
+  const finish = finishSave
+  if (finish === undefined) {
+    throw new Error('missing save resolver')
+  }
+  finish(true)
+  await savePromise
+  expect(draft.value?.displayName).toBe('typed during save')
+  expect(rebindDraftFromList).not.toHaveBeenCalled()
+  expect(reloadList).not.toHaveBeenCalled()
+  expect(closeSlide).not.toHaveBeenCalled()
+  expect(dialogModel.value).toBe(true)
+})
+
 /**
  * bindDialogProjectMediaSingleEditSave
  * saveSlideStay keeps the slide open.

@@ -14,18 +14,24 @@ export function createGlobalLanguageSelectorSpellcheckRefresh (deps: {
   } {
   return function useGlobalLanguageSelectorSpellcheckRefresh () {
     const showSpellcheckRefresh = deps.ref(false)
+    let spellcheckNoticeSerial = 0
 
     function noteLanguageApplied (
       priorCode: T_faUserSettingsLanguageCode,
       nextCode: T_faUserSettingsLanguageCode
     ): void {
       if (nextCode !== priorCode) {
+        spellcheckNoticeSerial += 1
         showSpellcheckRefresh.value = true
       }
     }
 
     async function refreshWebContentsAndHide (): Promise<void> {
+      const serialAtStart = spellcheckNoticeSerial
       await deps.runFaActionAwait('refreshWebContentsAfterLanguage', undefined)
+      if (spellcheckNoticeSerial !== serialAtStart) {
+        return
+      }
       showSpellcheckRefresh.value = false
     }
 

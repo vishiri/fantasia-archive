@@ -292,7 +292,7 @@ test('Test that DialogProjectMediaSingleEditSlide previous duplicates and slides
  */
 test('Test that DialogProjectMediaSingleEditSlide unlocks nav when the track transition never fires', async () => {
   vi.useFakeTimers()
-  try {
+  const run = (async () => {
     const w = mount(DialogProjectMediaSingleEditSlide, {
       global: slideGlobal,
       props: {
@@ -312,9 +312,10 @@ test('Test that DialogProjectMediaSingleEditSlide unlocks nav when the track tra
     await w.vm.$nextTick()
     expect(navPaneKinds(w)).toEqual(['live'])
     w.unmount()
-  } finally {
+  })()
+  await run.finally(() => {
     vi.useRealTimers()
-  }
+  })
 })
 
 function dispatchSlideArrowKey (key: string, init: KeyboardEventInit = {}): void {

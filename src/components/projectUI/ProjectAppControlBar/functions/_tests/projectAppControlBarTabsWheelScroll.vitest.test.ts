@@ -71,6 +71,45 @@ test('Test that resolveProjectAppControlBarTabsIsScrolledToInlineEnd is true at 
   })).toBe(true)
 })
 
+test('Test that resolveProjectAppControlBarTabsWheelScrollLeft moves toward the inline end in rtl', () => {
+  expect(resolveProjectAppControlBarTabsWheelScrollLeft({
+    clientWidth: 100,
+    delta: 25,
+    direction: 'rtl',
+    scrollLeft: 0,
+    scrollWidth: 300
+  })).toBe(-25)
+  expect(resolveProjectAppControlBarTabsWheelScrollLeft({
+    clientWidth: 100,
+    delta: 50,
+    direction: 'rtl',
+    scrollLeft: -180,
+    scrollWidth: 200
+  })).toBe(-100)
+  expect(resolveProjectAppControlBarTabsWheelScrollLeft({
+    clientWidth: 100,
+    delta: -10,
+    direction: 'rtl',
+    scrollLeft: 0,
+    scrollWidth: 300
+  })).toBeNull()
+})
+
+test('Test that resolveProjectAppControlBarTabsIsScrolledToInlineEnd uses the rtl inline end', () => {
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    direction: 'rtl',
+    scrollLeft: -100,
+    scrollWidth: 200
+  })).toBe(true)
+  expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
+    clientWidth: 100,
+    direction: 'rtl',
+    scrollLeft: 0,
+    scrollWidth: 300
+  })).toBe(false)
+})
+
 test('Test that resolveProjectAppControlBarTabsIsScrolledToInlineEnd is false when right side is clipped', () => {
   expect(resolveProjectAppControlBarTabsIsScrolledToInlineEnd({
     clientWidth: 100,

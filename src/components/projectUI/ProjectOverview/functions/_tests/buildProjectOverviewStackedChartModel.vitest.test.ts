@@ -101,8 +101,54 @@ test('Test that buildProjectOverviewStackedChartModel prefers sortOrder over lab
 })
 
 /**
+ * buildProjectOverviewStackedChartModel
+ * Equal sort_order keeps the query order (created time, then id), not template id.
+ */
+test('Test that buildProjectOverviewStackedChartModel keeps equal sortOrder query order', () => {
+  const model = buildProjectOverviewStackedChartModel({
+    distribution: {
+      ...distribution,
+      templates: [
+        {
+          templateId: 't-z',
+          titlePluralTranslationsJson: '{"en-US":"Zebras"}',
+          icon: 'mdi-z',
+          sortOrder: 0
+        },
+        {
+          templateId: 't-a',
+          titlePluralTranslationsJson: '{"en-US":"Apples"}',
+          icon: 'mdi-a',
+          sortOrder: 0
+        }
+      ],
+      worlds: [
+        {
+          color: '#222222',
+          displayNameTranslationsJson: '{"en-US":"Zulu"}',
+          sortOrder: 0,
+          worldId: 'w-z'
+        },
+        {
+          color: '#111111',
+          displayNameTranslationsJson: '{"en-US":"Alpha"}',
+          sortOrder: 0,
+          worldId: 'w-a'
+        }
+      ],
+      counts: []
+    },
+    preferredLanguageCode: 'en-US',
+    parseTranslationsJson: (raw) => JSON.parse(raw) as Record<string, string>
+  })
+
+  expect(model.categories).toEqual(['Zebras', 'Apples'])
+  expect(model.series.map((series) => series.name)).toEqual(['Zulu', 'Alpha'])
+})
+
+/**
  * resolveProjectOverviewTemplatePluralLabel / buildProjectOverviewStackedChartModel
- * Falls back through preferred, en-US, first non-empty, and empty color default.
+ * Falls back through preferred, en-US, then language-code order, and empty color default.
  */
 test('Test that buildProjectOverviewStackedChartModel resolves label and color fallbacks', () => {
   const model = buildProjectOverviewStackedChartModel({
@@ -132,6 +178,12 @@ test('Test that buildProjectOverviewStackedChartModel resolves label and color f
           templateId: 't-empty',
           titlePluralTranslationsJson: '{"de":"","fr":""}',
           sortOrder: 0
+        },
+        {
+          icon: 'mdi-e',
+          templateId: 't-code-order',
+          titlePluralTranslationsJson: '{"zh":" Dragons ","de":" Drachen "}',
+          sortOrder: 4
         }
       ],
       documentTemplateTotalCount: 4,
@@ -147,8 +199,8 @@ test('Test that buildProjectOverviewStackedChartModel resolves label and color f
     parseTranslationsJson: (raw) => JSON.parse(raw) as Record<string, string>
   })
 
-  expect(model.categories).toEqual(['', 'Artefakte', 'Helter', 'Places'])
+  expect(model.categories).toEqual(['', 'Artefakte', 'Helter', 'Places', 'Drachen'])
   expect(model.series[0]?.color).toBe('var(--fa-color-primary-bright)')
   expect(model.series[0]?.name).toBe('Orphan')
-  expect(model.series[0]?.data).toEqual([0, 0, 0, 0])
+  expect(model.series[0]?.data).toEqual([0, 0, 0, 0, 0])
 })

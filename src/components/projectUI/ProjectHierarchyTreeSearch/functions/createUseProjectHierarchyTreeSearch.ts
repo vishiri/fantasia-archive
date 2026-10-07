@@ -44,10 +44,12 @@ export function createUseProjectHierarchyTreeSearch (deps: {
       }
 
       if (layoutMode.value === 'followSidebar') {
-        return { width: `${sidebarLiveWidthPx!.value}px` }
+        const width = `${sidebarLiveWidthPx!.value}px`
+        return { width }
       }
 
-      return { width: `${deps.fixedSearchWidthPx}px` }
+      const width = `${deps.fixedSearchWidthPx}px`
+      return { width }
     })
 
     function clearSearchQuery (): void {

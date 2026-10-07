@@ -36,32 +36,43 @@ interface I_faSqlDistributionCountRow {
 function mapFaProjectDocumentDistributionTemplateRow (
   row: I_faSqlDistributionTemplateRow
 ): I_faProjectDocumentDistributionTemplateCategory {
+  const templateId = row.template_id
+  const titlePluralTranslationsJson = row.title_plural_translations_json
+  const icon = row.icon
+  const sortOrder = row.sort_order
   return {
-    templateId: row.template_id,
-    titlePluralTranslationsJson: row.title_plural_translations_json,
-    icon: row.icon,
-    sortOrder: row.sort_order
+    templateId,
+    titlePluralTranslationsJson,
+    icon,
+    sortOrder
   }
 }
 
 function mapFaProjectDocumentDistributionWorldRow (
   row: I_faSqlDistributionWorldRow
 ): I_faProjectDocumentDistributionWorldSeries {
+  const worldId = row.world_id
+  const displayNameTranslationsJson = row.display_name_translations_json
+  const color = row.color
+  const sortOrder = row.sort_order
   return {
-    worldId: row.world_id,
-    displayNameTranslationsJson: row.display_name_translations_json,
-    color: row.color,
-    sortOrder: row.sort_order
+    worldId,
+    displayNameTranslationsJson,
+    color,
+    sortOrder
   }
 }
 
 function mapFaProjectDocumentDistributionCountRow (
   row: I_faSqlDistributionCountRow
 ): I_faProjectDocumentDistributionCountCell {
+  const templateId = row.template_id
+  const worldId = row.world_id
+  const documentCount = Number(row.document_count)
   return {
-    templateId: row.template_id,
-    worldId: row.world_id,
-    documentCount: Number(row.document_count)
+    templateId,
+    worldId,
+    documentCount
   }
 }
 
@@ -80,7 +91,7 @@ export function listFaProjectDocumentDistribution (
         `FROM ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} dt ` +
         `INNER JOIN ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} wtp ` +
         'ON wtp.document_template_id = dt.id ' +
-        'ORDER BY dt.sort_order ASC, dt.display_name COLLATE NOCASE ASC'
+        'ORDER BY dt.sort_order ASC, dt.created_at_ms ASC, dt.id ASC'
     )
     .all() as I_faSqlDistributionTemplateRow[]
 
@@ -90,7 +101,7 @@ export function listFaProjectDocumentDistribution (
         'display_name_translations_json AS display_name_translations_json, ' +
         'color AS color, sort_order AS sort_order ' +
         `FROM ${FA_PROJECT_TABLE_WORLDS} ` +
-        'ORDER BY sort_order ASC'
+        'ORDER BY sort_order ASC, created_at_ms ASC, id ASC'
     )
     .all() as I_faSqlDistributionWorldRow[]
 

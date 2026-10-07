@@ -1,5 +1,6 @@
 export default {
   title: 'Настройки проекта',
+  loadError: 'Не удалось загрузить настройки проекта.',
   closeButton: 'Закрыть без сохранения',
   saveButton: 'Сохранить настройки',
   saveWithoutClosingButton: 'Сохранить без закрытия',

@@ -60,6 +60,8 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   readDragParentDocumentIdAtDragStart: () => string | null
   readDragScrollTopPxAtDragStart: () => number
   readDragSiblingOrderAtDragStart: () => string[] | null
+  isProjectReplacementInFlight?: () => boolean
+  readProjectContentEpoch?: () => number
   readDragModelValueSettledForCommit: () => boolean
   resetDragModelValueRevisionForDragStart: () => void
   isTreeDragActive: Ref<boolean>
@@ -113,13 +115,22 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     setDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.set,
     treeData: deps.treeData.value
   })
+  const dragCommitEpochGuard = deps.readProjectContentEpoch === undefined
+    ? {}
+    : { readProjectContentEpoch: deps.readProjectContentEpoch }
+  const dragCommitFlightGuard = deps.isProjectReplacementInFlight === undefined
+    ? {}
+    : { isProjectReplacementInFlight: deps.isProjectReplacementInFlight }
   scheduleProjectHierarchyTreeDragCommit({
+    ...dragCommitEpochGuard,
+    ...dragCommitFlightGuard,
     clearDragSessionFlags: deps.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     draggedDocumentId: deps.draggedDocumentId.get,
+    draggedTreeNodeId: deps.draggedTreeNodeId.get,
     dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     dragSiblingOrderAtDragStart: deps.readDragSiblingOrderAtDragStart,
     getPersistedScrollTopPx: deps.getPersistedScrollTopPx,
@@ -151,6 +162,19 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
   })
 }
 
+const HIERARCHY_DRAG_END_CANCEL_DELAY_MS = 50
+
+function scheduleUncommittedHierarchyDragEndRestore (
+  deps: T_projectHierarchyTreeDnDHandlerDeps
+): void {
+  window.setTimeout(() => {
+    if (deps.dragDropCommitted.value) {
+      return
+    }
+    deps.dragCancelWiring.finishDragSessionWithoutCommit()
+  }, HIERARCHY_DRAG_END_CANCEL_DELAY_MS)
+}
+
 function onTreeDragEndCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.documentRowDragHoldWiring.clearHoldSession()
   deps.isTreeDragActive.value = false
@@ -158,13 +182,7 @@ function onTreeDragEndCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): 
   if (shouldClearDragSessionWithoutCommit({
     dragDropCommitted: deps.dragDropCommitted.value
   })) {
-    deps.removeDragCancelListeners()
-    deps.dragCommitPending.value = false
-    deps.dragCommitScheduled.value = false
-    deps.draggedDocumentId.set(null)
-    deps.draggedTreeNodeId.set(null)
-    deps.dragExpandedSnapshot.set(null)
-    deps.dragSiblingOrderSnapshot.set(null)
+    scheduleUncommittedHierarchyDragEndRestore(deps)
   }
 }
 
@@ -221,9 +239,13 @@ export function createProjectHierarchyTreeDnDHandlers (
     onUnmountedCleanupImpl(deps)
   }
 
+  function getDragExpandedSnapshotNodeIds (): string[] | null {
+    return deps.dragExpandedSnapshot.get()
+  }
+
   return {
     commitAllowedDocumentRowDragSessionStart,
-    getDragExpandedSnapshotNodeIds: () => deps.dragExpandedSnapshot.get(),
+    getDragExpandedSnapshotNodeIds,
     onBeforeDragStart,
     onTreeAfterDrop,
     onTreeDataUpdate,

@@ -108,6 +108,9 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     templateCanonicalNameLabel,
     templateCanonicalNameTooltipText
   })
+  const menuPinnedAsideLabelValue = pinnedAsideWiring.menuPinnedAsideLabelValue
+  const menuPinnedAsideTooltipValue = pinnedAsideWiring.menuPinnedAsideTooltipValue
+  const menuPinnedAsideValue = pinnedAsideWiring.menuPinnedAsideValue
 
   const renameInputTestLocatorValue = computed(() => {
     return renameInputTestLocator.value ??
@@ -120,9 +123,9 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     contextMenuTestLocator,
     hasMenuPinnedAside,
     menuOffset,
-    menuPinnedAsideLabelValue: pinnedAsideWiring.menuPinnedAsideLabelValue,
-    menuPinnedAsideTooltipValue: pinnedAsideWiring.menuPinnedAsideTooltipValue,
-    menuPinnedAsideValue: pinnedAsideWiring.menuPinnedAsideValue,
+    menuPinnedAsideLabelValue,
+    menuPinnedAsideTooltipValue,
+    menuPinnedAsideValue,
     onRenameMenuBeforeShow,
     onRenameMenuHide,
     onRenameMenuShow,

@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
@@ -32,6 +33,16 @@ export function deleteFaProjectDocumentsForPlacementId (
   db: Database,
   placementId: string
 ): void {
+  const nowMs = Date.now()
+  db.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = NULL, ` +
+      'updated_at_ms = ? ' +
+      `WHERE ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IN (` +
+        `SELECT id FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?) AND (` +
+        `${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} IS NULL OR ` +
+        `${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} <> ?)`
+  ).run(nowMs, placementId, placementId)
   db.prepare(
     `DELETE FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?`
   ).run(placementId)

@@ -31,6 +31,8 @@ import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { copyToClipboard } from 'quasar'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
+import { createFaActionDefinitionHandlersProjectSettings } from './functions/createFaActionDefinitionHandlersProjectSettings'
+import { FaActionUserCanceledError } from './functions/faActionUserCanceledError'
 import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
 import { createFaActionDefinitionHandlersProjectMedia } from './functions/createFaActionDefinitionHandlersProjectMedia'
 import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboardWiring'
@@ -77,14 +79,20 @@ const faActionDefinitionHandlersApi = {
     S_FaActiveProject,
     S_FaAppStyling,
     S_FaProjectStyling,
+    S_FaUserSettings,
+    canOpenFloatingWindowWhileNoModal,
+    applyFaUserSettingsLanguageSelection
+  }),
+  ...createFaActionDefinitionHandlersProjectSettings({
+    i18n,
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
+    S_FaActiveProject,
     S_FaProjectSettings,
     S_FaProjectHierarchyTree,
     S_FaProjectWorkspaceWorlds,
-    S_FaUserSettings,
-    canOpenFloatingWindowWhileNoModal,
-    applyFaUserSettingsLanguageSelection,
     faProjectWorldsPersistSnapshotFromDialog,
-    faProjectDocumentTemplatesPersistSnapshotFromDialog
+    faProjectDocumentTemplatesPersistSnapshotFromDialog,
+    createProjectSwitchCanceledError: () => new FaActionUserCanceledError()
   }),
   ...buildFaActionDefinitionHandlersWindowChrome({
     toggleDevTools
@@ -97,7 +105,9 @@ const faActionDefinitionHandlersApi = {
     S_FaOpenedDocuments,
     getCurrentRoutePath: resolveFaAppRouterCurrentPath,
     i18n,
+    isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
     notifyCreate: notifyCreateForFaActionDefinitionHandlers,
+    readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
     resolveAdjacentOpenedDocumentTabId,
     resolveCanEditActiveDocumentViaKeybind,
     resolveFaDocumentWorkspaceRouteDocumentId,
@@ -120,17 +130,24 @@ const faActionDefinitionHandlersApi = {
     S_FaOpenedDocuments,
     S_FaProjectHierarchyTree,
     i18n,
-    notifyCreate: notifyCreateForFaActionDefinitionHandlers
+    isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
+    readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch()
   }),
   ...createFaActionDefinitionHandlersHierarchyTreeSortActions({
-    S_FaProjectHierarchyTree
+    S_FaProjectHierarchyTree,
+    isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+    readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch()
   }),
   ...createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions({
     S_FaOpenedDocuments,
     i18n,
-    notifyCreate: notifyCreateForFaActionDefinitionHandlers
+    isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
+    readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch()
   }),
   ...createFaActionDefinitionHandlersProjectMedia({
+    createProjectSwitchCanceledError: () => new FaActionUserCanceledError(),
     i18n,
     notifyCreate: notifyCreateForFaActionDefinitionHandlers,
     S_FaActiveProject,

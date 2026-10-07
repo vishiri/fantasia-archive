@@ -69,14 +69,14 @@ test('Test that pickFirstDialogQuickAddDocumentWorldId returns null for empty wo
 
 /**
  * sortDialogQuickAddDocumentWorldsBySortOrder
- * Ties break by id for stable order.
+ * Equal sortOrder keeps the incoming list order.
  */
-test('Test that sortDialogQuickAddDocumentWorldsBySortOrder breaks ties by id', () => {
+test('Test that sortDialogQuickAddDocumentWorldsBySortOrder keeps equal sortOrder list order', () => {
   const sorted = sortDialogQuickAddDocumentWorldsBySortOrder([
     makeWorld('world-z', 1),
     makeWorld('world-a', 1)
   ])
-  expect(sorted.map((world) => world.id)).toEqual(['world-a', 'world-z'])
+  expect(sorted.map((world) => world.id)).toEqual(['world-z', 'world-a'])
 })
 
 /**

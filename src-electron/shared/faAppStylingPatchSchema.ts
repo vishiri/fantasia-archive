@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import type { I_faAppStylingPatch } from 'app/types/I_faAppStylingDomain'
@@ -29,15 +30,6 @@ export const faAppStylingPatchSchema = z.object({
     })
   }
 })
-
-function isPlainRecord (value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  )
-}
 
 /**
  * Parses an IPC payload patching the user CSS and/or window frame. Throws 'TypeError' for non-object payloads or 'ZodError' for shape/type issues.

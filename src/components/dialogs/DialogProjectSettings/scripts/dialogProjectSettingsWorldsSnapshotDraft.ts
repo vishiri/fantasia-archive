@@ -14,34 +14,7 @@ import {
 import {
   resolveFaProjectWorldTemplatePlacementNicknameForStorage
 } from 'app/src/scripts/projectWorlds/faProjectWorldTemplatePlacementNickname_manager'
-
-const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
-
-function normalizeDialogProjectSettingsColorPalette (colorPalette: string): string {
-  const trimmed = colorPalette.trim()
-  if (trimmed.length === 0) {
-    return ''
-  }
-  const seen = new Set<string>()
-  const normalized: string[] = []
-  for (const segment of trimmed.split(';')) {
-    const part = segment.trim()
-    if (part.length === 0) {
-      continue
-    }
-    if (!HEX_COLOR_SEGMENT.test(part)) {
-      continue
-    }
-    const upper = part.toUpperCase()
-    const key = upper.toLowerCase()
-    if (seen.has(key)) {
-      continue
-    }
-    seen.add(key)
-    normalized.push(upper)
-  }
-  return normalized.join(';')
-}
+import { normalizeFaProjectWorldColorPaletteString } from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPaletteHexList'
 
 export function mapDialogProjectSettingsWorldsToSnapshot (
   worlds: I_dialogProjectSettingsWorldDraft[]
@@ -55,7 +28,7 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
       ),
       id: world.id
     }
-    const normalizedPalette = normalizeDialogProjectSettingsColorPalette(world.colorPalette)
+    const normalizedPalette = normalizeFaProjectWorldColorPaletteString(world.colorPalette)
     if (normalizedPalette.length > 0) {
       item.colorPalette = normalizedPalette
     }
@@ -64,11 +37,14 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
         const displayNameTranslations = normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
           group.displayNameTranslations
         )
+        const displayName = resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations)
+        const id = group.id
+        const rootSortOrder = group.rootSortOrder
         return {
-          displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
+          displayName,
           displayNameTranslations,
-          id: group.id,
-          rootSortOrder: group.rootSortOrder
+          id,
+          rootSortOrder
         }
       }),
       placements: world.templateLayout.placements.map((placement) => {
@@ -78,20 +54,26 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
         const nicknameSingularTranslations = normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
           placement.nicknameSingularTranslations
         )
+        const documentTemplateId = placement.documentTemplateId
+        const groupId = placement.groupId
+        const groupSortOrder = placement.groupSortOrder
+        const id = placement.id
+        const nickname = resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+          buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
+            nicknamePluralTranslations,
+            nicknameSingularTranslations
+          })
+        )
+        const rootSortOrder = placement.rootSortOrder
         return {
-          documentTemplateId: placement.documentTemplateId,
-          groupId: placement.groupId,
-          groupSortOrder: placement.groupSortOrder,
-          id: placement.id,
-          nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
-            buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
-              nicknamePluralTranslations,
-              nicknameSingularTranslations
-            })
-          ),
+          documentTemplateId,
+          groupId,
+          groupSortOrder,
+          id,
+          nickname,
           nicknamePluralTranslations,
           nicknameSingularTranslations,
-          rootSortOrder: placement.rootSortOrder
+          rootSortOrder
         }
       })
     }

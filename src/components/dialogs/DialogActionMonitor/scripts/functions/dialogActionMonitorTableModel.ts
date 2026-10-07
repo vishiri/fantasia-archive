@@ -148,23 +148,25 @@ export function buildDialogActionMonitorStatusBadge (
   }
 }
 
-function parseDialogActionMonitorPayloadPreview (payloadPreview: string | undefined): unknown {
+function parseDialogActionMonitorPayloadPreview (
+  payloadPreview: string | undefined,
+  parseJson: (raw: string) => unknown
+): unknown {
   if (payloadPreview === undefined || payloadPreview === '') {
     return undefined
   }
-  try {
-    return JSON.parse(payloadPreview) as unknown
-  } catch {
-    return undefined
-  }
+  return parseJson(payloadPreview)
 }
 
 /**
  * Pretty-printed JSON snapshot of a row used by the click-to-copy clipboard flow.
  */
-export function buildDialogActionMonitorRowClipboardJson (entry: I_faActionHistoryEntry): string {
+export function buildDialogActionMonitorRowClipboardJson (
+  entry: I_faActionHistoryEntry,
+  parseJson: (raw: string) => unknown
+): string {
   const { payloadPreview, ...rest } = entry
-  const parsedPayload = parseDialogActionMonitorPayloadPreview(payloadPreview)
+  const parsedPayload = parseDialogActionMonitorPayloadPreview(payloadPreview, parseJson)
   const copyTarget: Record<string, unknown> = { ...rest }
   if (parsedPayload !== undefined) {
     copyTarget.payload = parsedPayload

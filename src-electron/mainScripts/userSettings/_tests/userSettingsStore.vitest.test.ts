@@ -31,7 +31,9 @@ vi.mock('electron-store', () => {
         configurable: true,
         enumerable: true,
         get () {
-          return storeSnapshot
+          const published = Object.create(null) as I_faUserSettings
+          Object.assign(published, storeSnapshot)
+          return published
         },
         set (value: I_faUserSettings) {
           storeReplacementCalls.push(value)
@@ -93,6 +95,16 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
  * getFaUserSettings
  * Startup cleanup does not rewrite the store when all persisted keys still exist in defaults.
  */
+test('Test that getFaUserSettings rewrites an invalid appTheme during startup cleanup', async () => {
+  persistedStoreExtras.appTheme = 'notATheme'
+
+  const { getFaUserSettings } = await import('../userSettings_manager')
+  const store = getFaUserSettings()
+
+  expect(store.store.appTheme).toBe(FA_USER_SETTINGS_DEFAULTS.appTheme)
+  expect(storeReplacementCalls[0]?.appTheme).toBe(FA_USER_SETTINGS_DEFAULTS.appTheme)
+})
+
 test('Test that getFaUserSettings does not rewrite a clean persisted settings store', async () => {
   persistedStoreExtras.appTheme = 'lightThemeFlat'
 

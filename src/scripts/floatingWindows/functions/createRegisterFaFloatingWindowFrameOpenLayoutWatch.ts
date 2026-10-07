@@ -32,10 +32,13 @@ export function createRegisterFaFloatingWindowFrameOpenLayoutWatch (
     watch: deps.watch
   }
 
+  const registerFaFloatingWindowFrameOpenLayoutWatch = (
+    opts: Parameters<T_registerFaFloatingWindowFrameOpenLayoutWatchFn>[1]
+  ): void => {
+    deps.registerFaFloatingWindowFrameOpenLayoutWatchImpl(layoutDeps, opts)
+  }
+
   return {
-    registerFaFloatingWindowFrameOpenLayoutWatch: (opts) => deps.registerFaFloatingWindowFrameOpenLayoutWatchImpl(
-      layoutDeps,
-      opts
-    )
+    registerFaFloatingWindowFrameOpenLayoutWatch
   }
 }

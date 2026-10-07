@@ -42,15 +42,13 @@ function assertPlacementSortFields (placement: {
   }
 }
 
-function deleteRemovedFaProjectWorldTemplateLayoutRows (
+function deleteRemovedFaProjectWorldTemplatePlacements (
   db: Database,
   worldId: string,
   layout: I_faProjectWorldTemplateLayoutSnapshot
 ): void {
-  const snapshotGroupIds = new Set(layout.groups.map((group) => group.id))
   const snapshotPlacementIds = new Set(layout.placements.map((placement) => placement.id))
   const existingPlacementIds = listFaProjectWorldTemplatePlacementIdsForWorld(db, worldId)
-  const existingGroupIds = listFaProjectWorldTemplateGroupIdsForWorld(db, worldId)
 
   for (const placementId of existingPlacementIds) {
     if (!snapshotPlacementIds.has(placementId)) {
@@ -58,6 +56,16 @@ function deleteRemovedFaProjectWorldTemplateLayoutRows (
       deleteFaProjectWorldTemplatePlacementById(db, placementId)
     }
   }
+}
+
+function deleteRemovedFaProjectWorldTemplateGroups (
+  db: Database,
+  worldId: string,
+  layout: I_faProjectWorldTemplateLayoutSnapshot
+): void {
+  const snapshotGroupIds = new Set(layout.groups.map((group) => group.id))
+  const existingGroupIds = listFaProjectWorldTemplateGroupIdsForWorld(db, worldId)
+
   for (const groupId of existingGroupIds) {
     if (!snapshotGroupIds.has(groupId)) {
       deleteFaProjectWorldTemplateGroupById(db, groupId)
@@ -157,6 +165,7 @@ function upsertFaProjectWorldTemplateLayoutPlacements (
 
 /**
  * Replaces the full template layout for one world by upserting rows and deleting removed ids.
+ * Removed groups are deleted after placement updates so ON DELETE SET NULL cannot violate the placement sort CHECK.
  */
 export function replaceFaProjectWorldTemplateLayoutSnapshot (
   db: Database,
@@ -178,7 +187,8 @@ export function replaceFaProjectWorldTemplateLayoutSnapshot (
   )
   const existingGroupIds = new Set(listFaProjectWorldTemplateGroupIdsForWorld(db, worldId))
 
-  deleteRemovedFaProjectWorldTemplateLayoutRows(db, worldId, layout)
+  deleteRemovedFaProjectWorldTemplatePlacements(db, worldId, layout)
   upsertFaProjectWorldTemplateLayoutGroups(db, worldId, layout, existingGroupIds, nowMs)
   upsertFaProjectWorldTemplateLayoutPlacements(db, worldId, layout, existingPlacementIds, nowMs)
+  deleteRemovedFaProjectWorldTemplateGroups(db, worldId, layout)
 }

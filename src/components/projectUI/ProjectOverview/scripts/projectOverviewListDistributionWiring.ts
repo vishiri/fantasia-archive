@@ -12,13 +12,14 @@ export async function listProjectOverviewDocumentDistribution (): Promise<I_faPr
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listDocumentDistribution !== 'function') {
-    return {
+    const emptyDistribution: I_faProjectDocumentDistributionResult = {
       counts: [],
       documentTemplateTotalCount: 0,
       templates: [],
       totalDocumentCount: 0,
       worlds: []
     }
+    return emptyDistribution
   }
   return await api.listDocumentDistribution()
 }

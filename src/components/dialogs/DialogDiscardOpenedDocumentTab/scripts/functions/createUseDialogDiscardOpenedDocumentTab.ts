@@ -1,11 +1,38 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
 
+function resolveDiscardDialogDocumentName (
+  tab: {
+    displayNameDraft: string
+    savedDisplayName: string
+    tabLabel: string
+  },
+  documentId: string
+): string {
+  const draft = tab.displayNameDraft.trim()
+  if (draft.length > 0) {
+    return draft
+  }
+  const saved = tab.savedDisplayName.trim()
+  if (saved.length > 0) {
+    return saved
+  }
+  const tabLabel = tab.tabLabel.trim()
+  if (tabLabel.length > 0) {
+    return tabLabel
+  }
+  return documentId
+}
+
 export function createUseDialogDiscardOpenedDocumentTab (deps: {
   S_FaOpenedDocuments: () => StoreGeneric & {
     confirmDiscardAndClose: (documentId: string) => Promise<void>
     dismissPendingClose: () => void
-    findTabByDocumentId: (documentId: string) => { displayNameDraft: string } | null
+    findTabByDocumentId: (documentId: string) => {
+      displayNameDraft: string
+      savedDisplayName: string
+      tabLabel: string
+    } | null
   }
   computed: <T>(getter: () => T) => I_computedRef<T>
   ref: <T>(value: T) => I_ref<T>
@@ -23,7 +50,7 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
   return function useDialogDiscardOpenedDocumentTab () {
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
     const { pendingCloseDocumentId } = deps.storeToRefs(openedDocumentsStore)!
-    const dialogOpen = deps.ref(false)
+    const dialogOpen = deps.ref(pendingCloseDocumentId!.value !== null)
 
     const documentName = deps.computed(() => {
       const documentId = pendingCloseDocumentId!.value
@@ -31,7 +58,10 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
         return ''
       }
       const tab = openedDocumentsStore.findTabByDocumentId(documentId)
-      return tab?.displayNameDraft ?? documentId
+      if (tab === null) {
+        return documentId
+      }
+      return resolveDiscardDialogDocumentName(tab, documentId)
     })
 
     deps.watch(

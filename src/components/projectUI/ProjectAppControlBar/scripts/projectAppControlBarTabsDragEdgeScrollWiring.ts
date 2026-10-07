@@ -3,6 +3,7 @@ import {
   PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_SENSITIVITY_PX,
   resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec
 } from '../functions/projectAppControlBarTabsDragEdgeScroll'
+import { resolveProjectAppControlBarTabsScrollLeftBounds } from '../functions/projectAppControlBarTabsWheelScroll'
 import { PROJECT_APP_CONTROL_BAR_TABS_CONTENT_SELECTOR } from './projectAppControlBarTabsWheelScrollWiring'
 
 /** Cap one frame's dt so a tab-blur spike does not jump scroll. */
@@ -35,10 +36,12 @@ function applyProjectAppControlBarTabsDragEdgeScrollFrame (
   }
 
   const rect = session.content.getBoundingClientRect()
+  const direction = getComputedStyle(session.content).direction === 'rtl' ? 'rtl' : 'ltr'
   const velocityPxPerSec = resolveProjectAppControlBarTabsDragEdgeScrollVelocityPxPerSec({
     clientWidth: session.content.clientWidth,
     contentLeft: rect.left,
     contentRight: rect.right,
+    direction,
     maxSpeedPxPerSec: PROJECT_APP_CONTROL_BAR_TABS_DRAG_EDGE_SCROLL_MAX_SPEED_PX_PER_SEC,
     pointerClientX: session.pointerClientX,
     scrollLeft: session.content.scrollLeft,
@@ -59,11 +62,19 @@ function applyProjectAppControlBarTabsDragEdgeScrollFrame (
   }
 
   session.scrollCarryPx -= wholeDeltaPx
-  const maxScroll = session.content.scrollWidth - session.content.clientWidth
-  session.content.scrollLeft = Math.min(
-    maxScroll,
-    Math.max(0, session.content.scrollLeft + wholeDeltaPx)
+  const bounds = resolveProjectAppControlBarTabsScrollLeftBounds({
+    clientWidth: session.content.clientWidth,
+    direction,
+    scrollWidth: session.content.scrollWidth
+  })
+  if (bounds === null) {
+    return
+  }
+  const nextScrollLeft = Math.min(
+    bounds.maxScrollLeft,
+    Math.max(bounds.minScrollLeft, session.content.scrollLeft + wholeDeltaPx)
   )
+  session.content.scrollLeft = nextScrollLeft
 }
 
 function scheduleProjectAppControlBarTabsDragEdgeScrollFrame (

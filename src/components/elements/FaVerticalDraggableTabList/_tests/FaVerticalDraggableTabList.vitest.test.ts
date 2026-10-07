@@ -40,8 +40,8 @@ const listMountProps = {
   testLocatorList: 'dialogProjectSettings-worlds-list'
 }
 
-function mountTabList () {
-  return mount(FaVerticalDraggableTabList, {
+function mountTabList (attachTo?: HTMLElement) {
+  const options = {
     props: listMountProps,
     global: {
       components: { VueDraggable: vueDraggableStub },
@@ -70,6 +70,13 @@ function mountTabList () {
         'data-test-world-id': item.id
       })
     }
+  }
+  if (attachTo === undefined) {
+    return mount(FaVerticalDraggableTabList, options)
+  }
+  return mount(FaVerticalDraggableTabList, {
+    ...options,
+    attachTo
   })
 }
 
@@ -197,6 +204,32 @@ test('Test that FaVerticalDraggableTabList resyncs pointerHover after drag anima
 
   elementFromPointSpy.mockRestore()
   vi.useRealTimers()
+})
+
+/**
+ * FaVerticalDraggableTabList
+ * Drag end drops focus on a tab inside the scroll list and leaves outside focus alone.
+ */
+test('Test that FaVerticalDraggableTabList drag end blurs only a focused tab', async () => {
+  const wrapper = mountTabList(document.body)
+  const addButton = wrapper.get(
+    '[data-test-locator="dialogProjectSettings-worlds-addButton"]'
+  ).element as HTMLButtonElement
+  addButton.focus()
+
+  await wrapper.findComponent(vueDraggableStub).vm.$emit('end')
+
+  expect(document.activeElement).toBe(addButton)
+
+  const scroll = wrapper.get('[data-test-locator="dialogProjectSettings-worlds-list"]').element
+  const focusedTab = document.createElement('button')
+  scroll.appendChild(focusedTab)
+  focusedTab.focus()
+
+  await wrapper.findComponent(vueDraggableStub).vm.$emit('end')
+
+  expect(document.activeElement).not.toBe(focusedTab)
+  wrapper.unmount()
 })
 
 beforeEach(() => {

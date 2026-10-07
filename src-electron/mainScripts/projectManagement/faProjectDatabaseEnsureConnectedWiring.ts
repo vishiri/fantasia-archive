@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import type { IpcMainInvokeEvent } from 'electron'
 import type Database from 'better-sqlite3'
 
@@ -58,29 +60,35 @@ export function runWithFaProjectDatabaseSync<T> (work: (db: Database) => T): { o
   if (db0 === null) {
     return { ok: false }
   }
-  try {
+  const firstAttempt = Result.fromThrowable(
+    () => work(db0),
+    (error: unknown) => error
+  )()
+  if (firstAttempt.isOk()) {
+    const value = firstAttempt.value
     return {
       ok: true,
-      value: work(db0)
+      value
     }
-  } catch (firstErr) {
-    if (!isLikelyRecoverableProjectSqliteError(firstErr)) {
-      throw firstErr
-    }
-    closeFaProjectActiveDatabaseHandleOnly()
-    const p = getFaProjectLastKnownActiveProjectFilePath()
-    const hardened = p === null ? null : resolveHardenedFaProjectFilePath(p)
-    if (hardened === null || !reconnectFaProjectDatabaseAtKnownPathSync(hardened)) {
-      throw firstErr
-    }
-    const db1 = getFaProjectActiveDatabase()
-    if (db1 === null) {
-      throw firstErr
-    }
-    return {
-      ok: true,
-      value: work(db1)
-    }
+  }
+  const firstErr = firstAttempt.error
+  if (!isLikelyRecoverableProjectSqliteError(firstErr)) {
+    throw firstErr
+  }
+  closeFaProjectActiveDatabaseHandleOnly()
+  const p = getFaProjectLastKnownActiveProjectFilePath()
+  const hardened = p === null ? null : resolveHardenedFaProjectFilePath(p)
+  if (hardened === null || !reconnectFaProjectDatabaseAtKnownPathSync(hardened)) {
+    throw firstErr
+  }
+  const db1 = getFaProjectActiveDatabase()
+  if (db1 === null) {
+    throw firstErr
+  }
+  const value = work(db1)
+  return {
+    ok: true,
+    value
   }
 }
 

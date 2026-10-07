@@ -61,6 +61,14 @@ test('Test that faProjectWorldTemplatePlacementNicknameSchema trims nickname val
  * Project content Zod parsers
  * Accept strict create, update, link, and list filter shapes.
  */
+test('Test that parseFaProjectMediaPatch keeps a display name longer than 120 characters', () => {
+  const longName = 'M'.repeat(121)
+  const parsed = parseFaProjectMediaPatch({
+    displayName: `  ${longName}  `
+  })
+  expect(parsed.displayName).toBe(longName)
+})
+
 test('Test that project content schema parsers accept valid payloads', () => {
   expect(parseFaProjectWorldCreateInput({ displayName: '  Realm  ' }).displayName).toBe('Realm')
   expect(parseFaProjectWorldUpdatePayload({

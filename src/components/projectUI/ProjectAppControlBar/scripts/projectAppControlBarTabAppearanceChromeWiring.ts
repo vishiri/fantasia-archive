@@ -1,7 +1,10 @@
 import type { CSSProperties } from 'vue'
 
 import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
+import type { I_projectAppControlBarComposableApi } from 'app/types/I_faProjectAppControlBarDomain'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
+import { resolveProjectAppControlBarTabDisplayIcon } from '../functions/projectAppControlBarTabDisplayIcon'
 
 import { resolveFaDocumentAppearanceChromeStyle } from 'app/src/scripts/documentAppearance/documentAppearance_manager'
 import { buildFaColorGlyphCssCustomProperties } from 'app/src/scripts/faColorContrast/faColorContrast_manager'
@@ -73,4 +76,33 @@ export function resolveProjectAppControlBarTabInlineStyle (
   }
 
   return style
+}
+
+export function buildProjectAppControlBarTabAppearanceChromeApi (): Pick<
+  I_projectAppControlBarComposableApi,
+  | 'resolveDocumentTabAppearanceChrome'
+  | 'resolveDocumentTabDisplayIcon'
+  | 'resolveDocumentTabInlineStyle'
+> {
+  function resolveDocumentTabAppearanceChrome (
+    tab: I_faOpenedDocumentTab
+  ): I_faDocumentAppearanceChromeStyle | undefined {
+    return resolveProjectAppControlBarTabAppearanceChrome(tab)
+  }
+
+  function resolveDocumentTabDisplayIcon (tab: I_faOpenedDocumentTab): string {
+    return resolveProjectAppControlBarTabDisplayIcon(tab)
+  }
+
+  function resolveDocumentTabInlineStyle (
+    tab: I_faOpenedDocumentTab
+  ): CSSProperties | undefined {
+    return resolveProjectAppControlBarTabInlineStyle(tab)
+  }
+
+  return {
+    resolveDocumentTabAppearanceChrome,
+    resolveDocumentTabDisplayIcon,
+    resolveDocumentTabInlineStyle
+  }
 }

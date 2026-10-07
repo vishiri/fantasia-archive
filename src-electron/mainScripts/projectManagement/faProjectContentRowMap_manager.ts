@@ -8,15 +8,15 @@ import { parseFaProjectWorldTemplatePlacementNicknameTranslationsJson } from 'ap
 
 import {
   createMapFaProjectDocumentTemplateRow,
-  createMapFaProjectWorldRow,
+  createMapFaProjectWorldRow
+} from './functions/faProjectContentRowMap'
+import {
   createMapFaProjectWorldTemplateGroupRow,
   createMapFaProjectWorldTemplatePlacementForProjectSettingsRow
-} from './functions/faProjectContentRowMap'
+} from './functions/faProjectWorldTemplateLayoutRowMap'
 
-export {
-  mapFaProjectDocumentRow,
-  mapFaProjectNamedEntityRow
-} from './functions/faProjectContentRowMap'
+export { mapFaProjectNamedEntityRow } from './functions/faProjectContentRowMap'
+export { mapFaProjectDocumentRow } from './functions/faProjectDocumentRowMap'
 
 export const mapFaProjectDocumentTemplateRow = createMapFaProjectDocumentTemplateRow({
   parseTitlePluralTranslationsJson: parseFaProjectDocumentTemplateTitleTranslationsJson,

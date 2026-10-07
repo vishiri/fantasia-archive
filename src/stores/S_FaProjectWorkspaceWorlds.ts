@@ -61,9 +61,10 @@ export const S_FaProjectWorkspaceWorlds = defineStore('S_FaProjectWorkspaceWorld
     }
   )
 
+  const publishedWorldListItems = readonly(worldListItems)
   return {
     refreshWorkspaceWorlds,
     replaceSessionForComponentTesting,
-    worldListItems: readonly(worldListItems)
+    worldListItems: publishedWorldListItems
   }
 })

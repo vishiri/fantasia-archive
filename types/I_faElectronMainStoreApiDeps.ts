@@ -88,7 +88,8 @@ export interface I_faUserSettingsStoreApiDeps {
   buildSanitizedFaUserSettings: (
     currentSettings: Partial<I_faUserSettings>,
     defaults: I_faUserSettings,
-    isAppTheme: (value: string) => boolean
+    isAppTheme: (value: string) => boolean,
+    isLanguageCode: (value: string) => boolean
   ) => {
     hasUnexpectedKeys: boolean
     sanitized: I_faUserSettings
@@ -96,6 +97,7 @@ export interface I_faUserSettingsStoreApiDeps {
   createLazySingleton: <T>(factory: () => T) => () => T
   defaults: I_faUserSettings
   isFaUserSettingsAppTheme: (value: string) => boolean
+  isFaUserSettingsLanguageCode: (value: string) => boolean
   migrateLegacyFaUserSettingsKeys: (raw: unknown) => Record<string, unknown>
   storeName: string
 }

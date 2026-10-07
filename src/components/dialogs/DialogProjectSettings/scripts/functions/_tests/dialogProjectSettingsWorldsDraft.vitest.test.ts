@@ -212,6 +212,18 @@ test('Test that appendDialogProjectSettingsWorldDraft appends a new world row', 
   expect(hasDialogProjectSettingsWorldNameValidationError(next)).toBe(false)
 })
 
+test('Test that appendDialogProjectSettingsWorldDraft gives each world its own template layout', () => {
+  const first = appendDialogProjectSettingsWorldDraft([], 'en-US', 'One')
+  const next = appendDialogProjectSettingsWorldDraft(first, 'en-US', 'Two')
+  const left = next[0]?.templateLayout
+  const right = next[1]?.templateLayout
+  expect(left).toBeDefined()
+  expect(right).toBeDefined()
+  expect(left).not.toBe(right)
+  expect(left?.groups).not.toBe(right?.groups)
+  expect(left?.placements).not.toBe(right?.placements)
+})
+
 /**
  * isDialogProjectSettingsWorldTabValidationError
  * Combines blank world names and duplicate palette colors for tab styling.

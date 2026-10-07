@@ -23,7 +23,8 @@ export function createUseGlobalWindowButtons (deps: {
   return function useGlobalWindowButtons () {
     const isMaximized = deps.ref(true)
 
-    let checkerInterval: number
+    let checkerInterval: number | undefined
+    let maximizedCheckSerial = 0
 
     const minimizeWindow = (): void => {
       deps.runFaAction('minimizeApp', undefined)
@@ -45,11 +46,19 @@ export function createUseGlobalWindowButtons (deps: {
       if (!shouldPoll) {
         return
       }
-      isMaximized.value = await deps.checkWindowMaximized()
+      maximizedCheckSerial += 1
+      const serial = maximizedCheckSerial
+      const maximized = await deps.checkWindowMaximized()
+      if (serial !== maximizedCheckSerial) {
+        return
+      }
+      isMaximized.value = maximized
     }
 
     deps.onMounted(async () => {
-      deps.clearInterval(checkerInterval)
+      if (checkerInterval !== undefined) {
+        deps.clearInterval(checkerInterval)
+      }
 
       await checkIfWindowMaximized()
 
@@ -59,7 +68,11 @@ export function createUseGlobalWindowButtons (deps: {
     })
 
     deps.onUnmounted(async () => {
-      deps.clearInterval(checkerInterval)
+      maximizedCheckSerial += 1
+      if (checkerInterval !== undefined) {
+        deps.clearInterval(checkerInterval)
+        checkerInterval = undefined
+      }
     })
 
     return {

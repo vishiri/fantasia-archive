@@ -17,7 +17,6 @@
       <q-tooltip
         anchor="bottom middle"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         {{ tooltipLabel }}

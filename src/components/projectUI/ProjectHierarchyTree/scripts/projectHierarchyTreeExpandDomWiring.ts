@@ -49,10 +49,13 @@ export function collectProjectHierarchyTreeLiveExpandStateFromDom (
 ): I_faProjectHierarchyTreeLiveExpandDomState {
   const host = resolveProjectHierarchyTreeScrollHostForDomRead(treeScrollHost)
   if (host === null) {
+    const collapsedVisibleNodeIds: string[] = []
+    const expandedNodeIds: string[] = []
+    const rowCount = 0
     return {
-      collapsedVisibleNodeIds: [],
-      expandedNodeIds: [],
-      rowCount: 0,
+      collapsedVisibleNodeIds,
+      expandedNodeIds,
+      rowCount,
       scrollHostPresent: false
     }
   }
@@ -75,10 +78,11 @@ export function collectProjectHierarchyTreeLiveExpandStateFromDom (
     }
     collapsedVisibleNodeIds.push(nodeId)
   }
+  const rowCount = rows.length
   return {
     collapsedVisibleNodeIds,
     expandedNodeIds,
-    rowCount: rows.length,
+    rowCount,
     scrollHostPresent: true
   }
 }

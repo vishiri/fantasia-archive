@@ -35,11 +35,18 @@ const fetchLatestApi = createFetchLatestGithubReleaseVersion({
       }
     })
     if (!response.ok) {
-      throw new Error(`GitHub latest release request failed with status ${String(response.status)}.`)
+      throw new Error(i18n.global.t('appUpdateCheck.githubRequestFailed', {
+        status: String(response.status)
+      }))
     }
     return await response.json()
   },
   latestApiUrl: FA_APP_UPDATE_GITHUB_LATEST_API_URL,
+  releaseErrorMessages: {
+    emptyAfterStrip: () => i18n.global.t('appUpdateCheck.githubEmptyTagName'),
+    missingTagName: () => i18n.global.t('appUpdateCheck.githubMissingTagName'),
+    responseNotObject: () => i18n.global.t('appUpdateCheck.githubResponseNotObject')
+  },
   stripFaSemverVersion
 })
 
@@ -101,6 +108,7 @@ const checkForAppUpdatesApi = createCheckForAppUpdates({
     const persistedSettings = await userSettingsBridge.getSettings()
     return persistedSettings.hidePlushes === true
   },
+  getInstalledVersionUnreadableMessage: () => i18n.global.t('appUpdateCheck.installedVersionUnreadable'),
   getLocalVersion: async () => {
     const appDetails = window.faContentBridgeAPIs?.appDetails
     if (appDetails?.getProjectVersion === undefined) {

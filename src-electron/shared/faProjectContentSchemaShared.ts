@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
+import { isPlainRecord } from 'app/src-electron/shared/faPlainRecord'
 
 export const faProjectContentDisplayNameSchema = z
   .string()
@@ -18,13 +20,30 @@ export const faProjectWorldTemplatePlacementNicknameSchema = z
 export const faProjectContentIdSchema = z.string().uuid('id must be a UUID')
 
 export function parseFaProjectContentPlainRecord (value: unknown): Record<string, unknown> {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    Array.isArray(value) ||
-    Object.getPrototypeOf(value) !== Object.prototype
-  ) {
+  if (!isPlainRecord(value)) {
     throw new TypeError('payload must be a plain object')
   }
-  return value as Record<string, unknown>
+  return value
+}
+
+/**
+ * Parses a strict `{ id }` payload and returns the id.
+ */
+export function parseFaProjectContentIdPayload (
+  schema: z.ZodType<{ id: string }>,
+  payload: unknown
+): string {
+  const parsed = schema.parse(parseFaProjectContentPlainRecord(payload))
+  return parsed.id
+}
+
+/**
+ * Parses a plain-object payload and drops keys whose values are undefined.
+ */
+export function parseFaProjectContentDroppedRecord<T extends Record<string, unknown>> (
+  schema: z.ZodType<T>,
+  payload: unknown
+): T {
+  const parsed = schema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed)
 }

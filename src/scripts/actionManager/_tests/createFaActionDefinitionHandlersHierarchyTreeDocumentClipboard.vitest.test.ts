@@ -48,6 +48,7 @@ function createHandlers () {
 }
 
 beforeEach(() => {
+  vi.unstubAllGlobals()
   copyToClipboardMock.mockClear()
   notifyCreateMock.mockClear()
   sessionState.treeData = [
@@ -119,6 +120,63 @@ test('Test that handleCopyHierarchyTreeDocumentBackgroundColor copies and shows 
     type: 'positive'
   })
   expect(result).toEqual({ payloadPreview: '#112233' })
+})
+
+test('Test that hierarchy clipboard copy reads the document when the tree row is not loaded', async () => {
+  const getDocumentById = vi.fn(async () => ({
+    displayName: ' Hidden ',
+    documentBackgroundColor: ' #010203 ',
+    documentTextColor: ' #AABBCC ',
+    id: 'doc-hidden'
+  }))
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {
+      projectContent: {
+        getDocumentById
+      }
+    }
+  })
+  sessionState.treeData = []
+  const {
+    handleCopyHierarchyTreeDocumentBackgroundColor,
+    handleCopyHierarchyTreeDocumentName,
+    handleCopyHierarchyTreeDocumentTextColor
+  } = createHandlers()
+
+  const nameResult = await handleCopyHierarchyTreeDocumentName({ documentId: 'doc-hidden' })
+  expect(nameResult).toEqual({ payloadPreview: 'Hidden' })
+  expect(copyToClipboardMock).toHaveBeenCalledWith('Hidden')
+
+  copyToClipboardMock.mockClear()
+  await handleCopyHierarchyTreeDocumentTextColor({ documentId: 'doc-hidden' })
+  expect(copyToClipboardMock).toHaveBeenCalledWith('#AABBCC')
+
+  copyToClipboardMock.mockClear()
+  await handleCopyHierarchyTreeDocumentBackgroundColor({ documentId: 'doc-hidden' })
+  expect(copyToClipboardMock).toHaveBeenCalledWith('#010203')
+  expect(getDocumentById).toHaveBeenCalledWith('doc-hidden')
+  vi.unstubAllGlobals()
+})
+
+test('Test that hierarchy clipboard copy skips a missing document row', async () => {
+  const getDocumentById = vi.fn(async () => {
+    throw new Error('Document not found: doc-gone')
+  })
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {
+      projectContent: {
+        getDocumentById
+      }
+    }
+  })
+  sessionState.treeData = []
+  const { handleCopyHierarchyTreeDocumentName } = createHandlers()
+
+  await handleCopyHierarchyTreeDocumentName({ documentId: 'doc-gone' })
+
+  expect(copyToClipboardMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+  vi.unstubAllGlobals()
 })
 
 test('Test that hierarchy tree clipboard copy handlers skip when node is missing or value is empty', async () => {

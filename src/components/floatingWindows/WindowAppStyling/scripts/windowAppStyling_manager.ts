@@ -6,6 +6,7 @@ import {
   ref,
   watch
 } from 'vue'
+import { Result } from 'neverthrow'
 
 import {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
@@ -64,6 +65,7 @@ const wireStylingPersistedCssIntoOpenEditor = createWireStylingPersistedCssIntoO
 const wireStylingWindowOpenFromMenuAndProps = createWireStylingWindowOpenFromMenuAndProps({
   onMounted,
   readFaDialogComponentStoreOrNull: createReadFaDialogComponentStoreOrNull({
+    Result,
     S_DialogComponent: () => dialogStoreModule.S_DialogComponent()
   }),
   watch

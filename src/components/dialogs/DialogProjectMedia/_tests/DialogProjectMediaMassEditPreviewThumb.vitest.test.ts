@@ -72,6 +72,23 @@ test('Test that DialogProjectMediaMassEditPreviewThumb emits image load and erro
 
 /**
  * DialogProjectMediaMassEditPreviewThumb
+ * A new preview URL replaces the media element so a late load or error from the previous URL cannot apply.
+ */
+test('Test that DialogProjectMediaMassEditPreviewThumb replaces the image when the probe URL changes', async () => {
+  const w = mountThumb({
+    probeSrc: 'https://cdn.example.com/a.png',
+    showImage: true
+  })
+  const firstImage = w.get('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').element
+  await w.setProps({ probeSrc: 'https://cdn.example.com/b.png' })
+  const secondImage = w.get('[data-test-locator="dialogProjectMedia-massEdit-previewImage-row-1"]').element
+  expect(secondImage).not.toBe(firstImage)
+  expect((secondImage as HTMLImageElement).getAttribute('src')).toBe('https://cdn.example.com/b.png')
+  w.unmount()
+})
+
+/**
+ * DialogProjectMediaMassEditPreviewThumb
  * Warning state shows the tooltip hook and error frame.
  */
 test('Test that DialogProjectMediaMassEditPreviewThumb shows the warning glyph', () => {
@@ -256,6 +273,27 @@ test('Test that DialogProjectMediaMassEditPreviewThumb single-edit video is a pl
 
 /**
  * DialogProjectMediaMassEditPreviewThumb
+ * A failed single-edit video stays mounted so the next URL can still load.
+ */
+test('Test that DialogProjectMediaMassEditPreviewThumb keeps a failed single-edit video mounted', async () => {
+  const w = mountThumb({
+    probeSrc: 'https://cdn.example.com/broken.mp4',
+    showVideo: true,
+    showWarning: true,
+    thumbSize: 'singleEdit',
+    typeIconName: 'video_file'
+  })
+
+  const video = w.get('[data-test-locator="dialogProjectMedia-massEdit-previewVideo-row-1"]')
+  expect(video.classes()).toContain('dialogProjectMediaMassEditPreviewThumb__mediaProbe')
+  expect(video.attributes('controls')).toBeUndefined()
+  await video.trigger('loadedmetadata')
+  expect(w.emitted('load')).toHaveLength(1)
+  w.unmount()
+})
+
+/**
+ * DialogProjectMediaMassEditPreviewThumb
  * Single-edit audio relayouts native controls after metadata and the slide delay.
  */
 test('Test that DialogProjectMediaMassEditPreviewThumb single-edit audio is a player', async () => {
@@ -268,7 +306,7 @@ test('Test that DialogProjectMediaMassEditPreviewThumb single-edit audio is a pl
     typeIconName: 'audio_file'
   })
 
-  try {
+  const run = (async () => {
     const audio = w.get('[data-test-locator="dialogProjectMedia-massEdit-previewAudio-row-1"]')
     expect(audio.classes()).toContain('dialogProjectMediaMassEditPreviewThumb__audioPlayer')
     expect(audio.attributes('controls')).toBeDefined()
@@ -283,10 +321,11 @@ test('Test that DialogProjectMediaMassEditPreviewThumb single-edit audio is a pl
     expect(w.emitted('load')).toHaveLength(1)
     await vi.advanceTimersByTimeAsync(FA_PROJECT_MEDIA_AUDIO_CONTROLS_RELAYOUT_MS)
     expect(audio.attributes('controls')).toBeDefined()
-  } finally {
+  })()
+  await run.finally(() => {
     w.unmount()
     vi.useRealTimers()
-  }
+  })
 })
 
 /**

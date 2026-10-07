@@ -22,8 +22,21 @@ import {
 import type {
   I_faProjectDocumentTagAssignmentInput,
   I_faProjectRenameTagResult,
-  I_faProjectSetDocumentTagsResult
+  I_faProjectSetDocumentTagsResult,
+  I_faProjectTag
 } from 'app/types/I_faProjectTagDomain'
+
+function faProjectRenameTagResult (
+  tag: I_faProjectTag,
+  merged: boolean,
+  mergedFromTagId: string | null
+): I_faProjectRenameTagResult {
+  return {
+    tag,
+    merged,
+    mergedFromTagId
+  }
+}
 
 function createFaProjectTagRow (
   db: Database,
@@ -126,7 +139,13 @@ export function reorderFaProjectDocumentsUnderTag (
     .prepare(`SELECT document_id AS id FROM ${FA_PROJECT_TABLE_DOCUMENT_TAGS} WHERE tag_id = ?`)
     .all(tagId) as Array<{ id: string }>
   const existingSet = new Set(existingRows.map((row) => row.id))
-  if (orderedDocumentIds.length !== existingSet.size) {
+  const orderedUniqueIds = orderedDocumentIds.filter((documentId, index, ids) => {
+    return ids.indexOf(documentId) === index
+  })
+  if (
+    orderedDocumentIds.length !== existingSet.size ||
+    orderedUniqueIds.length !== existingSet.size
+  ) {
     throw new Error('Document list for tag reorder must match current membership')
   }
   for (const documentId of orderedDocumentIds) {
@@ -156,7 +175,7 @@ function mergeFaProjectTagIntoExisting (
   const sourceDocs = db
     .prepare(
       `SELECT document_id AS id FROM ${FA_PROJECT_TABLE_DOCUMENT_TAGS} WHERE tag_id = ? ` +
-        'ORDER BY sort_order ASC'
+        'ORDER BY sort_order ASC, document_id ASC'
     )
     .all(sourceTagId) as Array<{ id: string }>
   const targetDocSet = new Set(
@@ -181,11 +200,8 @@ function mergeFaProjectTagIntoExisting (
     nextOrder += 1
   }
   db.prepare(`DELETE FROM ${FA_PROJECT_TABLE_TAGS} WHERE id = ?`).run(sourceTagId)
-  return {
-    tag: mapFaProjectTagRow(getFaProjectTagRowById(db, targetTagId)),
-    merged: true,
-    mergedFromTagId: sourceTagId
-  }
+  const tag = mapFaProjectTagRow(getFaProjectTagRowById(db, targetTagId))
+  return faProjectRenameTagResult(tag, true, sourceTagId)
 }
 
 export function renameFaProjectTag (
@@ -200,21 +216,15 @@ export function renameFaProjectTag (
   }
   if (areFaProjectTagNamesCaseInsensitiveEqual(source.name, newName)) {
     if (source.name === newName) {
-      return {
-        tag: mapFaProjectTagRow(source),
-        merged: false,
-        mergedFromTagId: null
-      }
+      const tag = mapFaProjectTagRow(source)
+      return faProjectRenameTagResult(tag, false, null)
     }
     const nowMs = Date.now()
     db.prepare(
       `UPDATE ${FA_PROJECT_TABLE_TAGS} SET name = ?, updated_at_ms = ? WHERE id = ?`
     ).run(newName, nowMs, tagId)
-    return {
-      tag: mapFaProjectTagRow(getFaProjectTagRowById(db, tagId)),
-      merged: false,
-      mergedFromTagId: null
-    }
+    const tag = mapFaProjectTagRow(getFaProjectTagRowById(db, tagId))
+    return faProjectRenameTagResult(tag, false, null)
   }
   const conflictId = findFaProjectTagIdByWorldAndNameNocase(db, source.world_id, newName)
   if (conflictId === null) {
@@ -222,18 +232,12 @@ export function renameFaProjectTag (
     db.prepare(
       `UPDATE ${FA_PROJECT_TABLE_TAGS} SET name = ?, updated_at_ms = ? WHERE id = ?`
     ).run(newName, nowMs, tagId)
-    return {
-      tag: mapFaProjectTagRow(getFaProjectTagRowById(db, tagId)),
-      merged: false,
-      mergedFromTagId: null
-    }
+    const tag = mapFaProjectTagRow(getFaProjectTagRowById(db, tagId))
+    return faProjectRenameTagResult(tag, false, null)
   }
   if (conflictId === tagId) {
-    return {
-      tag: mapFaProjectTagRow(source),
-      merged: false,
-      mergedFromTagId: null
-    }
+    const tag = mapFaProjectTagRow(source)
+    return faProjectRenameTagResult(tag, false, null)
   }
   return mergeFaProjectTagIntoExisting(db, tagId, conflictId)
 }

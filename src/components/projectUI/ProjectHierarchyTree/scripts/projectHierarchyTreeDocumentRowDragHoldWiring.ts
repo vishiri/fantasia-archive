@@ -130,11 +130,12 @@ export function createProjectHierarchyTreeDocumentRowDragHoldSession (
     return isDragHoldArmed
   }
 
+  const handleTreeDragStartCapture = dragStartHandler.handleTreeDragStartCapture
   return {
     clearHoldSession,
     getIsDragHoldArmed,
     handleDocumentRowPointerDown,
-    handleTreeDragStartCapture: dragStartHandler.handleTreeDragStartCapture,
+    handleTreeDragStartCapture,
     markDragStartedFromHold
   }
 }

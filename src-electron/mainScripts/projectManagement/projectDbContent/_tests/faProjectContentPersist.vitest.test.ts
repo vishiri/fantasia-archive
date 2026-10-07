@@ -368,6 +368,31 @@ function makeProjectContentTestDb (): {
           }
         }
       }
+      if (normalized.includes('UPDATE documents') && normalized.includes('tree_parent_document_id = NULL')) {
+        return {
+          run: (_nowMs: number, placementId: string) => {
+            const parentIds = new Set<string>()
+            for (const [id, row] of tables.documents) {
+              if (row.tree_placement_id === placementId) {
+                parentIds.add(id)
+              }
+            }
+            let changes = 0
+            for (const row of tables.documents.values()) {
+              const parentId = row.tree_parent_document_id
+              if (typeof parentId !== 'string' || !parentIds.has(parentId)) {
+                continue
+              }
+              if (row.tree_placement_id === placementId) {
+                continue
+              }
+              row.tree_parent_document_id = null
+              changes += 1
+            }
+            return { changes }
+          }
+        }
+      }
       if (normalized.includes('DELETE FROM documents')) {
         if (normalized.includes('tree_placement_id')) {
           return {

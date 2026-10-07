@@ -20,6 +20,10 @@ import {
   resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabelFromResolved,
   resolveDialogProjectSettingsWorldTemplatePlacementUsesNicknameFromResolved
 } from './functions/dialogProjectSettingsWorldTemplateLayoutTreeLocalizedLabels'
+import {
+  mapPlacementToHeTreeNode,
+  readPlacementDraftLabelFields
+} from './dialogProjectSettingsWorldTemplateLayoutTreePlacementNode'
 
 type T_rootLayoutItem =
   | { kind: 'group', groupId: string, rootSortOrder: number }
@@ -44,66 +48,6 @@ function buildRootLayoutItems (
   ]
   items.sort((left, right) => left.rootSortOrder - right.rootSortOrder)
   return items
-}
-
-function readPlacementDraftLabelFields (
-  placement: I_dialogProjectSettingsWorldTemplatePlacementDraft
-): {
-    nicknamePluralTranslations: I_dialogProjectSettingsWorldTemplatePlacementDraft['nicknamePluralTranslations']
-    nicknameSingularTranslations: I_dialogProjectSettingsWorldTemplatePlacementDraft['nicknameSingularTranslations']
-    templateDisplayName: string
-  } {
-  const nicknamePluralTranslations = placement.nicknamePluralTranslations ?? {}
-  const nicknameSingularTranslations = placement.nicknameSingularTranslations ?? {}
-  const templateDisplayName = placement.templateDisplayName ??
-    (placement as { displayName?: string }).displayName ??
-    ''
-  return {
-    nicknamePluralTranslations,
-    nicknameSingularTranslations,
-    templateDisplayName
-  }
-}
-
-function mapPlacementToHeTreeNode (
-  placement: I_dialogProjectSettingsWorldTemplatePlacementDraft,
-  languageCode: T_faUserSettingsLanguageCode
-): I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
-  const {
-    nicknamePluralTranslations,
-    nicknameSingularTranslations,
-    templateDisplayName
-  } = readPlacementDraftLabelFields(placement)
-  const resolvedNickname = resolveFaProjectWorldTemplatePlacementNickname(
-    buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
-      nicknamePluralTranslations,
-      nicknameSingularTranslations
-    }),
-    languageCode
-  )
-  const usesNickname = resolveDialogProjectSettingsWorldTemplatePlacementUsesNicknameFromResolved({
-    resolvedNickname
-  })
-  const label = resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabelFromResolved({
-    resolvedNickname,
-    templateDisplayName
-  })
-  return {
-    children: [],
-    displayNameTranslations: {},
-    categoryCountInWorld: placement.categoryCountInWorld,
-    documentCountInWorld: placement.documentCountInWorld,
-    documentTemplateId: placement.documentTemplateId,
-    icon: placement.icon,
-    id: placement.id,
-    label,
-    nicknamePluralTranslations,
-    nicknameSingularTranslations,
-    nodeKind: 'template',
-    templateDisplayName,
-    usesNickname,
-    worldAppendix: placement.worldAppendix
-  }
 }
 
 function buildGroupChildNodes (
@@ -132,21 +76,28 @@ export function buildHeTreeNodesFromWorldTemplateLayoutDraft (
   return rootItems.map((item) => {
     if (item.kind === 'group') {
       const group = groupById.get(item.groupId)!
+      const children = buildGroupChildNodes(layout, group.id, languageCode)
+      const displayNameTranslations = group.displayNameTranslations
+      const id = group.id
+      const label = resolveFaProjectWorldTemplateGroupDisplayName(
+        displayNameTranslations,
+        languageCode
+      )
+      const nicknamePluralTranslations: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode['nicknamePluralTranslations'] = {}
+      const nicknameSingularTranslations: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode['nicknameSingularTranslations'] = {}
+      const nodeKind = 'group' as const
       return {
-        children: buildGroupChildNodes(layout, group.id, languageCode),
-        displayNameTranslations: group.displayNameTranslations,
+        children,
+        displayNameTranslations,
         categoryCountInWorld: 0,
         documentCountInWorld: 0,
         documentTemplateId: null,
         icon: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
-        id: group.id,
-        label: resolveFaProjectWorldTemplateGroupDisplayName(
-          group.displayNameTranslations,
-          languageCode
-        ),
-        nicknamePluralTranslations: {},
-        nicknameSingularTranslations: {},
-        nodeKind: 'group' as const,
+        id,
+        label,
+        nicknamePluralTranslations,
+        nicknameSingularTranslations,
+        nodeKind,
         templateDisplayName: '',
         usesNickname: false,
         worldAppendix: ''

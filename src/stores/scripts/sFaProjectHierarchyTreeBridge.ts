@@ -88,21 +88,27 @@ I_faProjectHierarchyTreeWorkspaceLayoutResult | null
     )
     if (tagsResult.isErr()) {
       console.error('[S_FaProjectHierarchyTree] listTagsWithDocumentCountsForWorld failed', tagsResult.error)
+      const tags = world.tags ?? []
       return {
         ...world,
-        tags: world.tags ?? []
+        tags
       }
     }
+    const tags = tagsResult.value.items.map((item) => {
+      const categoryCount = item.categoryCount
+      const documentCount = item.documentCount
+      const id = item.id
+      const name = item.name
+      return {
+        categoryCount,
+        documentCount,
+        id,
+        name
+      }
+    })
     return {
       ...world,
-      tags: tagsResult.value.items.map((item) => {
-        return {
-          categoryCount: item.categoryCount,
-          documentCount: item.documentCount,
-          id: item.id,
-          name: item.name
-        }
-      })
+      tags
     }
   }))
   return {
@@ -111,9 +117,10 @@ I_faProjectHierarchyTreeWorkspaceLayoutResult | null
 }
 
 export function createEmptyProjectHierarchyTreeUiState (): I_faProjectHierarchyTreeUiState {
+  const expandedNodeIds: I_faProjectHierarchyTreeUiState['expandedNodeIds'] = []
   return {
     ...EMPTY_UI_STATE,
-    expandedNodeIds: []
+    expandedNodeIds
   }
 }
 

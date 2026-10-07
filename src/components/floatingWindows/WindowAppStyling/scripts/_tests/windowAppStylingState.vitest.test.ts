@@ -471,6 +471,28 @@ test('Test that saveAndCloseWindow keeps the window open when the action returns
   expect(harness.current!.state.windowModel.value).toBe(true)
 })
 
+test('Test that saveAndCloseWindow stays open when CSS changes during save', async () => {
+  let finishSave: ((ok: boolean) => void) | undefined
+  const pendingSave = new Promise<boolean>((resolve) => {
+    finishSave = resolve
+  })
+  runFaActionAwaitMock.mockReturnValueOnce(pendingSave)
+  const { harness } = mountUseWindow('WindowAppStyling')
+  await nextTick()
+  harness.current!.state.workingCss.value = 'a { color: red; }'
+  const savePromise = harness.current!.state.saveAndCloseWindow()
+  harness.current!.state.workingCss.value = 'a { color: blue; }'
+  const finish = finishSave
+  if (finish === undefined) {
+    throw new Error('missing save resolver')
+  }
+  finish(true)
+  await savePromise
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('saveAppStyling', { css: 'a { color: red; }' })
+  expect(harness.current!.state.windowModel.value).toBe(true)
+  expect(harness.current!.state.workingCss.value).toBe('a { color: blue; }')
+})
+
 /**
  * useWindowAppStyling
  * After close, working copy and editor are torn down only once the transition duration elapses.

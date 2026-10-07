@@ -10,14 +10,20 @@ import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
  */
 export const S_FaRecentProjects = defineStore('S_FaRecentProjects', () => {
   const entries: Ref<I_faRecentProjectEntry[]> = ref([])
+  let recentProjectsGeneration = 0
 
   async function refreshRecentProjects (): Promise<void> {
     const api = window.faContentBridgeAPIs?.projectManagement
+    recentProjectsGeneration += 1
+    const generation = recentProjectsGeneration
     if (api === undefined) {
       entries.value = []
       return
     }
     const rows = await api.getRecentProjects()
+    if (generation !== recentProjectsGeneration) {
+      return
+    }
     entries.value = faRecentProjectListStructuralNormalize(rows)
   }
 

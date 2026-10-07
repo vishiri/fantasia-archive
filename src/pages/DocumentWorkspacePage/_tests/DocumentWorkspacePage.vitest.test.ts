@@ -520,6 +520,37 @@ test('Test that DocumentWorkspacePage renders editable color fields and forwards
   wrapper.unmount()
 })
 
+test('Test that DocumentWorkspacePage remounts fields when the open document changes', async () => {
+  const wrapper = mount(DocumentWorkspacePage, {
+    global: {
+      stubs: {
+        FaColorPickerInput: {
+          name: 'FaColorPickerInput',
+          props: ['modelValue', 'testLocator'],
+          template: '<div :data-test-locator="testLocator" />'
+        },
+        DocumentWorkspacePageSelectSmoke: true
+      }
+    }
+  })
+  await flushPromises()
+
+  const before = wrapper.getComponent({ name: 'FaColorPickerInput' }).vm
+  const currentTab = documentTabRef.value
+  if (currentTab === null) {
+    throw new Error('missing document tab')
+  }
+  documentTabRef.value = {
+    ...currentTab,
+    documentId: 'doc-2'
+  }
+  await flushPromises()
+
+  const after = wrapper.getComponent({ name: 'FaColorPickerInput' }).vm
+  expect(after).not.toBe(before)
+  wrapper.unmount()
+})
+
 test('Test that DocumentWorkspacePage renders belongs under field chrome and readonly input in preview mode', async () => {
   documentShowsEditFieldsRef.value = false
   documentShowsPreviewRef.value = true

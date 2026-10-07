@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive Innstillinger',
+  loadError: 'Kunne ikke laste inn innstillingene.',
   saveButton: 'Lagre innstillinger',
   closeButton: 'Lukk uten å lagre',
   settingsSearchPlaceholder: 'Søk i innstillingene...',

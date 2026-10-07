@@ -8,16 +8,36 @@ async function maybeAutoHideHierarchyTreeWhenNoWorldTemplatePlacements (
 ): Promise<void> {
   const hierarchyTreeStore = deps.S_FaProjectHierarchyTree()
   const userSettingsStore = deps.S_FaUserSettings()
+  const activeProject = deps.S_FaActiveProject()
+  const epochAtStart = activeProject.readProjectContentEpoch()
+  const projectStillCurrent = (): boolean => {
+    if (activeProject.isProjectReplacementInFlight()) {
+      return false
+    }
+    return activeProject.readProjectContentEpoch() === epochAtStart
+  }
   await syncHideHierarchyTreeWhenNoWorldTemplatePlacements({
     getHideHierarchyTree: () => userSettingsStore.settings?.hideHierarchyTree === true,
     getWorlds: () => hierarchyTreeStore.worlds,
     patchHideHierarchyTree: async (hideHierarchyTree) => {
       await userSettingsStore.patchSettingsSilently({ hideHierarchyTree })
     },
+    projectStillCurrent,
     refreshLayout: async () => {
       await hierarchyTreeStore.refreshLayout()
     }
   })
+}
+
+function projectOpenFlowStillCurrent (
+  deps: I_createFaActionDefinitionHandlersDialogsDeps,
+  epochAtStart: number
+): boolean {
+  const activeProject = deps.S_FaActiveProject()
+  if (activeProject.isProjectReplacementInFlight()) {
+    return false
+  }
+  return activeProject.readProjectContentEpoch() === epochAtStart
 }
 
 function maybeAutoOpenProjectNoteboardAfterHydrate (
@@ -33,6 +53,24 @@ function maybeAutoOpenProjectNoteboardAfterHydrate (
     },
     text: projectNoteboardStore.text
   })
+}
+
+async function showStartupTipsNotification (
+  deps: I_createFaActionDefinitionHandlersDialogsDeps
+): Promise<void> {
+  let hideMascot = false
+  const userSettingsBridge = window.faContentBridgeAPIs?.faUserSettings
+  if (userSettingsBridge?.getSettings !== undefined) {
+    const persistedSettings = await userSettingsBridge.getSettings()
+    if (persistedSettings.hideTooltipsStart === true) {
+      return
+    }
+    hideMascot = persistedSettings.hidePlushes === true
+  }
+  if (deps.S_FaActiveProject().hasActiveProject) {
+    return
+  }
+  deps.tipsTricksTriviaNotification(hideMascot)
 }
 
 export function buildFaActionDefinitionHandlersDialogsProjectFlow (
@@ -53,12 +91,13 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
     await Promise.resolve()
       .then(async () => {
         const outcome = await deps.S_FaActiveProject().createProjectFromUserInput(payload.projectName)
-        if (outcome === 'canceled') {
+        if (outcome === 'canceled' || outcome === 'superseded') {
           throw new deps.FaActionUserCanceledError()
         }
         deps.notifyFaProjectCreatedPositive()
+        const epochAtStart = deps.S_FaActiveProject().readProjectContentEpoch()
         const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
-        if (projectHydrated) {
+        if (projectHydrated && projectOpenFlowStillCurrent(deps, epochAtStart)) {
           maybeAutoOpenProjectNoteboardAfterHydrate(deps)
         }
         await deps.S_FaProjectSidebar().refreshProjectSidebar()
@@ -85,8 +124,9 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
         }
         if (outcome === 'opened') {
           deps.notifyFaProjectLoadedPositive()
+          const epochAtStart = deps.S_FaActiveProject().readProjectContentEpoch()
           const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
-          if (projectHydrated) {
+          if (projectHydrated && projectOpenFlowStillCurrent(deps, epochAtStart)) {
             maybeAutoOpenProjectNoteboardAfterHydrate(deps)
           }
           await deps.S_FaProjectSidebar().refreshProjectSidebar()
@@ -111,18 +151,8 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       })
   }
 
-  async function handleShowStartupTipsNotification (): Promise<void> {
-    let hideMascot = false
-    const userSettingsBridge = window.faContentBridgeAPIs?.faUserSettings
-    if (userSettingsBridge?.getSettings !== undefined) {
-      const persistedSettings = await userSettingsBridge.getSettings()
-      if (persistedSettings.hideTooltipsStart === true) {
-        return
-      }
-      hideMascot = persistedSettings.hidePlushes === true
-    }
-
-    deps.tipsTricksTriviaNotification(hideMascot)
+  const handleShowStartupTipsNotification = (): Promise<void> => {
+    return showStartupTipsNotification(deps)
   }
 
   async function handleCheckForAppUpdates (

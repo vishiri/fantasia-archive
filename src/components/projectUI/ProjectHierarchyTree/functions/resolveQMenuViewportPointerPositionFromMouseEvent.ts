@@ -3,8 +3,10 @@ import type { I_qMenuViewportPointerPosition } from 'app/types/I_qMenuViewportPo
 export function resolveQMenuViewportPointerPositionFromMouseEvent (
   event: MouseEvent
 ): I_qMenuViewportPointerPosition {
+  const left = event.clientX
+  const top = event.clientY
   return {
-    left: event.clientX,
-    top: event.clientY
+    left,
+    top
   }
 }

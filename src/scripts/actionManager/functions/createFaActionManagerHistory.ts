@@ -160,26 +160,36 @@ export function createFaActionManagerHistory (deps: T_createFaActionManagerHisto
   recordHistoryOverflowDrop: (entry: I_faActionQueueEntry, errorMessage: string) => void
   snapshotActionHistory: () => I_faActionHistoryEntry[]
 } {
+  const recordHistoryCompleted = (
+    uid: string,
+    outcome: { kind: 'success' } | { kind: 'failed', errorMessage: string },
+    finishedAt: number,
+    payloadPreview?: string
+  ): void => {
+    recordFaActionHistoryCompleted(deps, uid, outcome, finishedAt, payloadPreview)
+  }
+  const recordHistoryEnqueued = (entry: I_faActionQueueEntry): void => {
+    recordFaActionHistoryEnqueued(deps, entry)
+  }
+  const recordHistoryOverflowDrop = (entry: I_faActionQueueEntry, errorMessage: string): void => {
+    recordFaActionHistoryOverflowDrop(deps, entry, errorMessage)
+  }
+  const recordHistoryStarted = (uid: string, startedAt: number): void => {
+    recordFaActionHistoryStarted(deps, uid, startedAt)
+  }
+  const recordHistoryStartedFromEntry = (entry: I_faActionQueueEntry, startedAt: number): void => {
+    recordFaActionHistoryStartedFromEntry(deps, entry, startedAt)
+  }
+  const snapshotActionHistory = (): I_faActionHistoryEntry[] => {
+    return snapshotFaActionHistory(deps)
+  }
+
   return {
-    recordHistoryCompleted: (uid, outcome, finishedAt, payloadPreview) => recordFaActionHistoryCompleted(
-      deps,
-      uid,
-      outcome,
-      finishedAt,
-      payloadPreview
-    ),
-    recordHistoryEnqueued: (entry) => recordFaActionHistoryEnqueued(deps, entry),
-    recordHistoryOverflowDrop: (entry, errorMessage) => recordFaActionHistoryOverflowDrop(
-      deps,
-      entry,
-      errorMessage
-    ),
-    recordHistoryStarted: (uid, startedAt) => recordFaActionHistoryStarted(deps, uid, startedAt),
-    recordHistoryStartedFromEntry: (entry, startedAt) => recordFaActionHistoryStartedFromEntry(
-      deps,
-      entry,
-      startedAt
-    ),
-    snapshotActionHistory: () => snapshotFaActionHistory(deps)
+    recordHistoryCompleted,
+    recordHistoryEnqueued,
+    recordHistoryOverflowDrop,
+    recordHistoryStarted,
+    recordHistoryStartedFromEntry,
+    snapshotActionHistory
   }
 }

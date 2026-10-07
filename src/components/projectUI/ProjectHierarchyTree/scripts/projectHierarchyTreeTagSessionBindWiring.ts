@@ -55,10 +55,13 @@ export function bindProjectHierarchyTreeTagSessionWiring (deps: {
       const userSettingsStore = deps.S_FaUserSettings()
       const settings = userSettingsStore.settings
       const preview = userSettingsStore.appSettingsDialogPreview
+      const compactTags = preview?.compactTags ?? settings?.compactTags ?? FA_USER_SETTINGS_DEFAULTS.compactTags
+      const noTags = preview?.noTags ?? settings?.noTags ?? FA_USER_SETTINGS_DEFAULTS.noTags
+      const tagsAtTop = preview?.tagsAtTop ?? settings?.tagsAtTop ?? FA_USER_SETTINGS_DEFAULTS.tagsAtTop
       return {
-        compactTags: preview?.compactTags ?? settings?.compactTags ?? FA_USER_SETTINGS_DEFAULTS.compactTags,
-        noTags: preview?.noTags ?? settings?.noTags ?? FA_USER_SETTINGS_DEFAULTS.noTags,
-        tagsAtTop: preview?.tagsAtTop ?? settings?.tagsAtTop ?? FA_USER_SETTINGS_DEFAULTS.tagsAtTop
+        compactTags,
+        noTags,
+        tagsAtTop
       }
     },
     resolveTagsLabel: () => deps.i18nT('projectUI.projectHierarchyTree.tagsWrapperLabel')

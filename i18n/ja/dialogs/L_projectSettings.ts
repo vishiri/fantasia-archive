@@ -1,5 +1,6 @@
 export default {
   title: 'プロジェクト設定',
+  loadError: 'プロジェクト設定を読み込めませんでした。',
   closeButton: '保存せずに閉じる',
   saveButton: '設定を保存',
   saveWithoutClosingButton: '閉じずに保存',

@@ -1,5 +1,6 @@
 export default {
   title: 'Ρυθμίσεις έργου',
+  loadError: 'Δεν ήταν δυνατή η φόρτωση των ρυθμίσεων έργου.',
   closeButton: 'Κλείσιμο χωρίς αποθήκευση',
   saveButton: 'Αποθήκευση ρυθμίσεων',
   saveWithoutClosingButton: 'Αποθήκευση χωρίς κλείσιμο',

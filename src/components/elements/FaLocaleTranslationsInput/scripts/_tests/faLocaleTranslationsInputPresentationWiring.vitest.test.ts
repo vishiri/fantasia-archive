@@ -51,6 +51,33 @@ test('Test that createFaLocaleTranslationsInputPresentationWiring focusPreferred
   window.requestAnimationFrame = originalRequestAnimationFrame
 })
 
+test('Test that focusPreferredLanguageInput skips focus after the menu closes', async () => {
+  const focus = vi.fn()
+  let menuOpen = true
+  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+    callback(performance.now())
+    return 1
+  })
+  const originalRequestAnimationFrame = window.requestAnimationFrame
+  window.requestAnimationFrame = requestAnimationFrame
+
+  const wiring = createFaLocaleTranslationsInputPresentationWiring({
+    computed,
+    nextTick: async () => {},
+    readPreferredLanguageInputFocus: () => focus,
+    readPresentation: () => 'menuPanel'
+  })
+
+  wiring.focusPreferredLanguageInput(() => menuOpen)
+  menuOpen = false
+  await Promise.resolve()
+  await Promise.resolve()
+  await Promise.resolve()
+
+  expect(focus).not.toHaveBeenCalled()
+  window.requestAnimationFrame = originalRequestAnimationFrame
+})
+
 test('Test that createFaLocaleTranslationsInputPresentationWiring focusPreferredLanguageInput no-ops without focus fn', async () => {
   const wiring = createFaLocaleTranslationsInputPresentationWiring({
     computed,

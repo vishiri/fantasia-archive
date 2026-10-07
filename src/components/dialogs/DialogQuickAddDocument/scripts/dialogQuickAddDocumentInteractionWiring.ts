@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 import type {
   I_createUseDialogQuickAddDocumentDeps,
   I_dialogQuickAddDocumentSession
@@ -26,22 +28,25 @@ export function wireDialogQuickAddDocumentOpenClose (
     onDialogShow: () => void
   } {
   const openDialog = (input: T_dialogName): void => {
+    const alreadyOpen = session.dialogModel.value === true
     session.documentName.value = input
     session.selectedTemplateId.value = null
     session.skipNextWorldChangeReopen.value = true
     const openGeneration = session.focusGeneration.value + 1
     session.focusGeneration.value = openGeneration
     void (async () => {
-      try {
-        await hydrateDialogQuickAddDocumentWorlds(deps, session)
-      } catch {
-        // Still open so the user is not stuck if worlds IPC fails.
-      }
+      // Still open so the user is not stuck if worlds IPC fails.
+      await ResultAsync.fromPromise(
+        hydrateDialogQuickAddDocumentWorlds(deps, session),
+        () => undefined
+      )
       if (session.focusGeneration.value !== openGeneration) {
-        session.skipNextWorldChangeReopen.value = false
         return
       }
       session.dialogModel.value = true
+      if (alreadyOpen) {
+        session.skipNextWorldChangeReopen.value = false
+      }
     })()
   }
 
@@ -54,16 +59,17 @@ export function wireDialogQuickAddDocumentOpenClose (
     session.skipNextWorldChangeReopen.value = true
     const focusGeneration = session.focusGeneration.value + 1
     session.focusGeneration.value = focusGeneration
-    void (async () => {
-      try {
-        if (session.worlds.value.length === 0) {
-          await hydrateDialogQuickAddDocumentWorlds(deps, session)
-        }
-      } finally {
-        session.skipNextWorldChangeReopen.value = false
+    const hydrateWorlds = (async () => {
+      if (session.worlds.value.length === 0) {
+        await hydrateDialogQuickAddDocumentWorlds(deps, session)
       }
-      await focusDialogQuickAddDocumentTemplateSelectAfterShow(deps, session, focusGeneration)
     })()
+    void hydrateWorlds.finally(() => {
+      if (session.focusGeneration.value !== focusGeneration) {
+        return
+      }
+      session.skipNextWorldChangeReopen.value = false
+    }).then(() => focusDialogQuickAddDocumentTemplateSelectAfterShow(deps, session, focusGeneration))
   }
 
   const onDialogHide = (): void => {
@@ -156,6 +162,8 @@ export function wireDialogQuickAddDocumentSelectHandlers (
     scheduleDialogQuickAddDocumentTemplateFocus(deps, session)
   }
 
+  let templateCreateInFlight = false
+
   const onTemplateSelect = async (
     value: T_faSelectInputModelValue | null | undefined
   ): Promise<void> => {
@@ -169,22 +177,29 @@ export function wireDialogQuickAddDocumentSelectHandlers (
       return
     }
     const template = session.templatesById.value.get(templateId)
-    if (template === undefined) {
+    if (template === undefined || templateCreateInFlight) {
       return
     }
-    session.selectedTemplateId.value = templateId
-    const displayName = deps.resolveNewDocumentDisplayName({
-      preferredLanguageCode: deps.resolvePreferredLanguageCode(),
-      titlePluralTranslations: template.titlePluralTranslations,
-      titleSingularTranslations: template.titleSingularTranslations
-    })
-    // FA 1.0 closes first, then creates — keeps dismiss snappy while create runs.
-    closeDialog()
-    await deps.createTemporaryDocument({
-      displayName,
-      templateId,
-      worldId
-    })
+    templateCreateInFlight = true
+    try {
+      session.selectedTemplateId.value = templateId
+      const displayName = deps.resolveNewDocumentDisplayName({
+        preferredLanguageCode: deps.resolvePreferredLanguageCode(),
+        titlePluralTranslations: template.titlePluralTranslations,
+        titleSingularTranslations: template.titleSingularTranslations
+      })
+      // FA 1.0 closes first, then creates — keeps dismiss snappy while create runs.
+      closeDialog()
+      await deps.createTemporaryDocument({
+        displayName,
+        templateId,
+        worldId
+      })
+    } catch (error: unknown) {
+      deps.reportTemporaryDocumentCreateFailure(error)
+    } finally {
+      templateCreateInFlight = false
+    }
   }
 
   return {

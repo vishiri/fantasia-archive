@@ -23,9 +23,11 @@ export function createProjectHierarchyTreeDocumentOpenHandlers (deps: {
   function resolveDocumentTreeOpenMeta (
     node: I_faProjectHierarchyTreeHeTreeNode
   ): I_faOpenedDocumentTreeOpenMeta {
+    const tabLabel = node.label
+    const templateIcon = node.icon
     return {
-      tabLabel: node.label,
-      templateIcon: node.icon
+      tabLabel,
+      templateIcon
     }
   }
 
@@ -117,7 +119,10 @@ export function createProjectHierarchyTreeSessionHandlersClickWiring (deps: {
 type T_earlyWiring = ReturnType<typeof createProjectHierarchyTreeSessionEarlyWiring>
 
 type T_hierarchyStore = {
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  queuePersistExpandedNodeIds: (
+    expandedNodeIds: string[],
+    options?: { allowEmpty?: boolean }
+  ) => void
   refreshHierarchyTreeNodes?: ((nodeIds: string[]) => void) | undefined
   refreshLayout: () => Promise<void>
   uiState: { scrollTopPx: number }
@@ -132,6 +137,7 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>
@@ -170,8 +176,15 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     onDocumentOpenRequest: deps.onDocumentOpenRequest,
     openNodeIds: deps.earlyWiring.bootstrap.sessionRefs.openNodeIds,
     openIconExpandAnimationWiring: deps.earlyWiring.subWiring.openIconExpandAnimationWiring,
-    queuePersistExpandedNodeIds: (expandedNodeIds) => {
-      deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
+    queuePersistExpandedNodeIds: (
+      expandedNodeIds: string[],
+      options?: { allowEmpty?: boolean }
+    ) => {
+      if (options === undefined) {
+        deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
+        return
+      }
+      deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds, options)
     },
     refreshHierarchyTreeNodes: (nodeIds) => {
       deps.hierarchyStore.refreshHierarchyTreeNodes?.(nodeIds)

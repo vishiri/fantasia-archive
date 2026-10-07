@@ -11,7 +11,6 @@
       <q-tooltip
         anchor="bottom middle"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         <div class="fa-tooltip-keybind-stack">
@@ -38,7 +37,6 @@
       <q-tooltip
         anchor="bottom left"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         <div class="fa-tooltip-keybind-stack">
@@ -65,7 +63,6 @@
       <q-tooltip
         anchor="bottom left"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         <div class="fa-tooltip-keybind-stack">
@@ -92,7 +89,6 @@
       <q-tooltip
         anchor="bottom middle"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         {{ copyCurrentDocumentTooltip }}
@@ -109,7 +105,6 @@
       <q-tooltip
         anchor="bottom middle"
         class="projectAppControlBar__buttonTooltip"
-        :delay="500"
         self="top middle"
       >
         {{ addNewDocumentUnderThisTooltip }}

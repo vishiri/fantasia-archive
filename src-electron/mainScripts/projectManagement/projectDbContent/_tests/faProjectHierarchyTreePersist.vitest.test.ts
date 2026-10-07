@@ -8,7 +8,8 @@ import {
 import {
   createFaProjectDocument,
   deleteFaProjectDocument,
-  getFaProjectDocumentById
+  getFaProjectDocumentById,
+  updateFaProjectDocument
 } from '../faProjectDocumentsPersistWiring'
 import {
   listFaProjectPlacementDocumentChildren,
@@ -21,6 +22,7 @@ import {
 import { createFaProjectDocumentTemplate } from '../faProjectDocumentTemplatesPersistWiring'
 import { createFaProjectWorld } from '../faProjectWorldsPersistWiring'
 import { replaceFaProjectWorldTemplateLayoutSnapshot } from '../faProjectWorldTemplateLayoutSnapshotWiring'
+import { deleteFaProjectDocumentsForPlacementId } from '../faProjectWorldTemplateLayoutSqlWiring'
 
 let db: Database | null = null
 
@@ -264,6 +266,47 @@ test('Test that moveFaProjectDocumentInHierarchy rejects ancestor cycle', () => 
     targetParentDocumentId: child.id,
     targetSortOrder: 0
   })).toThrow()
+})
+
+/**
+ * moveFaProjectDocumentInHierarchy
+ * A pre-existing parent loop must not hang the ancestor walk.
+ */
+test('Test that moveFaProjectDocumentInHierarchy finishes when the target parent chain already loops', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const first = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'First',
+    sortOrder: 0
+  })
+  const second = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: first.id,
+    displayName: 'Second',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_parent_document_id = ? WHERE id = ?`
+  ).run(second.id, first.id)
+  const outsider = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Outsider',
+    sortOrder: 1
+  })
+  moveFaProjectDocumentInHierarchy(connection, {
+    documentId: outsider.id,
+    targetParentDocumentId: first.id,
+    targetSortOrder: 0
+  })
+  expect(getFaProjectDocumentById(connection, outsider.id).parentDocumentId).toBe(first.id)
 })
 
 /**
@@ -549,6 +592,90 @@ test('Test that searchFaProjectHierarchy ignores documents without placement_id'
 
 /**
  * deleteFaProjectDocument
+ * A placed document with no children deletes without a reparent pass.
+ */
+test('Test that deleteFaProjectDocument removes a placed document that has no children', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const leaf = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Leaf',
+    sortOrder: 0
+  })
+  deleteFaProjectDocument(connection, leaf.id)
+  expect(() => getFaProjectDocumentById(connection, leaf.id)).toThrow('Document')
+})
+
+/**
+ * deleteFaProjectDocument
+ * A child moved to another placement root sorts after siblings already there.
+ */
+test('Test that deleteFaProjectDocument places a foreign-placement child after existing roots', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const otherTemplate = createFaProjectDocumentTemplate(connection, { displayName: 'Place' })
+  const otherPlacementId = 'placement-other-roots'
+  replaceFaProjectWorldTemplateLayoutSnapshot(connection, seeded.worldId, {
+    groups: [],
+    placements: [
+      {
+        id: seeded.placementId,
+        documentTemplateId: seeded.templateId,
+        groupId: null,
+        rootSortOrder: 0,
+        groupSortOrder: null,
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {}
+      },
+      {
+        id: otherPlacementId,
+        documentTemplateId: otherTemplate.id,
+        groupId: null,
+        rootSortOrder: 1,
+        groupSortOrder: null,
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {}
+      }
+    ]
+  })
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const anchor = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: otherTemplate.id,
+    placementId: otherPlacementId,
+    displayName: 'Anchor',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: otherTemplate.id,
+    placementId: otherPlacementId,
+    displayName: 'Other child',
+    sortOrder: 1
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_parent_document_id = ? WHERE id = ?`
+  ).run(parent.id, child.id)
+  deleteFaProjectDocument(connection, parent.id)
+  const kept = getFaProjectDocumentById(connection, child.id)
+  expect(kept.parentDocumentId).toBeNull()
+  expect(kept.sortOrder).toBeGreaterThan(getFaProjectDocumentById(connection, anchor.id).sortOrder)
+})
+
+/**
+ * deleteFaProjectDocument
  * Promotes direct children to top level at the deleted document sort order.
  */
 test('Test that deleteFaProjectDocument promotes direct children to top level at deleted sort order', () => {
@@ -630,6 +757,371 @@ test('Test that deleteFaProjectDocument promotes nested children into deleted pa
     parentDocumentId: grandparent.id
   })
   expect(nested.items.map((row) => row.id)).toEqual([child.id])
+})
+
+/**
+ * deleteFaProjectDocument
+ * A parent loop must not block delete or cascade-remove the other document.
+ */
+test('Test that deleteFaProjectDocument removes one side of a parent loop and keeps the other', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const first = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'First',
+    sortOrder: 0
+  })
+  const second = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: first.id,
+    displayName: 'Second',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_parent_document_id = ? WHERE id = ?`
+  ).run(second.id, first.id)
+  deleteFaProjectDocument(connection, first.id)
+  expect(() => getFaProjectDocumentById(connection, first.id)).toThrow('Document')
+  const kept = getFaProjectDocumentById(connection, second.id)
+  expect(kept.parentDocumentId).toBeNull()
+})
+
+/**
+ * deleteFaProjectDocument
+ * An unplaced parent must not cascade-delete children that still have a placement.
+ */
+test('Test that deleteFaProjectDocument keeps children when the deleted parent has no placement', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_placement_id = NULL WHERE id = ?`
+  ).run(parent.id)
+  deleteFaProjectDocument(connection, parent.id)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  const kept = getFaProjectDocumentById(connection, child.id)
+  expect(kept.parentDocumentId).toBeNull()
+  expect(kept.placementId).toBe(seeded.placementId)
+})
+
+/**
+ * deleteFaProjectDocument
+ * A child in another placement must survive delete instead of failing the move.
+ */
+test('Test that deleteFaProjectDocument keeps a child anchored in another placement', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const otherTemplate = createFaProjectDocumentTemplate(connection, { displayName: 'Place' })
+  const otherPlacementId = 'placement-other'
+  replaceFaProjectWorldTemplateLayoutSnapshot(connection, seeded.worldId, {
+    groups: [],
+    placements: [
+      {
+        id: seeded.placementId,
+        documentTemplateId: seeded.templateId,
+        groupId: null,
+        rootSortOrder: 0,
+        groupSortOrder: null,
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {}
+      },
+      {
+        id: otherPlacementId,
+        documentTemplateId: otherTemplate.id,
+        groupId: null,
+        rootSortOrder: 1,
+        groupSortOrder: null,
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {}
+      }
+    ]
+  })
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: otherTemplate.id,
+    placementId: otherPlacementId,
+    displayName: 'Other child',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_parent_document_id = ? WHERE id = ?`
+  ).run(parent.id, child.id)
+  deleteFaProjectDocument(connection, parent.id)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  const kept = getFaProjectDocumentById(connection, child.id)
+  expect(kept.parentDocumentId).toBeNull()
+  expect(kept.placementId).toBe(otherPlacementId)
+})
+
+/**
+ * deleteFaProjectDocument
+ * An unplaced child of a placed parent must survive delete.
+ */
+test('Test that deleteFaProjectDocument keeps an unplaced child of a placed parent', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: null,
+    parentDocumentId: parent.id,
+    displayName: 'Unplaced child'
+  })
+  deleteFaProjectDocument(connection, parent.id)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  const kept = getFaProjectDocumentById(connection, child.id)
+  expect(kept.parentDocumentId).toBeNull()
+  expect(kept.placementId).toBeNull()
+})
+
+/**
+ * deleteFaProjectDocumentsForPlacementId
+ * Documents in another placement must survive when their parent placement is removed.
+ */
+test('Test that deleteFaProjectDocumentsForPlacementId keeps documents outside that placement', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const otherTemplate = createFaProjectDocumentTemplate(connection, { displayName: 'Location' })
+  replaceFaProjectWorldTemplateLayoutSnapshot(connection, seeded.worldId, {
+    groups: [],
+    placements: [{
+      id: seeded.placementId,
+      documentTemplateId: seeded.templateId,
+      groupId: null,
+      rootSortOrder: 0,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }, {
+      id: 'placement-2',
+      documentTemplateId: otherTemplate.id,
+      groupId: null,
+      rootSortOrder: 1,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }]
+  })
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  const outsider = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: otherTemplate.id,
+    placementId: 'placement-2',
+    displayName: 'Outsider',
+    sortOrder: 0
+  })
+  connection.prepare(
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_parent_document_id = ? WHERE id = ?`
+  ).run(parent.id, outsider.id)
+  deleteFaProjectDocumentsForPlacementId(connection, seeded.placementId)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  expect(() => getFaProjectDocumentById(connection, child.id)).toThrow('Document')
+  const kept = getFaProjectDocumentById(connection, outsider.id)
+  expect(kept.parentDocumentId).toBeNull()
+  expect(kept.placementId).toBe('placement-2')
+})
+
+/**
+ * updateFaProjectDocument
+ * Parent edits must reject a descendant the same way hierarchy move does.
+ */
+test('Test that updateFaProjectDocument rejects a parent that is a descendant', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  expect(() => updateFaProjectDocument(connection, parent.id, {
+    parentDocumentId: child.id
+  })).toThrow('own descendant')
+  expect(getFaProjectDocumentById(connection, parent.id).parentDocumentId).toBeNull()
+  const outsider = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Outsider',
+    sortOrder: 1
+  })
+  const nested = updateFaProjectDocument(connection, outsider.id, {
+    parentDocumentId: parent.id
+  })
+  expect(nested.parentDocumentId).toBe(parent.id)
+})
+
+/**
+ * createFaProjectDocument
+ * A parent from another placement would hide the new document from both trees.
+ */
+test('Test that createFaProjectDocument rejects a parent from another placement', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const otherTemplate = createFaProjectDocumentTemplate(connection, { displayName: 'Location' })
+  replaceFaProjectWorldTemplateLayoutSnapshot(connection, seeded.worldId, {
+    groups: [],
+    placements: [{
+      id: seeded.placementId,
+      documentTemplateId: seeded.templateId,
+      groupId: null,
+      rootSortOrder: 0,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }, {
+      id: 'placement-2',
+      documentTemplateId: otherTemplate.id,
+      groupId: null,
+      rootSortOrder: 1,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }]
+  })
+  const otherParent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: otherTemplate.id,
+    placementId: 'placement-2',
+    displayName: 'Other Parent',
+    sortOrder: 0
+  })
+  expect(() => createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: otherParent.id,
+    displayName: 'Hidden Child',
+    sortOrder: 0
+  })).toThrow('same template placement')
+})
+
+/**
+ * updateFaProjectDocument
+ * Moving only the placement while a parent stays behind hides the document.
+ */
+test('Test that updateFaProjectDocument rejects a placement that leaves the parent behind', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const otherTemplate = createFaProjectDocumentTemplate(connection, { displayName: 'Location' })
+  replaceFaProjectWorldTemplateLayoutSnapshot(connection, seeded.worldId, {
+    groups: [],
+    placements: [{
+      id: seeded.placementId,
+      documentTemplateId: seeded.templateId,
+      groupId: null,
+      rootSortOrder: 0,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }, {
+      id: 'placement-2',
+      documentTemplateId: otherTemplate.id,
+      groupId: null,
+      rootSortOrder: 1,
+      groupSortOrder: null,
+      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {}
+    }]
+  })
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  expect(() => updateFaProjectDocument(connection, child.id, {
+    placementId: 'placement-2',
+    templateId: otherTemplate.id
+  })).toThrow('same template placement')
+  expect(getFaProjectDocumentById(connection, child.id).placementId).toBe(seeded.placementId)
+  const moved = updateFaProjectDocument(connection, child.id, {
+    parentDocumentId: null,
+    placementId: 'placement-2',
+    templateId: otherTemplate.id
+  })
+  expect(moved.placementId).toBe('placement-2')
+  expect(moved.parentDocumentId).toBeNull()
 })
 
 /**

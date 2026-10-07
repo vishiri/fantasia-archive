@@ -16,6 +16,7 @@ export const useFaProjectWorldColorPaletteFromBridge = createUseFaProjectWorldCo
     const result = await api.listWorlds()
     return result.items.map((world) => world.colorPalette)
   },
+  readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
   ref,
   watch
 })

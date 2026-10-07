@@ -100,9 +100,9 @@ export interface I_dialogProjectSettingsWorldColorPaletteEditorApi {
   onSwatchColorUpdate: (entryId: string, hex: string) => void
   onSwatchDelete: (entryId: string) => void
   onSwatchDuplicate: (entryId: string) => void
-  openSwatchIndex: I_ref<number | null>
+  openSwatchEntryId: I_ref<string | null>
   worldPickerPalette: I_computedRef<T_faColorPickerInputPalette>
-  setOpenSwatchIndex: (index: number | null) => void
+  setOpenSwatchEntryId: (entryId: string | null) => void
   wouldSwatchDuplicateExceedMaxLength: (entryId: string) => boolean
 }
 

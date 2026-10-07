@@ -32,6 +32,7 @@ export default {
     warningPrefix: 'The tag will be deleted ',
     warningSuffix: ' with no way to revert this change.'
   },
+  deleteTagError: 'Could not delete the tag.',
   deleteTagSuccess: 'Tag successfully deleted.',
 
   placementCountTooltip: {
@@ -40,6 +41,7 @@ export default {
     totalCount: 'Количество документов и категорий:'
   },
   orderNumberBadgeTooltip: 'Custom order of the document',
+  renameTagError: 'Could not rename the tag.',
   renameTagDialog: {
     cancel: 'Cancel',
     confirm: 'Rename Tag',

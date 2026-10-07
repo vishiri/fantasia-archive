@@ -19,6 +19,17 @@ import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
+function faAppConfigExportErrorResult (err: Error): I_faAppConfigExportResult {
+  const errorMessage = err.message
+  const errorName = err.name
+  const outcome = 'error' as const
+  return {
+    errorMessage,
+    errorName,
+    outcome
+  }
+}
+
 async function tryWriteE2eExportPath (zipped: Uint8Array): Promise<I_faAppConfigExportResult | null> {
   const e2ePath = takeNextE2eAppConfigExportPath()
   if (e2ePath === null) {
@@ -40,11 +51,7 @@ async function tryWriteE2eExportPath (zipped: Uint8Array): Promise<I_faAppConfig
     e2ePath,
     err
   })
-  return {
-    errorMessage: err.message,
-    errorName: err.name,
-    outcome: 'error'
-  }
+  return faAppConfigExportErrorResult(err)
 }
 
 function validateFaAppConfigExportPayload (
@@ -130,11 +137,7 @@ export async function runExportAppConfigToFile (
     const e = zipResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faAppConfig] zip failed', err)
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+    return faAppConfigExportErrorResult(err)
   }
 
   const zipped = zipResult.value
@@ -178,9 +181,5 @@ export async function runExportAppConfigToFile (
     err,
     filePath
   })
-  return {
-    errorMessage: err.message,
-    errorName: err.name,
-    outcome: 'error'
-  }
+  return faAppConfigExportErrorResult(err)
 }

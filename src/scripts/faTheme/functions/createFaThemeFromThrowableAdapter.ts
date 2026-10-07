@@ -17,11 +17,18 @@ export function createFaThemeFromThrowableAdapter (deps: {
 
     return () => {
       const result = run()
+      const isErr = (): boolean => {
+        return result.isErr()
+      }
+      const isOk = (): boolean => {
+        return result.isOk()
+      }
+      const value = result.isOk() ? result.value : (undefined as T)
 
       return {
-        isErr: () => result.isErr(),
-        isOk: () => result.isOk(),
-        value: result.isOk() ? result.value : (undefined as T)
+        isErr,
+        isOk,
+        value
       }
     }
   }

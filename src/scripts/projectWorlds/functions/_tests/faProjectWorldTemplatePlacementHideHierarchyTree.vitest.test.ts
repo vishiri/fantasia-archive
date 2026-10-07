@@ -102,4 +102,16 @@ describe('syncHideHierarchyTreeWhenNoWorldTemplatePlacements', () => {
     })
     expect(patchHideHierarchyTree).not.toHaveBeenCalled()
   })
+
+  test('Test that syncHideHierarchyTreeWhenNoWorldTemplatePlacements skips when the project changed during refresh', async () => {
+    const patchHideHierarchyTree = vi.fn(async () => undefined)
+    await syncHideHierarchyTreeWhenNoWorldTemplatePlacements({
+      getHideHierarchyTree: () => false,
+      getWorlds: () => [{ placements: [] }],
+      patchHideHierarchyTree,
+      projectStillCurrent: () => false,
+      refreshLayout: async () => undefined
+    })
+    expect(patchHideHierarchyTree).not.toHaveBeenCalled()
+  })
 })

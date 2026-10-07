@@ -1,6 +1,8 @@
+import { Result } from 'neverthrow'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { faProjectDocumentTemplatesFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectDocumentTemplatesBridge'
 import { faProjectSettingsFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectSettingsBridge'
@@ -59,6 +61,7 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
       getCurrentLanguageCode: () => {
         return S_FaUserSettings().settings?.languageCode ?? 'en-US'
       },
+      readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
       patchHideHierarchyTreeSilently: async (hideHierarchyTree) => {
         await S_FaUserSettings().patchSettingsSilently({ hideHierarchyTree })
       },
@@ -91,11 +94,10 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
     isDialogProjectSettingsStoreTarget,
     onMounted,
     resolveDialogComponentStore: () => {
-      try {
-        return S_DialogComponent()
-      } catch {
-        return null
-      }
+      return Result.fromThrowable(
+        () => S_DialogComponent(),
+        () => null
+      )().unwrapOr(null)
     },
     watch
   })

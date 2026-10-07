@@ -12,6 +12,7 @@ import { createFaWelcomeScreenAutoLoadProject } from './functions/createFaWelcom
 
 const faWelcomeScreenAutoLoadProjectApi = createFaWelcomeScreenAutoLoadProject({
   getActiveProjectFilePath: () => S_FaActiveProject().activeProject?.filePath,
+  isProjectReplacementInFlight: () => S_FaActiveProject().isProjectReplacementInFlight(),
   getProjectManagementBridge: () => window.faContentBridgeAPIs?.projectManagement,
   hasWelcomeScreenAutoLoadMruHeadFailed,
   markWelcomeScreenAutoLoadMruHeadFailed,

@@ -37,6 +37,11 @@ export class FaFloatingWindowResizePointerSession {
     if (e.button !== 0) {
       return
     }
+    if (this.moveRafId !== null) {
+      this.sessionDeps.cancelAnimationFrame(this.moveRafId)
+      this.moveRafId = null
+    }
+    this.pendingMoveEvent = null
     e.preventDefault()
     e.stopPropagation()
     this.raiseZ()

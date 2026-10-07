@@ -44,23 +44,28 @@ export function resolveProjectHierarchyTreeDragSiblingOrderSnapshot (
     typeof movedNode.tagId === 'string' &&
     movedNode.tagId.length > 0
   ) {
+    const tagId = movedNode.tagId
+    const treeNodeId = movedNode.id
     return {
       orderedDocumentIds,
       parentDocumentId: null,
       placementId: '',
-      tagId: movedNode.tagId,
-      treeNodeId: movedNode.id
+      tagId,
+      treeNodeId
     }
   }
   if (movedNode.placementId === null) {
     return null
   }
+  const parentDocumentId = parentBucket.parentDocumentId
+  const placementId = movedNode.placementId
+  const mainTreeNodeId = movedNode.id
   return {
     orderedDocumentIds,
-    parentDocumentId: parentBucket.parentDocumentId,
-    placementId: movedNode.placementId,
+    parentDocumentId,
+    placementId,
     tagId: null,
-    treeNodeId: movedNode.id
+    treeNodeId: mainTreeNodeId
   }
 }
 

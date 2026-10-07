@@ -21,7 +21,7 @@ export default meta
 
 export const List: StoryObj<typeof meta> = {
   args: {
-    label: 'Project Media - Media list',
+    label: 'Project Media - Media List',
     testLocator: 'dialogProjectMedia-title-mediaList'
   }
 }

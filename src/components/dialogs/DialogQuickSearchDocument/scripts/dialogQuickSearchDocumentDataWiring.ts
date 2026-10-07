@@ -7,6 +7,29 @@ import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerI
 import { resolveTrimmedIconOrDefault } from 'app/src/scripts/faIcons/faIconDisplay_manager'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
+function mapDialogQuickSearchDocumentSourceRow (document: {
+  createdAtMs?: number
+  displayName: string
+  documentTextColor: string | null
+  id: string
+  isCategory: boolean
+  sortOrder: number
+  templateId: string | null
+}): I_dialogQuickSearchDocumentDocumentSource {
+  const row: I_dialogQuickSearchDocumentDocumentSource = {
+    displayName: document.displayName,
+    documentTextColor: document.documentTextColor,
+    id: document.id,
+    isCategory: document.isCategory,
+    sortOrder: document.sortOrder,
+    templateId: document.templateId
+  }
+  if (typeof document.createdAtMs === 'number') {
+    row.createdAtMs = document.createdAtMs
+  }
+  return row
+}
+
 /**
  * Loads worlds + template icons for Quick-Search Document option lists.
  * Component Playwright may seed window.__faComponentTestingQuickSearchDocumentSources when
@@ -18,9 +41,15 @@ export async function loadDialogQuickSearchDocumentSources (): Promise<{
 }> {
   const testingSources = window.__faComponentTestingQuickSearchDocumentSources
   if (testingSources !== undefined) {
+    const templates = testingSources.templates.map((template) => {
+      return { ...template }
+    })
+    const worlds = testingSources.worlds.map((world) => {
+      return { ...world }
+    })
     return {
-      templates: testingSources.templates.map((template) => ({ ...template })),
-      worlds: testingSources.worlds.map((world) => ({ ...world }))
+      templates,
+      worlds
     }
   }
   const api = window.faContentBridgeAPIs?.projectContent
@@ -28,9 +57,11 @@ export async function loadDialogQuickSearchDocumentSources (): Promise<{
     typeof api?.listWorldsForProjectSettings !== 'function' ||
     typeof api?.listDocumentTemplatesForProjectSettings !== 'function'
   ) {
+    const templates: I_dialogQuickSearchDocumentTemplateIconSource[] = []
+    const worlds: I_dialogQuickSearchDocumentWorldSource[] = []
     return {
-      templates: [],
-      worlds: []
+      templates,
+      worlds
     }
   }
   const [worldsResult, templatesResult] = await Promise.all([
@@ -65,28 +96,14 @@ export async function loadDialogQuickSearchDocumentDocumentsForWorld (
   if (testingSources !== undefined) {
     return testingSources.documents
       .filter((document) => document.worldId === worldId)
-      .map((document) => ({
-        displayName: document.displayName,
-        documentTextColor: document.documentTextColor,
-        id: document.id,
-        isCategory: document.isCategory,
-        sortOrder: document.sortOrder,
-        templateId: document.templateId
-      }))
+      .map((document) => mapDialogQuickSearchDocumentSourceRow(document))
   }
   const api = window.faContentBridgeAPIs?.projectContent
   if (typeof api?.listDocuments !== 'function') {
     return []
   }
   const result = await api.listDocuments({ worldId })
-  return result.items.map((document) => ({
-    displayName: document.displayName,
-    documentTextColor: document.documentTextColor,
-    id: document.id,
-    isCategory: document.isCategory,
-    sortOrder: document.sortOrder,
-    templateId: document.templateId
-  }))
+  return result.items.map((document) => mapDialogQuickSearchDocumentSourceRow(document))
 }
 
 /**

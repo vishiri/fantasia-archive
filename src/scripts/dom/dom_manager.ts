@@ -2,4 +2,5 @@ export { clearQuasarHoverableFocusState } from './functions/clearQuasarHoverable
 export { isMiddleMouseButton } from './functions/isMiddleMouseButton'
 export { isPrimaryMouseButton } from './functions/isPrimaryMouseButton'
 export { scrollContainerToRevealLastItem } from './functions/scrollContainerToRevealLastItem'
+export { shouldAcceptFaEnterOutsideIme } from './functions/shouldAcceptFaEnterOutsideIme'
 export { shouldScrollContainerAfterItemCountIncrease } from './functions/shouldScrollContainerAfterItemCountIncrease'

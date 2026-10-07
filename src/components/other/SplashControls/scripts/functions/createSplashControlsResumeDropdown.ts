@@ -101,8 +101,8 @@ function splashControlsOnResumePrimarySegmentClick (
   deps: T_createSplashControlsResumeDropdownDeps,
   activeProject: I_ref<{ filePath?: string } | null>
 ): void {
-  const sessionFilePath = activeProject.value?.filePath
-  if (sessionFilePath !== undefined && sessionFilePath.length > 0) {
+  const sessionFilePath = activeProject.value?.filePath?.trim() ?? ''
+  if (sessionFilePath.length > 0) {
     deps.runFaAction('loadExistingProject', {
       filePath: sessionFilePath,
       resumeActiveSession: true
@@ -247,6 +247,8 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
 
   deps.onUnmounted(clearResumePrimaryBusyTimer)
 
+  const splashRecentProjectRowTestLocator = deps.splashRecentProjectRowTestLocator
+
   return {
     hasRecentProjects,
     hideRecentProjectTooltip,
@@ -259,14 +261,18 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
     resumePrimaryBusy,
     resumePrimarySegmentLabel,
     showResumeDropdownArrowTooltip,
-    splashRecentProjectRowTestLocator: deps.splashRecentProjectRowTestLocator
+    splashRecentProjectRowTestLocator
   }
 }
 
 export function createSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDropdownDeps): {
   useSplashControlsResumeDropdown: () => ReturnType<typeof useSplashControlsResumeDropdown>
 } {
+  const useSplashControlsResumeDropdownBound = (): ReturnType<typeof useSplashControlsResumeDropdown> => {
+    return useSplashControlsResumeDropdown(deps)
+  }
+
   return {
-    useSplashControlsResumeDropdown: () => useSplashControlsResumeDropdown(deps)
+    useSplashControlsResumeDropdown: useSplashControlsResumeDropdownBound
   }
 }

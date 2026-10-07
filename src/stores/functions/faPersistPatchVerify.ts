@@ -15,3 +15,14 @@ export function didObjectPatchPersist<T extends object> (
 export function didCssPatchPersist (expectedCss: string, retrievedCss: string): boolean {
   return retrievedCss === expectedCss
 }
+
+/**
+ * True when the live preview still matches the CSS that was just saved.
+ * A newer preview typed during the save must stay.
+ */
+export function shouldClearCssLivePreviewAfterSave (
+  livePreview: string | null,
+  savedCss: string
+): boolean {
+  return livePreview === null || livePreview === savedCss
+}

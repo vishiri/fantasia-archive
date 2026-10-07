@@ -48,10 +48,13 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRootClass
   nodeKind: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode['nodeKind']
   rowHasValidationError: boolean
 }): Record<string, boolean> {
+  const error = params.rowHasValidationError
+  const group = params.nodeKind === 'group'
+  const template = params.nodeKind === 'template'
   return {
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--error': params.rowHasValidationError,
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--group': params.nodeKind === 'group',
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--template': params.nodeKind === 'template'
+    'dialogProjectSettingsWorldTemplateLayoutTreeNode--error': error,
+    'dialogProjectSettingsWorldTemplateLayoutTreeNode--group': group,
+    'dialogProjectSettingsWorldTemplateLayoutTreeNode--template': template
   }
 }
 

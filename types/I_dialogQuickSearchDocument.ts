@@ -19,6 +19,8 @@ export interface I_dialogQuickSearchDocumentTemplateIconSource {
 /** Document row used to build Quick-Search document options (categories included). */
 export interface I_dialogQuickSearchDocumentDocumentSource {
   id: string
+  /** Present when the document list row includes created_at_ms. */
+  createdAtMs?: number
   displayName: string
   documentTextColor: string | null
   isCategory: boolean

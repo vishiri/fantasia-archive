@@ -82,8 +82,10 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
 }
 
 export function buildProjectMenu (session: I_appMenuBuildSession): I_appMenuList {
+  const data = buildProjectMenuData(session)
+  const title = i18n.global.t('appControlMenus.project.title')
   return {
-    data: buildProjectMenuData(session),
-    title: i18n.global.t('appControlMenus.project.title')
+    data,
+    title
   }
 }

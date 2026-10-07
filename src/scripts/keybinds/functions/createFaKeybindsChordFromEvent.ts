@@ -109,11 +109,13 @@ function faKeybindTryChordFromEventWithSort (
   }
 
   const sortedMods = sortFaKeybindMods(mods)
+  const code = event.code
+  const chord = {
+    code,
+    mods: sortedMods
+  }
   return {
-    chord: {
-      code: event.code,
-      mods: sortedMods
-    },
+    chord,
     ok: true
   }
 }

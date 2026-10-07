@@ -42,15 +42,17 @@ export function listFaProjectWorldTemplateLayoutForProjectSettings (
     .all(worldId) as I_faSqlWorldTemplatePlacementJoinRow[]
 
   const placementCounts = listFaProjectPlacementCategoryDocumentCounts(db, worldId)
+  const groups = groupRows.map(mapFaProjectWorldTemplateGroupRow)
+  const placements = placementRows.map((row) => {
+    const counts = placementCounts.get(row.id)
+    return mapFaProjectWorldTemplatePlacementForProjectSettingsRow(row, {
+      categoryCountInWorld: counts?.categoryCount ?? 0,
+      documentCountInWorld: counts?.documentCount ?? 0
+    })
+  })
 
   return {
-    groups: groupRows.map(mapFaProjectWorldTemplateGroupRow),
-    placements: placementRows.map((row) => {
-      const counts = placementCounts.get(row.id)
-      return mapFaProjectWorldTemplatePlacementForProjectSettingsRow(row, {
-        categoryCountInWorld: counts?.categoryCount ?? 0,
-        documentCountInWorld: counts?.documentCount ?? 0
-      })
-    })
+    groups,
+    placements
   }
 }

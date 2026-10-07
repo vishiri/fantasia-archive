@@ -383,6 +383,73 @@ test('Test that setAppSettingsDialogPreview merges patches and applies light the
  * S_FaUserSettings / app settings dialog preview
  * hideDeadCrossThrough preview toggles the body-class applicator.
  */
+test('Test that a refresh started first does not replace a later save', async () => {
+  let releaseFirstGet: ((snapshot: typeof FA_USER_SETTINGS_DEFAULTS) => void) | undefined
+  const firstGet = new Promise<typeof FA_USER_SETTINGS_DEFAULTS>((resolve) => {
+    releaseFirstGet = resolve
+  })
+  getSettingsMock.mockImplementationOnce(() => firstGet)
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    appTheme: 'darkThemeFantasy' as const
+  })
+
+  const refreshPromise = store.refreshSettings()
+  await vi.waitUntil(() => getSettingsMock.mock.calls.length === 1)
+  const updatePromise = store.updateSettings({ appTheme: 'darkThemeFantasy' as const })
+  const finishFirstGet = releaseFirstGet
+  if (finishFirstGet === undefined) {
+    throw new Error('missing settings read resolver')
+  }
+  finishFirstGet({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    appTheme: 'lightThemeFlat' as const
+  })
+  await refreshPromise
+  await updatePromise
+
+  expect(store.settings?.appTheme).toBe('darkThemeFantasy')
+  expect(setSettingsMock).toHaveBeenCalledWith({ appTheme: 'darkThemeFantasy' })
+})
+
+test('Test that overlapping hierarchy toggles flip from the saved value', async () => {
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    hideHierarchyTree: false
+  })
+  await store.refreshSettings()
+
+  let releaseFirstSet: (() => void) | undefined
+  const firstSet = new Promise<void>((resolve) => {
+    releaseFirstSet = resolve
+  })
+  setSettingsMock.mockImplementationOnce(() => firstSet)
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    hideHierarchyTree: true
+  })
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    hideHierarchyTree: false
+  })
+
+  const firstToggle = store.toggleHideHierarchyTreeSilently()
+  await vi.waitUntil(() => setSettingsMock.mock.calls.length === 1)
+  const secondToggle = store.toggleHideHierarchyTreeSilently()
+  const finishFirstSet = releaseFirstSet
+  if (finishFirstSet === undefined) {
+    throw new Error('missing settings write resolver')
+  }
+  finishFirstSet()
+  await firstToggle
+  await secondToggle
+
+  expect(setSettingsMock).toHaveBeenNthCalledWith(1, { hideHierarchyTree: true })
+  expect(setSettingsMock).toHaveBeenNthCalledWith(2, { hideHierarchyTree: false })
+  expect(store.settings?.hideHierarchyTree).toBe(false)
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
 test('Test that setAppSettingsDialogPreview applies hideDeadCrossThrough preview', () => {
   store.setAppSettingsDialogPreview({ hideDeadCrossThrough: true })
   expect(applyHideDeadCrossThroughMock).toHaveBeenLastCalledWith(true)

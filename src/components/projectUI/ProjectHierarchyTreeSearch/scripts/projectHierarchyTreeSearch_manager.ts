@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import debounce from 'lodash-es/debounce.js'
 
 import { FA_PROJECT_SIDEBAR_MIN_WIDTH_PX } from 'app/types/I_faProjectSidebarDomain'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -22,6 +23,7 @@ export const useProjectHierarchyTreeSearch = createUseProjectHierarchyTreeSearch
   ref,
   resolveProjectHierarchyTreeSearchLayout,
   runProjectHierarchyTreeSearchQuery,
+  readProjectContentEpoch: () => S_FaActiveProject().readProjectContentEpoch(),
   S_FaProjectSidebar,
   S_FaUserSettings,
   storeToRefs,

@@ -135,6 +135,10 @@ export interface I_faSelectInputUseDeps {
     options: T_faSelectInputOptions
   ) => T_faSelectInputOption[]
   ref: <T>(value: T) => import('app/types/I_vueCompositionShims').I_ref<T>
+  shouldActivateFaSelectInputOnEnter: (event: {
+    isComposing?: boolean
+    keyCode?: number
+  }) => boolean
   resolveFaSelectInputEnterActivateOption: (input: {
     filteredOptions: readonly T_faSelectInputOption[]
     getOptionIndex?: (() => number) | undefined

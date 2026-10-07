@@ -145,17 +145,18 @@ test('runWithFaProjectDatabaseForIpcAsync rejects when renderer path differs fro
   reconnectMock.mockReturnValue(false)
   const otherPath = path.join(os.tmpdir(), 'fa-ensure-connected-other.faproject')
   fs.writeFileSync(otherPath, '')
-  try {
+  const run = (async () => {
     requestPathMock.mockResolvedValueOnce(otherPath)
     const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
       return 1
     })
     expect(out).toEqual({ ok: false })
-  } finally {
+  })()
+  await run.finally(() => {
     if (fs.existsSync(otherPath)) {
       fs.unlinkSync(otherPath)
     }
-  }
+  })
 })
 
 test('runWithFaProjectDatabaseForIpcAsync returns false when sender is not the main window', async () => {

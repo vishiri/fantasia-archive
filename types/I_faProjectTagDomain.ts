@@ -81,9 +81,11 @@ export interface I_faProjectDeleteTagInput {
   tagId: string
 }
 
-/** Document child under a tag, ordered by document_tags.sort_order. */
+/** Document child under a tag, ordered by document_tags.sort_order, then name, created time, id. */
 export interface I_faProjectTagDocumentChild {
   documentId: string
+  /** Document created_at_ms when the list query includes it. */
+  createdAtMs?: number
   displayName: string
   templateId: string | null
   isCategory: boolean
@@ -95,6 +97,8 @@ export interface I_faProjectTagDocumentChild {
   treeOrderNumber: number
   extraClasses: string
   sortOrder: number
+  /** Template icon for the hierarchy mirror. Empty when the document has no template. */
+  templateIcon?: string
 }
 
 export interface I_faProjectListDocumentsUnderTagInput {

@@ -45,10 +45,12 @@ export function updateDialogProjectSettingsDocumentTemplateDraftTitleTranslation
     if (template.id !== id) {
       return template
     }
+    const titlePluralTranslations = titleTranslations.plural
+    const titleSingularTranslations = titleTranslations.singular
     return {
       ...template,
-      titlePluralTranslations: titleTranslations.plural,
-      titleSingularTranslations: titleTranslations.singular
+      titlePluralTranslations,
+      titleSingularTranslations
     }
   })
 }

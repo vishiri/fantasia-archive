@@ -53,6 +53,11 @@ const ResultAsync = {
   })
 } as unknown as T_injectedResultAsync
 
+function isMissingProjectContentRow (error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+  return message.includes(' not found:')
+}
+
 test('Test that resolveOpenedDocumentTabDocumentActionContext reads template from database for persisted tabs', async () => {
   const sourceTab: I_faOpenedDocumentTab = {
     documentId: 'doc-1',
@@ -86,6 +91,7 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext reads template fro
 
   const context = await resolveOpenedDocumentTabDocumentActionContext({
     ResultAsync,
+    isMissingProjectContentRow,
     getDocumentById: async () => ({
       parentDocumentId: 'doc-parent',
       templateId: 'tpl-1',
@@ -101,6 +107,52 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext reads template fro
   })
 })
 
+test('Test that resolveOpenedDocumentTabDocumentActionContext returns the database placement id', async () => {
+  const sourceTab: I_faOpenedDocumentTab = {
+    documentId: 'doc-1',
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '',
+    documentTextColorDraft: '',
+    editState: false,
+    hasUnsavedChanges: false,
+    persistenceState: 'persisted',
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
+    savedDocumentTextColor: '',
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    worldId: 'world-1'
+  }
+
+  const context = await resolveOpenedDocumentTabDocumentActionContext({
+    ResultAsync,
+    isMissingProjectContentRow,
+    getDocumentById: async () => ({
+      parentDocumentId: null,
+      placementId: 'placement-2',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }),
+    sourceTab
+  })
+
+  expect(context?.placementId).toBe('placement-2')
+})
+
 test('Test that resolveOpenedDocumentTabDocumentActionContext keeps temporary tab placement metadata', async () => {
   const sourceTab = createTemporaryOpenedDocumentTabSeed({
     displayName: 'Temp doc',
@@ -114,6 +166,7 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext keeps temporary ta
 
   const context = await resolveOpenedDocumentTabDocumentActionContext({
     ResultAsync,
+    isMissingProjectContentRow,
     getDocumentById: async () => {
       throw new Error('should not query database for temporary tab')
     },
@@ -161,6 +214,7 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext returns null when 
 
   const context = await resolveOpenedDocumentTabDocumentActionContext({
     ResultAsync,
+    isMissingProjectContentRow,
     getDocumentById: async () => {
       throw new Error('should not query database for temporary tab')
     },
@@ -203,11 +257,53 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext returns null when 
 
   const context = await resolveOpenedDocumentTabDocumentActionContext({
     ResultAsync,
+    isMissingProjectContentRow,
     getDocumentById: async () => {
-      throw new Error('missing document')
+      throw new Error('Document not found: doc-missing')
     },
     sourceTab
   })
 
   expect(context).toBeNull()
+})
+
+test('Test that resolveOpenedDocumentTabDocumentActionContext throws when the document read fails', async () => {
+  const sourceTab: I_faOpenedDocumentTab = {
+    documentId: 'doc-locked',
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '',
+    documentTextColorDraft: '',
+    editState: false,
+    hasUnsavedChanges: false,
+    persistenceState: 'persisted',
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
+    savedDocumentTextColor: '',
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    worldId: 'world-1'
+  }
+
+  await expect(resolveOpenedDocumentTabDocumentActionContext({
+    ResultAsync,
+    isMissingProjectContentRow,
+    getDocumentById: async () => {
+      throw new Error('database locked')
+    },
+    sourceTab
+  })).rejects.toThrow('database locked')
 })

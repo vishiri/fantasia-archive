@@ -102,7 +102,8 @@ export function getFaProjectDocumentTemplateById (
 export function listFaProjectDocumentTemplates (
   db: Database
 ): I_faProjectDocumentTemplateListResult {
-  return { items: listFaProjectDocumentTemplateRows(db) }
+  const items = listFaProjectDocumentTemplateRows(db)
+  return { items }
 }
 
 export function listFaProjectDocumentTemplatesForProjectSettings (

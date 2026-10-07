@@ -45,6 +45,7 @@ function makeDeps (
     readLastSelectedWorldId: async () => null,
     ref,
     registerComponentDialogStackGuard: vi.fn(),
+    reportTemporaryDocumentCreateFailure: vi.fn(),
     resolveDialogComponentStoreOrNull: () => null,
     resolveNewDocumentDisplayName: () => 'Heroes',
     resolvePreferredLanguageCode: () => 'en-US',
@@ -173,6 +174,7 @@ test('Test that hydrateDialogQuickAddDocumentSources seeds worlds and first worl
     pickFirstWorldId: () => 'world-a'
   })
   await hydrateDialogQuickAddDocumentSources(deps, {
+    focusGeneration: ref(1),
     selectedTemplateId,
     selectedWorldId,
     templatesById,
@@ -182,4 +184,63 @@ test('Test that hydrateDialogQuickAddDocumentSources seeds worlds and first worl
   expect(selectedWorldId.value).toBe('world-a')
   expect(worlds.value).toHaveLength(1)
   expect(templatesById.value.get('tpl-hero')?.id).toBe('tpl-hero')
+})
+
+/**
+ * hydrateDialogQuickAddDocumentSources
+ * A superseded open must not replace worlds or clear the template the newer open already showed.
+ */
+test('Test that hydrateDialogQuickAddDocumentSources drops worlds after focus generation changes', async () => {
+  let resolveSavedWorld: ((value: string | null) => void) | undefined
+  const pendingSavedWorld = new Promise<string | null>((resolve) => {
+    resolveSavedWorld = resolve
+  })
+  const focusGeneration = ref(1)
+  const selectedTemplateId = ref<string | null>('keep-template')
+  const selectedWorldId = ref<string | null>('keep-world')
+  const templatesById = ref(new Map())
+  const worlds = ref([{
+    color: '#111',
+    displayNameTranslations: { 'en-US': 'Keep' },
+    id: 'keep-world',
+    sortOrder: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    }
+  }])
+  const pending = hydrateDialogQuickAddDocumentSources(makeDeps({
+    loadQuickAddDocumentSources: async () => ({
+      templates: [],
+      worlds: [{
+        color: '#abc',
+        displayNameTranslations: { 'en-US': 'Stale' },
+        id: 'stale-world',
+        sortOrder: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        }
+      }]
+    }),
+    pickFirstWorldId: () => 'stale-world',
+    readLastSelectedWorldId: () => pendingSavedWorld
+  }), {
+    focusGeneration,
+    selectedTemplateId,
+    selectedWorldId,
+    templatesById,
+    worlds
+  })
+  await Promise.resolve()
+  focusGeneration.value = 2
+  const finishSavedWorld = resolveSavedWorld
+  if (finishSavedWorld === undefined) {
+    throw new Error('missing saved world resolver')
+  }
+  finishSavedWorld('stale-world')
+  await pending
+  expect(selectedTemplateId.value).toBe('keep-template')
+  expect(selectedWorldId.value).toBe('keep-world')
+  expect(worlds.value.map((world) => world.id)).toEqual(['keep-world'])
 })

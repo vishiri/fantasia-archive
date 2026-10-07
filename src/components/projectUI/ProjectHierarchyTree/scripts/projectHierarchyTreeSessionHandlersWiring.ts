@@ -29,6 +29,7 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
     initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: T_faOpenedDocumentOpenMode
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>
@@ -94,67 +95,25 @@ function buildProjectHierarchyTreeSessionHandlersReturn (input: {
   setTreeComponentRef: (instance: I_faProjectHierarchyTreeHeTreeInstance | null) => void
   setTreeScrollHostRef: (element: HTMLElement | null) => void
 }) {
-  const eachDroppableHandler = input.droppableHandlers.eachDroppableHandler
-  const rootDroppableHandler = input.droppableHandlers.rootDroppableHandler
+  const {
+    bulkContextMenuWiring,
+    clickHandlersWiring,
+    droppableHandlers,
+    eachDraggableHandler,
+    expandHandlersWiring,
+    setTreeComponentRef,
+    setTreeScrollHostRef
+  } = input
+  const { onDocumentRowAuxClick, onNodeClick } = clickHandlersWiring
   return {
-    eachDraggableHandler: input.eachDraggableHandler,
-    eachDroppableHandler,
-    contextMenuAddNewRowIcon: input.bulkContextMenuWiring.contextMenuAddNewRowIcon,
-    contextMenuAddNewRowLabel: input.bulkContextMenuWiring.contextMenuAddNewRowLabel,
-    contextMenuAnchorNodeId: input.bulkContextMenuWiring.contextMenuAnchorNodeId,
-    contextMenuShowsBulkExpandRows: input.bulkContextMenuWiring.contextMenuShowsBulkExpandRows,
-    contextMenuShowsCopyRows: input.bulkContextMenuWiring.contextMenuShowsCopyRows,
-    contextMenuShowsDocumentOpenEditRows: input.bulkContextMenuWiring.contextMenuShowsDocumentOpenEditRows,
-    contextMenuShowsSortByRows: input.bulkContextMenuWiring.contextMenuShowsSortByRows,
-    contextMenuSortByDirectScopeOnly: input.bulkContextMenuWiring.contextMenuSortByDirectScopeOnly,
-    contextMenuShowsTagMenuRows: input.bulkContextMenuWiring.contextMenuShowsTagMenuRows,
-    addDocumentPlacementOptions: input.bulkContextMenuWiring.addDocumentPlacementOptions,
-    deleteTagConfirmOpen: input.bulkContextMenuWiring.deleteTagConfirmOpen,
-    deleteTagName: input.bulkContextMenuWiring.deleteTagName,
-    isNodeContextMenuOpen: input.bulkContextMenuWiring.isNodeContextMenuOpen,
-    nodeMenuPointerPosition: input.bulkContextMenuWiring.nodeMenuPointerPosition,
-    onAddNewDocumentFromContextMenuClick: input.bulkContextMenuWiring.onAddNewDocumentFromContextMenuClick,
-    onAddNewDocumentToThisTagFromContextMenuClick:
-      input.bulkContextMenuWiring.onAddNewDocumentToThisTagFromContextMenuClick,
-    onAddNewDocumentUnderThisFromContextMenuClick:
-      input.bulkContextMenuWiring.onAddNewDocumentUnderThisFromContextMenuClick,
-    onCollapseAllUnderNodeClick: input.bulkContextMenuWiring.onCollapseAllUnderNodeClick,
-    onConfirmDeleteTag: input.bulkContextMenuWiring.onConfirmDeleteTag,
-    onConfirmRenameTag: input.bulkContextMenuWiring.onConfirmRenameTag,
-    onCopyBackgroundColorFromContextMenuClick:
-      input.bulkContextMenuWiring.onCopyBackgroundColorFromContextMenuClick,
-    onCopyDocumentFromContextMenuClick: input.bulkContextMenuWiring.onCopyDocumentFromContextMenuClick,
-    onCopyNameFromContextMenuClick: input.bulkContextMenuWiring.onCopyNameFromContextMenuClick,
-    onCopyTextColorFromContextMenuClick: input.bulkContextMenuWiring.onCopyTextColorFromContextMenuClick,
-    onDeleteDocumentFromContextMenuClick: input.bulkContextMenuWiring.onDeleteDocumentFromContextMenuClick,
-    onDeleteTagFromContextMenuClick: input.bulkContextMenuWiring.onDeleteTagFromContextMenuClick,
-    onDismissDeleteTagDialog: input.bulkContextMenuWiring.onDismissDeleteTagDialog,
-    onDismissRenameTagDialog: input.bulkContextMenuWiring.onDismissRenameTagDialog,
-    onDocumentRowAuxClick: input.clickHandlersWiring.onDocumentRowAuxClick,
-    onEditDocumentFromContextMenuClick: input.bulkContextMenuWiring.onEditDocumentFromContextMenuClick,
-    onExpandAllUnderNodeClick: input.bulkContextMenuWiring.onExpandAllUnderNodeClick,
-    onNodeClick: input.clickHandlersWiring.onNodeClick,
-    onNodeContextMenuHide: input.bulkContextMenuWiring.onNodeContextMenuHide,
-    onNodeRowContextMenu: input.bulkContextMenuWiring.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: input.bulkContextMenuWiring.onOpenDocumentFromContextMenuClick,
-    onRenameTagFromContextMenuClick: input.bulkContextMenuWiring.onRenameTagFromContextMenuClick,
-    onSortByItemFromContextMenuClick: input.bulkContextMenuWiring.onSortByItemFromContextMenuClick,
-    renameTagCanConfirm: input.bulkContextMenuWiring.renameTagCanConfirm,
-    renameTagCurrentName: input.bulkContextMenuWiring.renameTagCurrentName,
-    renameTagDialogOpen: input.bulkContextMenuWiring.renameTagDialogOpen,
-    renameTagMergeWarning: input.bulkContextMenuWiring.renameTagMergeWarning,
-    renameTagNameDraft: input.bulkContextMenuWiring.renameTagNameDraft,
-    onNodeClose: input.expandHandlersWiring.onNodeClose,
-    onNodeOpen: input.expandHandlersWiring.onNodeOpen,
-    onNodeOpenIconClick: input.expandHandlersWiring.onNodeOpenIconClick,
-    onNodeOpenIconPointerDown: input.expandHandlersWiring.onNodeOpenIconPointerDown,
-    onNonWorldOpenIconClick: input.expandHandlersWiring.onNonWorldOpenIconClick,
-    onNonWorldOpenIconPointerDown: input.expandHandlersWiring.onNonWorldOpenIconPointerDown,
-    onWorldNodeRowClick: input.expandHandlersWiring.onWorldNodeRowClick,
-    onWorldNodeRowPointerDown: input.expandHandlersWiring.onWorldNodeRowPointerDown,
-    rootDroppableHandler,
-    setTreeComponentRef: input.setTreeComponentRef,
-    setTreeScrollHostRef: input.setTreeScrollHostRef
+    ...bulkContextMenuWiring,
+    ...droppableHandlers,
+    ...expandHandlersWiring,
+    eachDraggableHandler,
+    onDocumentRowAuxClick,
+    onNodeClick,
+    setTreeComponentRef,
+    setTreeScrollHostRef
   }
 }
 

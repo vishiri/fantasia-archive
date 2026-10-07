@@ -1211,6 +1211,7 @@ test('Test that session handlers create temporary document when add-new row is c
     displayName: 'New character',
     openMode: 'leftNavigate',
     parentDocumentId: null,
+    placementId: 'placement-1',
     templateId: 'template-1',
     worldId: 'world-1'
   })

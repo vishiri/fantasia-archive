@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import type { I_faComponentTestingProjectContentOverrides } from 'app/types/I_faComponentTestingStoreSeed'
 import type { I_faProjectDocument } from 'app/types/I_faProjectDocumentDomain'
 import type { I_faProjectDocumentTemplate } from 'app/types/I_faProjectDocumentTemplateDomain'
@@ -39,11 +41,10 @@ export function getFaComponentTestingHierarchySearchProbe (): {
 }
 
 function syncHierarchySearchProbeToWindow (): void {
-  try {
+  // Node Vitest without a Window global.
+  void Result.fromThrowable(() => {
     window.__faComponentTestingHierarchySearchProbe = getFaComponentTestingHierarchySearchProbe()
-  } catch {
-    // Node Vitest without a Window global.
-  }
+  }, () => undefined)()
 }
 
 /**
@@ -180,8 +181,9 @@ export async function searchFaProjectHierarchyForRenderer (
     hierarchySearchLastQuery = query
     syncHierarchySearchProbeToWindow()
     const hits = overridesMap[query] ?? overridesMap['*'] ?? []
+    const copiedHits = [...hits]
     return {
-      hits: [...hits],
+      hits: copiedHits,
       query
     }
   }

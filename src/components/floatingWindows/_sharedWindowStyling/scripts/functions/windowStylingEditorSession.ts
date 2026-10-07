@@ -18,10 +18,16 @@ export function createWindowStylingEditorSession (
   }
 
   async function onWindowShow (): Promise<void> {
-    if (deps.editorHostRef.value === null) {
+    const host = deps.editorHostRef.value
+    if (host === null) {
       return
     }
-    await monaco.mountInto(deps.editorHostRef.value, deps.workingCss.value)
+    const showStartedWhileOpen = deps.windowModel.value
+    await monaco.mountInto(host, deps.workingCss.value)
+    if (showStartedWhileOpen && !deps.windowModel.value) {
+      monaco.disposeEditor()
+      return
+    }
     deps.reconcileMountedMonacoWithWorkingCss({
       editor: monaco.editor.value,
       workingCss: deps.workingCss.value

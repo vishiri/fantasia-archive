@@ -6,7 +6,10 @@ import type {
 import type { I_faProjectHierarchyTreeDocumentChild, I_faProjectHierarchyTreeMoveDocumentInput } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
-import { tryGetFaProjectHierarchyTreeStoreForRenderer } from './faComponentTestingProjectContentDocumentIndexWiring'
+import {
+  enqueueFaProjectDocumentHierarchyWrite,
+  tryGetFaProjectHierarchyTreeStoreForRenderer
+} from './faComponentTestingProjectContentDocumentIndexWiring'
 import { getFaComponentTestingProjectContentOverrides } from './faComponentTestingProjectContentOverridesWiring'
 import { buildFaComponentTestingPlacementDocumentChildrenKey } from './functions/faComponentTestingPlacementDocumentChildren'
 
@@ -204,6 +207,14 @@ export async function updateFaProjectDocumentForRenderer (
  * Moves a document in the hierarchy via bridge, then patches the session document index.
  */
 export async function moveFaProjectDocumentInHierarchyForRenderer (
+  input: I_faProjectHierarchyTreeMoveDocumentInput
+): Promise<I_faProjectHierarchyTreeDocumentChild> {
+  return await enqueueFaProjectDocumentHierarchyWrite(() => {
+    return moveFaProjectDocumentInHierarchyNow(input)
+  })
+}
+
+async function moveFaProjectDocumentInHierarchyNow (
   input: I_faProjectHierarchyTreeMoveDocumentInput
 ): Promise<I_faProjectHierarchyTreeDocumentChild> {
   const api = window.faContentBridgeAPIs?.projectContent

@@ -48,10 +48,12 @@ export async function e2eSeedDocumentsWithTags (
       await content.setDocumentTags({
         documentId: document.id,
         tags: tagSpecs.map((tagSpec) => {
+          const id = crypto.randomUUID()
+          const name = tagSpec.name
           return {
-            id: crypto.randomUUID(),
+            id,
             isNew: true,
-            name: tagSpec.name
+            name
           }
         })
       })
@@ -74,12 +76,16 @@ export async function e2eSeedDocumentsWithTags (
     return map
   }, seeded.worldId)
 
+  const documents = seeded.documents
+  const placementId = seeded.placementId
+  const templateId = seeded.templateId
+  const worldId = seeded.worldId
   return {
-    documents: seeded.documents,
-    placementId: seeded.placementId,
+    documents,
+    placementId,
     tagIdsByName,
-    templateId: seeded.templateId,
-    worldId: seeded.worldId
+    templateId,
+    worldId
   }
 }
 

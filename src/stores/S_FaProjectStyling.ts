@@ -17,6 +17,16 @@ export const S_FaProjectStyling = defineStore('S_FaProjectStyling', () => {
   const root: Ref<I_faProjectStylingRoot | null> = ref(null)
   const css: Ref<string> = ref('')
   const cssLivePreview: Ref<string | null> = ref(null)
+  let projectStylingIoTail: Promise<void> = Promise.resolve()
+
+  function enqueueProjectStylingIo<T> (work: () => Promise<T>): Promise<T> {
+    const run = projectStylingIoTail.then(work)
+    projectStylingIoTail = run.then(
+      () => undefined,
+      () => undefined
+    )
+    return run
+  }
 
   function applyRoot (next: I_faProjectStylingRoot): void {
     root.value = next
@@ -35,21 +45,28 @@ export const S_FaProjectStyling = defineStore('S_FaProjectStyling', () => {
    * @returns false when preload bridge misses 'getProjectStyling'.
    */
   async function refreshProjectStyling (): Promise<boolean> {
-    return faProjectStylingRefreshFromBridge({ applyRoot })
+    await import('app/src/stores/S_FaActiveProject')
+    return await enqueueProjectStylingIo(() => faProjectStylingRefreshFromBridge({ applyRoot }))
   }
 
   /**
    * KV partial write mirroring the project noteboard race merge pattern for frame-only commits.
    */
+  async function readProjectStylingContentEpoch (): Promise<number> {
+    const activeProject = await import('app/src/stores/S_FaActiveProject')
+    return activeProject.S_FaActiveProject().readProjectContentEpoch()
+  }
+
   async function persistProjectStylingPartialSilent (
     patch: I_faProjectStylingPatch
   ): Promise<void> {
-    const cssSnapshotBeforePersist = css.value
-    await faProjectStylingPersistPartialSilent({
+    const epochAtStart = await readProjectStylingContentEpoch()
+    await enqueueProjectStylingIo(() => faProjectStylingPersistPartialSilent({
       applyRoot,
-      cssSnapshotBeforePersist,
-      patch
-    })
+      epochAtStart,
+      patch,
+      readCurrentCss: () => css.value
+    }))
   }
 
   async function persistCurrentCssSilent (): Promise<void> {
@@ -60,11 +77,14 @@ export const S_FaProjectStyling = defineStore('S_FaProjectStyling', () => {
    * @returns false when preload APIs are unavailable; otherwise throws on KV mismatch paths like app-wide styling mismatch handling.
    */
   async function savePersistedCssFromEditor (cssValue: string): Promise<boolean> {
-    return faProjectStylingSaveCssFromEditor({
+    const epochAtStart = await readProjectStylingContentEpoch()
+    return await enqueueProjectStylingIo(() => faProjectStylingSaveCssFromEditor({
       applyRoot,
       clearCssLivePreview,
-      css: cssValue
-    })
+      css: cssValue,
+      epochAtStart,
+      readCssLivePreview: () => cssLivePreview.value
+    }))
   }
 
   const applyRootBinding = applyRoot

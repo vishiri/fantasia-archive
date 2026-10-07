@@ -2,29 +2,22 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import { Result } from 'neverthrow'
 import { afterEach, expect, test } from 'vitest'
 
-import { createResolveHardenedFaProjectFilePath } from '../faProjectFilePathHardening'
-import { pathLooksLikeFaProjectFile } from '../../projectManagementSharedPathWiring'
-
-const { resolveHardenedFaProjectFilePath } = createResolveHardenedFaProjectFilePath({
-  pathLooksLikeFaProjectFile,
-  realpathSync: (path) => fs.realpathSync(path),
-  statSync: (path) => fs.statSync(path)
-})
+import { resolveHardenedFaProjectFilePath } from '../faProjectFilePathHardeningWiring'
+import { createResolveHardenedFaProjectFilePath } from '../functions/faProjectFilePathHardening'
 
 const createdPaths: string[] = []
 
 afterEach(() => {
   for (const p of createdPaths.splice(0)) {
-    try {
+    Result.fromThrowable(() => {
       fs.rmSync(p, {
         force: true,
         recursive: true
       })
-    } catch {
-      // best-effort cleanup
-    }
+    }, () => undefined)()
   }
 })
 
@@ -38,7 +31,16 @@ function track (p: string): string {
  * Rejects when resolved real path no longer looks like a .faproject file.
  */
 test('Test that resolveHardenedFaProjectFilePath rejects when real path fails extension check', () => {
+  const passthroughResult = {
+    fromThrowable: <T, E>(fn: () => T, _onError: (error: unknown) => E) => {
+      const value = fn()
+      return () => ({
+        unwrapOr: <D>(defaultValue: D): T | D => value ?? defaultValue
+      })
+    }
+  }
   const { resolveHardenedFaProjectFilePath } = createResolveHardenedFaProjectFilePath({
+    Result: passthroughResult,
     pathLooksLikeFaProjectFile: (candidate) => candidate.endsWith('.faproject'),
     realpathSync: () => '/tmp/notes.txt',
     statSync: () => ({ isFile: () => true })
@@ -92,9 +94,10 @@ test('Test that resolveHardenedFaProjectFilePath rejects symlink to non-project 
   const linkPath = path.join(dir, 'alias.faproject')
   fs.writeFileSync(target, 'x')
 
-  try {
+  const linked = Result.fromThrowable(() => {
     fs.symlinkSync(target, linkPath, 'file')
-  } catch {
+  }, () => null)()
+  if (linked.isErr()) {
     return
   }
 

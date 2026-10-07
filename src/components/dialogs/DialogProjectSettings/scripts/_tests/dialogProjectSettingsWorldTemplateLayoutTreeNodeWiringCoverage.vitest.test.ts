@@ -145,6 +145,23 @@ test('Test that tree node action tooltip wiring skips show inside nextTick when 
   vi.useRealTimers()
 })
 
+test('Test that tree node action tooltip wiring does not show after hide once the delay has fired', async () => {
+  vi.useFakeTimers()
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()
+  const nicknameShow = vi.fn()
+  wiring.placementNicknameHoverTooltipRef.value = {
+    hide: vi.fn(),
+    show: nicknameShow
+  } as unknown as QTooltip
+
+  wiring.revealPlacementNicknameHoverTooltip()
+  vi.advanceTimersByTime(FA_Q_TOOLTIP_DELAY_MS)
+  wiring.hidePlacementNicknameHoverTooltip()
+  await nextTick()
+  expect(nicknameShow).not.toHaveBeenCalled()
+  vi.useRealTimers()
+})
+
 test('Test that tree node action tooltip wiring clears pending reveal timer on hide', async () => {
   vi.useFakeTimers()
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()

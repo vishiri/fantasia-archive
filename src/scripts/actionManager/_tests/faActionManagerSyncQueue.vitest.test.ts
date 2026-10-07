@@ -215,11 +215,15 @@ test('Test that handler throws are routed to the failure reporter', async () => 
  */
 test('Test that unknown action ids during dispatch are reported', async () => {
   const def = buildDef('closeApp', () => {})
-  enqueueSyncAction(buildEntry('closeApp'), def, () => undefined)
+  const entry = buildEntry('closeApp')
+  recordHistoryEnqueued(entry)
+  enqueueSyncAction(entry, def, () => undefined)
   await awaitSyncQueueDrain()
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({ type: 'negative' })
   )
+  const failedRow = S_FaActionManager().actionHistory.find((row) => row.uid === entry.uid)
+  expect(failedRow?.status).toBe('failed')
 })
 
 /**

@@ -12,10 +12,13 @@ const registerFaE2eActiveProjectSnapshotProbeApi = createRegisterFaE2eActiveProj
     if (project === null) {
       return null
     }
+    const filePath = project.filePath
+    const id = project.id
+    const name = project.name
     return {
-      filePath: project.filePath,
-      id: project.id,
-      name: project.name
+      filePath,
+      id,
+      name
     }
   },
   setE2eSnapshotGetter: (getter) => {

@@ -5,6 +5,7 @@ export function createUseFaProjectWorldColorPaletteFromBridge (deps: {
   computed: <T>(fn: () => T) => I_computedRef<T>
   getActiveProjectId: () => string | null
   listWorldColorPaletteStrings: () => Promise<readonly string[]>
+  readProjectContentEpoch?: () => number | undefined
   ref: <T>(value: T) => I_ref<T>
   watch: (
     source: () => string | null,
@@ -22,12 +23,19 @@ export function createUseFaProjectWorldColorPaletteFromBridge (deps: {
       if (!options.enabled.value) {
         return
       }
+      const epochAtStart = deps.readProjectContentEpoch?.()
       const projectId = deps.getActiveProjectId()
       if (projectId === null) {
         paletteHexList.value = []
         return
       }
       const colorPaletteStrings = await deps.listWorldColorPaletteStrings()
+      if (deps.readProjectContentEpoch?.() !== epochAtStart) {
+        return
+      }
+      if (deps.getActiveProjectId() !== projectId) {
+        return
+      }
       paletteHexList.value = deps.aggregateFaProjectWorldColorPaletteHexList(colorPaletteStrings)
     }
 

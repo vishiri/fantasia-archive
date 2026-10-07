@@ -57,8 +57,9 @@ export function resolveProjectHierarchyTreeDragDropTargetParentDocumentId (
   }
   const parentData = targetInfo.parent.data
   if (parentData.nodeKind === 'document' && parentData.documentId !== null) {
+    const parentDocumentId = parentData.documentId
     return {
-      parentDocumentId: parentData.documentId,
+      parentDocumentId,
       resolved: true
     }
   }
@@ -157,10 +158,11 @@ export function createWaitForProjectHierarchyTreeDragGetDataOrderStable (deps: {
       await deps.nextTick()
     }
     const lastOrder = deps.readSiblingOrderFromGetData()
+    const settled = lastOrder !== null
     return {
       attempts: maxAttempts,
       orderedDocumentIds: lastOrder,
-      settled: lastOrder !== null
+      settled
     }
   }
 }
@@ -204,8 +206,9 @@ export function syncProjectHierarchyTreeSiblingOrderFromHeTreeGetData (input: {
     input.draggedDocumentId,
     getDataSnapshot.orderedDocumentIds
   )
+  const orderedDocumentIds = getDataSnapshot.orderedDocumentIds
   return {
-    orderedDocumentIds: getDataSnapshot.orderedDocumentIds,
+    orderedDocumentIds,
     patched
   }
 }

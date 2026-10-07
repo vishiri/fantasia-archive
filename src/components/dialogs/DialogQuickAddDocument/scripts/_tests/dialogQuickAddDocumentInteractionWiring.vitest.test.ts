@@ -68,6 +68,7 @@ function makeDeps (
     readLastSelectedWorldId: async () => null,
     ref,
     registerComponentDialogStackGuard: vi.fn(),
+    reportTemporaryDocumentCreateFailure: vi.fn(),
     resolveDialogComponentStoreOrNull: () => null,
     resolveNewDocumentDisplayName: () => 'Heroes',
     resolvePreferredLanguageCode: () => 'en-US',
@@ -81,6 +82,47 @@ function makeDeps (
     ...overrides
   }
 }
+
+/**
+ * wireDialogQuickAddDocumentOpenClose
+ * A second open while the dialog is already showing does not get another @show,
+ * so the world-change skip must clear when that hydrate finishes.
+ * An older hydrate must not clear the skip a newer open still needs.
+ */
+test('Test that a superseded Quick Add open leaves the newer world-change skip set', async () => {
+  const resolvers: Array<() => void> = []
+  const deps = makeDeps({
+    loadQuickAddDocumentSources: () => new Promise((resolve) => {
+      resolvers.push(() => {
+        resolve({
+          templates: [],
+          worlds: []
+        })
+      })
+    }),
+    onBeforeUnmount: () => undefined,
+    onMounted: () => undefined
+  })
+  const session = makeSession()
+  session.dialogModel.value = true
+  const props = reactive<{ directInput?: 'QuickAddDocument' | undefined }>({})
+  wireDialogQuickAddDocumentOpenClose(deps, session, props)
+
+  props.directInput = 'QuickAddDocument'
+  await nextTick()
+  props.directInput = undefined
+  await nextTick()
+  props.directInput = 'QuickAddDocument'
+  await nextTick()
+  expect(session.skipNextWorldChangeReopen.value).toBe(true)
+  resolvers[0]?.()
+  await flushPromises()
+  expect(session.skipNextWorldChangeReopen.value).toBe(true)
+  resolvers[1]?.()
+  await flushPromises()
+  expect(session.dialogModel.value).toBe(true)
+  expect(session.skipNextWorldChangeReopen.value).toBe(false)
+})
 
 /**
  * wireDialogQuickAddDocumentSelectHandlers
@@ -140,6 +182,70 @@ test('Test that onTemplateSelect closes dialog before createTemporaryDocument', 
 
 /**
  * wireDialogQuickAddDocumentSelectHandlers
+ * Create failure after close is reported and does not stick the in-flight guard.
+ */
+test('Test that onTemplateSelect reports a create failure and allows another select', async () => {
+  const createError = new Error('Could not create the document.')
+  const createTemporaryDocument = vi.fn(async (): Promise<string> => 'temp-2')
+  createTemporaryDocument.mockRejectedValueOnce(createError)
+  const reportTemporaryDocumentCreateFailure = vi.fn()
+  const closeDialog = vi.fn()
+  const deps = makeDeps({
+    createTemporaryDocument,
+    reportTemporaryDocumentCreateFailure
+  })
+  const session = makeSession()
+  const { onTemplateSelect } = wireDialogQuickAddDocumentSelectHandlers(deps, session, closeDialog)
+  const templateValue = {
+    id: 'tpl-hero',
+    name: 'Heroes'
+  }
+
+  await expect(onTemplateSelect(templateValue)).resolves.toBeUndefined()
+  expect(closeDialog).toHaveBeenCalledTimes(1)
+  expect(reportTemporaryDocumentCreateFailure).toHaveBeenCalledWith(createError)
+
+  await onTemplateSelect(templateValue)
+  expect(createTemporaryDocument).toHaveBeenCalledTimes(2)
+})
+
+/**
+ * wireDialogQuickAddDocumentSelectHandlers
+ * A second template pick while create is running does not add another document.
+ */
+test('Test that a second template select is ignored while create is in flight', async () => {
+  let releaseCreate: (() => void) | undefined
+  const createGate = new Promise<string>((resolve) => {
+    releaseCreate = () => {
+      resolve('temp')
+    }
+  })
+  const createTemporaryDocument = vi.fn(() => createGate)
+  const closeDialog = vi.fn()
+  const deps = makeDeps({ createTemporaryDocument })
+  const session = makeSession()
+  const { onTemplateSelect } = wireDialogQuickAddDocumentSelectHandlers(deps, session, closeDialog)
+  const templateValue = {
+    id: 'tpl-hero',
+    name: 'Heroes'
+  }
+  const firstSelect = onTemplateSelect(templateValue)
+  const secondSelect = onTemplateSelect(templateValue)
+  await Promise.resolve()
+  expect(createTemporaryDocument).toHaveBeenCalledTimes(1)
+  const finishCreate = releaseCreate
+  if (finishCreate === undefined) {
+    throw new Error('missing create resolver')
+  }
+  finishCreate()
+  await firstSelect
+  await secondSelect
+  expect(createTemporaryDocument).toHaveBeenCalledTimes(1)
+  expect(closeDialog).toHaveBeenCalledTimes(1)
+})
+
+/**
+ * wireDialogQuickAddDocumentSelectHandlers
  * World select clears template and skips reopen while hydrate skip flag is set.
  */
 test('Test that onWorldSelect clears template and skips reopen during hydrate', () => {
@@ -185,6 +291,20 @@ test('Test that onWorldSelect schedules template focus when world id unchanged',
  * wireDialogQuickAddDocumentOpenClose
  * Store UUID watch opens only for QuickAddDocument; dialogModel false cancels focus generation.
  */
+test('Test that Quick Add still opens when world hydrate fails', async () => {
+  const deps = makeDeps({
+    loadQuickAddDocumentSources: async () => {
+      throw new Error('worlds down')
+    }
+  })
+  const session = makeSession()
+  const props = reactive<{ directInput?: 'QuickAddDocument' }>({})
+  wireDialogQuickAddDocumentOpenClose(deps, session, props)
+  props.directInput = 'QuickAddDocument'
+  await flushPromises()
+  expect(session.dialogModel.value).toBe(true)
+})
+
 test('Test that openClose wiring opens from store and cancels focus on dialog close', async () => {
   const dialogStore = reactive<{
     dialogToOpen: string

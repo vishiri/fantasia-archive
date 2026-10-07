@@ -94,6 +94,31 @@ test('persisted-css wire forwards store css into Monaco setValue while open', as
  * wireAppStylingPersistedCssIntoOpenEditor
  * Keeps Monaco quiet when persisted already equals the buffered copy before the watcher mutates the editor wrapper.
  */
+test('persisted-css wire keeps working CSS typed before the saved snapshot arrives', async () => {
+  const persistedCssRef = ref('old')
+  const windowModel = ref(true)
+  const workingCss = ref('old')
+  const setValue = vi.fn()
+  const stubEditor = shallowRef({
+    getValue: (): string => 'old',
+    setValue
+  })
+
+  wireAppStylingPersistedCssIntoOpenEditor({
+    getPersistedCss: (): string => persistedCssRef.value,
+    monaco: { editor: stubEditor } as unknown as I_FaMonacoMount,
+    windowModel,
+    workingCss
+  })
+
+  workingCss.value = 'typed during save'
+  persistedCssRef.value = 'saved'
+  await nextTick()
+
+  expect(workingCss.value).toBe('typed during save')
+  expect(setValue).not.toHaveBeenCalled()
+})
+
 test('persisted-css wire skips when persisted matches workingCss ahead of watcher', async () => {
   const persistedCssRef = ref('tick-a')
   const windowModel = ref(true)

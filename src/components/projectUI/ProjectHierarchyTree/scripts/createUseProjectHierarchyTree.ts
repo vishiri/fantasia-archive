@@ -121,16 +121,25 @@ export function createUseProjectHierarchyTree (deps: {
       storeToRefs: deps.storeToRefs,
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
+    const {
+      documentButtonGroupWiring,
+      extraTreePaddingWiring,
+      nodeDisplayBindings,
+      orderNumberBadgeWiring,
+      placementCountWiring,
+      projectNameTitleWiring,
+      treeLineWiring
+    } = settingsSurface
     return {
       activeDocumentId,
       ...sessionApi,
-      ...settingsSurface.documentButtonGroupWiring,
-      ...settingsSurface.treeLineWiring,
-      ...settingsSurface.extraTreePaddingWiring,
-      ...settingsSurface.placementCountWiring,
-      ...settingsSurface.orderNumberBadgeWiring,
-      ...settingsSurface.projectNameTitleWiring,
-      ...settingsSurface.nodeDisplayBindings
+      ...documentButtonGroupWiring,
+      ...treeLineWiring,
+      ...extraTreePaddingWiring,
+      ...placementCountWiring,
+      ...orderNumberBadgeWiring,
+      ...projectNameTitleWiring,
+      ...nodeDisplayBindings
     }
   }
 }

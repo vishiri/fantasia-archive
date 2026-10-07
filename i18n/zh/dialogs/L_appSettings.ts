@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive 设置',
+  loadError: '无法加载设置。',
   saveButton: '保存设置',
   closeButton: '关闭而不保存',
   settingsSearchPlaceholder: '搜索设置...',

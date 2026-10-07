@@ -39,6 +39,7 @@ $projectOverview-graph-apex-svg-height-css: var(
   --fa-projectOverview-graph-apex-svg-height,
   #{$projectOverview-graph-apex-svg-height}
 );
+$projectOverview-graph-apex-svg-marginBottom: -40px;
 $projectOverview-graph-card-height: 587px;
 /* When hideTooltipsProject is on — keep in sync with FA_PROJECT_OVERVIEW_GRAPH_CARD_HEIGHT_TIPS_HIDDEN_PX. */
 $projectOverview-graph-card-height-tipsHidden: 808px;

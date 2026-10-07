@@ -121,20 +121,33 @@ export const S_FaActionManager = defineStore('S_FaActionManager', () => {
     lastFailure.value = failure
   }
 
+  const actionHistory = readonly(historyState.actionHistory)
+  const appendHistoryEntry = historyState.appendHistoryEntry
+  const findHistoryEntry = historyState.findHistoryEntry
+  const updateHistoryEntryStatus = historyState.updateHistoryEntryStatus
+  const addAsync = queueState.addAsync
+  const currentSyncAction = readonly(queueState.currentSyncAction)
+  const inFlightAsyncActions = readonly(queueState.inFlightAsyncActions)
+  const pendingSyncQueue = readonly(queueState.pendingSyncQueue)
+  const popSync = queueState.popSync
+  const pushSync = queueState.pushSync
+  const removeAsync = queueState.removeAsync
+  const setCurrent = queueState.setCurrent
+  const publishedLastFailure = readonly(lastFailure)
   return {
-    actionHistory: readonly(historyState.actionHistory),
-    appendHistoryEntry: historyState.appendHistoryEntry,
-    findHistoryEntry: historyState.findHistoryEntry,
-    updateHistoryEntryStatus: historyState.updateHistoryEntryStatus,
-    addAsync: queueState.addAsync,
-    currentSyncAction: readonly(queueState.currentSyncAction),
-    inFlightAsyncActions: readonly(queueState.inFlightAsyncActions),
-    pendingSyncQueue: readonly(queueState.pendingSyncQueue),
-    popSync: queueState.popSync,
-    pushSync: queueState.pushSync,
-    removeAsync: queueState.removeAsync,
-    setCurrent: queueState.setCurrent,
-    lastFailure: readonly(lastFailure),
+    actionHistory,
+    appendHistoryEntry,
+    findHistoryEntry,
+    updateHistoryEntryStatus,
+    addAsync,
+    currentSyncAction,
+    inFlightAsyncActions,
+    pendingSyncQueue,
+    popSync,
+    pushSync,
+    removeAsync,
+    setCurrent,
+    lastFailure: publishedLastFailure,
     recordFailure
   }
 })

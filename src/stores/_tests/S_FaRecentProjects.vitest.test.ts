@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
+import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+
 import { S_FaRecentProjects } from '../S_FaRecentProjects'
 
 const getRecentMock = vi.fn()
@@ -46,6 +48,35 @@ test('Test that refreshRecentProjects normalizes IPC rows', async () => {
   expect(store.entries).toEqual([{
     filePath: 'D:\\dup.faproject',
     name: 'Dup'
+  }])
+})
+
+test('Test that a recent-project refresh does not replace a later refresh', async () => {
+  const store = S_FaRecentProjects()
+  let resolveFirst: ((value: I_faRecentProjectEntry[]) => void) | undefined
+  let calls = 0
+  getRecentMock.mockImplementation(() => {
+    calls += 1
+    if (calls === 1) {
+      return new Promise<I_faRecentProjectEntry[]>((resolve) => {
+        resolveFirst = resolve
+      })
+    }
+    return Promise.resolve([{
+      filePath: 'D:\\new.faproject',
+      name: 'New'
+    }])
+  })
+  const first = store.refreshRecentProjects()
+  const second = store.refreshRecentProjects()
+  resolveFirst?.([{
+    filePath: 'D:\\old.faproject',
+    name: 'Old'
+  }])
+  await Promise.all([first, second])
+  expect(store.entries).toEqual([{
+    filePath: 'D:\\new.faproject',
+    name: 'New'
   }])
 })
 

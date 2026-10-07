@@ -3,13 +3,40 @@ import { ResultAsync } from 'neverthrow'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import {
   applyTemporaryOpenedDocumentParent,
-  resolveOpenedDocumentTabIsTemporary
+  resolveOpenedDocumentParentIdDraftForPersist,
+  resolveOpenedDocumentTabIsTemporary,
+  resolveTemporaryDocumentParentDocumentIdForSave
 } from 'app/src/scripts/openedDocuments/openedDocuments_manager'
 
 type T_projectContentApiForTemporaryTabHydration = {
   getDocumentById: (id: string) => Promise<unknown>
   getDocumentTemplateById: (id: string) => Promise<unknown>
   getWorldById: (id: string) => Promise<unknown>
+}
+
+/**
+ * True when main rejected because the row id is gone, including Electron's remote-method wrapper.
+ */
+export function isFaProjectContentMissingRowError (error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+  const name = error instanceof Error ? error.name : ''
+  const hasNotFoundName = name === 'FaProjectContentNotFoundError' ||
+    message.includes('FaProjectContentNotFoundError')
+  const hasNotFoundMessage = message.includes(' not found:')
+  return hasNotFoundName || hasNotFoundMessage
+}
+
+/**
+ * Missing rows return null. Any other read failure is thrown for the caller.
+ */
+export function throwUnlessFaProjectContentMissingRow (error: unknown): null {
+  if (isFaProjectContentMissingRowError(error)) {
+    return null
+  }
+  if (error instanceof Error) {
+    throw error
+  }
+  throw new Error(String(error))
 }
 
 /**
@@ -37,7 +64,10 @@ export async function reconcileTemporaryOpenedDocumentTabFromSnapshot (
     (error): unknown => error
   )
   if (worldAndTemplateResult.isErr()) {
-    return null
+    if (isFaProjectContentMissingRowError(worldAndTemplateResult.error)) {
+      return null
+    }
+    return tab
   }
 
   const parentDocumentId = tab.parentDocumentId ?? null
@@ -52,5 +82,66 @@ export async function reconcileTemporaryOpenedDocumentTabFromSnapshot (
   if (parentResult.isOk()) {
     return tab
   }
-  return applyTemporaryOpenedDocumentParent(tab, null)
+  if (!isFaProjectContentMissingRowError(parentResult.error)) {
+    return tab
+  }
+  const draftParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
+    tab.parentDocumentIdDraft ?? ''
+  )
+  const resolvedParentResult = await ResultAsync.fromPromise(
+    resolveTemporaryOpenedDocumentParentIdForSave({
+      draftParentDocumentId,
+      getDocumentById: (documentId) => api.getDocumentById(documentId),
+      parentResolveChain: tab.temporaryParentResolveDocumentIds ?? []
+    }),
+    (error): unknown => error
+  )
+  if (resolvedParentResult.isErr()) {
+    return tab
+  }
+  return applyTemporaryOpenedDocumentParent(tab, resolvedParentResult.value)
+}
+
+/**
+ * Resolves a temporary document parent for create.
+ * A missing row falls back along the ancestor chain. Any other read failure aborts the save.
+ */
+export async function resolveTemporaryOpenedDocumentParentIdForSave (input: {
+  draftParentDocumentId: string | null
+  getDocumentById: (documentId: string) => Promise<unknown>
+  parentResolveChain: readonly string[]
+}): Promise<string | null> {
+  const availableDocumentIds = new Set<string>()
+  for (const chainDocumentId of input.parentResolveChain) {
+    const chainDocumentResult = await ResultAsync.fromPromise(
+      input.getDocumentById(chainDocumentId),
+      (error): unknown => error
+    )
+    if (chainDocumentResult.isOk()) {
+      availableDocumentIds.add(chainDocumentId)
+      continue
+    }
+    if (!isFaProjectContentMissingRowError(chainDocumentResult.error)) {
+      const error = chainDocumentResult.error
+      throw error instanceof Error ? error : new Error(String(error))
+    }
+  }
+  if (input.draftParentDocumentId === null) {
+    return null
+  }
+  const parentDocumentResult = await ResultAsync.fromPromise(
+    input.getDocumentById(input.draftParentDocumentId),
+    (error): unknown => error
+  )
+  if (parentDocumentResult.isOk()) {
+    return input.draftParentDocumentId
+  }
+  if (!isFaProjectContentMissingRowError(parentDocumentResult.error)) {
+    const error = parentDocumentResult.error
+    throw error instanceof Error ? error : new Error(String(error))
+  }
+  return resolveTemporaryDocumentParentDocumentIdForSave({
+    chain: input.parentResolveChain,
+    isDocumentIdAvailable: (chainDocumentId) => availableDocumentIds.has(chainDocumentId)
+  })
 }

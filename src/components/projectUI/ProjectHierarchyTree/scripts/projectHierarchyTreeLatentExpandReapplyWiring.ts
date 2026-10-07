@@ -138,14 +138,20 @@ export async function reapplyProjectHierarchyTreeLatentDescendantExpandState (de
 
 export function syncProjectHierarchyTreeOpenSetToPersist (deps: {
   openNodeIds: Ref<Set<string>>
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  queuePersistExpandedNodeIds: (
+    expandedNodeIds: string[],
+    options?: { allowEmpty?: boolean }
+  ) => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): void {
   const expandedNodeIds = collectProjectHierarchyTreePersistedExpandedNodeIds(
     deps.treeData.value,
     deps.openNodeIds.value
   )
-  deps.queuePersistExpandedNodeIds(expandedNodeIds)
+  const allowEmpty = true
+  deps.queuePersistExpandedNodeIds(expandedNodeIds, {
+    allowEmpty
+  })
 }
 
 export function markProjectHierarchyTreeNodeOpen (deps: {

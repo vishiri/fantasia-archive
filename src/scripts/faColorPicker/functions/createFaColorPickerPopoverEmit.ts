@@ -1,6 +1,7 @@
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 export function createFaColorPickerPopoverEmit (deps: {
+  onBeforeUnmount: (fn: () => void) => void
   onUnmounted: (fn: () => void) => void
   ref: <T>(value: T) => I_ref<T>
   throttle: <T extends (...args: never[]) => void>(
@@ -23,6 +24,7 @@ export function createFaColorPickerPopoverEmit (deps: {
     props: { modelValue: string },
     emitModelValue: (value: string) => void
   ) => {
+    applyTextModelValue: (value: string) => void
     onPickerChange: (value: string | null) => void
     onPickerMenuHide: () => void
     onPickerUpdate: (value: string | null) => void
@@ -33,6 +35,7 @@ export function createFaColorPickerPopoverEmit (deps: {
     emitModelValue: (value: string) => void
   ) {
     const pickerDraftHex = deps.ref<string | null>(null)
+    let pickerUnmounting = false
 
     const throttledEmit = deps.throttle((value: string) => {
       emitModelValue(value)
@@ -40,6 +43,13 @@ export function createFaColorPickerPopoverEmit (deps: {
       leading: true,
       trailing: true
     })
+
+    function cancelPendingPickerEmit (): void {
+      pickerUnmounting = true
+      throttledEmit.cancel()
+    }
+
+    deps.onBeforeUnmount(cancelPendingPickerEmit)
 
     deps.onUnmounted(() => {
       throttledEmit.cancel()
@@ -72,11 +82,23 @@ export function createFaColorPickerPopoverEmit (deps: {
     }
 
     function onPickerMenuHide (): void {
+      if (pickerUnmounting) {
+        throttledEmit.cancel()
+        pickerDraftHex.value = null
+        return
+      }
       throttledEmit.flush()
       pickerDraftHex.value = null
     }
 
+    function applyTextModelValue (value: string): void {
+      pickerDraftHex.value = null
+      throttledEmit.cancel()
+      emitModelValue(value)
+    }
+
     return {
+      applyTextModelValue,
       onPickerChange,
       onPickerMenuHide,
       onPickerUpdate,

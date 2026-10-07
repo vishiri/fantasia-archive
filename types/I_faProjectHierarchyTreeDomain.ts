@@ -21,6 +21,11 @@ export interface I_faProjectHierarchyTreeUiState {
 /** Partial update merged into hierarchy_tree_ui_state by main-process IPC. */
 export interface I_faProjectHierarchyTreeUiStatePatch {
   expandedNodeIds?: string[] | undefined
+  /**
+   * JSON of expandedNodeIds the writer last observed.
+   * Main process keeps the stored list when it no longer matches.
+   */
+  expandedNodeIdsBaseJson?: string | undefined
   scrollTopPx?: number | undefined
 }
 
@@ -35,6 +40,7 @@ export interface I_faProjectHierarchyTreeLiveExpandDomState {
 /** Options for drag post-commit expanded snapshot restore. */
 export interface I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions {
   includeAncestorClosure?: boolean
+  isStillCurrent?: () => boolean
   skipAncestorPrune?: boolean
 }
 
@@ -327,4 +333,48 @@ export interface I_faProjectHierarchyTreeTagAddDocumentPlacementOption {
 /** Optional preferred he-tree node id when resolving a document parent bucket. */
 export interface I_faProjectHierarchyTreeDocumentParentBucketLookupOptions {
   preferredNodeId?: string | null | undefined
+}
+
+/** Lazy-child hooks for hierarchy skeleton nodes. */
+export interface I_faProjectHierarchyTreeSkeletonLazyApi {
+  resolveLazyChildren: (parent: I_faProjectHierarchyTreeHeTreeNode) => I_faProjectHierarchyTreeHeTreeNode[]
+  syncProjectHierarchyTreeNodeLazyChildren: (node: I_faProjectHierarchyTreeHeTreeNode) => void
+}
+
+/** Tag-branch hooks for hierarchy skeleton worlds. */
+export interface I_faProjectHierarchyTreeSkeletonTagBranchApi {
+  mergeWorldChildrenWithTags: (input: {
+    structuralChildren: I_faProjectHierarchyTreeHeTreeNode[]
+    tagBranchNodes: I_faProjectHierarchyTreeHeTreeNode[]
+    tagsAtTop: boolean
+  }) => I_faProjectHierarchyTreeHeTreeNode[]
+  patchTagBranchLabelsInPlace: (input: {
+    lazyPlaceholderApi: I_faProjectHierarchyTreeSkeletonLazyApi
+    resolveTagsLabel: () => string
+    tagSettings: I_faProjectHierarchyTreeTagSettings
+    world: I_faProjectHierarchyTreeWorkspaceWorld
+    worldNode: I_faProjectHierarchyTreeHeTreeNode
+  }) => void
+  resolveTagBranchNodes: (input: {
+    lazyPlaceholderApi: I_faProjectHierarchyTreeSkeletonLazyApi
+    tagSettings: I_faProjectHierarchyTreeTagSettings
+    tagsLabel: string
+    world: I_faProjectHierarchyTreeWorkspaceWorld
+  }) => I_faProjectHierarchyTreeHeTreeNode[]
+}
+
+/** Injected deps for the workspace hierarchy skeleton mapper. */
+export interface I_faProjectHierarchyTreeSkeletonDeps {
+  groupIcon: string
+  lazyPlaceholderApi: I_faProjectHierarchyTreeSkeletonLazyApi
+  patchPlacementNodeInPlace: (input: {
+    lazyPlaceholderApi: I_faProjectHierarchyTreeSkeletonLazyApi
+    placement: I_faProjectHierarchyTreeWorkspacePlacement
+    placementNode: I_faProjectHierarchyTreeHeTreeNode
+    resolvePlacementDisplayIcon: (icon: string) => string
+  }) => void
+  resolvePlacementDisplayIcon: (icon: string) => string
+  resolveTagsLabel: () => string
+  resolveTagSettings: () => I_faProjectHierarchyTreeTagSettings
+  tagBranchApi: I_faProjectHierarchyTreeSkeletonTagBranchApi
 }

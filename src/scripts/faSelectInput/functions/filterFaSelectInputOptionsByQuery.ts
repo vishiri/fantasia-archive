@@ -20,8 +20,8 @@ function splitFaSelectInputQueryWords (needle: string): string[] {
 
 /**
  * Match a display label against a multi-word query the FA 1.0 way.
- * Ports advancedDocumentFilter quirks: no early break per token, exact equality also
- * counts as partial via includes, and one token may claim multiple unused label words.
+ * Ports advancedDocumentFilter quirks: exact equality also counts as partial via includes.
+ * Each query token claims one unused label word so a repeated word can match twice.
  */
 function matchFaSelectInputLabelByQueryWords (
   label: string,
@@ -30,17 +30,18 @@ function matchFaSelectInputLabelByQueryWords (
   const filteredSearchWordList = splitFaSelectInputQueryWords(needle)
 
   if (label.toLowerCase() === filteredSearchWordList.join(' ') && filteredSearchWordList.length > 0) {
+    const matchedLabelWordsLower = label
+      .split(' ')
+      .filter((word) => {
+        return word !== ''
+      })
+      .map((word) => {
+        return word.toLowerCase()
+      })
     return {
       exactMatch: true,
       fullWordMatch: 0,
-      matchedLabelWordsLower: label
-        .split(' ')
-        .filter((word) => {
-          return word !== ''
-        })
-        .map((word) => {
-          return word.toLowerCase()
-        }),
+      matchedLabelWordsLower,
       matches: true,
       partialWordMatch: 0
     }
@@ -49,36 +50,43 @@ function matchFaSelectInputLabelByQueryWords (
   const documentWordList = label.toLowerCase().split(' ')
   let fullWordMatch = 0
   let partialWordMatch = 0
-  let previousWordNotFound = false
-  let filteredOut = false
+  let anyWordMissing = false
   const foundWordList: string[] = []
+  const claimedWordIndexes = new Set<number>()
 
   for (const filterWord of filteredSearchWordList) {
     let wordNotFound = true
-    for (const docWord of documentWordList) {
-      if (foundWordList.includes(docWord)) {
+    for (let wordIndex = 0; wordIndex < documentWordList.length; wordIndex += 1) {
+      if (claimedWordIndexes.has(wordIndex)) {
         continue
       }
-      if (docWord === filterWord) {
+      const docWord = documentWordList[wordIndex] ?? ''
+      const isExact = docWord === filterWord
+      const isPartial = docWord.includes(filterWord)
+      if (!isExact && !isPartial) {
+        continue
+      }
+      if (isExact) {
         fullWordMatch += 1
-        wordNotFound = false
-        foundWordList.push(docWord)
       }
-      if (docWord.includes(filterWord)) {
-        partialWordMatch += 1
-        wordNotFound = false
-        foundWordList.push(docWord)
-      }
+      partialWordMatch += 1
+      wordNotFound = false
+      claimedWordIndexes.add(wordIndex)
+      foundWordList.push(docWord)
+      break
     }
-    filteredOut = !(!wordNotFound && !previousWordNotFound)
-    previousWordNotFound = wordNotFound
+    if (wordNotFound) {
+      anyWordMissing = true
+      break
+    }
   }
 
+  const matches = filteredSearchWordList.length > 0 && !anyWordMissing
   return {
     exactMatch: false,
     fullWordMatch,
     matchedLabelWordsLower: foundWordList,
-    matches: (fullWordMatch > 0 || partialWordMatch > 0) && !filteredOut,
+    matches,
     partialWordMatch
   }
 }
@@ -172,14 +180,16 @@ export function filterFaSelectInputOptionsByQuery (
       if (!item.id.toLowerCase().includes(idNeedle)) {
         return null
       }
+      const matchedLabelWordsLower: string[] = []
+      const match: I_faSelectInputLabelQueryMatch = {
+        exactMatch: false,
+        fullWordMatch: 0,
+        matchedLabelWordsLower,
+        matches: true,
+        partialWordMatch: 0
+      }
       return {
-        match: {
-          exactMatch: false,
-          fullWordMatch: 0,
-          matchedLabelWordsLower: [],
-          matches: true,
-          partialWordMatch: 0
-        },
+        match,
         option: item
       }
     })

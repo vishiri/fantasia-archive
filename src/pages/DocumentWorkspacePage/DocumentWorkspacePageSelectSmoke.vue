@@ -126,6 +126,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ResultAsync } from 'neverthrow'
 import { onMounted, ref, watch } from 'vue'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
@@ -183,14 +184,19 @@ async function loadProjectSmokeOptions (): Promise<void> {
   }
 
   isProjectOptionsLoading.value = true
-  try {
-    const [templatesResult, documentsResult] = await Promise.all([
+  const loaded = await ResultAsync.fromPromise(
+    Promise.all([
       projectContent.listDocumentTemplates(),
       projectContent.listDocuments()
-    ])
-    const templates = templatesResult.items
+    ]),
+    () => undefined
+  )
+  if (loaded.isErr()) {
+    smokeTemplateOptions.value = []
+    smokeDocumentOptions.value = []
+  } else {
+    const templates = loaded.value[0].items
     smokeTemplateOptions.value = mapDocumentWorkspacePageSelectSmokeTemplateOptions(templates)
-
     const templateIconById = new Map<string, string>()
     for (const template of templates) {
       if (template.icon.length > 0) {
@@ -198,15 +204,11 @@ async function loadProjectSmokeOptions (): Promise<void> {
       }
     }
     smokeDocumentOptions.value = mapDocumentWorkspacePageSelectSmokeDocumentOptions(
-      documentsResult.items,
+      loaded.value[1].items,
       templateIconById
     )
-  } catch {
-    smokeTemplateOptions.value = []
-    smokeDocumentOptions.value = []
-  } finally {
-    isProjectOptionsLoading.value = false
   }
+  isProjectOptionsLoading.value = false
 }
 
 onMounted(() => {

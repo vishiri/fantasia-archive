@@ -391,6 +391,108 @@ test('Test that list and reindex placement children use the session document ind
   })).rejects.toThrow('projectContent.reindexDocumentSiblingsInHierarchy unavailable')
 })
 
+test('Test that overlapping sibling reindex waits for the earlier write', async () => {
+  setFaComponentTestingProjectContentOverrides(null)
+  let releaseFirst: () => void = () => undefined
+  const firstGate = new Promise<void>((resolve) => {
+    releaseFirst = resolve
+  })
+  const calls: string[] = []
+  const reindexDocumentSiblingsInHierarchy = vi.fn(async (input: { movedDocumentId: string }) => {
+    calls.push(input.movedDocumentId)
+    if (input.movedDocumentId === 'first') {
+      await firstGate
+    }
+    return true
+  })
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {
+      projectContent: {
+        reindexDocumentSiblingsInHierarchy
+      }
+    }
+  })
+
+  const firstWrite = reindexFaProjectDocumentSiblingsForRenderer({
+    movedDocumentId: 'first',
+    orderedDocumentIds: ['first'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  const secondWrite = reindexFaProjectDocumentSiblingsForRenderer({
+    movedDocumentId: 'second',
+    orderedDocumentIds: ['second'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  await Promise.resolve()
+  expect(calls).toEqual(['first'])
+  releaseFirst()
+  await firstWrite
+  await secondWrite
+  expect(calls).toEqual(['first', 'second'])
+})
+
+test('Test that a parent move waits for an in-flight sibling reindex', async () => {
+  setFaComponentTestingProjectContentOverrides(null)
+  let releaseReindex: (() => void) | undefined
+  const reindexGate = new Promise<void>((resolve) => {
+    releaseReindex = resolve
+  })
+  const calls: string[] = []
+  const reindexDocumentSiblingsInHierarchy = vi.fn(async () => {
+    calls.push('reindex')
+    await reindexGate
+    return true
+  })
+  const moveDocumentInHierarchy = vi.fn(async () => {
+    calls.push('move')
+    return {
+      displayName: 'Moved',
+      hasChildren: false,
+      id: 'doc-1',
+      parentDocumentId: 'parent-2',
+      placementId: 'placement-1',
+      sortOrder: 1
+    }
+  })
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {
+      projectContent: {
+        moveDocumentInHierarchy,
+        reindexDocumentSiblingsInHierarchy
+      }
+    }
+  })
+
+  const reindexWrite = reindexFaProjectDocumentSiblingsForRenderer({
+    movedDocumentId: 'doc-1',
+    orderedDocumentIds: ['doc-1'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  const moveWrite = moveFaProjectDocumentInHierarchyForRenderer({
+    documentId: 'doc-1',
+    targetParentDocumentId: 'parent-2',
+    targetSortOrder: 1
+  })
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (calls.length === 1) {
+      break
+    }
+    await Promise.resolve()
+  }
+  expect(calls).toEqual(['reindex'])
+  const finishReindex = releaseReindex
+  if (finishReindex === undefined) {
+    throw new Error('missing reindex resolver')
+  }
+  finishReindex()
+  await reindexWrite
+  await moveWrite
+  expect(calls).toEqual(['reindex', 'move'])
+})
+
 test('Test that searchFaProjectHierarchyForRenderer uses searchHitsByQuery overrides', async () => {
   const hit = {
     ancestorDocumentIds: [] as string[],

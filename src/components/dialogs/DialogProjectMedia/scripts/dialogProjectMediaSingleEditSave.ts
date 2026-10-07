@@ -4,6 +4,8 @@ import type {
 } from 'app/types/I_faProjectMediaDomain'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 
+import { enqueueDialogProjectMediaSave } from './dialogProjectMediaSaveQueue'
+
 export async function persistDialogProjectMediaSingleEdit (input: {
   afterSuccess: 'closeDialog' | 'closeSlide' | 'staySlide'
   closeSlide: () => void
@@ -21,18 +23,27 @@ export async function persistDialogProjectMediaSingleEdit (input: {
   if (row === null) {
     return
   }
+  const savedSnapshot = JSON.stringify(row)
   const items = [input.mapRowToUpsertItem(row)]
-  const saved = await input.runFaActionAwait('saveProjectMedia', { items })
-  if (!saved) {
-    return
-  }
-  await applyDialogProjectMediaSingleEditSaveSuccess({
-    afterSuccess: input.afterSuccess,
-    closeSlide: input.closeSlide,
-    dialogModel: input.dialogModel,
-    rebindDraftFromList: input.rebindDraftFromList,
-    reloadList: input.reloadList,
-    savedId: row.id
+  const savedId = row.id
+  await enqueueDialogProjectMediaSave(async () => {
+    const saved = await input.runFaActionAwait('saveProjectMedia', { items })
+    if (!saved) {
+      return
+    }
+    if (JSON.stringify(input.draft.value) !== savedSnapshot) {
+      return
+    }
+    await applyDialogProjectMediaSingleEditSaveSuccess({
+      afterSuccess: input.afterSuccess,
+      closeSlide: input.closeSlide,
+      dialogModel: input.dialogModel,
+      draft: input.draft,
+      rebindDraftFromList: input.rebindDraftFromList,
+      reloadList: input.reloadList,
+      savedId,
+      savedSnapshot
+    })
   })
 }
 
@@ -40,9 +51,11 @@ async function applyDialogProjectMediaSingleEditSaveSuccess (input: {
   afterSuccess: 'closeDialog' | 'closeSlide' | 'staySlide'
   closeSlide: () => void
   dialogModel: I_ref<boolean>
+  draft: I_ref<I_faProjectMediaMassEditRow | null>
   rebindDraftFromList: (id: string) => void
   reloadList: () => Promise<void>
   savedId: string
+  savedSnapshot: string
 }): Promise<void> {
   if (input.afterSuccess === 'closeDialog') {
     input.dialogModel.value = false
@@ -50,6 +63,9 @@ async function applyDialogProjectMediaSingleEditSaveSuccess (input: {
   }
   if (input.afterSuccess === 'staySlide') {
     await input.reloadList()
+    if (JSON.stringify(input.draft.value) !== input.savedSnapshot) {
+      return
+    }
     input.rebindDraftFromList(input.savedId)
     return
   }

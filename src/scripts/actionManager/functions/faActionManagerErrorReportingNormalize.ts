@@ -21,8 +21,9 @@ export function normalizeFaActionError (error: unknown): {
       name: 'Error'
     }
   }
+  const message = String(error)
   return {
-    message: String(error),
+    message,
     name: 'Error'
   }
 }

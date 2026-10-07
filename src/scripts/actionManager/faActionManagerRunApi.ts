@@ -17,12 +17,14 @@ function buildFaActionManagerRunEntry<Id extends T_faActionId> (
   payload: I_faActionPayloadMap[Id],
   kind: I_faActionDefinition<T_faActionId>['kind']
 ): I_faActionQueueEntry {
+  const enqueuedAt = deps.nowMs()
+  const uid = deps.uuidv4()
   return {
-    enqueuedAt: deps.nowMs(),
+    enqueuedAt,
     id,
     kind,
     payload,
-    uid: deps.uuidv4()
+    uid
   }
 }
 
@@ -44,7 +46,8 @@ async function dispatchFaActionManagerAsyncEntry (
         typeof resolved === 'object' &&
         typeof (resolved as { payloadPreview?: unknown }).payloadPreview === 'string'
       ) {
-        return { payloadPreview: (resolved as { payloadPreview: string }).payloadPreview }
+        const payloadPreview = (resolved as { payloadPreview: string }).payloadPreview
+        return { payloadPreview }
       }
       return undefined
     })(),
@@ -100,6 +103,27 @@ function enqueueFaActionManagerSyncEntry<Id extends T_faActionId> (
   return accepted
 }
 
+function reportUnknownFaActionManagerId<Id extends T_faActionId> (
+  deps: T_createFaActionManagerRunDeps,
+  id: Id,
+  payload: I_faActionPayloadMap[Id]
+): void {
+  const entry = buildFaActionManagerRunEntry(deps, id, payload, 'async')
+  deps.recordHistoryStartedFromEntry(entry, entry.enqueuedAt)
+  const failure = deps.reportFaActionFailure(
+    entry,
+    new Error(`Unknown action id: ${String(id)}`)
+  )
+  deps.recordHistoryCompleted(
+    entry.uid,
+    {
+      errorMessage: failure.errorMessage,
+      kind: 'failed'
+    },
+    deps.nowMs()
+  )
+}
+
 function runFaActionManagerAction<Id extends T_faActionId> (
   deps: T_createFaActionManagerRunDeps,
   id: Id,
@@ -107,10 +131,7 @@ function runFaActionManagerAction<Id extends T_faActionId> (
 ): void {
   const definition = deps.findFaActionDefinition(id)
   if (definition === undefined) {
-    deps.reportFaActionFailure(
-      buildFaActionManagerRunEntry(deps, id, payload, 'async'),
-      new Error(`Unknown action id: ${String(id)}`)
-    )
+    reportUnknownFaActionManagerId(deps, id, payload)
     return
   }
   if (definition.kind === 'async') {
@@ -131,10 +152,7 @@ function runFaActionManagerActionAwait<Id extends T_faActionId> (
 ): Promise<boolean> {
   const definition = deps.findFaActionDefinition(id)
   if (definition === undefined) {
-    deps.reportFaActionFailure(
-      buildFaActionManagerRunEntry(deps, id, payload, 'async'),
-      new Error(`Unknown action id: ${String(id)}`)
-    )
+    reportUnknownFaActionManagerId(deps, id, payload)
     return Promise.resolve(false)
   }
   if (definition.kind === 'async') {
@@ -189,8 +207,21 @@ function runFaActionManagerActionAwait<Id extends T_faActionId> (
 }
 
 export function createFaActionManagerRun (deps: T_createFaActionManagerRunDeps): T_createFaActionManagerRunApi {
+  const runFaAction = <Id extends T_faActionId>(
+    id: Id,
+    payload: I_faActionPayloadMap[Id]
+  ): void => {
+    runFaActionManagerAction(deps, id, payload)
+  }
+  const runFaActionAwait = <Id extends T_faActionId>(
+    id: Id,
+    payload: I_faActionPayloadMap[Id]
+  ): Promise<boolean> => {
+    return runFaActionManagerActionAwait(deps, id, payload)
+  }
+
   return {
-    runFaAction: (id, payload) => runFaActionManagerAction(deps, id, payload),
-    runFaActionAwait: (id, payload) => runFaActionManagerActionAwait(deps, id, payload)
+    runFaAction,
+    runFaActionAwait
   }
 }

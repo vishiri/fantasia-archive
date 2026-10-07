@@ -21,13 +21,30 @@ const FA_PROJECT_HIERARCHY_TREE_UI_STATE_DEFAULT: I_faProjectHierarchyTreeUiStat
   scrollTopPx: 0
 }
 
+function resolveUpsertExpandedNodeIds (
+  currentExpandedNodeIds: readonly string[],
+  patch: I_faProjectHierarchyTreeUiStatePatch
+): string[] {
+  if (patch.expandedNodeIds === undefined) {
+    return [...currentExpandedNodeIds]
+  }
+  const baseJson = patch.expandedNodeIdsBaseJson
+  if (baseJson !== undefined && JSON.stringify(currentExpandedNodeIds) !== baseJson) {
+    return [...currentExpandedNodeIds]
+  }
+  return [...patch.expandedNodeIds]
+}
+
 function duplicateFaProjectHierarchyTreeUiState (
   state: I_faProjectHierarchyTreeUiState
 ): I_faProjectHierarchyTreeUiState {
+  const schemaVersion = state.schemaVersion
+  const expandedNodeIds = [...state.expandedNodeIds]
+  const scrollTopPx = state.scrollTopPx
   return {
-    schemaVersion: state.schemaVersion,
-    expandedNodeIds: [...state.expandedNodeIds],
-    scrollTopPx: state.scrollTopPx
+    schemaVersion,
+    expandedNodeIds,
+    scrollTopPx
   }
 }
 
@@ -55,10 +72,12 @@ export function upsertFaProjectHierarchyTreeUiStateKv (
     return
   }
   const current = readFaProjectHierarchyTreeUiState(db)
+  const expandedNodeIds = resolveUpsertExpandedNodeIds(current.expandedNodeIds, patch)
+  const scrollTopPx = patch.scrollTopPx ?? current.scrollTopPx
   const next: I_faProjectHierarchyTreeUiState = {
     schemaVersion: 1,
-    expandedNodeIds: patch.expandedNodeIds ?? current.expandedNodeIds,
-    scrollTopPx: patch.scrollTopPx ?? current.scrollTopPx
+    expandedNodeIds,
+    scrollTopPx
   }
   upsertFaProjectDataKv(
     db,

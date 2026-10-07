@@ -1,60 +1,25 @@
-import { z } from 'zod'
-
-import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
-
-import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH } from 'app/src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl'
+import { normalizeFaProjectDocumentTemplateTitleSingularTranslations } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import type { I_faProjectDocumentTemplateTitleSingularTranslations } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
-import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import { FA_PROJECT_NAME_MAX_LEN } from './faProjectConstants'
-import { normalizeFaProjectDocumentTemplateTitleSingularTranslations } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
+import { createFaProjectLocaleTranslationsJsonApi } from './faProjectLocaleTranslationsJsonApi'
 
-/** Max stored JSON payload for document_templates.title_singular_translations_json. */
-export const FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+const titleSingularTranslationsApi = createFaProjectLocaleTranslationsJsonApi<I_faProjectDocumentTemplateTitleSingularTranslations>({
+  valueMaxLength: FA_PROJECT_NAME_MAX_LEN,
+  jsonMaxLength: FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH,
+  storageLimitMessage: 'Document template singular title translations exceed storage limit',
+  normalize: normalizeFaProjectDocumentTemplateTitleSingularTranslations
+})
 
-const faProjectDocumentTemplateTitleSingularTranslationValueSchema = z.string().max(FA_PROJECT_NAME_MAX_LEN)
+export const parseFaProjectDocumentTemplateTitleSingularTranslationsJson =
+  titleSingularTranslationsApi.parseJson
 
-const faProjectDocumentTemplateTitleSingularTranslationsRecordSchema = z.object(
-  Object.fromEntries(
-    FA_USER_SETTINGS_LANGUAGE_CODES.map((code) => {
-      return [code, faProjectDocumentTemplateTitleSingularTranslationValueSchema.optional()]
-    })
-  ) as Record<T_faUserSettingsLanguageCode, z.ZodOptional<z.ZodString>>
-).strict()
-
-export function parseFaProjectDocumentTemplateTitleSingularTranslationsJson (
-  rawJson: string
-): I_faProjectDocumentTemplateTitleSingularTranslations {
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(rawJson)
-  } catch {
-    return {}
-  }
-  const recordResult = faProjectDocumentTemplateTitleSingularTranslationsRecordSchema.safeParse(parsed)
-  if (!recordResult.success) {
-    return {}
-  }
-  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(dropUndefinedRecordValues(recordResult.data) as I_faProjectDocumentTemplateTitleSingularTranslations)
-}
-
-export function serializeFaProjectDocumentTemplateTitleSingularTranslationsJson (
-  titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
-): string {
-  const normalized = normalizeFaProjectDocumentTemplateTitleSingularTranslations(titleSingularTranslations)
-  const serialized = JSON.stringify(normalized)
-  if (serialized.length > FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH) {
-    throw new Error('Document template singular title translations exceed storage limit')
-  }
-  return serialized
-}
-
-export function parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot (
-  payload: unknown
-): I_faProjectDocumentTemplateTitleSingularTranslations {
-  const parsed = faProjectDocumentTemplateTitleSingularTranslationsRecordSchema.parse(payload)
-  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplateTitleSingularTranslations)
-}
+export const serializeFaProjectDocumentTemplateTitleSingularTranslationsJson =
+  titleSingularTranslationsApi.serializeJson
 
 export const faProjectDocumentTemplateTitleSingularTranslationsSnapshotSchema =
-  faProjectDocumentTemplateTitleSingularTranslationsRecordSchema
+  titleSingularTranslationsApi.snapshotSchema
+
+export const parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot =
+  titleSingularTranslationsApi.parseSnapshot

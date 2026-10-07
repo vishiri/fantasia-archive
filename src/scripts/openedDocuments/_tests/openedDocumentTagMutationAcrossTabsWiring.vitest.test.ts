@@ -201,8 +201,8 @@ test('applyOpenedDocumentTagRenameAcrossTabs tolerates missing tag lists', () =>
       })
     ]
   })
-  expect(next?.tagsDraft).toEqual([])
-  expect(next?.savedTags).toEqual([])
+  expect(next?.tagsDraft).toBeUndefined()
+  expect(next?.savedTags).toBeUndefined()
 })
 
 test('applyOpenedDocumentTagDeleteAcrossTabs tolerates missing tag lists', () => {
@@ -215,6 +215,6 @@ test('applyOpenedDocumentTagDeleteAcrossTabs tolerates missing tag lists', () =>
       })
     ]
   })
-  expect(next?.tagsDraft).toEqual([])
-  expect(next?.savedTags).toEqual([])
+  expect(next?.tagsDraft).toBeUndefined()
+  expect(next?.savedTags).toBeUndefined()
 })

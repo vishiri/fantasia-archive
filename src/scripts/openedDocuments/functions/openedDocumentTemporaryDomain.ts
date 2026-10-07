@@ -34,13 +34,17 @@ export function normalizeOpenedDocumentTabPersistenceState (
 ): I_faOpenedDocumentTab {
   const persistenceState = tab.persistenceState ?? 'persisted'
   if (persistenceState === 'temporary') {
+    const parentDocumentId = tab.parentDocumentId ?? null
+    const templateId = tab.templateId
+    const temporaryParentResolveDocumentIds = tab.temporaryParentResolveDocumentIds
+    const worldId = tab.worldId
     return {
       ...tab,
-      parentDocumentId: tab.parentDocumentId ?? null,
+      parentDocumentId,
       persistenceState,
-      templateId: tab.templateId,
-      temporaryParentResolveDocumentIds: tab.temporaryParentResolveDocumentIds,
-      worldId: tab.worldId
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId
     }
   }
 
@@ -131,13 +135,17 @@ export function createPromoteTemporaryOpenedDocumentTabAfterCreate (deps: {
       ? ''
       : String(savedTreeOrderNumber)
     const savedExtraClasses = deps.normalizeNullableStringFromDb(input.savedExtraClasses)
+    const displayNameDraft = input.savedDisplayName
+    const documentId = input.documentId
+    const editState = input.keepEditMode ? tab.editState : false
+    const worldId = tab.worldId
     return {
       ...tab,
-      displayNameDraft: input.savedDisplayName,
-      documentId: input.documentId,
+      displayNameDraft,
+      documentId,
       documentBackgroundColorDraft: savedDocumentBackgroundColor,
       documentTextColorDraft: savedDocumentTextColor,
-      editState: input.keepEditMode,
+      editState,
       hasUnsavedChanges: false,
       isCategoryDraft: savedIsCategory,
       isFinishedDraft: savedIsFinished,
@@ -147,7 +155,7 @@ export function createPromoteTemporaryOpenedDocumentTabAfterCreate (deps: {
       parentDocumentIdDraft: savedParentDocumentId,
       savedParentDocumentId,
       persistenceState: 'persisted',
-      savedDisplayName: input.savedDisplayName,
+      savedDisplayName: displayNameDraft,
       savedDocumentBackgroundColor,
       savedDocumentTextColor,
       savedIsCategory,
@@ -160,7 +168,7 @@ export function createPromoteTemporaryOpenedDocumentTabAfterCreate (deps: {
       savedExtraClasses,
       templateId: undefined,
       temporaryParentResolveDocumentIds: undefined,
-      worldId: tab.worldId
+      worldId
     }
   }
 }

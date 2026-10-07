@@ -86,7 +86,18 @@ function forwardVueTestUtilsWarnUnlessFiltered (...args: unknown[]): void {
 
 const resetFaVitestRendererHarness = createResetFaVitestRendererHarness(i18nLocaleRef)
 
+/**
+ * Blocks real network from component tests (e.g. Help menu update check hitting GitHub).
+ * An in-flight happy-dom request at window teardown throws AbortError and leaves the worker hung.
+ * Tests needing fetch stub it themselves after this runs.
+ */
+function rejectFaVitestNetworkFetch (input: RequestInfo | URL): Promise<Response> {
+  const url = input instanceof Request ? input.url : String(input)
+  return Promise.reject(new Error(`Network fetch blocked in component Vitest: ${url}`))
+}
+
 beforeEach(() => {
+  vi.stubGlobal('fetch', rejectFaVitestNetworkFetch)
   ensureVitestCoverageTmpDir()
   vi.spyOn(console, 'warn').mockImplementation(forwardVueTestUtilsWarnUnlessFiltered)
   setFantasiaStorybookCanvasFlag(false)

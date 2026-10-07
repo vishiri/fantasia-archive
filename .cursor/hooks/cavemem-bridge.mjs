@@ -6,6 +6,8 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
+import { Result } from 'neverthrow';
+
 const CAVEMEM_HOOK = process.argv[2];
 const VALID_HOOKS = [
   'session-start',
@@ -24,12 +26,15 @@ const raw = readFileSync(0, 'utf8');
 let cursorInput = {};
 
 if (raw.trim()) {
-  try {
-    cursorInput = JSON.parse(raw);
-  } catch {
+  const parsed = Result.fromThrowable(
+    () => JSON.parse(raw),
+    () => undefined
+  )().unwrapOr(undefined);
+  if (parsed === undefined) {
     process.stderr.write('cavemem-bridge: invalid JSON on stdin\n');
     process.exit(0);
   }
+  cursorInput = parsed;
 }
 
 const sessionId = cursorInput.session_id ?? cursorInput.conversation_id ?? 'unknown';
@@ -43,23 +48,31 @@ function mapCursorToCavemem(hookName, input) {
         cwd,
         ide: 'cursor',
       };
-    case 'user-prompt-submit':
+    case 'user-prompt-submit': {
+      const prompt = input.prompt ?? '';
       return {
         session_id: sessionId,
-        prompt: input.prompt ?? '',
+        prompt,
       };
-    case 'post-tool-use':
+    }
+    case 'post-tool-use': {
+      const tool_name = input.tool_name;
+      const tool_input = input.tool_input;
+      const tool_response = input.tool_output;
       return {
         session_id: sessionId,
-        tool_name: input.tool_name,
-        tool_input: input.tool_input,
-        tool_response: input.tool_output,
+        tool_name,
+        tool_input,
+        tool_response,
       };
-    case 'stop':
+    }
+    case 'stop': {
+      const turn_summary = input.text ?? input.turn_summary ?? '';
       return {
         session_id: sessionId,
-        turn_summary: input.text ?? input.turn_summary ?? '',
+        turn_summary,
       };
+    }
     case 'session-end':
       return {
         session_id: sessionId,
@@ -108,17 +121,16 @@ if (result.status !== 0) {
 }
 
 if (CAVEMEM_HOOK === 'session-start' && result.stdout?.trim()) {
-  try {
-    const parsed = JSON.parse(result.stdout);
-    const context = parsed?.hookSpecificOutput?.additionalContext;
+  const parsed = Result.fromThrowable(
+    () => JSON.parse(result.stdout),
+    () => undefined
+  )().unwrapOr(undefined);
+  const context = parsed?.hookSpecificOutput?.additionalContext;
 
-    if (typeof context === 'string' && context.trim()) {
-      process.stdout.write(JSON.stringify({
-        additional_context: context,
-      }));
-    }
-  } catch {
-    // ignore parse errors
+  if (typeof context === 'string' && context.trim()) {
+    process.stdout.write(JSON.stringify({
+      additional_context: context,
+    }));
   }
 }
 

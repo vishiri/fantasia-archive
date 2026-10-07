@@ -7,6 +7,7 @@ import {
 } from 'app/types/I_faSelectInput'
 
 import { buildFaColorGlyphCssCustomProperties } from 'app/src/scripts/faColorContrast/faColorContrast_manager'
+import { shouldAcceptFaEnterOutsideIme } from 'app/src/scripts/dom/dom_manager'
 import {
   appendFaSelectInputCreatedValue,
   bindFaSelectInputOptionItemActivateProps,
@@ -32,6 +33,8 @@ import {
   resolveFaSelectInputOptionIconStyle,
   shouldShowFaSelectInputInlineSelection
 } from './functions/faSelectInputPresentation'
+
+export const shouldActivateFaSelectInputOnEnter = shouldAcceptFaEnterOutsideIme
 
 export {
   bindFaSelectInputOptionItemActivateProps,
@@ -64,5 +67,6 @@ export const useFaSelectInput = createUseFaSelectInput({
   ref,
   resolveFaSelectInputEnterActivateOption,
   resolveFaSelectInputOptionIcon,
+  shouldActivateFaSelectInputOnEnter,
   splitFaSelectInputLabelForFilterHighlight
 }, createFaSelectInputApi)

@@ -1,8 +1,39 @@
 import type {
   I_faChordSerialized,
   I_faKeybindsRoot,
-  T_faKeybindCommandId
+  T_faKeybindCommandId,
+  T_faKeybindModifierLiteral
 } from 'app/types/I_faKeybindsDomain'
+
+const FA_KEYBIND_MODIFIER_LITERALS: readonly T_faKeybindModifierLiteral[] = [
+  'alt',
+  'ctrl',
+  'meta',
+  'shift'
+]
+
+function isFaKeybindModifierLiteral (value: unknown): value is T_faKeybindModifierLiteral {
+  return FA_KEYBIND_MODIFIER_LITERALS.some((modifier) => modifier === value)
+}
+
+function readCleanFaChordSerialized (value: unknown): I_faChordSerialized | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return null
+  }
+  const record = value as Record<string, unknown>
+  if (typeof record.code !== 'string' || record.code.length === 0) {
+    return null
+  }
+  if (!Array.isArray(record.mods) || !record.mods.every(isFaKeybindModifierLiteral)) {
+    return null
+  }
+  const code = record.code
+  const mods = record.mods
+  return {
+    code,
+    mods
+  }
+}
 
 export function buildCleanFaKeybindsRoot (
   raw: Partial<I_faKeybindsRoot> & Record<string, unknown>,
@@ -18,6 +49,7 @@ export function buildCleanFaKeybindsRoot (
     : {}
 
   const overrides: I_faKeybindsRoot['overrides'] = {}
+  let droppedInvalidChord = false
   for (const id of commandIds) {
     if (!Object.prototype.hasOwnProperty.call(fromDiskRaw, id)) {
       continue
@@ -25,9 +57,14 @@ export function buildCleanFaKeybindsRoot (
     const v = fromDiskRaw[id]
     if (v === null) {
       overrides[id] = null
-    } else if (v !== undefined && typeof v === 'object' && !Array.isArray(v)) {
-      overrides[id] = v as I_faChordSerialized
+      continue
     }
+    const chord = readCleanFaChordSerialized(v)
+    if (chord === null) {
+      droppedInvalidChord = true
+      continue
+    }
+    overrides[id] = chord
   }
 
   const next: I_faKeybindsRoot = {
@@ -40,7 +77,10 @@ export function buildCleanFaKeybindsRoot (
     return !isFaKeybindCommandId(k)
   })
 
-  const shouldRewrite = unexpectedTop || unexpectedOverrideKeys || raw.schemaVersion !== 1
+  const shouldRewrite = unexpectedTop ||
+    unexpectedOverrideKeys ||
+    droppedInvalidChord ||
+    raw.schemaVersion !== 1
 
   return {
     next,

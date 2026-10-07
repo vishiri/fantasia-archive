@@ -29,8 +29,12 @@ export function readFaProjectDocumentHasChildren (
 ): boolean {
   const row = db
     .prepare(
-      `SELECT 1 AS ok FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        `WHERE ${parentColumn} = ? LIMIT 1`
+      `SELECT 1 AS ok FROM ${FA_PROJECT_TABLE_DOCUMENTS} AS child ` +
+        `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENTS} AS parent ON parent.id = ? ` +
+        `WHERE child.${parentColumn} = parent.id AND (` +
+        `child.${placementColumn} = parent.${placementColumn} OR (` +
+        `child.${placementColumn} IS NULL AND parent.${placementColumn} IS NULL)) ` +
+        'LIMIT 1'
     )
     .get(documentId) as { ok: number } | undefined
   return row !== undefined
@@ -80,20 +84,33 @@ export function mapFaProjectHierarchyDocumentChildRow (
   db: Database,
   row: I_faSqlProjectDocumentRow
 ): I_faProjectHierarchyTreeDocumentChild {
+  const documentBackgroundColor = row.document_background_color
+  const documentTextColor = row.document_text_color
+  const id = row.id
+  const displayName = row.display_name
+  const placementId = row.tree_placement_id ?? ''
+  const parentDocumentId = row.tree_parent_document_id
+  const sortOrder = row.tree_custom_sort_order
+  const hasChildren = readFaProjectDocumentHasChildren(db, row.id)
+  const isCategory = row.is_category === 1
+  const isFinished = row.is_finished === 1
+  const isMinor = row.is_minor === 1
+  const isDead = row.is_dead === 1
+  const treeOrderNumber = row.tree_order_number
   return {
-    documentBackgroundColor: row.document_background_color,
-    documentTextColor: row.document_text_color,
-    id: row.id,
-    displayName: row.display_name,
-    placementId: row.tree_placement_id ?? '',
-    parentDocumentId: row.tree_parent_document_id,
-    sortOrder: row.tree_custom_sort_order,
-    hasChildren: readFaProjectDocumentHasChildren(db, row.id),
-    isCategory: row.is_category === 1,
-    isFinished: row.is_finished === 1,
-    isMinor: row.is_minor === 1,
-    isDead: row.is_dead === 1,
-    treeOrderNumber: row.tree_order_number
+    documentBackgroundColor,
+    documentTextColor,
+    id,
+    displayName,
+    placementId,
+    parentDocumentId,
+    sortOrder,
+    hasChildren,
+    isCategory,
+    isFinished,
+    isMinor,
+    isDead,
+    treeOrderNumber
   }
 }
 
@@ -121,27 +138,66 @@ export function assertFaProjectHierarchySamePlacementParent (
   }
 }
 
+export function faProjectHierarchyParentTargetContainsDocument (
+  db: Database,
+  documentId: string,
+  candidateParentId: string | null
+): boolean {
+  if (candidateParentId === null) {
+    return false
+  }
+  const visited = new Set<string>()
+  let cursor: string | null = candidateParentId
+  while (cursor !== null) {
+    if (cursor === documentId) {
+      return true
+    }
+    if (visited.has(cursor)) {
+      return false
+    }
+    visited.add(cursor)
+    const row = db
+      .prepare(`SELECT ${parentColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
+      .get(cursor) as { [key: string]: string | null } | undefined
+    if (row === undefined) {
+      return false
+    }
+    cursor = row[parentColumn] ?? null
+  }
+  return false
+}
+
+export function assertFaProjectDocumentTreeParentOnWrite (
+  db: Database,
+  documentId: string,
+  nextPlacementId: string | null,
+  previousPlacementId: string | null,
+  nextParentDocumentId: string | null,
+  previousParentDocumentId: string | null
+): void {
+  const parentChanged = nextParentDocumentId !== previousParentDocumentId
+  const placementChanged = nextPlacementId !== previousPlacementId
+  if (!parentChanged && !placementChanged) {
+    return
+  }
+  if (nextPlacementId !== null) {
+    assertFaProjectHierarchySamePlacementParent(db, nextPlacementId, nextParentDocumentId)
+  }
+  if (!parentChanged) {
+    return
+  }
+  assertFaProjectHierarchyNoAncestorCycle(db, documentId, nextParentDocumentId)
+}
+
 export function assertFaProjectHierarchyNoAncestorCycle (
   db: Database,
   documentId: string,
   candidateParentId: string | null
 ): void {
-  if (candidateParentId === null) {
+  if (!faProjectHierarchyParentTargetContainsDocument(db, documentId, candidateParentId)) {
     return
   }
-  let cursor: string | null = candidateParentId
-  while (cursor !== null) {
-    if (cursor === documentId) {
-      throw new Error('Document cannot be moved under its own descendant')
-    }
-    const row = db
-      .prepare(`SELECT ${parentColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
-      .get(cursor) as { [key: string]: string | null } | undefined
-    if (row === undefined) {
-      break
-    }
-    cursor = row[parentColumn] ?? null
-  }
+  throw new Error('Document cannot be moved under its own descendant')
 }
 
 export function shiftFaProjectHierarchySiblingSortOrders (
@@ -183,8 +239,13 @@ export function collectFaProjectHierarchyAncestorDocumentIds (
   parentDocumentId: string | null
 ): string[] {
   const ancestors: string[] = []
+  const visited = new Set<string>()
   let cursor = parentDocumentId
   while (cursor !== null) {
+    if (visited.has(cursor)) {
+      break
+    }
+    visited.add(cursor)
     ancestors.unshift(cursor)
     const row = db
       .prepare(`SELECT ${parentColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)

@@ -18,6 +18,6 @@ export default {
     variableListTitle: 'Fantasia Archive variable list'
   },
   loading: 'Loading editor…',
-  saveButton: 'Save changes',
+  saveButton: 'Save Changes',
   title: 'Custom Project CSS'
 }

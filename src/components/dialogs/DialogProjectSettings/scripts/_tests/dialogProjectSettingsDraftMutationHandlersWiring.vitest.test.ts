@@ -90,7 +90,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
   expect(localWorlds.value?.[0]!.templateLayout.placements[0]!?.templateDisplayName).toBe('Synced template name')
 
   expect(localWorlds.value?.[1]!.displayNameTranslations).toEqual({ 'en-US': 'Renamed world' })
-  expect(localWorlds.value?.[1]!.color).toBe('#aabbcc')
+  expect(localWorlds.value?.[1]!.color).toBe('#AABBCC')
   expect(localWorlds.value?.[1]!.colorPalette).toBe('#112233')
   expect(localWorlds.value?.[1]!.templateLayout.groups).toHaveLength(1)
   expect(localDocumentTemplates.value?.[1]!.titlePluralTranslations).toEqual({ 'en-US': 'Renamed template' })

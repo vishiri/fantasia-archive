@@ -39,6 +39,7 @@ type T_sessionWiringDeps = {
     initialTagsDraft?: import('app/types/I_faProjectTagDomain').I_faProjectDocumentTagAssignmentInput[] | undefined
     openMode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode
     parentDocumentId: null
+    placementId?: string | null | undefined
     templateId: string
     worldId: string
   }) => Promise<string>

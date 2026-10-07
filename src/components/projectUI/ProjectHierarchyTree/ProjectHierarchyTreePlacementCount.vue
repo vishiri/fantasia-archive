@@ -14,15 +14,15 @@
       ? 'projectHierarchyTreePlacementCount__docCount text-primary-bright'
       : 'projectHierarchyTreePlacementCount__catCount'"
     :data-test-locator="`${testLocator}-${segment.kind}`"
-  >{{ segment.value }}</span></template>)<q-tooltip :delay="500">
+  >{{ segment.value }}</span></template>)<q-tooltip>
     <div data-test-locator="projectHierarchyTree-placementCountTooltip">
-      {{ totalCountLabel }}
+      {{ $t('projectUI.projectHierarchyTree.placementCountTooltip.totalCount') }}
       <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ totalCount }}</span>
       <br>
-      {{ documentCountLabel }}
+      {{ $t('projectUI.projectHierarchyTree.placementCountTooltip.documentCount') }}
       <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ documentCount }}</span>
       <br>
-      {{ categoryCountLabel }}
+      {{ $t('projectUI.projectHierarchyTree.placementCountTooltip.categoryCount') }}
       <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ categoryCount }}</span>
     </div>
   </q-tooltip>
@@ -31,7 +31,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import type { I_projectHierarchyTreePlacementCountDisplay } from 'app/types/I_projectHierarchyTreePlacementCount'
 
@@ -42,26 +41,12 @@ const props = defineProps<{
   testLocator?: string
 }>()
 
-const { t } = useI18n()
-
 const testLocator = computed(() => {
   return props.testLocator ?? 'projectHierarchyTree-placementCount'
 })
 
 const totalCount = computed(() => {
   return props.documentCount + props.categoryCount
-})
-
-const totalCountLabel = computed(() => {
-  return t('projectUI.projectHierarchyTree.placementCountTooltip.totalCount')
-})
-
-const documentCountLabel = computed(() => {
-  return t('projectUI.projectHierarchyTree.placementCountTooltip.documentCount')
-})
-
-const categoryCountLabel = computed(() => {
-  return t('projectUI.projectHierarchyTree.placementCountTooltip.categoryCount')
 })
 </script>
 

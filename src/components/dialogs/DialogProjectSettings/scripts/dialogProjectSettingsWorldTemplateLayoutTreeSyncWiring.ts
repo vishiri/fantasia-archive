@@ -7,6 +7,10 @@ import type {
 } from 'app/types/I_dialogProjectSettingsWorlds'
 
 import {
+  beginProjectHierarchyTreeSuppressEmit,
+  endProjectHierarchyTreeSuppressEmit
+} from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeSuppressEmitDepth'
+import {
   mapDialogProjectSettingsWorldTemplateLayoutToSnapshot
 } from './dialogProjectSettingsWorldTemplateLayoutDraft'
 import { normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder } from './dialogProjectSettingsWorldTemplateLayoutRootOrder'
@@ -63,12 +67,12 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring (de
         return
       }
     }
-    deps.suppressTreeEmit.value = true
+    beginProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
     deps.treeData.value = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, languageCode)
     void deps.nextTick().then(() => {
       return deps.nextTick()
     }).then(() => {
-      deps.suppressTreeEmit.value = false
+      endProjectHierarchyTreeSuppressEmit(deps.suppressTreeEmit)
     })
   }
 

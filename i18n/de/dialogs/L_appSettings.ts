@@ -1,5 +1,6 @@
 export default {
   title: 'Fantasia Archive-Einstellungen',
+  loadError: 'Einstellungen konnten nicht geladen werden.',
   saveButton: 'Einstellungen speichern',
   closeButton: 'Schließen ohne zu speichern',
   settingsSearchPlaceholder: 'Durchsuchen Sie die Einstellungen...',

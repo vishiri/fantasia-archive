@@ -40,27 +40,19 @@ test('Test that worlds layout expand snapshot returns empty when live and store 
 
 /**
  * shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds
- * Skip persisting empty restore when intended ids existed but tree was empty.
+ * Skip persisting empty restore when intended ids existed.
  */
-test('Test that restored expand persist skips empty wipe while tree is empty', () => {
+test('Test that restored expand persist skips empty wipe when intended ids remain', () => {
   expect(shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
     intendedExpandedNodeIds: ['world-1'],
-    restoredExpandedNodeIds: [],
-    treeNodeCount: 0
+    restoredExpandedNodeIds: []
   })).toBe(false)
   expect(shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
-    intendedExpandedNodeIds: ['world-1'],
-    restoredExpandedNodeIds: [],
-    treeNodeCount: 1
-  })).toBe(true)
-  expect(shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
     intendedExpandedNodeIds: [],
-    restoredExpandedNodeIds: [],
-    treeNodeCount: 0
+    restoredExpandedNodeIds: []
   })).toBe(true)
   expect(shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
     intendedExpandedNodeIds: ['world-1'],
-    restoredExpandedNodeIds: ['world-1'],
-    treeNodeCount: 0
+    restoredExpandedNodeIds: ['world-1']
   })).toBe(true)
 })

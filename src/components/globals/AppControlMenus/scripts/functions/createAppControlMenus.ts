@@ -41,79 +41,85 @@ export function createAppControlMenus (deps: {
     return deps.readAppControlMenusTestingTypeFromCachedSnapshot(snap)
   }
 
+  function openChangelogFromComponentTestingMenu (): void {
+    deps.openDialogMarkdownDocument('changeLog')
+  }
+
   function buildComponentTestingMenuList (): I_appMenuList {
+    const title = 'Test Title'
+    const data: I_appMenuList['data'] = [
+      {
+        mode: 'item',
+        text: 'Test Button 1 - Open Dialog with Markdown document',
+        icon: 'mdi-text-box-plus-outline',
+        trigger: openChangelogFromComponentTestingMenu,
+        conditions: true
+      },
+      {
+        mode: 'item',
+        text: 'Test Button 2 - Keybind Settings (hint)',
+        icon: 'mdi-keyboard-settings',
+        keybindCommandId: 'openKeybindSettings',
+        conditions: true
+      },
+      {
+        mode: 'separator'
+      },
+      {
+        mode: 'item',
+        text: 'Test Button 3 - Secondary',
+        icon: 'mdi-text-box-remove-outline',
+        conditions: true,
+        specialColor: 'secondary'
+      },
+      {
+        mode: 'separator'
+      },
+      {
+        mode: 'item',
+        text: 'Test Button 4',
+        icon: 'mdi-page-layout-sidebar-left',
+        conditions: true
+      },
+      {
+        mode: 'item',
+        text: 'Test Button 5',
+        icon: 'mdi-clipboard-text-outline',
+        conditions: true
+      },
+      {
+        mode: 'separator'
+      },
+      {
+        mode: 'item',
+        text: 'Test Button 6 - Grey, Submenu',
+        icon: 'keyboard_arrow_right',
+        conditions: true,
+        specialColor: 'grey',
+        submenu: [
+          {
+            mode: 'item',
+            text: 'Submenu-Test Button 1 - Advanced Search Guide (hint)',
+            icon: 'mdi-file-question',
+            keybindCommandId: 'openAdvancedSearchGuide',
+            conditions: true
+          },
+          {
+            mode: 'separator'
+          },
+          {
+            mode: 'item',
+            text: 'Submenu-Test Button 2 - Secondary',
+            icon: 'mdi-wrench',
+            conditions: true,
+            specialColor: 'secondary'
+          }
+        ]
+      }
+    ]
     return {
-      title: 'Test Title',
-      data: [
-        {
-          mode: 'item',
-          text: 'Test Button 1 - Open Dialog with Markdown document',
-          icon: 'mdi-text-box-plus-outline',
-          trigger: () => deps.openDialogMarkdownDocument('changeLog'),
-          conditions: true
-        },
-        {
-          mode: 'item',
-          text: 'Test Button 2 - Keybind Settings (hint)',
-          icon: 'mdi-keyboard-settings',
-          keybindCommandId: 'openKeybindSettings',
-          conditions: true
-        },
-        {
-          mode: 'separator'
-        },
-        {
-          mode: 'item',
-          text: 'Test Button 3 - Secondary',
-          icon: 'mdi-text-box-remove-outline',
-          conditions: true,
-          specialColor: 'secondary'
-        },
-        {
-          mode: 'separator'
-        },
-        {
-          mode: 'item',
-          text: 'Test Button 4',
-          icon: 'mdi-page-layout-sidebar-left',
-          conditions: true
-        },
-        {
-          mode: 'item',
-          text: 'Test Button 5',
-          icon: 'mdi-clipboard-text-outline',
-          conditions: true
-        },
-        {
-          mode: 'separator'
-        },
-        {
-          mode: 'item',
-          text: 'Test Button 6 - Grey, Submenu',
-          icon: 'keyboard_arrow_right',
-          conditions: true,
-          specialColor: 'grey',
-          submenu: [
-            {
-              mode: 'item',
-              text: 'Submenu-Test Button 1 - Advanced Search Guide (hint)',
-              icon: 'mdi-file-question',
-              keybindCommandId: 'openAdvancedSearchGuide',
-              conditions: true
-            },
-            {
-              mode: 'separator'
-            },
-            {
-              mode: 'item',
-              text: 'Submenu-Test Button 2 - Secondary',
-              icon: 'mdi-wrench',
-              conditions: true,
-              specialColor: 'secondary'
-            }
-          ]
-        }
-      ]
+      data,
+      title
     }
   }
 

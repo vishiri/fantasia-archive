@@ -6,6 +6,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { Result } from 'neverthrow'
+
 import {
   getFaTwoLevelFeatureRootFromVue,
   getFaTwoLevelMainScriptsAreaFromFile,
@@ -36,24 +38,30 @@ function resolveFaTwoLevelLintFilename (context) {
 
 function scriptsDirHasFunctionsFolder (scriptsDir, cwd) {
   const functionsDir = path.join(cwd, scriptsDir, 'functions')
+  const stat = Result.fromThrowable(
+    () => fs.statSync(functionsDir),
+    () => null
+  )()
 
-  try {
-    return fs.statSync(functionsDir).isDirectory()
-  } catch {
+  if (stat.isErr()) {
     return false
   }
+
+  return stat.value.isDirectory()
 }
 
 function scriptsDirHasManagerFile (scriptsDir, cwd) {
   const absoluteScriptsDir = path.join(cwd, scriptsDir)
+  const entries = Result.fromThrowable(
+    () => fs.readdirSync(absoluteScriptsDir),
+    () => null
+  )()
 
-  try {
-    const entries = fs.readdirSync(absoluteScriptsDir)
-
-    return entries.some((name) => name.endsWith('_manager.ts'))
-  } catch {
+  if (entries.isErr()) {
     return false
   }
+
+  return entries.value.some((name) => name.endsWith('_manager.ts'))
 }
 
 function resolveFeatureManagerExists (featureRoot, cwd) {
@@ -81,42 +89,46 @@ const functionsOnlyTypeImports = {
       return {}
     }
 
-    return {
-      ImportDeclaration (node) {
-        if (node.importKind === 'type') {
-          if (isFaTwoLevelTypesImportSource(node.source.value)) {
-            return
-          }
-
-          context.report({
-            node,
-            message: `functions/ allows import type only from app/types/ (or types/). ${FA_TWO_LEVEL_DOC}`
-          })
-
+    const ImportDeclaration = (node) => {
+      if (node.importKind === 'type') {
+        if (isFaTwoLevelTypesImportSource(node.source.value)) {
           return
         }
 
         context.report({
           node,
-          message: `functions/ must not use value imports. Pass dependencies via manager-injected arguments. ${FA_TWO_LEVEL_DOC}`
+          message: `functions/ allows import type only from app/types/ (or types/). ${FA_TWO_LEVEL_DOC}`
         })
-      },
-      ExportNamedDeclaration (node) {
-        if (node.source === null) {
-          return
-        }
 
-        context.report({
-          node,
-          message: `functions/ must not re-export from other modules. ${FA_TWO_LEVEL_DOC}`
-        })
-      },
-      ExportAllDeclaration (node) {
-        context.report({
-          node,
-          message: `functions/ must not re-export from other modules. ${FA_TWO_LEVEL_DOC}`
-        })
+        return
       }
+
+      context.report({
+        node,
+        message: `functions/ must not use value imports. Pass dependencies via manager-injected arguments. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+    const ExportNamedDeclaration = (node) => {
+      if (node.source === null) {
+        return
+      }
+
+      context.report({
+        node,
+        message: `functions/ must not re-export from other modules. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+    const ExportAllDeclaration = (node) => {
+      context.report({
+        node,
+        message: `functions/ must not re-export from other modules. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+
+    return {
+      ImportDeclaration,
+      ExportNamedDeclaration,
+      ExportAllDeclaration
     }
   }
 }
@@ -192,13 +204,15 @@ const featureScriptsLayout = {
       return {}
     }
 
+    const Program = (node) => {
+      context.report({
+        node,
+        message: `Legacy script module is not allowed beside scripts/functions/ (or mainScripts/<area>/functions/). Move logic into functions/ and wire from a *_manager.ts or *Wiring.ts sibling. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+
     return {
-      Program (node) {
-        context.report({
-          node,
-          message: `Legacy script module is not allowed beside scripts/functions/ (or mainScripts/<area>/functions/). Move logic into functions/ and wire from a *_manager.ts or *Wiring.ts sibling. ${FA_TWO_LEVEL_DOC}`
-        })
-      }
+      Program
     }
   }
 }
@@ -233,13 +247,15 @@ const requireManagerWhenFunctions = {
       return {}
     }
 
+    const Program = (node) => {
+      context.report({
+        node,
+        message: `scripts/functions/ requires a sibling scripts/*_manager.ts entry module. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+
     return {
-      Program (node) {
-        context.report({
-          node,
-          message: `scripts/functions/ requires a sibling scripts/*_manager.ts entry module. ${FA_TWO_LEVEL_DOC}`
-        })
-      }
+      Program
     }
   }
 }
@@ -282,30 +298,32 @@ const vueScriptImportAllowlist = {
       return {}
     }
 
-    return {
-      ImportDeclaration (node) {
-        if (node.importKind === 'type') {
-          if (isFaTwoLevelTypesImportSource(node.source.value)) {
-            return
-          }
-
-          context.report({
-            node,
-            message: `Vue script may only import types from app/types/ when using a manager. ${FA_TWO_LEVEL_DOC}`
-          })
-
-          return
-        }
-
-        if (isFaTwoLevelAllowedVueImportSource(node.source.value)) {
+    const ImportDeclaration = (node) => {
+      if (node.importKind === 'type') {
+        if (isFaTwoLevelTypesImportSource(node.source.value)) {
           return
         }
 
         context.report({
           node,
-          message: `Vue script may only import the feature *_manager.ts, child *.vue, or app/types/. ${FA_TWO_LEVEL_DOC}`
+          message: `Vue script may only import types from app/types/ when using a manager. ${FA_TWO_LEVEL_DOC}`
         })
+
+        return
       }
+
+      if (isFaTwoLevelAllowedVueImportSource(node.source.value)) {
+        return
+      }
+
+      context.report({
+        node,
+        message: `Vue script may only import the feature *_manager.ts, child *.vue, or app/types/. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+
+    return {
+      ImportDeclaration
     }
   }
 }
@@ -325,24 +343,26 @@ const noFunctionsImportManager = {
       return {}
     }
 
-    return {
-      ImportDeclaration (node) {
-        const source = node.source.value.replace(/\\/g, '/')
+    const ImportDeclaration = (node) => {
+      const source = node.source.value.replace(/\\/g, '/')
 
-        if (source.includes('_manager')) {
-          context.report({
-            node,
-            message: `functions/ must not import managers. ${FA_TWO_LEVEL_DOC}`
-          })
-        }
-
-        if (/\/S_[^/]+\.ts$/.test(source) || source.includes('/stores/S_')) {
-          context.report({
-            node,
-            message: `functions/ must not import Pinia stores. ${FA_TWO_LEVEL_DOC}`
-          })
-        }
+      if (source.includes('_manager')) {
+        context.report({
+          node,
+          message: `functions/ must not import managers. ${FA_TWO_LEVEL_DOC}`
+        })
       }
+
+      if (/\/S_[^/]+\.ts$/.test(source) || source.includes('/stores/S_')) {
+        context.report({
+          node,
+          message: `functions/ must not import Pinia stores. ${FA_TWO_LEVEL_DOC}`
+        })
+      }
+    }
+
+    return {
+      ImportDeclaration
     }
   }
 }
@@ -438,63 +458,70 @@ const managerWiringOnly = {
       })
     }
 
-    return {
-      Program (node) {
-        if (isDomainBarrelManagerBody(node.body)) {
-          // Domain barrel *_manager.ts files may re-export sibling managers; no local fn check here.
-        }
-      },
-      FunctionDeclaration (node) {
-        reportLocalFunction(node, 'a function')
-      },
-      ExportNamedDeclaration (node) {
-        if (node.declaration?.type === 'FunctionDeclaration') {
-          reportLocalFunction(node, 'export function')
-        }
+    const Program = (node) => {
+      if (isDomainBarrelManagerBody(node.body)) {
+        // Domain barrel *_manager.ts files may re-export sibling managers; no local fn check here.
+      }
+    }
+    const FunctionDeclaration = (node) => {
+      reportLocalFunction(node, 'a function')
+    }
+    const ExportNamedDeclaration = (node) => {
+      if (node.declaration?.type === 'FunctionDeclaration') {
+        reportLocalFunction(node, 'export function')
+      }
 
-        if (node.declaration?.type === 'VariableDeclaration') {
-          for (const declarator of node.declaration.declarations) {
-            if (declarator.init?.type === 'ArrowFunctionExpression' ||
-              declarator.init?.type === 'FunctionExpression') {
-              reportLocalFunction(declarator, 'export const with a function expression')
-            } else if (!isManagerWiringAllowedInitializer(declarator.init)) {
-              reportLocalFunction(declarator, 'export const with inline logic')
-            }
-          }
-        }
-      },
-      ExportDefaultDeclaration (node) {
-        if (node.declaration?.type === 'FunctionDeclaration' ||
-          node.declaration?.type === 'ArrowFunctionExpression') {
-          reportLocalFunction(node, 'export default function')
-        }
-      },
-      VariableDeclaration (node) {
-        if (!isManagerTopLevelStatement(node)) {
-          return
-        }
-
-        if (node.kind !== 'const' && node.kind !== 'let') {
-          return
-        }
-
-        for (const declarator of node.declarations) {
+      if (node.declaration?.type === 'VariableDeclaration') {
+        for (const declarator of node.declaration.declarations) {
           if (declarator.init?.type === 'ArrowFunctionExpression' ||
             declarator.init?.type === 'FunctionExpression') {
-            reportLocalFunction(declarator, 'a local const/let with a function expression')
-          } else if (declarator.init !== null && declarator.init !== undefined &&
-            !isManagerWiringAllowedInitializer(declarator.init)) {
-            reportLocalFunction(declarator, 'local const/let with inline logic')
+            reportLocalFunction(declarator, 'export const with a function expression')
+          } else if (!isManagerWiringAllowedInitializer(declarator.init)) {
+            reportLocalFunction(declarator, 'export const with inline logic')
           }
         }
-      },
-      ClassDeclaration (node) {
-        if (!isManagerTopLevelStatement(node)) {
-          return
-        }
-
-        reportLocalFunction(node, 'a class')
       }
+    }
+    const ExportDefaultDeclaration = (node) => {
+      if (node.declaration?.type === 'FunctionDeclaration' ||
+        node.declaration?.type === 'ArrowFunctionExpression') {
+        reportLocalFunction(node, 'export default function')
+      }
+    }
+    const VariableDeclaration = (node) => {
+      if (!isManagerTopLevelStatement(node)) {
+        return
+      }
+
+      if (node.kind !== 'const' && node.kind !== 'let') {
+        return
+      }
+
+      for (const declarator of node.declarations) {
+        if (declarator.init?.type === 'ArrowFunctionExpression' ||
+          declarator.init?.type === 'FunctionExpression') {
+          reportLocalFunction(declarator, 'a local const/let with a function expression')
+        } else if (declarator.init !== null && declarator.init !== undefined &&
+          !isManagerWiringAllowedInitializer(declarator.init)) {
+          reportLocalFunction(declarator, 'local const/let with inline logic')
+        }
+      }
+    }
+    const ClassDeclaration = (node) => {
+      if (!isManagerTopLevelStatement(node)) {
+        return
+      }
+
+      reportLocalFunction(node, 'a class')
+    }
+
+    return {
+      Program,
+      FunctionDeclaration,
+      ExportNamedDeclaration,
+      ExportDefaultDeclaration,
+      VariableDeclaration,
+      ClassDeclaration
     }
   }
 }
@@ -514,31 +541,33 @@ const storesFunctionsLayout = {
       return {}
     }
 
-    return {
-      ImportDeclaration (node) {
-        const source = node.source.value.replace(/\\/g, '/')
+    const ImportDeclaration = (node) => {
+      const source = node.source.value.replace(/\\/g, '/')
 
-        if (!source.includes('/stores/functions/') && !source.includes('stores/functions/')) {
-          return
-        }
-
-        if (isFaTwoLevelPiniaStoreManager(filename) || isFaTwoLevelStoreBridgeScript(filename)) {
-          return
-        }
-
-        if (isFaTwoLevelFunctionsFile(filename) && filename.includes('/src/stores/functions/')) {
-          return
-        }
-
-        if (/\.vitest\.test\.ts$/.test(filename)) {
-          return
-        }
-
-        context.report({
-          node,
-          message: `Only src/stores/S_*.ts or stores/scripts/*Bridge*.ts may import stores/functions/. ${FA_TWO_LEVEL_DOC}`
-        })
+      if (!source.includes('/stores/functions/') && !source.includes('stores/functions/')) {
+        return
       }
+
+      if (isFaTwoLevelPiniaStoreManager(filename) || isFaTwoLevelStoreBridgeScript(filename)) {
+        return
+      }
+
+      if (isFaTwoLevelFunctionsFile(filename) && filename.includes('/src/stores/functions/')) {
+        return
+      }
+
+      if (/\.vitest\.test\.ts$/.test(filename)) {
+        return
+      }
+
+      context.report({
+        node,
+        message: `Only src/stores/S_*.ts or stores/scripts/*Bridge*.ts may import stores/functions/. ${FA_TWO_LEVEL_DOC}`
+      })
+    }
+
+    return {
+      ImportDeclaration
     }
   }
 }
